@@ -1,10 +1,8 @@
 from django.db import models
-
-class Login(models.Model):
-    loginId = models.CharField(max_length=10)
+from django.contrib.auth.models import User
 
 class Faculty(models.Model):
-    login = models.OneToOneField('Login', on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
     chamber = models.CharField(max_length=10)
     residence = models.CharField(max_length=10)
@@ -26,9 +24,15 @@ class Superintendent(models.Model):
 class FacultyIncharge(models.Model):
     faculty = models.OneToOneField('Faculty', on_delete=models.CASCADE)
     function = models.CharField(max_length=20)
+
+class Staff(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=50)
+    staffType = models.CharField(max_length=20)
+    phone = models.CharField(max_length=15)
    
 class Student(models.Model):
-    login = models.OneToOneField('Login', on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
     bitsId = models.CharField(max_length=15)
     gender = models.CharField(max_length=1)
@@ -79,4 +83,21 @@ class Leave(models.Model):
     corrAddress = models.TextField()
     corrPhone = models.CharField(max_length=15)
 
+class LateComer(models.Model):
+    student = models.ForeignKey('Student', on_delete = models.CASCADE)
+    dateTime = models.DateTimeField()
 
+class InOut(models.Model):
+    student = models.ForeignKey('Student', on_delete = models.CASCADE)
+    place = models.CharField(max_length=20)
+    outDateTime = models.DateTimeField()
+    inDateTime = models.DateTimeField()
+    onCampus = models.BooleanField()
+    onLeave = models.BooleanField()
+
+class Disco(models.Model):
+    student = models.ForeignKey('Student', on_delete = models.CASCADE)
+    dateOfViolation = models.DateField()
+    subject = models.TextField()
+    action = models.TextField()
+    date = models.DateField()
