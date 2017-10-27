@@ -82,6 +82,18 @@ class Leave(models.Model):
     consent = models.CharField(max_length=10)
     corrAddress = models.TextField()
     corrPhone = models.CharField(max_length=15)
+    approvedBy = models.CharField(max_length=50)
+    approved = models.BooleanField()
+    comment = models.TextField()
+
+class DayPass(models.Model):
+    student = models.ForeignKey('Student', on_delete = models.CASCADE)
+    date = models.DateField()
+    reason = models.TextField()
+    consent = models.CharField(max_length=10)
+    approvedBy = models.CharField(max_length=50)
+    approved = models.BooleanField()
+    comment = models.TextField()
 
 class LateComer(models.Model):
     student = models.ForeignKey('Student', on_delete = models.CASCADE)
@@ -101,3 +113,20 @@ class Disco(models.Model):
     subject = models.TextField()
     action = models.TextField()
     date = models.DateField()
+
+
+class MessOptionOpen(models.Model):
+    monthYear = models.DateField()
+    dateOpen = models.DateField()
+    dateClose = models.DateField()
+
+
+class Transaction(models.Model):
+    student = models.ForeignKey('Student', on_delete = models.CASCADE)
+    timestamp = models.DateTimeField(auto_now=True)
+
+class MessBill(models.Model):
+    transaction = models.OneToOneField('Transaction', on_delete=models.CASCADE)
+    month = models.DateField()
+    amount = models.FloatField()
+
