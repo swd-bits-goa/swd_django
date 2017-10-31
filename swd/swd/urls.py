@@ -19,6 +19,7 @@ from tools import user, profile
 from django.contrib.auth import views as auth_views
 from django.conf.urls.static import static
 from django.conf import settings
+from main import views as main_views
 
 urlpatterns = [
     url(r'^jet/', include('jet.urls', 'jet')),
@@ -28,5 +29,6 @@ urlpatterns = [
     url(r'^logout/', auth_views.logout),
     url(r'^', include('main.urls')),
     url(r'^create-users/', user.index, name='user'),
-    url(r'^create-profiles/', profile.index, name='profile')
+    url(r'^create-profiles/', profile.index, name='profile'),
+    url(r'^accounts/profile/', main_views.login_success, name='login-success'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
