@@ -40,20 +40,23 @@ class Student(models.Model):
     phone = models.CharField(max_length=15)
     email = models.EmailField()
     address = models.TextField()
-    bloodGroup = models.CharField(max_length=3)
-    cgpa = models.FloatField()
+    bloodGroup = models.CharField(max_length=10)
+    cgpa = models.FloatField(null=True)
     admit = models.DateField()
     parentName = models.CharField(max_length=50)
     parentPhone = models.CharField(max_length=20)
     parentEmail = models.CharField(max_length=50)
 
+    def __str__(self):
+        return self.bitsId + ' (' + self.name + ')'
+
 class DayScholar(models.Model):
     student = models.OneToOneField('Student', on_delete = models.CASCADE)
 
-class hostelPS(models.Model):
+class HostelPS(models.Model):
     student = models.OneToOneField('Student', on_delete = models.CASCADE)
     ps = models.BooleanField()
-    psStation = models.CharField(max_length=20)
+    psStation = models.CharField(max_length=20, null=True)
     hostel = models.CharField(max_length=5, null=True)
     room = models.CharField(max_length=4, null=True)
 
@@ -129,4 +132,3 @@ class MessBill(models.Model):
     transaction = models.OneToOneField('Transaction', on_delete=models.CASCADE)
     month = models.DateField()
     amount = models.FloatField()
-
