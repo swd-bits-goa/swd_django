@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'main',
     'tools',
+    'schema',
+    'graphene_django',
 ]
 
 MIDDLEWARE = [
@@ -54,6 +56,10 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'swd.urls'
+
+GRAPHENE = {
+    'SCHEMA': 'swd.schema.schema'
+}
 
 TEMPLATES = [
     {
