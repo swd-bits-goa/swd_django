@@ -142,7 +142,9 @@ class Query(graphene.AbstractType):
     student = graphene.Field(
         StudentType,
         id=graphene.Int(),
-        username = graphene.String()
+        username = graphene.String(),
+        name = graphene.String(),
+        bitsId = graphene.String()
     )
 
     all_day_scholars = graphene.List(DayScholarType)
@@ -358,6 +360,9 @@ class Query(graphene.AbstractType):
     def resolve_student(self, args, **kwargs):
         id = kwargs.get('id')
         username = kwargs.get('username')
+        name = kwargs.get('name')
+        bitsId = kwargs.get('bitsId')
+
 
         if id is not None:
            return Student.objects.get(id=id)
@@ -566,7 +571,7 @@ class Query(graphene.AbstractType):
         if username is not None:
             user = User.objects.get(username=username)
             student = Student.objects.get(user=user)
-            return MessBill.objects.get(student=student)
+            return MessBill.objects.filter(student=student)
 
         return None
 
