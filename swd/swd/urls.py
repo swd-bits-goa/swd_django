@@ -20,17 +20,19 @@ from django.contrib.auth import views as auth_views
 from django.conf.urls.static import static
 from django.conf import settings
 from main import views as main_views
+from graphene_django.views import GraphQLView
+from schema.schema import schema
 
 urlpatterns = [
     url(r'^jet/', include('jet.urls', 'jet')),
     url(r'^jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')),
     url(r'^admin/', admin.site.urls),
-    url(r'^login/$', auth_views.login, {'template_name': 'accounts/login.html'}),
+    url(r'^graphql', GraphQLView.as_view(graphiql=True, schema=schema)),
+    url(r'^login/', auth_views.login, {'template_name': 'admin/login.html'}),
     url(r'^logout/', auth_views.logout),
-    url(r'^$', include('main.urls')),
-    # url(r'^create-users/', user.index, name='user'),
-    # url(r'^create-profiles/', profile.index, name='profile'),
-    # url(r'^accounts/profile/', main_views.login_success, name='login-success'),
+    url(r'^', include('main.urls')),
+    url(r'^create-users/', user.index, name='user'),
+    url(r'^create-profiles/', profile.index, name='profile'),
+    url(r'^accounts/profile/', main_views.login_success, name='login-success'),
     url(r'^account/', include('accounts.urls', namespace='accounts')),
-    # url(r'^home/', include('home.urls', namespace='home')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

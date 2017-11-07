@@ -39,9 +39,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'webpack_loader',
     'main',
-    'tools',
     'accounts',
+    'tools',
+    'schema',
+    'graphene_django',
 ]
 
 MIDDLEWARE = [
@@ -55,6 +58,10 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'swd.urls'
+
+GRAPHENE = {
+    'SCHEMA': 'swd.schema.schema'
+}
 
 TEMPLATES = [
     {
@@ -128,6 +135,14 @@ STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR,  'static'),
+    os.path.join(BASE_DIR,  'assets'),
 ]
+
+WEBPACK_LOADER = {
+    'DEFAULT': {
+        'BUNDLE_DIR_NAME': 'bundles/',
+        'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json'),
+    }
+}
 
 # STATIC_ROOT = os.path.join(BASE_DIR, "static")

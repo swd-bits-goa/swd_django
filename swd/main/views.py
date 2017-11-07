@@ -7,6 +7,9 @@ from django.contrib.auth.models import User
 # from main.forms import HomeForm
 from main.models import Student
 
+def index(request):
+    return render(request, 'home.html',{})
+
 class HomeView(TemplateView):
     template_name = 'home/home.html'
 
@@ -35,7 +38,6 @@ class HomeView(TemplateView):
 
         args = {'form': form, 'text': text}
         return render(request, self.template_name, args)
-
 
 def login_success(request):
     return HttpResponse("Success!")
