@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'webpack_loader',
     'main',
+    'accounts',
     'tools',
     'schema',
     'graphene_django',
