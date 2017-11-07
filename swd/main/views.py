@@ -7,9 +7,6 @@ from django.contrib.auth.models import User
 # from main.forms import HomeForm
 from main.models import Student
 
-def index(request):
-    return render(request, 'home.html',{})
-
 class HomeView(TemplateView):
     template_name = 'home/home.html'
 
