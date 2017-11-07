@@ -22,17 +22,30 @@ from django.conf import settings
 from main import views as main_views
 from graphene_django.views import GraphQLView
 from schema.schema import schema
+from django.views.decorators.csrf import csrf_exempt
+
+# REST
+from rest_framework_jwt.views import obtain_jwt_token
+from rest_framework_jwt.views import refresh_jwt_token
+from rest_framework_jwt.views import verify_jwt_token
 
 urlpatterns = [
     url(r'^jet/', include('jet.urls', 'jet')),
     url(r'^jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')),
     url(r'^admin/', admin.site.urls),
+    
     url(r'^graphql', GraphQLView.as_view(graphiql=True, schema=schema)),
-        url(r'^gql', csrf_exempt(GraphQLView.as_view(batch=True, schema=schema))),
+    url(r'^gql', csrf_exempt(GraphQLView.as_view(batch=True, schema=schema))),
+    
     url(r'^login/', auth_views.login, {'template_name': 'admin/login.html'}),
     url(r'^logout/', auth_views.logout),
     url(r'^', include('main.urls')),
     url(r'^create-users/', user.index, name='user'),
     url(r'^create-profiles/', profile.index, name='profile'),
     url(r'^accounts/profile/', main_views.login_success, name='login-success'),
+
+    # REST
+    url(r'^api-token-auth/', obtain_jwt_token),
+    url(r'^api-token-refresh/', refresh_jwt_token),
+    url(r'^api-token-verify/', verify_jwt_token),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

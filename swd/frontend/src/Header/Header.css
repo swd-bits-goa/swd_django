@@ -1,0 +1,64 @@
+/**
+ * React Starter Kit (https://www.reactstarterkit.com/)
+ *
+ * Copyright © 2014-present Kriasoft, LLC. All rights reserved.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE.txt file in the root directory of this source tree.
+ */
+
+@import '../variables.css';
+
+:root {
+  --brand-color: #61dafb;
+}
+
+.root {
+  background: #0e1952; /* For browsers that do not support gradients */
+  background: -webkit-linear-gradient(right top, #036, #203752); /* For Safari 5.1 to 6.0 */
+  background: -o-linear-gradient(left, #036, #203752); /* For Opera 11.1 to 12.0 */
+  background: -moz-linear-gradient(left, #036, #203752); /* For Firefox 3.6 to 15 */
+  background: linear-gradient(to left, #036, #203752); /* Standard syntax (must be last) */
+  color: #fff;
+}
+
+.container {
+  margin: 0 auto;
+  padding: 20px 0;
+  max-width: var(--max-content-width);
+}
+
+.brand {
+  color: color(var(--brand-color) lightness(+10%));
+  text-decoration: none;
+  font-size: 1.75em; /* ~28px */
+}
+
+.brandTxt {
+  margin-left: 10px;
+}
+
+.nav {
+  float: right;
+  margin-top: 6px;
+}
+
+.banner {
+  text-align: center;
+  min-height: 50vh;
+}
+
+.bannerTitle {
+  margin: 0;
+  padding: 10px;
+  font-weight: normal;
+  font-size: 4em;
+  line-height: 1em;
+}
+
+.bannerDesc {
+  padding: 0;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 1.25em;
+  margin: 0;
+}

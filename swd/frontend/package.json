@@ -7,7 +7,8 @@
     "react-apollo": "^2.0.0",
     "react-dom": "^16.0.0",
     "react-router-dom": "^4.2.2",
-    "react-scripts": "0.9.x"
+    "react-scripts": "0.9.x",
+    "react-tap-event-plugin": "^3.0.2"
   },
   "devDependencies": {},
   "scripts": {
