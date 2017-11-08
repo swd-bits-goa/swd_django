@@ -5,7 +5,6 @@ import PropTypes from 'prop-types';
 import { Card } from 'material-ui/Card';
 import { List, ListItem } from 'material-ui/List';
 import Divider from 'material-ui/Divider';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './InfoCard.css';
 
 
@@ -42,4 +41,4 @@ InfoCard.propTypes = {
     )).isRequired,
 };
 
-export default withStyles(s)(InfoCard);
+export default InfoCard;
