@@ -36,7 +36,7 @@ class LoginModal extends React.Component {
         <Dialog
           title="Log In"
           actions={actions}
-          modal={false}
+          modal={true}
           open={this.props.open}
           onRequestClose={this.props.onRequestClose}
         >
