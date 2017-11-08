@@ -27,10 +27,12 @@ class Navigation extends React.Component {
     sideBarOpen: PropTypes.bool.isRequired,
   };
 
-  state = {
-    loginModalOpen: false,
+constructor(props) {
+  super(props);
+  this.state = {
+    loginModalOpen : false,
   };
-
+}
 
   handleLoginOpen = () => {
     this.setState({ loginModalOpen: true });
@@ -38,6 +40,7 @@ class Navigation extends React.Component {
 
   handleLoginClose = () => {
     this.setState({ loginModalOpen: false });
+    console.log("Closed!");
   };
 
   render() {
@@ -46,8 +49,9 @@ class Navigation extends React.Component {
       width: 24,
       height: 24,
     };
-
+console.log(this.state);
     return (
+
       // There's a noticeable lag when rendering components based on
       // media queries for the first time
       <Mobile>
@@ -60,9 +64,12 @@ class Navigation extends React.Component {
             </ToolbarGroup>
             <ToolbarGroup lastChild>
               <IconButton iconStyle={filledIcon}><ActionSearch color={darkGreen} /></IconButton>
-              <RaisedButton label="Login" backgroundColor={darkGreen} labelColor={grey50} />
+              <RaisedButton label="Login" backgroundColor={darkGreen} labelColor={grey50} onTouchTap={this.handleLoginOpen} />
             </ToolbarGroup>
           </Toolbar>
+          <LoginModal
+            open={this.state.loginModalOpen}
+            onRequestClose={this.handleLoginClose} />
         </div>
       </Mobile>
     );
