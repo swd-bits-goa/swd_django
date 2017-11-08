@@ -6,9 +6,11 @@
     "apollo-client": "^2.0.0",
     "graphql": "^0.11.3",
     "material-ui": "^0.19.4",
+    "prop-types": "^15.6.0",
     "react": "^16.0.0",
     "react-apollo": "^1.4",
     "react-dom": "^16.0.0",
+    "react-responsive": "^3.0.0",
     "react-router-dom": "^4.2.2",
     "react-tap-event-plugin": "^3.0.2"
   },

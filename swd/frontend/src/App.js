@@ -5,10 +5,9 @@ import {
   ApolloClient,
   createBatchingNetworkInterface,
 } from 'react-apollo'
-// import Layout from './Components/Layout';
-import Footer from './Components/Footer';
+import Home from './Routes/home/Home';
+import Layout from './Components/Layout';
 import logo from './logo.svg';
-import './App.css';
 import PropTypes from 'prop-types';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 
@@ -29,28 +28,36 @@ const client = new ApolloClient({
   networkInterface: networkInterface,
 })
 
-const Home1 = () => (
-  <div className="App">
-    <header className="App-header">
-      <img src={logo} className="App-logo" alt="logo"/>
-      <h1 className="App-title">Welcome to React</h1>
-    </header>
-    <p className="App-intro">
-      To get started, edit
-      <code>src/App.js</code>
-      and save to reload.
-    </p>
-  </div>
-);
+class App extends React.Component {
 
-class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+    loggedIn: false,
+    latestNews : [
+  {
+    title: 'Winner of Aditya Birla Group scholarship 2017',
+    link: 'blah'
+  }, {
+    title: 'Important notice regarding MCN scholarship',
+    link: 'blah'
+  }
+],
+  };
+
+  }
+
   render() {
     return (
       <Router>
         <Switch>
-        <Route path="/footer" component={Footer}/>
-        <Route path="/" component={Home1}/>
-        
+        <Route path="/" render={ () => 
+        (
+          <Layout isLoggedIn={this.state.loggedIn}>
+            <Home news={this.state.latestNews}/>
+            </Layout>
+        )}/>
+
         </Switch>
       </Router>
     )
