@@ -45,6 +45,27 @@ const client = new ApolloClient({
 })
 
 
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  componentDidCatch(error, info) {
+    // Display fallback UI
+    this.setState({ hasError: true });
+    // You can also log the error to an error reporting service
+    // logErrorToMyService(error, info);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      // You can render any custom fallback UI
+      return <h1>Something went wrong.</h1>;
+    }
+    return this.props.children;
+  }
+}
 
 class App extends React.Component {
 
@@ -68,12 +89,14 @@ class App extends React.Component {
   render() {
     return (
       // apollo interfacing
+      
       <ApolloProvider client={client}>
         <Router>
           <Switch>
           <Route path="/" render={ () => 
           (
             <Layout isLoggedIn={this.state.loggedIn}>
+              
               <Home news={this.state.latestNews}/>
               </Layout>
           )}/>
@@ -81,6 +104,7 @@ class App extends React.Component {
           </Switch>
         </Router>
       </ApolloProvider>
+
     )
   }
 }
