@@ -20,6 +20,30 @@ const query = gql`
 }
 `
 
+
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  componentDidCatch(error, info) {
+    // Display fallback UI
+    this.setState({ hasError: true });
+    // You can also log the error to an error reporting service
+    // logErrorToMyService(error, info);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      // You can render any custom fallback UI
+      return <h1>Something went wrong.</h1>;
+    }
+    return this.props.children;
+  }
+}
+
+
 class Home extends React.Component {
   static propTypes = {
     news: PropTypes.arrayOf(PropTypes.shape({
@@ -27,11 +51,11 @@ class Home extends React.Component {
       link: PropTypes.string.isRequired,
       content: PropTypes.string,
     })).isRequired,
-    data: PropTypes.arrayOf(PropTypes.shape({
-      loading: React.PropTypes.bool,
-      error: React.PropTypes.object,
-      currentUser: React.PropTypes.object,
-    })).isRequired,
+    data: PropTypes.shape({
+      loading: PropTypes.bool,
+      error: PropTypes.object,
+      currentUser: PropTypes.object,
+    }).isRequired,
   };
     
   // const data = (props) => {
@@ -44,19 +68,20 @@ class Home extends React.Component {
 
   render() {
     return (
-      <Mobile>
-        <div className={s.container} style={{ backgroundImage: `url(${background})` }}>
-          <Card>
-            <CardMedia>
-              <img src={bdome} style={{ maxWidth: '80%' }} alt="SWD" />
+       
+        <Mobile>
+          <div className={s.container} style={{ backgroundImage: `url(${background})` }}>
+            <Card>
+              <CardMedia>
+                <img src={bdome} style={{ maxWidth: '80%' }} alt="SWD" />
 
-            </CardMedia>
-          </Card>
-          <InfoCard title="Latest News" list={this.props.news} />
-          <div>{this.props.data.currentUser.username}</div> 
-        </div>
-      </Mobile>
-
+              </CardMedia>
+            </Card>
+            <InfoCard title="Latest News" list={this.props.news} />
+            <div>{this.props.data.currentUser.username}</div> 
+          </div>
+        </Mobile>
+      
     );
   }
 }
