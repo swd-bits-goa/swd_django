@@ -7,3 +7,7 @@ def index(request):
 
 def login_success(request):
     return HttpResponse("Success!")
+
+
+def dashboard(request):
+    return render(request, "index.html", {})
