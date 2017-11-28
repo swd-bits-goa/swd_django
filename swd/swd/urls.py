@@ -34,4 +34,5 @@ urlpatterns = [
     url(r'^create-users/', user.index, name='user'),
     url(r'^create-profiles/', profile.index, name='profile'),
     url(r'^accounts/profile/', main_views.login_success, name='login-success'),
+    url(r'^dashboard/', main_views.dashboard, name="dashboard")
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
