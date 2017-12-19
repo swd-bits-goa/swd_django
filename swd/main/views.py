@@ -2,7 +2,9 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from .models import Student
+from .models import Student, MessOptionOpen, MessOption
+from datetime import date, datetime
+from .forms import MessForm
 
 def index(request):
     return render(request, 'home1.html',{})
@@ -43,4 +45,28 @@ def loginform(request):
 def logoutform(request):
     logout(request)
     return render(request, "logout.html", {})
+
+def messoption(request):
+    messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
+    messopen = messopen.exclude(dateOpen__gte=date.today())
+    if messopen:
+        messoption = MessOption.objects.filter(monthYear__gte=messopen[0].dateOpen)
+        messoption = messoption.exclude(monthYear__gte=messopen[0].dateClose)
+
+    context = {}
+
+    if messopen and not messoption:
+        form = MessForm(request.POST)
+        context = {'option': 0, 'form': form, 'dateClose': messopen[0].dateClose}
+    elif messopen and messoption:
+        context = {'option': 1, 'mess': messoption[0].mess}
+    else:
+        context = {'option': 2}
+
+    if request.POST:
+        mess = request.POST.get('mess')
+        messoptionfill = MessOption(student=Student.objects.get(user=request.user), monthYear=datetime.now(), mess=mess)
+        messoptionfill.save()
+
     
+    return render(request, "mess.html", context)

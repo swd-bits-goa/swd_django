@@ -36,5 +36,6 @@ urlpatterns = [
     url(r'^create-profiles/', profile.index, name='profile'),
     url(r'^accounts/profile/', main_views.login_success, name='login-success'),
     url(r'^dashboard/', main_views.dashboard, name="dashboard"),
-    url(r'^profile/', main_views.profile, name="profile")
+    url(r'^profile/', main_views.profile, name="profile"),
+    url(r'^messoption/', main_views.messoption, name="messoption")
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
