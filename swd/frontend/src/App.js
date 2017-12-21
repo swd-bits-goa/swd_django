@@ -1,49 +1,62 @@
-import React, { Component } from 'react'
-import { BrowserRouter as Router, Route, Switch, Link } from 'react-router-dom'
-import {
-  ApolloProvider,
-  ApolloClient,
-  createBatchingNetworkInterface,
-} from 'react-apollo'
-import Home from './Routes/home/Home';
-import Layout from './Components/Layout';
-import logo from './logo.svg';
-import PropTypes from 'prop-types';
-import injectTapEventPlugin from 'react-tap-event-plugin';
+import React, { Component } from "react";
+import { BrowserRouter as Router, Route, Switch, Link } from "react-router-dom";
+import { ApolloProvider } from "react-apollo";
+import { ApolloClient } from "apollo-client";
+import { HttpLink } from "apollo-link-http";
+import { ApolloLink, concat } from "apollo-link";
+import { InMemoryCache } from "apollo-cache-inmemory";
+import Home from "./Routes/home/Home";
+import Layout from "./Components/Layout";
+import logo from "./logo.svg";
+import PropTypes from "prop-types";
+import injectTapEventPlugin from "react-tap-event-plugin";
 
 // react-tap-event-plugin provides onTouchTap() to all React Components.
 // It's a mobile-friendly onClick() alternative for components in Material-UI,
 // especially useful for the buttons.
 injectTapEventPlugin();
 
-const networkInterface = createBatchingNetworkInterface({
-  uri: 'http://localhost:8000/gql',
-  batchInterval: 10,
-  opts: {
-    credentials: 'same-origin',
-  },
-})
+const link = new HttpLink({
+  uri: "http://localhost:8000/graphql",
+  credentials: "same-origin"
+});
 
-networkInterface.use([
-  {
-    applyBatchMiddleware(req, next) {
-      if (!req.options.headers) {
-        req.options.headers = {}
+const authMiddleware =  new ApolloLink((operation, next)=>{
+
+    const token = localStorage.getItem('token')
+      ? localStorage.getItem('token')
+      : null;
+    
+    operation.setContext(({ headers = {} }) => ({
+      headers: {
+        ...headers,
+        authorization : `JWT ${token}`,
       }
+    }));
+    return next(operation);
+});
 
-      const token = localStorage.getItem('token')
-        ? localStorage.getItem('token')
-        : null
-      req.options.headers['authorization'] = `JWT ${token}`
-      next()
-    },
-  },
-])
+// networkInterface.use([
+  // {
+  //   applyBatchMiddleware(req, next) {
+  //     if (!req.options.headers) {
+  //       req.options.headers = {}How
+  //     }
+
+  //     const token = localStorage.getItem('token')
+  //       ? localStorage.getItem('token')
+  //       : null
+  //     req.options.headers['authorization'] = `JWT ${token}`
+  //     next()
+  //   },
+  // },
+// ])
+
 
 const client = new ApolloClient({
-  networkInterface: networkInterface,
-})
-
+  link: concat(authMiddleware,link),
+  cache: new InMemoryCache()
+});
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -68,46 +81,43 @@ class ErrorBoundary extends React.Component {
 }
 
 class App extends React.Component {
-
   constructor(props) {
     super(props);
     this.state = {
-    loggedIn: true, //need to change this
-    latestNews : [
-  {
-    title: 'Winner of Aditya Birla Group scholarship 2017',
-    link: 'blah'
-  }, {
-    title: 'Important notice regarding MCN scholarship',
-    link: 'blah'
-  }
-],
-  };
-
+      loggedIn: false, //need to change this
+      latestNews: [
+        {
+          title: "Winner of Aditya Birla Group scholarship 2017",
+          link: "blah"
+        },
+        {
+          title: "Important notice regarding MCN scholarship",
+          link: "blah"
+        }
+      ]
+    };
   }
 
   render() {
     return (
       // apollo interfacing
-      
+
       <ApolloProvider client={client}>
         <Router>
           <Switch>
-          <Route path="/" render={ () => 
-          (
-            <Layout isLoggedIn={this.state.loggedIn}>
-              
-              <Home news={this.state.latestNews}/>
-              </Layout>
-          )}/>
-
+            <Route
+              path="/"
+              render={() => (
+                <Layout isLoggedIn={this.state.loggedIn}>
+                  <Home news={this.state.latestNews} />
+                </Layout>
+              )}
+            />
           </Switch>
         </Router>
       </ApolloProvider>
-
-    )
+    );
   }
 }
 
-
-export default App
+export default App;

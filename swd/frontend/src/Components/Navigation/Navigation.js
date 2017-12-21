@@ -70,7 +70,6 @@ console.log(this.state);
             <ToolbarGroup lastChild>
               <IconButton iconStyle={filledIcon}><ActionSearch color={darkGreen} /></IconButton>
               <RaisedButton label="Login" backgroundColor={darkGreen} labelColor={grey50} onTouchTap={this.handleLoginOpen} />
-              <RaisedButton label="Logout" backgroundColor={darkGreen} labelColor={grey50} onTouchTap={this.handleLogout} />
             </ToolbarGroup>
             
           </Toolbar>

@@ -1,25 +1,29 @@
-
 /* eslint no-unused-vars:0 */
 
-import React from 'react';
-import PropTypes from 'prop-types';
-import { Card, CardActions, CardHeader, CardMedia, CardTitle, CardText } from 'material-ui/Card';
-import { Mobile } from '../../Components/Responsive';
-import InfoCard from '../../Components/InfoCard';
-import background from './Background.svg';
-import bdome from './BDome.svg';
-import s from './Home.css';
-import { gql, graphql } from 'react-apollo'
+import React from "react";
+import PropTypes from "prop-types";
+import {
+  Card,
+  CardActions,
+  CardHeader,
+  CardMedia,
+  CardTitle,
+  CardText
+} from "material-ui/Card";
+import { Mobile } from "../../Components/Responsive";
+import InfoCard from "../../Components/InfoCard";
+import background from "./Background.svg";
+import bdome from "./BDome.svg";
+import s from "./Home.css";
+import gql from "graphql-tag";
+import { graphql } from "react-apollo";
 
 const query = gql`
-{
-  currentUser {
-    id
+query GetCurrentUser{
+  user(username: "blah") {
     username
   }
-}
-`
-
+}`
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -43,21 +47,22 @@ class ErrorBoundary extends React.Component {
   }
 }
 
-
 class Home extends React.Component {
   static propTypes = {
-    news: PropTypes.arrayOf(PropTypes.shape({
-      title: PropTypes.string.isRequired,
-      link: PropTypes.string.isRequired,
-      content: PropTypes.string,
-    })).isRequired,
-    data: PropTypes.shape({
-      loading: PropTypes.bool,
-      error: PropTypes.object,
-      currentUser: PropTypes.object,
-    }).isRequired,
+    news: PropTypes.arrayOf(
+      PropTypes.shape({
+        title: PropTypes.string.isRequired,
+        link: PropTypes.string.isRequired,
+        content: PropTypes.string
+      })
+    ).isRequired
+    // data: PropTypes.shape({
+    //   loading: PropTypes.bool,
+    //   error: PropTypes.object,
+    //   currentUser: PropTypes.object,
+    // }).isRequired,
   };
-    
+
   // const data = (props) => {
   //   const loading = props.data.loading;
   //   const error = props.data.error;
@@ -65,27 +70,34 @@ class Home extends React.Component {
   //   // render UI with loading, error, or currentUser
   // }
 
-
   render() {
     return (
-       
-        <Mobile>
-          <div className={s.container} style={{ backgroundImage: `url(${background})` }}>
-            <Card>
-              <CardMedia>
-                <img src={bdome} style={{ maxWidth: '80%' }} alt="SWD" />
-
-              </CardMedia>
-            </Card>
-            <InfoCard title="Latest News" list={this.props.news} />
-            <div>{this.props.data.currentUser.username}</div> 
-          </div>
-        </Mobile>
-      
+      <Mobile>
+        <div
+          className={s.container}
+          style={{ backgroundImage: `url(${background})` }}
+        >
+          <Card>
+            <CardMedia>
+              <img src={bdome} style={{ maxWidth: "80%" }} alt="SWD" />
+            </CardMedia>
+          </Card>
+          <InfoCard title="Latest News" list={this.props.news} />
+          {this.props.data && this.props.data.networkStatus === 7 ? (
+            <div id="Hello-GQL">{this.props.data.user.username}</div>
+          ) : (
+            <div>loading</div>
+          )}
+        </div>
+      </Mobile>
     );
   }
 }
 
-Home = graphql(query)(Home)
+Home = graphql(query, {
+  options: {
+    errorPolicy: "all"
+  }
+})(Home);
 
 export default Home;
