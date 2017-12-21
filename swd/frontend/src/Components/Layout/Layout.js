@@ -18,7 +18,7 @@ class Layout extends React.Component {
   };
 
   state = {
-    sideBarOpen: true,
+    sideBarOpen: false,
   };
 
   handleSideBarToggle = () => {
