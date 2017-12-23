@@ -21,6 +21,8 @@ def dashboard(request):
     }
     return render(request, "index.html", context)
 
+
+@login_required
 def profile(request):
     student = Student.objects.get(user=request.user)
     context = {
@@ -29,6 +31,8 @@ def profile(request):
     print(student.name)
     return render(request, "profile.html", context)
 
+
+@login_required
 def loginform(request):
     if request.POST:
         username = request.POST.get('username')
@@ -42,10 +46,14 @@ def loginform(request):
 
     return render(request, "sign-in.html", {})
 
+
+@login_required
 def logoutform(request):
     logout(request)
     return render(request, "logout.html", {})
 
+
+@login_required
 def messoption(request):
     messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
     messopen = messopen.exclude(dateOpen__gte=date.today())
@@ -72,6 +80,7 @@ def messoption(request):
     return render(request, "mess.html", context)
 
 
+@login_required
 def leave(request):
     student = Student.objects.get(user=request.user)
     context = {
@@ -80,6 +89,7 @@ def leave(request):
     return render(request, "index.html", context)
 
 
+@login_required
 def certificates(request):
     student = Student.objects.get(user=request.user)
     context = {
