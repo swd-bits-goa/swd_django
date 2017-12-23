@@ -302,34 +302,35 @@
             <!-- #User Info -->
             <!-- Menu -->
             <div class="menu">
+                {% load main_extras %}
                 <ul class="list">
                     <li class="header">MAIN NAVIGATION</li>
-                    <li>
+                    <li class="{% active_page request 'dashboard' %}">
                     <a href="/dashboard">
                             <i class="material-icons">home</i>
                             <span>Home</span>
                         </a>
                     </li>
-                        <li class="active">
+                        <li class="{% active_page request 'profile' %}">
                             <a href="/profile">
                             <i class="material-icons">text_fields</i>
                             <span>Profile</span>
                         </a>
                         </li>
-                        <li>
-                            <a href="pages/helper-classes.html">
+                        <li class="{% active_page request 'messoption' %}">
+                            <a href="/messoption">
                             <i class="material-icons">layers</i>
                             <span>Mess Option</span>
                         </a>
                         </li>
-                        <li>
-                            <a href="pages/typography.html">
+                        <li class="{% active_page request 'leave' %}">
+                            <a href="/leave">
                             <i class="material-icons">text_fields</i>
                             <span>Leave</span>
                         </a>
                         </li>
-                        <li>
-                            <a href="pages/helper-classes.html">
+                        <li class="{% active_page request 'certificates' %}">
+                            <a href="/certificates">
                             <i class="material-icons">layers</i>
                             <span>Certificates</span>
                         </a>
@@ -498,11 +499,10 @@
        {% block content %}
        {% endblock %}
     </section>
-
-    <script src="{% static 'user/plugins/bootstrap/js/bootstrap.js' %}"></script>
-
     <!-- Jquery Core Js -->
     <script src="{% static 'user/plugins/jquery/jquery.min.js' %}"></script>
+
+    <script src="{% static 'user/plugins/bootstrap/js/bootstrap.js' %}"></script>
 
     <script src="{% static 'user/plugins/bootstrap-select/js/bootstrap-select.js' %}"></script>
 
@@ -529,18 +529,18 @@
     <script src="{% static 'user/plugins/chartjs/Chart.bundle.js' %}"></script>
 
     <!-- Flot Charts Plugin Js -->
-    <script src="{% static 'user/plugins/flot-charts/jquery.flot.js' %}"></script>
+    <!-- <script src="{% static 'user/plugins/flot-charts/jquery.flot.js' %}"></script>
     <script src="{% static 'user/plugins/flot-charts/jquery.flot.resize.js' %}"></script>
     <script src="{% static 'user/plugins/flot-charts/jquery.flot.pie.js' %}"></script>
     <script src="{% static 'user/plugins/flot-charts/jquery.flot.categories.js' %}"></script>
-    <script src="{% static 'user/plugins/flot-charts/jquery.flot.time.js' %}"></script>
+    <script src="{% static 'user/plugins/flot-charts/jquery.flot.time.js' %}"></script> -->
 
     <!-- Sparkline Chart Plugin Js -->
     <script src="{% static 'user/plugins/jquery-sparkline/jquery.sparkline.js' %}"></script>
 
     <!-- Custom Js -->
     <script src="{% static 'user/js/admin.js' %}"></script>
-    <script src="{% static 'user/js/pages/index.js' %}"></script>
+    <!-- <script src="{% static 'user/js/pages/index.js' %}"></script> -->
 
     <!-- Demo Js -->
     <script src="{% static 'user/js/demo.js' %}"></script>

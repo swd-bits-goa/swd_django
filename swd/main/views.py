@@ -70,3 +70,19 @@ def messoption(request):
 
     
     return render(request, "mess.html", context)
+
+
+def leave(request):
+    student = Student.objects.get(user=request.user)
+    context = {
+        'student': student,
+    }
+    return render(request, "index.html", context)
+
+
+def certificates(request):
+    student = Student.objects.get(user=request.user)
+    context = {
+        'student': student,
+    }
+    return render(request, "index.html", context)
