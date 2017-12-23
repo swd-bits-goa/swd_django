@@ -6,6 +6,7 @@ import { HttpLink } from "apollo-link-http";
 import { ApolloLink, concat } from "apollo-link";
 import { InMemoryCache } from "apollo-cache-inmemory";
 import Home from "./Routes/home/Home";
+import AboutSWD from "./Routes/aboutSWD/AboutSWD";
 import Layout from "./Components/Layout";
 import logo from "./logo.svg";
 import PropTypes from "prop-types";
@@ -122,13 +123,21 @@ class App extends React.Component {
         <Router>
           <Switch>
             <Route
+              path="/aboutSWD"
+              render={() => (
+                <Layout isLoggedIn={this.state.loggedIn}>
+                <AboutSWD/>
+                </Layout>
+              )}
+            />
+            <Route
               path="/"
               render={() => (
                 <Layout isLoggedIn={this.state.loggedIn} login={this.login} logout={this.logout}>
                   <Home news={this.state.latestNews} />
                 </Layout>
               )}
-            />
+            /> 
           </Switch>
         </Router>
       </ApolloProvider>

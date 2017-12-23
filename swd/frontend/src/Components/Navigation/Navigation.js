@@ -24,7 +24,7 @@ import { Mobile } from '../Responsive';
 class Navigation extends React.Component {
   static propTypes = {
     isLoggedIn: PropTypes.bool.isRequired,
-    toggleFunc: PropTypes.func.isRequired,
+    toggleSideBar: PropTypes.func.isRequired,
     sideBarOpen: PropTypes.bool.isRequired,
     login: PropTypes.func.isRequired,
     logout: PropTypes.func.isRequired
@@ -67,7 +67,7 @@ console.log(this.state);
         <div className={s.AppBar}>
           <Toolbar>
             <ToolbarGroup firstChild>
-              <IconButton><NavigationMenu color={darkGreen} /></IconButton>
+              <IconButton onTouchTap={this.props.toggleSideBar}><NavigationMenu color={darkGreen} /></IconButton>
               <ToolbarTitle text="SWD" />
               <ToolbarSeparator />
             </ToolbarGroup>

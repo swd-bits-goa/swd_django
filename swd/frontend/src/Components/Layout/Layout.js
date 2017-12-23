@@ -30,7 +30,7 @@ class Layout extends React.Component {
   render() {
     const contentBodyStyle = { transition: 'margin-left 450ms cubic-bezier(0.23, 1, 0.32, 1)' };
 
-    if (this.state.sideBarOpen && this.props.isLoggedIn) {
+    if (this.state.sideBarOpen) {
       contentBodyStyle.marginLeft = 256;
     } else {
       contentBodyStyle.marginLeft = 0;
@@ -41,7 +41,7 @@ class Layout extends React.Component {
         <div className={s.container}>
           <div style={contentBodyStyle}>
             <Header
-              toggleFunc={this.handleSideBarToggle}
+              toggleSideBar={this.handleSideBarToggle}
               sideBarOpen={this.state.sideBarOpen}
               isLoggedIn={this.props.isLoggedIn}
               login={this.props.login}
@@ -53,11 +53,9 @@ class Layout extends React.Component {
             />
           </div>
 
-          { this.props.isLoggedIn ? (
             <Sidebar
               open={this.state.sideBarOpen}
             />
-        ) : null }
 
         </div>
       </MuiThemeProvider>
