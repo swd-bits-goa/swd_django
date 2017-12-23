@@ -2,16 +2,8 @@
 
 import React from "react";
 import PropTypes from "prop-types";
-import {
-  Card,
-  CardActions,
-  CardHeader,
-  CardMedia,
-  CardTitle,
-  CardText
-} from "material-ui/Card";
 import { Mobile } from "../../Components/Responsive";
-import InfoCard from "../../Components/InfoCard";
+import ExpandableCard from "../../Components/ExpandableCard";
 import s from "./AboutSWD.css";
 import gql from "graphql-tag";
 import { graphql } from "react-apollo";
@@ -19,9 +11,6 @@ import { graphql } from "react-apollo";
 
 
 class AboutSWD extends React.Component {
-  static propTypes = {
-    
-  };
 
   // const data = (props) => {
   //   const loading = props.data.loading;
@@ -34,13 +23,12 @@ class AboutSWD extends React.Component {
     return (
         
       <Mobile>
-       <div>
-          <Card>
-            
-          </Card>
-          
-
-        </div>
+        <div className={s.container}>
+          <ExpandableCard title="Hostel Facilities" text="sfsf"/>
+          <ExpandableCard title="Mess Facilities" text="sfsf"/>
+          <ExpandableCard title = "Financial Aid" text = "sfsf" />
+          <ExpandableCard title = "Online Services" text = "sfsf" />
+          </div>
       </Mobile>
       
     );
