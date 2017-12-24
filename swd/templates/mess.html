@@ -28,6 +28,7 @@
                             <form method="POST">
                             {% csrf_token %}
                             <div class="col-md-12">
+                                <p>Final date for filling is: {{ dateClose }}</p>
                                 {{ form }}
                             </div>
                             <div class="col-xs-4">
@@ -37,7 +38,7 @@
                         {% elif option == 1 %}
                             You have filled this periods mess as <b> Dining Hall {{mess}} </b>
                         {% else %}
-
+                            <p>Sorry, the period for filling the mess options are over. Your mess will be alloted randomly</p>
                         {% endif %}
                     </div>
                 </div>

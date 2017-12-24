@@ -57,13 +57,14 @@ def logoutform(request):
 def messoption(request):
     messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
     messopen = messopen.exclude(dateOpen__gte=date.today())
+    student = Student.objects.get(user=request.user)
+
     if messopen:
-        messoption = MessOption.objects.filter(monthYear__gte=messopen[0].dateOpen)
-        messoption = messoption.exclude(monthYear__gte=messopen[0].dateClose)
+        messoption = MessOption.objects.filter(monthYear=messopen[0].monthYear, student=student)
 
     context = {}
 
-    if messopen and not messoption:
+    if messopen and not messoption and datetime.today().date() < messopen[0].dateClose:
         form = MessForm(request.POST)
         context = {'option': 0, 'form': form, 'dateClose': messopen[0].dateClose}
     elif messopen and messoption:
@@ -73,8 +74,9 @@ def messoption(request):
 
     if request.POST:
         mess = request.POST.get('mess')
-        messoptionfill = MessOption(student=Student.objects.get(user=request.user), monthYear=datetime.now(), mess=mess)
+        messoptionfill = MessOption(student=student, monthYear=messopen[0].monthYear, mess=mess)
         messoptionfill.save()
+        return redirect('messoption')
 
     
     return render(request, "mess.html", context)
