@@ -20,8 +20,8 @@ import { graphql } from "react-apollo";
 
 const query = gql`
 query GetCurrentUser{
-  user(username: "blah") {
-    username
+  user(username: "f20110362") {
+    username, id
   }
 }`
 

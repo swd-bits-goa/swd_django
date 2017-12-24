@@ -242,9 +242,10 @@ class Query(graphene.AbstractType):
     )
     
     def resolve_current_user(self, args, **kwargs):
-        if not context.user.is_authenticated():
+        if not args.context.user.is_authenticated:
             return None
-        return context.user
+        else:
+            return args.context.user
 
     def resolve_all_users(self, args, **kwargs):
         return User.objects.all()
