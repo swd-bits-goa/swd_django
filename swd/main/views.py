@@ -4,7 +4,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from .models import Student, MessOptionOpen, MessOption
 from datetime import date, datetime
-from .forms import MessForm
+from .forms import MessForm, LeaveForm
+from django.contrib import messages
 
 def index(request):
     return render(request, 'home1.html',{})
@@ -85,10 +86,25 @@ def messoption(request):
 @login_required
 def leave(request):
     student = Student.objects.get(user=request.user)
+    form = LeaveForm()
     context = {
         'student': student,
+        'form': form
     }
-    return render(request, "index.html", context)
+
+    if request.POST:
+        print('hello')
+        form = LeaveForm(request.POST)
+        print(form)
+        if form.is_valid():
+            leaveform = form.save(commit=False)
+            leaveform.student = student
+            print(leave)
+            leaveform.save()
+
+        else:
+            print(messages.error)
+    return render(request, "leave.html", context)
 
 
 @login_required

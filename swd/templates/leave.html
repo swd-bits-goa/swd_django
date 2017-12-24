@@ -9,28 +9,20 @@
             <div class="col s6 l6">
                 <div class="card">
                     <div class="card-content">
-                        <span class="card-title">Mess Option</span>
-                         {% if option == 0 %}
+                        <span class="card-title">Apply for Leave</span>
                         <form method="POST">
                             {% csrf_token %}
                             <div class="col-md-12">
-                                <p>Final date for filling is: {{ dateClose }}</p>
-                                 {% for field in form %}
-                                    <div class="input-field col s12">
-                                        {{ field }}
-                                        {{ field.label_tag }}
-                                    </div>
+                                {% for field in form %}
+                                <div class="input-field col s12">
+                                    {{ field }} {{ field.label_tag }}
+                                </div>
                                 {% endfor %}
-                                
                             </div>
                             <div class="col-xs-4">
                                 <button class="btn btn-block bg-green waves-effect" type="submit">SUBMIT</button>
                             </div>
                         </form>
-                        {% elif option == 1 %} You have filled this periods mess as <b> Dining Hall {{mess}} </b>
-                        {% else %}
-                        <p>Sorry, the period for filling the mess options are over. Your mess will be alloted randomly</p>
-                        {% endif %}
                     </div>
                 </div>
             </div>
