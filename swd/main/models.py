@@ -1,6 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+MESS_CHOICES = (
+    ('A','Dining Hall A'),
+    ('C','Dining Hall C'))
+
 class Faculty(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
@@ -68,7 +72,7 @@ class CSA(models.Model):
 class MessOption(models.Model):
     student = models.ForeignKey('Student', on_delete = models.CASCADE)
     monthYear = models.DateField()
-    mess = models.CharField(max_length=1)
+    mess = models.CharField(max_length=1, choices=MESS_CHOICES)
     
 class Bonafide(models.Model):
     student = models.ForeignKey('Student', on_delete = models.CASCADE)
