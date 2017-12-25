@@ -19,11 +19,13 @@ import gql from "graphql-tag";
 import { graphql } from "react-apollo";
 
 const query = gql`
-query GetCurrentUser{
-  user(username: "f20110362") {
-    username, id
+  query GetCurrentUser {
+    currentUser {
+      id
+      username
+    }
   }
-}`
+`;
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -56,20 +58,8 @@ class Home extends React.Component {
         content: PropTypes.string
       })
     ).isRequired
-    // data: PropTypes.shape({
-    //   loading: PropTypes.bool,
-    //   error: PropTypes.object,
-    //   currentUser: PropTypes.object,
-    // }).isRequired,
+
   };
-
-  // const data = (props) => {
-  //   const loading = props.data.loading;
-  //   const error = props.data.error;
-  //   const currentUser = props.data.currentUser;
-  //   // render UI with loading, error, or currentUser
-  // }
-
   render() {
     return (
       <Mobile>
@@ -83,8 +73,12 @@ class Home extends React.Component {
             </CardMedia>
           </Card>
           <InfoCard title="Latest News" list={this.props.news} />
+          {/* TODO: Handle apollo errors */}
           {this.props.data && this.props.data.networkStatus === 7 ? (
-            <div id="Hello-GQL">{this.props.data.user.username}</div>
+            <div>
+              {this.props.data.currentUser &&
+                this.props.data.currentUser.username}
+            </div>
           ) : (
             <div>loading</div>
           )}

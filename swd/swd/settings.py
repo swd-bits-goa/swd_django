@@ -68,7 +68,7 @@ JWT_VERIFY_EXPIRATION = False
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    # 'swd.middleware.JWTMiddleware', causing problems if enabled
+    'swd.middleware.JWTMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',

@@ -83,7 +83,7 @@ class TransactionType(DjangoObjectType):
     class Meta:
         model = Transaction
 
-class MessBillType(DjangoObjectType):
+class MessBillType(DjangoObjectType):   
     class Meta:
         model = MessBill
 
@@ -242,7 +242,8 @@ class Query(graphene.AbstractType):
     )
     
     def resolve_current_user(self, args, **kwargs):
-        if not args.context.user.is_authenticated:
+        context = args.context
+        if not context.user.is_authenticated:
             return None
         else:
             return args.context.user
