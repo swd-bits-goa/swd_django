@@ -1,6 +1,20 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+MESS_CHOICES = (
+    ('A','Dining Hall A'),
+    ('C','Dining Hall C'))
+
+CONSENT_CHOICES = (
+    ('Letter', 'Letter'),
+    ('Fax', 'Fax'),
+    ('Email', 'Email'))
+
+BONAFIDE_REASON_CHOICES = (
+    ('Bank Loan', 'Bank Loan'),
+    ('Fax', 'Fax'),
+    ('Other', 'Other'))
+
 class Faculty(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
@@ -68,26 +82,26 @@ class CSA(models.Model):
 class MessOption(models.Model):
     student = models.ForeignKey('Student', on_delete = models.CASCADE)
     monthYear = models.DateField()
-    mess = models.CharField(max_length=1)
+    mess = models.CharField(max_length=1, choices=MESS_CHOICES)
     
 class Bonafide(models.Model):
     student = models.ForeignKey('Student', on_delete = models.CASCADE)
-    reason = models.CharField(max_length=20)
-    otherReason = models.CharField(max_length=20, null=True)
+    reason = models.CharField(max_length=20, choices=BONAFIDE_REASON_CHOICES)
+    otherReason = models.CharField(max_length=20, null=True, blank=True)
     reqDate = models.DateField()
-    printed = models.BooleanField()
+    printed = models.BooleanField(default=0, blank=True)
 
 class Leave(models.Model):
     student = models.ForeignKey('Student', on_delete = models.CASCADE)
     dateTimeStart = models.DateTimeField()
-    dataTimeEnd = models.DateTimeField()
+    dateTimeEnd = models.DateTimeField()
     reason = models.TextField()
-    consent = models.CharField(max_length=10)
+    consent = models.CharField(max_length=10, choices=CONSENT_CHOICES)
     corrAddress = models.TextField()
     corrPhone = models.CharField(max_length=15)
-    approvedBy = models.CharField(max_length=50)
-    approved = models.BooleanField()
-    comment = models.TextField()
+    approvedBy = models.CharField(max_length=50, default='', blank=True)
+    approved = models.BooleanField(default=0, blank=True)
+    comment = models.TextField(default='', blank=True)
 
 class DayPass(models.Model):
     student = models.ForeignKey('Student', on_delete = models.CASCADE)

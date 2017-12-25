@@ -33,19 +33,33 @@ urlpatterns = [
     url(r'^jet/', include('jet.urls', 'jet')),
     url(r'^jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')),
     url(r'^admin/', admin.site.urls),
+
     
     url(r'^graphql', csrf_exempt(GraphQLView.as_view(graphiql=True, schema=schema))),
     url(r'^gql', csrf_exempt(GraphQLView.as_view(batch=True, schema=schema))),
     
-    url(r'^login/', auth_views.login, {'template_name': 'admin/login.html'}),
-    url(r'^logout/', auth_views.logout),
+#    url(r'^login/', auth_views.login, {'template_name': 'admin/login.html'}),
+#    url(r'^logout/', auth_views.logout),
+
+    # Django Login
+    url(r'^login/', main_views.loginform, name="login"),
+    url(r'^logout/', main_views.logoutform, name="logout"),
+
     url(r'^', include('main.urls')),
     url(r'^create-users/', user.index, name='user'),
     url(r'^create-profiles/', profile.index, name='profile'),
     url(r'^accounts/profile/', main_views.login_success, name='login-success'),
 
+
     # REST
     url(r'^api-token-auth/', obtain_jwt_token),
     url(r'^api-token-refresh/', refresh_jwt_token),
     url(r'^api-token-verify/', verify_jwt_token),
+
+    url(r'^dashboard/', main_views.dashboard, name="dashboard"),
+    url(r'^profile/', main_views.profile, name="profile"),
+    url(r'^messoption/', main_views.messoption, name="messoption"),
+    url(r'^leave/', main_views.leave, name="leave"),
+    url(r'^certificates/', main_views.certificates, name="certificates")
+
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
