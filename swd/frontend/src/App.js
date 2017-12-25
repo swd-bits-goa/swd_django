@@ -21,40 +21,35 @@ const link = new HttpLink({
   credentials: "same-origin"
 });
 
-const authMiddleware =  new ApolloLink((operation, next)=>{
+const authMiddleware = new ApolloLink((operation, next) => {
+  operation.setContext(({ headers = {} }) => ({
+    headers: {
+      ...headers,
+      authorization: `JWT ${localStorage.getItem("token") || null}`
+    }
+  }));
 
-    const token = localStorage.getItem('token')
-      ? localStorage.getItem('token')
-      : null;
-    
-    operation.setContext(({ headers = {} }) => ({
-      headers: {
-        ...headers,
-        authorization : `JWT ${token}`,
-      }
-    }));
-    return next(operation);
+  return next(operation);
 });
 
 // networkInterface.use([
-  // {
-  //   applyBatchMiddleware(req, next) {
-  //     if (!req.options.headers) {
-  //       req.options.headers = {}How
-  //     }
+// {
+//   applyBatchMiddleware(req, next) {
+//     if (!req.options.headers) {
+//       req.options.headers = {}How
+//     }
 
-  //     const token = localStorage.getItem('token')
-  //       ? localStorage.getItem('token')
-  //       : null
-  //     req.options.headers['authorization'] = `JWT ${token}`
-  //     next()
-  //   },
-  // },
+//     const token = localStorage.getItem('token')
+//       ? localStorage.getItem('token')
+//       : null
+//     req.options.headers['authorization'] = `JWT ${token}`
+//     next()
+//   },
+// },
 // ])
 
-
 const client = new ApolloClient({
-  link: concat(authMiddleware,link),
+  link: concat(authMiddleware, link),
   cache: new InMemoryCache()
 });
 
@@ -84,7 +79,7 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      loggedIn: false, //need to change this
+      loggedIn: true, //need to change this
       latestNews: [
         {
           title: "Winner of Aditya Birla Group scholarship 2017",
