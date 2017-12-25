@@ -94,9 +94,9 @@ class Leave(models.Model):
     consent = models.CharField(max_length=10, choices=CONSENT_CHOICES)
     corrAddress = models.TextField()
     corrPhone = models.CharField(max_length=15)
-    approvedBy = models.CharField(max_length=50, default=None)
-    approved = models.BooleanField(default=None)
-    comment = models.TextField(default=None)
+    approvedBy = models.CharField(max_length=50, default='', blank=True)
+    approved = models.BooleanField(default=0, blank=True)
+    comment = models.TextField(default='', blank=True)
 
 class DayPass(models.Model):
     student = models.ForeignKey('Student', on_delete = models.CASCADE)

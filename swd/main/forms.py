@@ -9,18 +9,20 @@ class MessForm(forms.ModelForm):
         fields = ['mess']
 
 class LeaveForm(forms.ModelForm):
+    dateStart = forms.CharField(label='Departure Date', widget=forms.TextInput(attrs={'class': 'datepicker'}))
+    timeStart = forms.CharField(label='Departure Time', widget=forms.TextInput(attrs={'class': 'timepicker'}))
+    dateEnd = forms.CharField(label='Arrival Date', widget=forms.TextInput(attrs={'class': 'datepicker'}))
+    timeEnd = forms.CharField(label='Arrival Time', widget=forms.TextInput(attrs={'class': 'timepicker'}))
+
     class Meta:
         model = Leave
-        exclude = ['student', 'approvedBy', 'approved', 'comment']
+        exclude = ['dateTimeStart', 'dateTimeEnd', 'student',
+                   'approvedBy', 'approved', 'comment']
         widgets = {
-            'dateTimeStart': forms.TextInput(attrs={'class': 'datepicker'}),
-            'dateTimeEnd': forms.TextInput(attrs={'class': 'datepicker'}),
             'reason': forms.Textarea(attrs={'class': 'materialize-textarea'}),
             'corrAddress': forms.Textarea(attrs={'class': 'materialize-textarea'}),
         }
         labels = {
-            'dateTimeStart': _('Departure Date'),
-            'dateTimeEnd': _('Arrival Date'),
             'consent': _('Parent Consent Type'),
             'corrAddress': _('Address for Correspondence during Leave'),
             'corrPhone': _('Contact No. during Leave'),
