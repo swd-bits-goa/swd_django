@@ -33,8 +33,37 @@
                     </div>
                 </div>
             </div>
-        </div>
 
+            <div class="col s6 l6">
+                <div class="card">
+                    <div class="card-content">
+                        <span class="card-title">Leave Applications</span>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Leave No.</th>
+                                    <th>Duration</th>
+                                    <th>Approval Status</th>
+                                    <th>Comments</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for leave in leaves %}
+                                <tr>
+                                    <td>{{ leave.id }}</td>
+                                    <td>{{ leave.dateTimeStart }} to {{ leave.dateTimeEnd }}</td>
+                                    <td>{% if leave.approved == 0 and leave.approvedBy == ''%}In Process{% elif leave.approved == 0 %}Not Approved{% else %}Approved{% endif %}</td>
+                                    <td>{{ leave.comment }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
     </div>
     <br><br>
 </div>
