@@ -10,6 +10,11 @@ CONSENT_CHOICES = (
     ('Fax', 'Fax'),
     ('Email', 'Email'))
 
+BONAFIDE_REASON_CHOICES = (
+    ('Bank Loan', 'Bank Loan'),
+    ('Fax', 'Fax'),
+    ('Other', 'Other'))
+
 class Faculty(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
@@ -81,10 +86,10 @@ class MessOption(models.Model):
     
 class Bonafide(models.Model):
     student = models.ForeignKey('Student', on_delete = models.CASCADE)
-    reason = models.CharField(max_length=20)
-    otherReason = models.CharField(max_length=20, null=True)
+    reason = models.CharField(max_length=20, choices=BONAFIDE_REASON_CHOICES)
+    otherReason = models.CharField(max_length=20, null=True, blank=True)
     reqDate = models.DateField()
-    printed = models.BooleanField()
+    printed = models.BooleanField(default=0, blank=True)
 
 class Leave(models.Model):
     student = models.ForeignKey('Student', on_delete = models.CASCADE)
