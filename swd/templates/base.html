@@ -1,0 +1,165 @@
+ {% load staticfiles %}
+<!DOCTYPE html>
+
+
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0" />
+    <title>SWD BITS Goa</title>
+
+    <!-- CSS  -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="{% static 'assets/css/materialize.css' %}" type="text/css" rel="stylesheet" media="screen,projection" />
+    <link href="{% static 'assets/css/style.css' %}" type="text/css" rel="stylesheet" media="screen,projection" />
+</head>
+
+<body>
+    <nav class="light-blue lighten-1" role="navigation">
+        <div class="nav-wrapper container"><a id="logo-container" href="#" class="brand-logo"></a>
+            <ul class="right hide-on-med-and-down">
+                <li><a href="/login">Login</a></li>
+            </ul>
+
+            <ul id="nav-mobile" class="side-nav">
+                <li><a href="/login">Login</a></li>
+            </ul>
+            <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
+        </div>
+    </nav>
+    <div class="section no-pad-bot" id="index-banner">
+    </div>
+    <ul id="slide-out" class="side-nav fixed">
+        <li><a href="#!">First Sidebar Link</a></li>
+        <li><a href="#!">Second Sidebar Link</a></li>
+    </ul>
+
+{% block content %} 
+{% endblock %}
+
+    <!-- <footer class="page-footer orange">
+        <div class="container">
+            <div class="row">
+                <div class="col l6 s12">
+                    <h5 class="white-text">SWD</h5>
+                    <p class="grey-text text-lighten-4">Student Welfare Division</p>
+
+
+                </div>
+                <div class="col l3 s12">
+                    <h5 class="white-text">Settings</h5>
+                    <ul>
+                        <li><a class="white-text" href="#!">Link 1</a></li>
+                        <li><a class="white-text" href="#!">Link 2</a></li>
+                        <li><a class="white-text" href="#!">Link 3</a></li>
+                        <li><a class="white-text" href="#!">Link 4</a></li>
+                    </ul>
+                </div>
+                <div class="col l3 s12">
+                    <h5 class="white-text">Connect</h5>
+                    <ul>
+                        <li><a class="white-text" href="#!">Link 1</a></li>
+                        <li><a class="white-text" href="#!">Link 2</a></li>
+                        <li><a class="white-text" href="#!">Link 3</a></li>
+                        <li><a class="white-text" href="#!">Link 4</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-copyright">
+            <div class="container">
+                Made by <a class="orange-text text-lighten-3" href="http://materializecss.com">OSDLabs</a>
+            </div>
+        </div>
+    </footer> -->
+
+    <style>
+            body {
+             padding-left: 300px;
+            }
+
+        @media only screen and (max-width : 992px) {
+            body {
+                padding-left:0;
+            }
+        }
+    </style>
+
+    <!--  Scripts-->
+    <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script src="{% static 'assets/js/materialize.js' %}"></script>
+    <script src="{% static 'assets/js/init.js' %}"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('select').material_select();
+        });
+
+        $('.datepicker').pickadate({
+            selectMonths: true, // Creates a dropdown to control month
+            selectYears: 5, // Creates a dropdown of 15 years to control year,
+            today: 'Today',
+            clear: 'Clear',
+            close: 'Ok',
+            closeOnSelect: false // Close upon selecting a date,
+        });
+        
+        $('.timepicker').pickatime({
+            default: 'now', // Set default time: 'now', '1:30AM', '16:30'
+            fromnow: 0,       // set default time to * milliseconds from now (using with default = 'now')
+            twelvehour: false, // Use AM/PM or 24-hour format
+            donetext: 'OK', // text for done-button
+            cleartext: 'Clear', // text for clear-button
+            canceltext: 'Cancel', // Text for cancel-button
+            autoclose: false, // automatic close timepicker
+            ampmclickable: true, // make AM PM clickable
+            aftershow: function () { } //Function for after opening timepicker
+        });
+        
+    </script>
+
+</body>
+
+</html>
+
+            <!-- #User Info -->
+            <!-- Menu -->
+            <!-- <div class="menu">
+                {% load main_extras %}
+                <ul class="list">
+                    <li class="header">MAIN NAVIGATION</li>
+                    <li class="{% active_page request 'dashboard' %}">
+                    <a href="/dashboard">
+                            <i class="material-icons">home</i>
+                            <span>Home</span>
+                        </a>
+                    </li>
+                        <li class="{% active_page request 'profile' %}">
+                            <a href="/profile">
+                            <i class="material-icons">text_fields</i>
+                            <span>Profile</span>
+                        </a>
+                        </li>
+                        <li class="{% active_page request 'messoption' %}">
+                            <a href="/messoption">
+                            <i class="material-icons">layers</i>
+                            <span>Mess Option</span>
+                        </a>
+                        </li>
+                        <li class="{% active_page request 'leave' %}">
+                            <a href="/leave">
+                            <i class="material-icons">text_fields</i>
+                            <span>Leave</span>
+                        </a>
+                        </li>
+                        <li class="{% active_page request 'certificates' %}">
+                            <a href="/certificates">
+                            <i class="material-icons">layers</i>
+                            <span>Certificates</span>
+                        </a>
+                        </li>
+                </ul>
+            </div> -->
