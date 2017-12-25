@@ -2,9 +2,9 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from .models import Student, MessOptionOpen, MessOption, Leave
+from .models import Student, MessOptionOpen, MessOption, Leave, Bonafide
 from datetime import date, datetime
-from .forms import MessForm, LeaveForm
+from .forms import MessForm, LeaveForm, BonafideForm
 from django.contrib import messages
 from django.utils.timezone import make_aware
 
@@ -131,7 +131,31 @@ def leave(request):
 @login_required
 def certificates(request):
     student = Student.objects.get(user=request.user)
+    form = BonafideForm()
     context = {
+        'option': 0,
         'student': student,
+        'form': form
     }
-    return render(request, "index.html", context)
+    bonafideContext = {
+        'bonafides': Bonafide.objects.filter(student=student),
+    }
+
+    if request.POST:
+        form = BonafideForm(request.POST)
+        if form.is_valid():
+            bonafideform = form.save(commit=False)
+            bonafideform.reqDate = datetime.today()
+            bonafideform.student = student
+            bonafideform.save()
+
+            context = {
+                'option': 1,
+            }
+        else:
+            context = {
+                'option': 2,
+            }
+            print(form.errors)
+
+    return render(request, "certificates.html", dict(context, **bonafideContext))

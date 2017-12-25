@@ -1,5 +1,5 @@
 from django import forms
-from .models import MessOption, Leave
+from .models import MessOption, Leave, Bonafide
 from django.forms.widgets import TextInput, Textarea
 from django.utils.translation import ugettext_lazy as _
 
@@ -26,4 +26,13 @@ class LeaveForm(forms.ModelForm):
             'consent': _('Parent Consent Type'),
             'corrAddress': _('Address for Correspondence during Leave'),
             'corrPhone': _('Contact No. during Leave'),
+        }
+
+class BonafideForm(forms.ModelForm):
+    class Meta:
+        model = Bonafide
+        fields = ['reason', 'otherReason']
+
+        labels = {
+            'otherReason': _('Please mention if other reason. (Write full name of scholarship if applicable)'),
         }
