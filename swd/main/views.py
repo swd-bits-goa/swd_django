@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from .models import Student, MessOptionOpen, MessOption
+from .models import Student, MessOptionOpen, MessOption, Leave
 from datetime import date, datetime
 from .forms import MessForm, LeaveForm
 from django.contrib import messages
@@ -94,6 +94,10 @@ def leave(request):
         'form': form
     }
 
+    leaveContext = {
+        'leaves': Leave.objects.filter(student=student),
+    }
+
     if request.POST:
         form = LeaveForm(request.POST)
         if form.is_valid():
@@ -121,7 +125,7 @@ def leave(request):
                 'option': 2,
             }
             print(form.errors)
-    return render(request, "leave.html", context)
+    return render(request, "leave.html", dict(context, **leaveContext))
 
 
 @login_required
