@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'tools',
     'schema',
     'graphene_django',
+    'materializecssform'
 ]
 
 MIDDLEWARE = [

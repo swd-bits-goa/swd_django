@@ -4,7 +4,9 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from .models import Student, MessOptionOpen, MessOption
 from datetime import date, datetime
-from .forms import MessForm
+from .forms import MessForm, LeaveForm
+from django.contrib import messages
+from django.utils.timezone import make_aware
 
 def index(request):
     return render(request, 'home1.html',{})
@@ -85,10 +87,41 @@ def messoption(request):
 @login_required
 def leave(request):
     student = Student.objects.get(user=request.user)
+    form = LeaveForm()
     context = {
+        'option' : 0,
         'student': student,
+        'form': form
     }
-    return render(request, "index.html", context)
+
+    if request.POST:
+        form = LeaveForm(request.POST)
+        if form.is_valid():
+            leaveform = form.save(commit=False)
+            dateStart = datetime.strptime(request.POST.get('dateStart'), '%d %B, %Y').date()
+            timeStart = datetime.strptime(request.POST.get('timeStart'), '%H:%M').time()
+            dateTimeStart = datetime.combine(dateStart, timeStart)
+            dateEnd = datetime.strptime(request.POST.get('dateEnd'), '%d %B, %Y').date()
+            timeEnd = datetime.strptime(request.POST.get('timeEnd'), '%H:%M').time()
+            dateTimeEnd = datetime.combine(dateEnd, timeEnd)
+            leaveform.dateTimeStart = make_aware(dateTimeStart)
+            leaveform.dateTimeEnd = make_aware(dateTimeEnd)
+            leaveform.student = student
+            leaveform.save()
+
+            context = {
+                'option': 1,
+                'dateStart': request.POST.get('dateStart'),
+                'dateEnd': request.POST.get('dateEnd'),
+                'timeStart': request.POST.get('timeStart'),
+                'timeEnd': request.POST.get('timeEnd'),
+            }
+        else:
+            context = {
+                'option': 2,
+            }
+            print(form.errors)
+    return render(request, "leave.html", context)
 
 
 @login_required

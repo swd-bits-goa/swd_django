@@ -5,6 +5,11 @@ MESS_CHOICES = (
     ('A','Dining Hall A'),
     ('C','Dining Hall C'))
 
+CONSENT_CHOICES = (
+    ('Letter', 'Letter'),
+    ('Fax', 'Fax'),
+    ('Email', 'Email'))
+
 class Faculty(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
@@ -84,14 +89,14 @@ class Bonafide(models.Model):
 class Leave(models.Model):
     student = models.ForeignKey('Student', on_delete = models.CASCADE)
     dateTimeStart = models.DateTimeField()
-    dataTimeEnd = models.DateTimeField()
+    dateTimeEnd = models.DateTimeField()
     reason = models.TextField()
-    consent = models.CharField(max_length=10)
+    consent = models.CharField(max_length=10, choices=CONSENT_CHOICES)
     corrAddress = models.TextField()
     corrPhone = models.CharField(max_length=15)
-    approvedBy = models.CharField(max_length=50)
-    approved = models.BooleanField()
-    comment = models.TextField()
+    approvedBy = models.CharField(max_length=50, default='', blank=True)
+    approved = models.BooleanField(default=0, blank=True)
+    comment = models.TextField(default='', blank=True)
 
 class DayPass(models.Model):
     student = models.ForeignKey('Student', on_delete = models.CASCADE)
