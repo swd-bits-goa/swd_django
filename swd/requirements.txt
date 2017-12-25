@@ -1,13 +1,13 @@
 Django==1.11.6
 django-jet==1.0.6
 pytz==2017.2
-Django==1.11.6
-django-jet==1.0.6
+django-cors-headers==2.1.0
 django-webpack-loader==0.5.0
 djangorestframework==3.7.3
 djangorestframework-jwt==1.11.0
 graphene==2.0
 graphene-django==2.0.0
+
 graphql-core==2.0
 graphql-relay==0.4.5
 iso8601==0.1.12

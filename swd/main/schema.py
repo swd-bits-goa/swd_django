@@ -83,12 +83,16 @@ class TransactionType(DjangoObjectType):
     class Meta:
         model = Transaction
 
-class MessBillType(DjangoObjectType):
+class MessBillType(DjangoObjectType):   
     class Meta:
         model = MessBill
 
 
 class Query(graphene.AbstractType):
+    # used to get all data to the frontend
+    current_user = graphene.Field(UserType)
+
+    
     all_users = graphene.List(UserType)
     user = graphene.Field(
         UserType,
@@ -237,6 +241,12 @@ class Query(graphene.AbstractType):
         username = graphene.String()
     )
     
+    def resolve_current_user(self, args, **kwargs):
+        context = args.context
+        if not context.user.is_authenticated:
+            return None
+        else:
+            return args.context.user
 
     def resolve_all_users(self, args, **kwargs):
         return User.objects.all()
