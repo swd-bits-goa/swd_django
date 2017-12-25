@@ -15,6 +15,7 @@ def index(request):
 def login_success(request):
     return HttpResponse("Success!")
 
+
 @login_required
 def dashboard(request):
     student = Student.objects.get(user=request.user)
@@ -34,7 +35,6 @@ def profile(request):
     return render(request, "profile.html", context)
 
 
-@login_required
 def loginform(request):
     if request.POST:
         username = request.POST.get('username')
@@ -64,15 +64,15 @@ def messoption(request):
     if messopen:
         messoption = MessOption.objects.filter(monthYear=messopen[0].monthYear, student=student)
 
-    context = {}
+    context = {'student': student}
 
     if messopen and not messoption and datetime.today().date() < messopen[0].dateClose:
         form = MessForm(request.POST)
-        context = {'option': 0, 'form': form, 'dateClose': messopen[0].dateClose}
+        context = {'option': 0, 'form': form, 'dateClose': messopen[0].dateClose, 'student': student}
     elif messopen and messoption:
-        context = {'option': 1, 'mess': messoption[0].mess}
+        context = {'option': 1, 'mess': messoption[0].mess, 'student': student}
     else:
-        context = {'option': 2}
+        context = {'option': 2, 'student': student}
 
     if request.POST:
         mess = request.POST.get('mess')
