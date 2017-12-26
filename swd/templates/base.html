@@ -18,7 +18,36 @@
 </head>
 
 <body>
-    <nav class="" role="navigation">
+    <nav class="nav-extended">
+        <div class="nav-wrapper">
+            <a href="#" class="brand-logo">Student Welfare Division</a>
+            <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
+            <ul id="nav-mobile" class="right hide-on-med-and-down">
+                <li class=""><a href="/profile" class="valign-wrapper"><img class="circle profileImg" src="{% static 'assets/img/profile-swd.jpg' %}">&nbsp;{{ student.name|title }}</a></li>
+                <li><a href="/logout">Logout</a></li>
+            </ul>
+            <ul class="side-nav" id="mobile-demo">
+                <li><a href="/profile" class="valign-wrapper"><img class="circle profileImg" src="{% static 'assets/img/profile-swd.jpg' %}">&nbsp;{{ student.name|title }}</a></li>
+                <li><a href="/logout">Logout</a></li>
+            </ul>
+            <style>
+                .profileImg {
+                    max-width: 35px;
+                    height:auto
+                }
+            </style>
+        </div>
+        <div class="nav-content">
+            <ul class="tabs tabs-transparent">
+                {% load main_extras %}
+                <li class="tab"><a href="/dashboard" class="{% active_page request 'dashboard' %}" target="_self">Dashboard</a></li>
+                <li class="tab"><a href="/messoption" class="{% active_page request 'messoption' %}" target="_self">Mess Option</a></li>
+                <li class="tab"><a href="/leave"  class="{% active_page request 'leave' %}" target="_self">Leave</a></li>
+                <li class="tab"><a href="/certificates" class="{% active_page request 'certificates' %}" target="_self">Certificates</a></li>
+            </ul>
+        </div>
+    </nav>
+    {% comment %} <nav class="" role="navigation">
         <div class="nav-wrapper"><a id="logo-container" href="#" class="brand-logo"></a>
             <ul id="dropdown1" class="dropdown-content">
                 <li><a href="/profile"><i class="material-icons">person_outline</i>Profile</a></li>
@@ -34,10 +63,10 @@
             </ul>
             <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
         </div>
-    </nav>
+    </nav> {% endcomment %}
     <div class="section no-pad-bot" id="index-banner">
     </div>
-    <ul id="slide-out" class="side-nav fixed">
+    {% comment %} <ul id="slide-out" class="side-nav fixed">
         <li>
             <div class="user-view">
                 <div class="background">
@@ -56,7 +85,7 @@
         <li>
             <div class="divider"></div>
         </li>
-    </ul>
+    </ul> {% endcomment %}
 {% block content %} 
 {% endblock %}
 
@@ -95,19 +124,6 @@
             </div>
         </div>
     </footer> -->
-
-    <style>
-            body {
-             padding-left: 300px;
-            }
-
-        @media only screen and (max-width : 992px) {
-            body {
-                padding-left:0;
-            }
-        }
-    </style>
-
     <!--  Scripts-->
     <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
     <script src="{% static 'assets/js/materialize.js' %}"></script>

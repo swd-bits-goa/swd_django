@@ -34,5 +34,5 @@ class BonafideForm(forms.ModelForm):
         fields = ['reason', 'otherReason']
 
         labels = {
-            'otherReason': _('Please mention if other reason. (Write full name of scholarship if applicable)'),
+            'otherReason': _('Please mention if other reason'),
         }
