@@ -1,0 +1,65 @@
+{% extends "easy_pdf/base.html" %}
+{% load staticfiles %}
+
+{% block layout_style %}
+    <style type="text/css">
+        @page {
+            size: {{ pagesize|default:"A4" }};
+            margin-left: 2.5cm;
+            margin-right: 2.5cm;
+            margin-top: 2.5cm;
+            margin-bottom: 2cm;
+
+            @frame header {
+                -pdf-frame-content: page-header;
+                margin-top: 1.3cm;
+                margin-right: 2mm;
+                margin-bottom: 1cm;
+                margin-left: 1.2cm;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block extra_style %}
+<style type="text/css">
+    body {
+        font-family: "Helvetica", "sans-serif";
+        color: #333333;
+        padding-right: 50px;
+        padding-left: 50px;
+    }
+    h1 {
+        font-size: 20px;
+    }
+    p {
+        font-size: 14px;
+        line-height: 20px;
+    }
+
+    .date {
+        display: inline;
+    }
+    .ref {
+        display: inline;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="content">
+    <img src="http://localhost:8000/static/assets/img/BITS_Goa_campus_logo.gif"/>
+    <div class="top">
+        <h3 class="ref" align="left">Hello</h3>
+        <h3 class="date" align="right">{{ date }}</h3>
+    </div>
+    <h1 align="center">CERTIFICATE</h1>
+    <p>This is to certify that {% if student.gender == 'M' %} Mr. {% else %} Ms. {% endif %} {{ student.name|title }}, ID No. {{ student.bitsId }} is a bonafide student of third year class. He was admitted to
+    the Institute on 30/07/2015, for pursuing the B.E.(Hons) Electronics and Instrumentation Engineering programme of studies. He
+    is residing in the Hostel AH4-206 of this Institute. Date of joining the current academic session is 1 August, 2017.</p>
+    <p>
+        This certificate is issues for the purpose of applying for US Visa from 11th December 2017 to 16th December 2017 and he
+        needs to return back to Campus on 6th January 2018 to attend his regular classes.
+    </p>
+</div>
+{% endblock %}

@@ -23,6 +23,8 @@ from main import views as main_views
 from graphene_django.views import GraphQLView
 from schema.schema import schema
 from django.views.decorators.csrf import csrf_exempt
+from django.views.generic import TemplateView
+from main.views import HelloPDFView
 
 # REST
 from rest_framework_jwt.views import obtain_jwt_token
@@ -60,6 +62,9 @@ urlpatterns = [
     url(r'^profile/', main_views.profile, name="profile"),
     url(r'^messoption/', main_views.messoption, name="messoption"),
     url(r'^leave/', main_views.leave, name="leave"),
-    url(r'^certificates/', main_views.certificates, name="certificates")
+    url(r'^certificates/', main_views.certificates, name="certificates"),
+    url(r'^bonafidepdf/', main_views.bonafidepdf, name="bonafidepdf"),
+
+    url('bonafide/', HelloPDFView.as_view()),
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
