@@ -8,6 +8,19 @@ from .forms import MessForm, LeaveForm, BonafideForm
 from django.contrib import messages
 from django.utils.timezone import make_aware
 
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+
+from easy_pdf.views import PDFTemplateView
+
+BRANCH = {
+    'A1': 'B.E.(Hons) Chemical Engineering',
+    'A3': 'B.E.(Hons) Electrical and Electronics Engineering',
+    'A4': 'B.E.(Hons) Mechanical Engineering',
+    'A7': 'B.E.(Hons) Computer Science',
+    'A8': 'B.E.(Hons) Electronics and Instrumentation Engineering',
+}
+
 def index(request):
     return render(request, 'home1.html',{})
 
@@ -159,3 +172,30 @@ def certificates(request):
             print(form.errors)
 
     return render(request, "certificates.html", dict(context, **bonafideContext))
+
+def bonafidepdf(request):
+    response = HttpResponse(content_type='application/pdf')
+    p = canvas.Canvas(response, pagesize=letter)
+    width, height = letter
+    text = '''
+    '''
+    p.drawString(100, 700, text)
+    p.showPage()
+    p.save()
+    return response
+
+def printBonafide(request):
+    pass
+
+class HelloPDFView(PDFTemplateView):
+    context_object_name = 'contexts'
+    template_name = 'bonafidepdf.html'
+
+    def get_context_data(self, **kwargs):
+        return super(HelloPDFView, self).get_context_data(
+            student = Student.objects.get(user=self.request.user),
+            date = datetime.today().date(),
+            pagesize='A4',
+            title='Hi there!',
+            **kwargs
+        )

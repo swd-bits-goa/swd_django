@@ -36,3 +36,6 @@ class BonafideForm(forms.ModelForm):
         labels = {
             'otherReason': _('Please mention if other reason'),
         }
+
+class printBonafideForm(forms.Form):
+    text = forms.CharField(required=True, label='Body Text', widget=forms.Textarea(attrs={'class': 'materialize-textarea'}))
