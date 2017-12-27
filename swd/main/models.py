@@ -23,27 +23,49 @@ class Faculty(models.Model):
     phone = models.CharField(max_length=15)
     email = models.EmailField()
 
+    def __str__(self):
+        return self.name + ' ' + self.email + ' ' + self.chamber
+
 class Warden(models.Model):
     faculty = models.OneToOneField('Faculty', on_delete=models.CASCADE)
     hostel = models.CharField(max_length=5)
+    email = models.EmailField()
+
+    def __str__(self):
+        return self.hostel + ' ' + self.faculty.name + ' ' + self.email + ' ' + self.chamber
 
 class Nucleus(models.Model):
     faculty = models.OneToOneField('Faculty', on_delete=models.CASCADE)
     function = models.CharField(max_length=20)
+    email = models.EmailField()
+
+    def __str__(self):
+        return self.function + ' ' + self.faculty.name + ' ' + self.email + ' ' + self.faculty.chamber
 
 class Superintendent(models.Model):
     faculty = models.OneToOneField('Faculty', on_delete=models.CASCADE)
     function = models.CharField(max_length=20)
 
+    def __str__(self):
+        return self.function + ' ' + self.faculty.name + ' ' + self.faculty.email + ' ' + self.faculty.chamber
+
 class FacultyIncharge(models.Model):
     faculty = models.OneToOneField('Faculty', on_delete=models.CASCADE)
     function = models.CharField(max_length=20)
+
+    def __str__(self):
+        return self.function + ' ' + self.faculty.name + ' ' + self.faculty.email + ' ' + self.faculty.chamber
+
+
 
 class Staff(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
     staffType = models.CharField(max_length=20)
     phone = models.CharField(max_length=15)
+
+    def __str__(self):
+        return self.staffType + ' ' + self.name 
    
 class Student(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -67,6 +89,9 @@ class Student(models.Model):
 class DayScholar(models.Model):
     student = models.OneToOneField('Student', on_delete = models.CASCADE)
 
+    def __str__(self):
+        return self.student.bitsId + ' (' + self.student.name + ')'
+
 class HostelPS(models.Model):
     student = models.OneToOneField('Student', on_delete = models.CASCADE)
     ps = models.BooleanField()
@@ -74,15 +99,24 @@ class HostelPS(models.Model):
     hostel = models.CharField(max_length=5, null=True)
     room = models.CharField(max_length=4, null=True)
 
+    def __str__(self):
+        return self.bitsId + ' (' + self.name + ')'
+
 class CSA(models.Model):
     student = models.OneToOneField('Student', on_delete = models.CASCADE)
     title = models.CharField(max_length=20)
     email = models.EmailField()
 
+    def __str__(self):
+        return self.title + ' ' + self.student.name + self.email
+
 class MessOption(models.Model):
     student = models.ForeignKey('Student', on_delete = models.CASCADE)
     monthYear = models.DateField()
     mess = models.CharField(max_length=1, choices=MESS_CHOICES)
+
+    def __str__(self):
+        return self.mess + ' ' + self.student.bitsId
     
 class Bonafide(models.Model):
     student = models.ForeignKey('Student', on_delete = models.CASCADE)
@@ -90,6 +124,9 @@ class Bonafide(models.Model):
     otherReason = models.CharField(max_length=20, null=True, blank=True)
     reqDate = models.DateField()
     printed = models.BooleanField(default=0, blank=True)
+
+    def __str__(self):
+        return self.student.bitsId + ' (' + self.student.name + ') ' + self.reason
 
 class Leave(models.Model):
     student = models.ForeignKey('Student', on_delete = models.CASCADE)
@@ -103,6 +140,9 @@ class Leave(models.Model):
     approved = models.BooleanField(default=0, blank=True)
     comment = models.TextField(default='', blank=True)
 
+    def __str__(self):
+        return self.student.bitsId + ' '+ self.student.name 
+
 class DayPass(models.Model):
     student = models.ForeignKey('Student', on_delete = models.CASCADE)
     date = models.DateField()
@@ -112,9 +152,15 @@ class DayPass(models.Model):
     approved = models.BooleanField()
     comment = models.TextField()
 
+    def __str__(self):
+        return self.student.bitsId + ' (' + self.student.name + ')'
+
 class LateComer(models.Model):
     student = models.ForeignKey('Student', on_delete = models.CASCADE)
     dateTime = models.DateTimeField()
+
+    def __str__(self):
+        return self.student.bitsId + ' (' + self.student.name + ')'
 
 class InOut(models.Model):
     student = models.ForeignKey('Student', on_delete = models.CASCADE)
@@ -124,6 +170,9 @@ class InOut(models.Model):
     onCampus = models.BooleanField()
     onLeave = models.BooleanField()
 
+    def __str__(self):
+        return self.student.bitsId + ' (' + self.student.name + ')'
+
 class Disco(models.Model):
     student = models.ForeignKey('Student', on_delete = models.CASCADE)
     dateOfViolation = models.DateField()
@@ -131,18 +180,30 @@ class Disco(models.Model):
     action = models.TextField()
     date = models.DateField()
 
+    def __str__(self):
+        return self.student.bitsId + ' (' + self.student.name + ')'
+
 
 class MessOptionOpen(models.Model):
     monthYear = models.DateField()
     dateOpen = models.DateField()
     dateClose = models.DateField()
 
+    def __str__(self):
+        return str(self.monthYear.month) + ' Open: ' + str(self.dateOpen) + ' Close: ' + str(self.dateClose)
+
 
 class Transaction(models.Model):
     student = models.ForeignKey('Student', on_delete = models.CASCADE)
     timestamp = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return self.timestamp + ' ' + student.user
+
 class MessBill(models.Model):
     transaction = models.OneToOneField('Transaction', on_delete=models.CASCADE)
     month = models.DateField()
     amount = models.FloatField()
+
+    def __str__(self):
+        return 
