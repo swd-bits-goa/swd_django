@@ -13,13 +13,7 @@ from reportlab.pdfgen import canvas
 
 from easy_pdf.views import PDFTemplateView
 
-BRANCH = {
-    'A1': 'B.E.(Hons) Chemical Engineering',
-    'A3': 'B.E.(Hons) Electrical and Electronics Engineering',
-    'A4': 'B.E.(Hons) Mechanical Engineering',
-    'A7': 'B.E.(Hons) Computer Science',
-    'A8': 'B.E.(Hons) Electronics and Instrumentation Engineering',
-}
+from braces import views
 
 def index(request):
     return render(request, 'home1.html',{})
@@ -187,15 +181,17 @@ def bonafidepdf(request):
 def printBonafide(request):
     pass
 
-class HelloPDFView(PDFTemplateView):
+class HelloPDFView(views.LoginRequiredMixin, views.PermissionRequiredMixin, PDFTemplateView):
+    permission_required = "auth.change_user"
     context_object_name = 'contexts'
     template_name = 'bonafidepdf.html'
 
     def get_context_data(self, **kwargs):
+
         return super(HelloPDFView, self).get_context_data(
-            student = Student.objects.get(user=self.request.user),
+            bonafide=Bonafide.objects.get(pk=self.request.GET.get('bonafide')),
             date = datetime.today().date(),
             pagesize='A4',
-            title='Hi there!',
+            title='Bonafide Certificates',
             **kwargs
         )
