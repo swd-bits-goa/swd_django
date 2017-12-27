@@ -15,6 +15,14 @@ BONAFIDE_REASON_CHOICES = (
     ('Fax', 'Fax'),
     ('Other', 'Other'))
 
+BRANCH = {
+    'A1': 'B.E.(Hons) Chemical Engineering',
+    'A3': 'B.E.(Hons) Electrical and Electronics Engineering',
+    'A4': 'B.E.(Hons) Mechanical Engineering',
+    'A7': 'B.E.(Hons) Computer Science',
+    'A8': 'B.E.(Hons) Electronics and Instrumentation Engineering',
+}
+
 class Faculty(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
@@ -90,6 +98,20 @@ class Bonafide(models.Model):
     otherReason = models.CharField(max_length=20, null=True, blank=True)
     reqDate = models.DateField()
     printed = models.BooleanField(default=0, blank=True)
+    text = models.TextField(default='', blank=True)
+
+    def createText(self):
+        gender = "Mr." if self.student.gender == 'M' else "Ms."
+        branch = BRANCH[self.student.bitsId[4:6]]
+        reason = self.reason if self.reason is not 'Other' else self.otherReason
+        return '''This is to certify that ''' + gender + self.student.name.title() + ''', ID No.''' + self.student.bitsId + ''' is a bonafide student of third year class. He was admitted to the Institute on 30/07/2015, for pursuing the ''' + branch + ''' programme of studies. He is residing in the Hostel AH4 - 206 of this Institute. Date of joining the current academic session is 1 August, 2017.
+    
+    This certificate is issues for the purpose of applying for ''' + reason + ''' from 11th December 2017 to 16th December 2017 and he needs to return back to Campus on 6th January 2018 to attend his regular classes.'''
+
+    def save(self, *args, **kwargs):
+        if self.text == '':
+            self.text = self.createText()
+        super(Bonafide, self).save(*args, **kwargs)
 
 class Leave(models.Model):
     student = models.ForeignKey('Student', on_delete = models.CASCADE)
