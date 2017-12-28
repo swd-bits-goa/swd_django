@@ -5,6 +5,7 @@ import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
 
+
 class LoginModal extends React.Component {
 
   // Validate form data
@@ -35,7 +36,13 @@ class LoginModal extends React.Component {
         res.json().then(res => {
           if (res.token) {
             localStorage.setItem('token', res.token)
-            window.location.replace('/')
+            console.log("Logged in!")
+            this.props.login()
+            // No need to refresh, component will rerender
+            // Request LoginModal close
+            this.props.onRequestClose()
+            // TODO: Rerender the home component instead of refreshing the page
+            window.location.replace("/")
           }
           // Error handling
           if (res.non_field_errors)
@@ -54,6 +61,7 @@ class LoginModal extends React.Component {
     open: PropTypes.bool.isRequired, // Handles modal state
     // Closure to allow child component to handle state data
     onRequestClose: PropTypes.func.isRequired,
+    login: PropTypes.func.isRequired
   };
 
 //  TODO: Convert form into a controlled React component 
@@ -63,7 +71,7 @@ class LoginModal extends React.Component {
       username : "",
       password : ""
     },
-    nonFieldError : ""
+    nonFieldError : "",
   }
 
   render() {

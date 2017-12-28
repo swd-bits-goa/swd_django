@@ -25,6 +25,7 @@ class Navigation extends React.Component {
     isLoggedIn: PropTypes.bool.isRequired,
     toggleFunc: PropTypes.func.isRequired,
     sideBarOpen: PropTypes.bool.isRequired,
+    login: PropTypes.func.isRequired
   };
 
 constructor(props) {
@@ -46,6 +47,7 @@ constructor(props) {
   handleLogout = () => {
     localStorage.removeItem('token')
     window.location.replace('/')
+    // TODO: Switch from server-side routing to client-side routing
   }
 
   render() {
@@ -69,13 +71,19 @@ console.log(this.state);
             </ToolbarGroup>
             <ToolbarGroup lastChild>
               <IconButton iconStyle={filledIcon}><ActionSearch color={darkGreen} /></IconButton>
+              { !(this.props.isLoggedIn) ? 
               <RaisedButton label="Login" backgroundColor={darkGreen} labelColor={grey50} onTouchTap={this.handleLoginOpen} />
+              :
+             <RaisedButton label="Logout" backgroundColor={darkGreen} labelColor={grey50} onTouchTap={this.handleLogout} />
+              }
+
             </ToolbarGroup>
             
           </Toolbar>
           <LoginModal
             open={this.state.loginModalOpen}
-            onRequestClose={this.handleLoginClose} />
+            onRequestClose={this.handleLoginClose}
+            login={this.props.login} />
         </div>
       </Mobile>
     );

@@ -79,7 +79,8 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      loggedIn: true, //need to change this
+      loggedIn: localStorage.getItem('token') ? true : false , 
+      //Check if we're already logged in when starting the app
       latestNews: [
         {
           title: "Winner of Aditya Birla Group scholarship 2017",
@@ -93,7 +94,16 @@ class App extends React.Component {
     };
   }
 
+  login = () => {
+    this.setState({ loggedIn: true})
+  }
+
+  logout = () => {
+    this.setState({ loggedIn: false})
+  }
+
   render() {
+
     return (
       // apollo interfacing
 
@@ -103,7 +113,7 @@ class App extends React.Component {
             <Route
               path="/"
               render={() => (
-                <Layout isLoggedIn={this.state.loggedIn}>
+                <Layout isLoggedIn={this.state.loggedIn} login={this.login}>
                   <Home news={this.state.latestNews} />
                 </Layout>
               )}
