@@ -1,45 +1,33 @@
-{% load staticfiles %}
-<!DOCTYPE html>
-<html>
 
-<head>
-    <meta charset="UTF-8">
-    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-    <title>404 | Bootstrap Based Admin Template - Material Design</title>
-    <!-- Favicon-->
-    <link rel="icon" href="{% static 'user/favicon.ico' %}" type="image/x-icon">
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <!--Import Google Icon Font-->
+      <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+      <!--Import materialize.css-->
+      <link type="text/css" rel="stylesheet" href="../static/assets/css/materialize.min.css"  media="screen,projection"/>
 
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&subset=latin,cyrillic-ext" rel="stylesheet" type="text/css">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" type="text/css">
+      <!--Let browser know website is optimized for mobile-->
+      <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    </head>
 
-    <!-- Bootstrap Core Css -->
-    <link href="{% static 'user/plugins/bootstrap/css/bootstrap.css' %}" rel="stylesheet">
+    <body class="four-zero-four">
+      <div class="four-zero-four-container">
+        <div class="row">
 
-    <!-- Waves Effect Css -->
-    <link href="{% static 'user/plugins/node-waves/waves.css' %}" rel="stylesheet" />
-
-    <!-- Custom Css -->
-    <link href="{% static 'user/css/style.css' %}" rel="stylesheet">
-</head>
-
-<body class="four-zero-four">
-    <div class="four-zero-four-container">
-        {% comment %} <div class="error-code">Logged out</div> {% endcomment %}
-        <div class="error-message">Logged Out</div>
-        <div class="button-place">
-            <a href="/" class="btn btn-default btn-lg waves-effect">GO TO HOMEPAGE</a>
-        </div>
-    </div>
-
-    <!-- Jquery Core Js -->
-    <script src="{% static 'user/plugins/jquery/jquery.min.js' %}"></script>
-
-    <!-- Bootstrap Core Js -->
-    <script src="{% static 'user/plugins/bootstrap/js/bootstrap.js' %}"></script>
-
-    <!-- Waves Effect Plugin Js -->
-    <script src="{% static 'user/plugins/node-waves/waves.js' %}"></script>
-</body>
-
-</html>
+          <div class="col s6 offset-s3 z-depth-4" id="panell">
+            <h1></h1>
+            <div class="error-message">
+              <p>     <h5>    Logged Out    </h5>    </p>
+              </div>
+            <div class="button-place">
+                <a href="/" class="btn btn-default btn-lg waves-effect">GO TO HOMEPAGE</a>
+            </div>
+          </div>
+          </div>
+          </div>
+      <!--Import jQuery before materialize.js-->
+      <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+      <script type="text/javascript" src="../static/assets/js/materialize.min.js"></script>
+    </body>
+  </html>
