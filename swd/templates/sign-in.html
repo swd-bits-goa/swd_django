@@ -1,92 +1,48 @@
-﻿{% load staticfiles %}
-<!DOCTYPE html>
-<html>
 
-<head>
-    <meta charset="UTF-8">
-    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <!--Import Google Icon Font-->
+      <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+      <!--Import materialize.css-->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">      <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>SWD BITS Goa</title>
-    <!-- Favicon-->
-    <link rel="icon" href="{% static 'user/favicon.ico' %}" type="image/x-icon">
+    </head>
 
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&subset=latin,cyrillic-ext" rel="stylesheet" type="text/css">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" type="text/css">
+    <body>
+      <div class="container">
+        <div class="row">
 
-    <!-- Bootstrap Core Css -->
-    <link href="{% static 'user/plugins/bootstrap/css/bootstrap.css' %}" rel="stylesheet">
+          <div class="col s6 offset-s3 z-depth-4" id="panell">
+            <h1></h1>
+            <a href="javascript:void(0);">Student Welfare Division, BITS Pilani, Goa</a>
+            <h1></h1>
+            <h5 id="title">Sign in to access SWD</h5>
+            <form>
 
-    <!-- Waves Effect Css -->
-    <link href="{% static 'user/plugins/node-waves/waves.css' %}" rel="stylesheet" />
+          <div class="input-field" id="username">
+              <input  type="text" class="validate">
+              <label for="username">Username</label>
+          </div>
+          <div class="input-field" id="password">
+            <input  type="password" class="validate">
+            <label for="password">Password</label>
+          </div>
+        <p>
+            <input type="checkbox" id="remember"/>
+            <label for="remember" id="checkbox" >Remember me</label>
+        </p>
+        <a class="waves-effect waves-light btn" id="loginbtn">Login</a>
 
-    <!-- Animation Css -->
-    <link href="{% static 'user/plugins/animate-css/animate.css' %}" rel="stylesheet" />
-
-    <!-- Custom Css -->
-    <link href="{% static 'user/css/style.css' %}" rel="stylesheet">
-</head>
-
-<body class="login-page">
-    <div class="login-box">
-        <div class="logo">
-            <a href="javascript:void(0);">SWD</a>
-            <small>Student Welfare Division, BITS Pilani, Goa</small>
+        </form>
+          <h1></h1>
+          <a href="forgot-password.html">Forgot Password?</a>
+          <h1></h1>
+          </div>
         </div>
-        <div class="card">
-            <div class="body">
-                <form id="sign_in" method="POST">
-                     {% csrf_token %}
-                    <div class="msg">Sign in to access SWD</div>
-                    <div class="input-group">
-                        <span class="input-group-addon">
-                            <i class="material-icons">person</i>
-                        </span>
-                        <div class="form-line">
-                            <input type="text" class="form-control" name="username" placeholder="Username" required autofocus>
-                        </div>
-                    </div>
-                    <div class="input-group">
-                        <span class="input-group-addon">
-                            <i class="material-icons">lock</i>
-                        </span>
-                        <div class="form-line">
-                            <input type="password" class="form-control" name="password" placeholder="Password" required>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-xs-8 p-t-5">
-                            <input type="checkbox" name="rememberme" id="rememberme" class="filled-in chk-col-pink">
-                            <label for="rememberme">Remember Me</label>
-                        </div>
-                        <div class="col-xs-4">
-                            <button class="btn btn-block bg-pink waves-effect" type="submit">SIGN IN</button>
-                        </div>
-                    </div>
-                    <div class="row m-t-15 m-b--20">
-                        <div class="col-xs-6 align-right">
-                            <a href="forgot-password.html">Forgot Password?</a>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
+
     </div>
 
-    <!-- Jquery Core Js -->
-    <script src="{% static 'user/plugins/jquery/jquery.min.js' %}"></script>
-
-    <!-- Bootstrap Core Js -->
-    <script src="{% static 'user/plugins/bootstrap/js/bootstrap.js' %}"></script>
-
-    <!-- Waves Effect Plugin Js -->
-    <script src="{% static 'user/plugins/node-waves/waves.js' %}"></script>
-
-    <!-- Validation Plugin Js -->
-    <script src="{% static 'user/plugins/jquery-validation/jquery.validate.js' %}"></script>
-
-    <!-- Custom Js -->
-    <script src="{% static 'user/js/admin.js' %}"></script>
-    <script src="{% static 'user/js/pages/examples/sign-in.js' %}"></script>
-</body>
-
-</html>
+      <!--Import jQuery before materialize.js-->
+      <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>  </html>
