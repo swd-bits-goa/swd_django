@@ -1,11 +1,16 @@
 
+{% load staticfiles %}
   <!DOCTYPE html>
   <html>
     <head>
       <!--Import Google Icon Font-->
       <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-      <!--Import materialize.css-->
-        <link type="text/css" rel="stylesheet" href="../static/assets/css/materialize.min.css"  media="screen,projection"/>
+      <!--Import materialize.css
+
+        <link type="text/css" rel="stylesheet" href="{% static 'assets/css/materialize.css' %}"  media="screen,projection"/>
+        -->
+        <link href="{% static 'assets/css/materialize.css' %}" type="text/css" rel="stylesheet" media="screen,projection" />
+        <link href="{% static 'assets/css/style.css' %}" type="text/css" rel="stylesheet" media="screen,projection" />
   <title>SWD BITS Goa</title>
     </head>
 
@@ -45,5 +50,5 @@
 
       <!--Import jQuery before materialize.js-->
       <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-  <script type="text/javascript" src="../static/assets/js/materialize.min.js"></script>
+      <script src="{% static 'assets/js/materialize.js' %}"></script>
     </html>
