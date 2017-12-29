@@ -16,35 +16,46 @@
 
     <body>
       <div class="container">
-        <div class="row">
+        <div class="row valign-wrapper" id="bodyWrap">
 
-          <div class="col s6 offset-s3 z-depth-4" id="panell">
-            <h1></h1>
-            <a href="javascript:void(0);">Student Welfare Division, BITS Pilani, Goa</a>
-            <h1></h1>
-            <h5 id="title">Sign in to access SWD</h5>
-            <form id="sign_in" method="POST">
-
-          <div class="input-field" id="username">
-              <input  type="text" class="validate">
-              <label for="username">Username</label>
-          </div>
-          <div class="input-field" id="password">
-            <input  type="password" class="validate">
-            <label for="password">Password</label>
-          </div>
-        <p>
-            <input type="checkbox" id="remember"/>
-            <label for="remember" id="checkbox" >Remember me</label>
-        </p>
-        <a class="waves-effect waves-light btn" id="loginbtn">Login</a>
-
-        </form>
-          <h1></h1>
-          <a href="forgot-password.html">Forgot Password?</a>
-          <h1></h1>
+          <div class="col s12 m6 offset-m3">
+            <h2 class="white-text" align="center">Student Welfare Division</h2>
+            <div class="card darken-1">
+              <div class="card-content">
+                <span class="card-title">Sign in to access SWD</span>
+            
+                {% comment %} <a href="javascript:void(0);">Student Welfare Division, BITS Pilani, Goa</a> {% endcomment %}
+                
+                <form id="sign_in" method="POST">
+                   {% csrf_token %}
+                  <div class="input-field" id="username">
+                      <input  type="text" class="validate" name="username">
+                      <label for="username">Username</label>
+                  </div>
+                  
+                  <div class="input-field" id="password">
+                    <input  type="password" class="validate" name="password">
+                    <label for="password">Password</label>
+                  </div>
+                  
+                  <button type="submit" class="waves-effect waves-light btn" id="loginbtn">Login</button>
+                
+                </form>
+              
+            </div>
           </div>
         </div>
+
+
+      </div>
+      <style>
+        #bodyWrap {
+          height:90vh;
+        }
+        body {
+          background: #00BCD4;
+        }
+      </style>
 
     </div>
 
