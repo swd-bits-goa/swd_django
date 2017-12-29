@@ -1,45 +1,58 @@
 {% load staticfiles %}
-<!DOCTYPE html>
-<html>
 
-<head>
-    <meta charset="UTF-8">
-    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-    <title>404 | Bootstrap Based Admin Template - Material Design</title>
-    <!-- Favicon-->
-    <link rel="icon" href="{% static 'user/favicon.ico' %}" type="image/x-icon">
+  <!DOCTYPE html>
+  <html>
 
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&subset=latin,cyrillic-ext" rel="stylesheet" type="text/css">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" type="text/css">
+  <head>
+    <!--Import Google Icon Font-->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!--Import materialize.css
 
-    <!-- Bootstrap Core Css -->
-    <link href="{% static 'user/plugins/bootstrap/css/bootstrap.css' %}" rel="stylesheet">
+        <link type="text/css" rel="stylesheet" href="{% static 'assets/css/materialize.css' %}"  media="screen,projection"/>
+        -->
+    <link href="{% static 'assets/css/materialize.css' %}" type="text/css" rel="stylesheet" media="screen,projection" />
+    <link href="{% static 'assets/css/style.css' %}" type="text/css" rel="stylesheet" media="screen,projection" />
+    <title>SWD BITS Goa</title>
+  </head>
 
-    <!-- Waves Effect Css -->
-    <link href="{% static 'user/plugins/node-waves/waves.css' %}" rel="stylesheet" />
+  <body>
+    <div class="container">
+      <div class="row valign-wrapper" id="bodyWrap">
 
-    <!-- Custom Css -->
-    <link href="{% static 'user/css/style.css' %}" rel="stylesheet">
-</head>
+        <div class="col s12 m6 offset-m3">
+          <h2 class="white-text" align="center">Student Welfare Division</h2>
+          <div class="card darken-1">
+            <div class="card-content">
+              <span class="card-title"></span> {% comment %} <a href="javascript:void(0);">Student Welfare Division, BITS Pilani, Goa</a>              {% endcomment %}
 
-<body class="four-zero-four">
-    <div class="four-zero-four-container">
-        {% comment %} <div class="error-code">Logged out</div> {% endcomment %}
-        <div class="error-message">Logged Out</div>
-        <div class="button-place">
-            <a href="/" class="btn btn-default btn-lg waves-effect">GO TO HOMEPAGE</a>
+              <h5 align="center">You have successfully logged out.</h5>
+              <div class="row">
+              <div class="card-action col s12 m4 offset-m4">
+                <a href="/">Home</a>
+                <a href="/login">Login</a>
+              </div>
+              </div>
+
+            </div>
+          </div>
         </div>
+
+
+      </div>
+      <style>
+        #bodyWrap {
+          height: 90vh;
+        }
+
+        body {
+          background: #00BCD4;
+        }
+      </style>
+
     </div>
 
-    <!-- Jquery Core Js -->
-    <script src="{% static 'user/plugins/jquery/jquery.min.js' %}"></script>
+    <!--Import jQuery before materialize.js-->
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="{% static 'assets/js/materialize.js' %}"></script>
 
-    <!-- Bootstrap Core Js -->
-    <script src="{% static 'user/plugins/bootstrap/js/bootstrap.js' %}"></script>
-
-    <!-- Waves Effect Plugin Js -->
-    <script src="{% static 'user/plugins/node-waves/waves.js' %}"></script>
-</body>
-
-</html>
+  </html>

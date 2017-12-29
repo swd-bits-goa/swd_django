@@ -1,92 +1,65 @@
-﻿{% load staticfiles %}
-<!DOCTYPE html>
-<html>
 
-<head>
-    <meta charset="UTF-8">
-    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-    <title>SWD BITS Goa</title>
-    <!-- Favicon-->
-    <link rel="icon" href="{% static 'user/favicon.ico' %}" type="image/x-icon">
+{% load staticfiles %}
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <!--Import Google Icon Font-->
+      <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+      <!--Import materialize.css
 
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&subset=latin,cyrillic-ext" rel="stylesheet" type="text/css">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" type="text/css">
+        <link type="text/css" rel="stylesheet" href="{% static 'assets/css/materialize.css' %}"  media="screen,projection"/>
+        -->
+        <link href="{% static 'assets/css/materialize.css' %}" type="text/css" rel="stylesheet" media="screen,projection" />
+        <link href="{% static 'assets/css/style.css' %}" type="text/css" rel="stylesheet" media="screen,projection" />
+  <title>SWD BITS Goa</title>
+    </head>
 
-    <!-- Bootstrap Core Css -->
-    <link href="{% static 'user/plugins/bootstrap/css/bootstrap.css' %}" rel="stylesheet">
+    <body>
+      <div class="container">
+        <div class="row valign-wrapper" id="bodyWrap">
 
-    <!-- Waves Effect Css -->
-    <link href="{% static 'user/plugins/node-waves/waves.css' %}" rel="stylesheet" />
-
-    <!-- Animation Css -->
-    <link href="{% static 'user/plugins/animate-css/animate.css' %}" rel="stylesheet" />
-
-    <!-- Custom Css -->
-    <link href="{% static 'user/css/style.css' %}" rel="stylesheet">
-</head>
-
-<body class="login-page">
-    <div class="login-box">
-        <div class="logo">
-            <a href="javascript:void(0);">SWD</a>
-            <small>Student Welfare Division, BITS Pilani, Goa</small>
-        </div>
-        <div class="card">
-            <div class="body">
+          <div class="col s12 m6 offset-m3">
+            <h2 class="white-text" align="center">Student Welfare Division</h2>
+            <div class="card darken-1">
+              <div class="card-content">
+                <span class="card-title">Sign in to access SWD</span>
+            
+                {% comment %} <a href="javascript:void(0);">Student Welfare Division, BITS Pilani, Goa</a> {% endcomment %}
+                
                 <form id="sign_in" method="POST">
-                     {% csrf_token %}
-                    <div class="msg">Sign in to access SWD</div>
-                    <div class="input-group">
-                        <span class="input-group-addon">
-                            <i class="material-icons">person</i>
-                        </span>
-                        <div class="form-line">
-                            <input type="text" class="form-control" name="username" placeholder="Username" required autofocus>
-                        </div>
-                    </div>
-                    <div class="input-group">
-                        <span class="input-group-addon">
-                            <i class="material-icons">lock</i>
-                        </span>
-                        <div class="form-line">
-                            <input type="password" class="form-control" name="password" placeholder="Password" required>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-xs-8 p-t-5">
-                            <input type="checkbox" name="rememberme" id="rememberme" class="filled-in chk-col-pink">
-                            <label for="rememberme">Remember Me</label>
-                        </div>
-                        <div class="col-xs-4">
-                            <button class="btn btn-block bg-pink waves-effect" type="submit">SIGN IN</button>
-                        </div>
-                    </div>
-                    <div class="row m-t-15 m-b--20">
-                        <div class="col-xs-6 align-right">
-                            <a href="forgot-password.html">Forgot Password?</a>
-                        </div>
-                    </div>
+                   {% csrf_token %}
+                  <div class="input-field" id="username">
+                      <input  type="text" class="validate" name="username">
+                      <label for="username">Username</label>
+                  </div>
+                  
+                  <div class="input-field" id="password">
+                    <input  type="password" class="validate" name="password">
+                    <label for="password">Password</label>
+                  </div>
+                  
+                  <button type="submit" class="waves-effect waves-light btn" id="loginbtn">Login</button>
+                
                 </form>
+              
             </div>
+          </div>
         </div>
+
+
+      </div>
+      <style>
+        #bodyWrap {
+          height:90vh;
+        }
+        body {
+          background: #00BCD4;
+        }
+      </style>
+
     </div>
 
-    <!-- Jquery Core Js -->
-    <script src="{% static 'user/plugins/jquery/jquery.min.js' %}"></script>
-
-    <!-- Bootstrap Core Js -->
-    <script src="{% static 'user/plugins/bootstrap/js/bootstrap.js' %}"></script>
-
-    <!-- Waves Effect Plugin Js -->
-    <script src="{% static 'user/plugins/node-waves/waves.js' %}"></script>
-
-    <!-- Validation Plugin Js -->
-    <script src="{% static 'user/plugins/jquery-validation/jquery.validate.js' %}"></script>
-
-    <!-- Custom Js -->
-    <script src="{% static 'user/js/admin.js' %}"></script>
-    <script src="{% static 'user/js/pages/examples/sign-in.js' %}"></script>
-</body>
-
-</html>
+      <!--Import jQuery before materialize.js-->
+      <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+      <script src="{% static 'assets/js/materialize.js' %}"></script>
+    </html>
