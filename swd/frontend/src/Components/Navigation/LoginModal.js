@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
+import {withApollo} from 'react-apollo';
 
 
 class LoginModal extends React.Component {
@@ -36,13 +37,13 @@ class LoginModal extends React.Component {
         res.json().then(res => {
           if (res.token) {
             localStorage.setItem('token', res.token)
-            console.log("Logged in!")
             this.props.login()
             // No need to refresh, component will rerender
             // Request LoginModal close
             this.props.onRequestClose()
-            // TODO: Rerender the home component instead of refreshing the page
-            window.location.replace("/")
+            
+            // Reset Apollo's cache store so that it can refetch all active queries
+            this.props.client.resetStore()
           }
           // Error handling
           if (res.non_field_errors)
@@ -123,4 +124,4 @@ class LoginModal extends React.Component {
   }
 }
 
-export default LoginModal;
+export default withApollo(LoginModal);

@@ -13,6 +13,7 @@ import IconMenu from 'material-ui/IconMenu';
 import RaisedButton from 'material-ui/RaisedButton';
 import ActionSearch from 'material-ui/svg-icons/action/search';
 import Avatar from 'material-ui/Avatar';
+import {withApollo} from 'react-apollo';
 import { grey200, grey50 } from 'material-ui/styles/colors';
 // Import custom navigation styles
 import s from './Navigation.css';
@@ -25,7 +26,8 @@ class Navigation extends React.Component {
     isLoggedIn: PropTypes.bool.isRequired,
     toggleFunc: PropTypes.func.isRequired,
     sideBarOpen: PropTypes.bool.isRequired,
-    login: PropTypes.func.isRequired
+    login: PropTypes.func.isRequired,
+    logout: PropTypes.func.isRequired
   };
 
 constructor(props) {
@@ -46,8 +48,8 @@ constructor(props) {
 
   handleLogout = () => {
     localStorage.removeItem('token')
-    window.location.replace('/')
-    // TODO: Switch from server-side routing to client-side routing
+    this.props.logout()
+    this.props.client.resetStore()
   }
 
   render() {
@@ -178,4 +180,4 @@ console.log(this.state);
   }
 }
 
-export default (Navigation);
+export default withApollo(Navigation);

@@ -113,7 +113,7 @@ class App extends React.Component {
             <Route
               path="/"
               render={() => (
-                <Layout isLoggedIn={this.state.loggedIn} login={this.login}>
+                <Layout isLoggedIn={this.state.loggedIn} login={this.login} logout={this.logout}>
                   <Home news={this.state.latestNews} />
                 </Layout>
               )}
