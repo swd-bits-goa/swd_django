@@ -27,7 +27,13 @@ class LoginModal extends React.Component {
     this.setState({ fieldError: fieldError})
       
     // If we have any field errors, prevent sending login request
-    if (Object.keys(fieldError).length) return;
+    if (Object.keys(fieldError).length) return
+
+    // Since we're sending the request, reset field errors
+    this.setState({ fieldError: {
+      username : "",
+      password : ""
+    }})
 
     fetch('http://localhost:8000/api-token-auth/', {
       method: 'POST',
@@ -99,6 +105,7 @@ class LoginModal extends React.Component {
           modal={true}
           open={this.props.open}
           onRequestClose={this.props.onRequestClose}
+          contentStyle= {{ width: "98%"}} // Not full for aesthetic purposes
         >
           Username same as BITS mail. Use your LDAP Authentication password to login.
 
