@@ -43,7 +43,6 @@ constructor(props) {
 
   handleLoginClose = () => {
     this.setState({ loginModalOpen: false });
-    console.log("Closed!");
   };
 
   handleLogout = () => {
@@ -58,7 +57,7 @@ constructor(props) {
       width: 24,
       height: 24,
     };
-console.log(this.state);
+    
     return (
 
       // There's a noticeable lag when rendering components based on

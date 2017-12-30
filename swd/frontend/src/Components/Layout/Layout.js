@@ -55,6 +55,7 @@ class Layout extends React.Component {
 
             <Sidebar
               open={this.state.sideBarOpen}
+              toggleOpen={this.handleSideBarToggle}
             />
 
         </div>
