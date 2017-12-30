@@ -187,6 +187,9 @@ class HelloPDFView(views.LoginRequiredMixin, views.PermissionRequiredMixin, PDFT
     template_name = 'bonafidepdf.html'
 
     def get_context_data(self, **kwargs):
+        b = Bonafide.objects.get(pk=self.request.GET.get('bonafide'))
+        b.printed = True
+        b.save()
 
         return super(HelloPDFView, self).get_context_data(
             bonafide=Bonafide.objects.get(pk=self.request.GET.get('bonafide')),
