@@ -92,7 +92,18 @@ class App extends React.Component {
         }
       ]
     };
+
+
   }
+
+  static childContextTypes = {
+    loggedIn: PropTypes.bool
+  }
+
+
+  getChildContext = () => ({
+    loggedIn: this.state.loggedIn
+  })
 
   login = () => {
     this.setState({ loggedIn: true})
