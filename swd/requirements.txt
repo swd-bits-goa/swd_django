@@ -5,10 +5,13 @@ cssselect2==0.2.1
 defusedxml==0.5.0
 Django==1.11.6
 django-braces==1.12.0
+django-jet==1.0.6
+pytz==2017.2
 django-cors-headers==2.1.0
 django-easy-pdf==0.1.1
 django-jet==1.0.6
 django-webpack-loader==0.5.0
+django-easy-pdf==0.1.1
 djangorestframework==3.7.3
 djangorestframework-jwt==1.11.0
 graphene==2.0
