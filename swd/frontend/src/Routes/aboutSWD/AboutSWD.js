@@ -12,22 +12,32 @@ import { graphql } from "react-apollo";
 
 class AboutSWD extends React.Component {
 
-  // const data = (props) => {
-  //   const loading = props.data.loading;
-  //   const error = props.data.error;
-  //   const currentUser = props.data.currentUser;
-  //   // render UI with loading, error, or currentUser
-  // }
-
   render() {
     return (
         
       <Mobile>
         <div className={s.container}>
-          <ExpandableCard title="Hostel Facilities" text="sfsf"/>
-          <ExpandableCard title="Mess Facilities" text="sfsf"/>
-          <ExpandableCard title = "Financial Aid" text = "sfsf" />
-          <ExpandableCard title = "Online Services" text = "sfsf" />
+          <ExpandableCard title="Hostel Facilities">
+            <ul class="details">
+							<li> Mess selection facility every month. </li>
+							<li>Apply for issue of certificate. </li>
+							<li> Leave application submission </li>		
+						</ul>
+            </ExpandableCard>
+          <ExpandableCard title="Mess Facilities">
+          <ul class="details">
+							<li>There are 2 Dinning Halls (A &amp; C) each of capacity 1200. </li>
+							<li> Current Caterers: 
+								<ul>
+									<li>A Dinning Hall : Vinayak Foods</li>
+									<li>C Dinning Hall : Aditya cateres </li>
+									<li> Mess Rate :   which includes four meals (Breakfast, Lunch, Dinner)</li>
+								</ul>
+							</li>
+						</ul>
+            </ExpandableCard>
+          <ExpandableCard title = "Financial Aid"/>
+          <ExpandableCard title = "Online Services"/>
           </div>
       </Mobile>
       

@@ -6,7 +6,7 @@ import s from './ExpandableCard.css';
 
 const ExpandableCard = (props) => {
 
-  const { title, text } = props;
+  const { title, text, children } = props;
 
   return(
 <div className={s.container}>
@@ -17,6 +17,7 @@ const ExpandableCard = (props) => {
       showExpandableButton={true}/>
     <CardText expandable={true}>
      {text}
+     {children}
     </CardText>
   </Card>
 </div>
@@ -25,7 +26,7 @@ const ExpandableCard = (props) => {
 
 ExpandableCard.propTypes = {
   title: PropTypes.string.isRequired,
-  text : PropTypes.string.isRequired
+  text : PropTypes.string
 };
 
 export default ExpandableCard;
