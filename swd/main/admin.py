@@ -14,8 +14,6 @@ models = [ Faculty, Warden, Nucleus, Superintendent, FacultyIncharge, Staff, Day
 
 @admin.register(Bonafide)
 class BonafideAdmin(admin.ModelAdmin):
-    
-
     list_display = (
         'id',
         'student',
@@ -24,13 +22,12 @@ class BonafideAdmin(admin.ModelAdmin):
         'bonafide_actions', 
     )
     def get_url(self, pk):
-        print(Bonafide.objects.filter(pk=pk))
-        url = HttpResponseRedirect('/bonafide/?bonafide=' + Bonafide.objects.filter(pk=pk) )
+        url = '/bonafide/?bonafide=' + str(Bonafide.objects.get(pk=pk).id)
         return url
 
     def bonafide_actions(self, obj):
         return format_html  (
-            '<a class="button" href="{}" target="blank_">Deposit</a>&nbsp;',
+            '<a class="button" href="{}" target="blank_">Print</a>&nbsp;',
             self.get_url(obj.pk),
         )
     bonafide_actions.short_description = 'Bonafide Actions'
