@@ -87,7 +87,7 @@ def messoption(request):
         messoptionfill.save()
         return redirect('messoption')
 
-    
+
     return render(request, "mess.html", context)
 
 
@@ -181,7 +181,7 @@ def bonafidepdf(request):
 def printBonafide(request):
     pass
 
-class HelloPDFView(views.LoginRequiredMixin, views.PermissionRequiredMixin, PDFTemplateView):
+class BonafidePDFView(views.LoginRequiredMixin, views.PermissionRequiredMixin, PDFTemplateView):
     permission_required = "auth.change_user"
     context_object_name = 'contexts'
     template_name = 'bonafidepdf.html'
