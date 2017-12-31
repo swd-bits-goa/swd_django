@@ -23,6 +23,31 @@ BRANCH = {
     'A8': 'B.E.(Hons) Electronics and Instrumentation Engineering',
 }
 
+STUDENT_STATUS = (
+    ('Student', 'Student'),
+    ('Thesis', 'Thesis'),
+    ('PS2', 'PS2'),
+    ('Graduate', 'Graduate'))
+
+HOSTELS = (
+    ('AH1', 'AH1'),
+    ('AH2', 'AH2'),
+    ('AH3', 'AH3'),
+    ('AH4', 'AH4'),
+    ('AH5', 'AH5'),
+    ('AH6', 'AH6'),
+    ('AH7', 'AH7'),
+    ('AH8', 'AH8'),
+    ('AH9', 'AH9'),
+    ('CH1', 'CH1'),
+    ('CH2', 'CH2'),
+    ('CH3', 'CH3'),
+    ('CH4', 'CH4'),
+    ('CH5', 'CH5'),
+    ('CH6', 'CH6'),
+    ('CH7', 'CH7'),
+)
+
 class Faculty(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
@@ -36,19 +61,17 @@ class Faculty(models.Model):
 
 class Warden(models.Model):
     faculty = models.OneToOneField('Faculty', on_delete=models.CASCADE)
-    hostel = models.CharField(max_length=5)
-    email = models.EmailField()
+    hostel = models.CharField(max_length=5, choices=HOSTELS)
 
     def __str__(self):
-        return self.hostel + ' ' + self.faculty.name + ' ' + self.email + ' ' + self.chamber
+        return self.hostel + ' ' + self.faculty.name + ' ' + self.faculty.email + ' ' + self.faculty.chamber
 
 class Nucleus(models.Model):
     faculty = models.OneToOneField('Faculty', on_delete=models.CASCADE)
     function = models.CharField(max_length=20)
-    email = models.EmailField()
 
     def __str__(self):
-        return self.function + ' ' + self.faculty.name + ' ' + self.email + ' ' + self.faculty.chamber
+        return self.function + ' ' + self.faculty.name + ' ' + self.faculty.email + ' ' + self.faculty.chamber
 
 class Superintendent(models.Model):
     faculty = models.OneToOneField('Faculty', on_delete=models.CASCADE)
@@ -102,13 +125,19 @@ class DayScholar(models.Model):
 
 class HostelPS(models.Model):
     student = models.OneToOneField('Student', on_delete = models.CASCADE)
-    ps = models.BooleanField()
-    psStation = models.CharField(max_length=20, null=True)
-    hostel = models.CharField(max_length=5, null=True)
-    room = models.CharField(max_length=4, null=True)
+    acadstudent = models.BooleanField()
+    status = models.CharField(max_length=10, choices=STUDENT_STATUS)
+    psStation = models.CharField(max_length=20, null=True, blank=True)
+    hostel = models.CharField(max_length=5, null=True, blank=True, choices=HOSTELS)
+    room = models.CharField(max_length=4, null=True, blank=True)
 
     def __str__(self):
-        return self.bitsId + ' (' + self.name + ')'
+        return self.student.bitsId + ' (' + self.student.name + ')'
+
+    def save(self, *args, **kwargs):
+        if self.acadstudent == True:
+            self.status = 'Student'
+        super(HostelPS, self).save(*args, **kwargs)
 
 class CSA(models.Model):
     student = models.OneToOneField('Student', on_delete = models.CASCADE)
@@ -158,7 +187,7 @@ class Leave(models.Model):
     consent = models.CharField(max_length=10, choices=CONSENT_CHOICES)
     corrAddress = models.TextField()
     corrPhone = models.CharField(max_length=15)
-    approvedBy = models.CharField(max_length=50, default='', blank=True)
+    approvedBy = models.ForeignKey('Warden', blank=True, null=True)
     approved = models.BooleanField(default=0, blank=True)
     comment = models.TextField(default='', blank=True)
 

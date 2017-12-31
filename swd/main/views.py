@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
-from .models import Student, MessOptionOpen, MessOption, Leave, Bonafide
+from django.contrib.auth.decorators import login_required, user_passes_test
+from .models import Student, MessOptionOpen, MessOption, Leave, Bonafide, Faculty, Warden
 from datetime import date, datetime
 from .forms import MessForm, LeaveForm, BonafideForm
 from django.contrib import messages
@@ -51,6 +51,8 @@ def loginform(request):
             login(request, user)
             if user.is_staff:
                 return redirect('/admin')
+            if user.groups.filter(name='warden').exists():
+                return redirect('/warden')
             return redirect('dashboard')
 
     return render(request, "sign-in.html", {})
@@ -198,3 +200,50 @@ class BonafidePDFView(views.LoginRequiredMixin, views.PermissionRequiredMixin, P
             title='Bonafide Certificates',
             **kwargs
         )
+
+def is_member(user):
+    return user.groups.filter(name='warden').exists()
+
+@login_required
+@user_passes_test(is_member)
+def warden(request):
+    warden = Warden.objects.get(faculty__user=request.user)
+    leaves = Leave.objects.filter(student__hostelps__hostel='AH4').order_by('approved', '-id')
+    context = {
+        'option':1,
+        'warden': warden,
+        'leaves': leaves,
+    }
+    return render(request, "warden.html", context)
+
+@login_required
+@user_passes_test(is_member)
+def wardenapprove(request, leave):
+    leave = Leave.objects.get(id=leave)
+    warden = Warden.objects.get(faculty__user=request.user)
+    context = {
+        'option': 2,
+        'warden': warden,
+        'leave': leave,
+    }
+
+    if request.POST:
+        approved = request.POST.getlist('group1')
+        print(approved)
+        comment = request.POST.get('comment')
+
+        if '1' in approved:
+            leave.approved=True
+            leave.approvedBy = warden
+        elif '2' in approved:
+            leave.approved=False
+            leave.approvedBy = warden
+        else:
+            leave.approved=False
+            leave.approvedBy = None
+        
+        leave.comment = comment
+        leave.save()
+        return redirect('warden')
+
+    return render(request, "warden.html", context)

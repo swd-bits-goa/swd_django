@@ -9,7 +9,10 @@ from django.http import HttpResponseRedirect
 class StudentAdmin(admin.ModelAdmin):
     search_fields = ['name','bitsId']
 
-models = [ Faculty, Warden, Nucleus, Superintendent, FacultyIncharge, Staff, DayScholar, HostelPS, CSA, MessOption, Leave, DayPass, LateComer, InOut, Disco, MessOptionOpen, Transaction, MessBill]
+class HostelPSAdmin(admin.ModelAdmin):
+    search_fields = ['student__name', 'student__bitsId']
+
+models = [ Faculty, Warden, Nucleus, Superintendent, FacultyIncharge, Staff, DayScholar, CSA, MessOption, Leave, DayPass, LateComer, InOut, Disco, MessOptionOpen, Transaction, MessBill]
     
 
 @admin.register(Bonafide)
@@ -34,6 +37,7 @@ class BonafideAdmin(admin.ModelAdmin):
     bonafide_actions.allow_tags = True
 
 admin.site.register(Student, StudentAdmin)
+admin.site.register(HostelPS, HostelPSAdmin)
 # admin.site.register(Bonafide, BonafideAdmin)
 admin.site.register(models)
 
