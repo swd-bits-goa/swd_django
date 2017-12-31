@@ -28,4 +28,8 @@ urlpatterns = [
     url(r'^bonafidepdf/', views.bonafidepdf, name="bonafidepdf"),
 
     url('bonafide/', BonafidePDFView.as_view()),
+
+    url(r'^warden/$', views.warden, name="warden"),
+    url(r'^warden/([0-9]+)/$', views.wardenapprove, name="wardenapprove"),
+
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

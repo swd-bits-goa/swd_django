@@ -1,0 +1,199 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0" />
+    <title>SWD BITS Goa</title>
+
+    <!-- CSS  -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="{% static 'assets/css/materialize.css' %}" type="text/css" rel="stylesheet" media="screen,projection" />
+    <link href="{% static 'assets/css/style.css' %}" type="text/css" rel="stylesheet" media="screen,projection" />
+</head>
+
+<body>
+    <nav class="nav-extended">
+        <div class="nav-wrapper">
+            <a href="#" class="brand-logo">&nbsp;Student Welfare Division</a>
+            <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
+            <ul id="nav-mobile" class="right hide-on-med-and-down">
+                <li class=""><a href="/profile" class="valign-wrapper"><img class="circle profileImg" src="{% static 'assets/img/profile-swd.jpg' %}">&nbsp;{{ warden.faculty.name|title }}</a></li>
+                <li><a href="/logout">Logout</a></li>
+            </ul>
+            <ul class="side-nav" id="mobile-demo">
+                <li><a href="/profile" class="valign-wrapper"><img class="circle profileImg" src="{% static 'assets/img/profile-swd.jpg' %}">&nbsp;{{ warden.faculty.name|title }}</a></li>
+                <li><a href="/logout">Logout</a></li>
+            </ul>
+            <style>
+                .profileImg {
+                    max-width: 35px;
+                    height: auto
+                }
+            </style>
+        </div>
+    </nav>
+    <div class="section no-pad-bot" id="index-banner">
+    </div>
+
+    <div>
+        <div class="section">
+
+            <!--   Icon Section   -->
+            <div class="row">
+                {% if option == 1 %}
+                <div class="col s6 l6">
+                    <div class="card">
+                        <div class="card-content">
+                            <span class="card-title">Leave Applications</span>
+                            <table class="bordered highlight">
+                                <thead>
+                                    <tr>
+                                        <th>Leave No.</th>
+                                        <th>Name (ID)</th>
+                                        <th>Duration</th>
+                                        <th>Approval Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for leave in leaves %}
+                                    <tr class="clickable" onclick="leaveclick(this)" data-id="{{ leave.id }}">
+                                        <td>{{ leave.id }}</td>
+                                        <td>{{ leave.student.name }} ({{ leave.student.bitsId }})</td>
+                                        <td>{{ leave.dateTimeStart|date:"d/M/y" }} to {{ leave.dateTimeEnd|date:"d/M/y" }}</td>
+                                        <td>{% if leave.approved == 0 and leave.approvedBy == ''%}In Process{% elif leave.approved == 0 %}Not Approved{% else %}Approved{% endif %}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                {% else %}
+                <div class="col s6 l6">
+                    <div class="card">
+                        <div class="card-content">
+                            <span class="card-title">Leave Dash</span>
+
+                            <div class="row"> 
+                                <div class="col s4">
+                                    Name:
+                                </div>
+                                <div class="col s6">
+                                    {{ leave.student.name }}
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col s4">
+                                    ID:
+                                </div>
+                                <div class="col s6">
+                                    {{ leave.student.bitsId }}
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col s4">
+                                    Start Date and Time:
+                                </div>
+                                <div class="col s6">
+                                    {{ leave.dateTimeStart }}
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col s4">
+                                    End Date and Time:
+                                </div>
+                                <div class="col s6">
+                                    {{ leave.dateTimeEnd }}
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col s4">
+                                    Reason:
+                                </div>
+                                <div class="col s6">
+                                    {{ leave.reason }}
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col s4">
+                                    Consent:
+                                </div>
+                                <div class="col s6">
+                                    {{ leave.consent }}
+                                </div>
+                            </div>
+                            <form method="POST">
+                                {% csrf_token %}
+                                <div style="background-color:#eee; padding:15px;">
+                                <div class="row">
+                                    <div class="input-field col s12">
+                                        <textarea id="comment" name="comment" class="materialize-textarea">{{ leave.comment }}</textarea>
+                                        <label for="comment">Comments</label>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col s4">
+                                        <input name="group1" type="radio" class="with-gap" id="leave-approve" value="1" {% if leave.approved == True %} checked="checked" {% endif %}/>
+                                        <label for="leave-approve">Approve</label>
+                                    </div>
+                                    <div class="col s4">
+                                        <input name="group1" type="radio" class="with-gap" id="leave-disapprove" value="2" {% if leave.approved == False and leave.approvedBy != '' %}checked="checked" {% endif %}/>
+                                        <label for="leave-disapprove">Disapprove</label>
+                                    </div>
+                                    <div class="col s4">
+                                        <input name="group1" type="radio" class="with-gap" id="leave-process" value="3" {% if leave.approved == False %}{% if leave.approvedBy == '' or leave.approvedBy == None %}checked="checked" {% endif %}{% endif %}/>
+                                        <label for="leave-process">In Process</label>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col s6">
+                                        <a href="/warden" class="btn btn-block bg-green waves-effect" >CANCEL</a>
+                                    </div>
+                                    <div class="col s6 right-align">
+                                        <button class="btn btn-block bg-green waves-effect" type="submit">SUBMIT</button>
+                                    </div>
+                                </div>
+                                </div>
+
+
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+            </div>
+        </div>
+        <br><br>
+    </div>
+
+
+
+    <!--  Scripts-->
+    <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script src="{% static 'assets/js/materialize.js' %}"></script>
+    <script src="{% static 'assets/js/init.js' %}"></script>
+    <style>
+        .clickable {
+            cursor: pointer;
+        }
+    </style>
+    <script>
+       function leaveclick(d) {
+           window.location.href = '/warden/' + $(d).data('id') +'/';
+       }
+
+    </script>
+
+</body>
+
+</html>
