@@ -10,12 +10,75 @@
                 <div class="card">
                     <div class="card-content">
                         <span class="card-title">Dashboard</span>
-                        <p>Coming Soon</p>
+                        <td>Name: </td>
+                        <td>{{ student.name }}</td></br>
+                        <td>BITS ID: </td>
+                        <td>{{ student.bitsId }}</td>
                     </div>
                 </div>
             </div>
-
-
+            <div class="col s6 l6">
+                <div class="card">
+                    <div class="card-content">
+                        <span class="card-title">Mess Option</span>
+                        {% if option == 0 %}<p>The option is open right now. Please go to the respective tab and fill it.</p>
+                        {% elif option == 1 %} You have filled this periods mess as <b> Dining Hall {{mess}} </b>
+                        {% else %}
+                        <p>Sorry, the period for filling the mess options are over. Your mess will be alloted randomly.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+          </div>
+         <div class="row">
+          <div class="col s6 l6">
+              <div class="card">
+                  <div class="card-content">
+                      <span class="card-title">Leave Status</span>
+                      <table class="striped">
+                          <thead>
+                              <tr>
+                                  <th>Leave No.</th>
+                                  <th>Approval Status</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              {% for leave in leaves %}
+                              <tr>
+                                  <td>{{ leave.id }}</td>
+                                  <td>{% if leave.approved == 0 and leave.approvedBy == ''%}In Process{% elif leave.approved == 0 %}Not Approved{% else %}Approved{% endif %}</td>
+                              </tr>
+                              {% endfor %}
+                          </tbody>
+                      </table>
+                  </div>
+              </div>
+          </div>
+          <div class="col s6 l6">
+              <div class="card">
+                  <div class="card-content">
+                      <span class="card-title">Bonafide Applications</span>
+                      <table class="striped">
+                          <thead>
+                              <tr>
+                                  <th>Bonafide No.</th>
+                                  <th>Reason</th>
+                                  <th>Print Status</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              {% for bonafide in bonafides %}
+                              <tr>
+                                  <td>{{ bonafide.id }}</td>
+                                  <td>{% if bonafide.reason == 'Other' %} {{ bonafide.otherReason|default_if_none:"" }} {% else %} {{ bonafide.reason }} {% endif %}</td>
+                                  <td>{% if bonafide.printed == 0 %}Not Printed {% else %}Printed{% endif %}</td>
+                              </tr>
+                              {% endfor %}
+                          </tbody>
+                      </table>
+                  </div>
+              </div>
+          </div>
         </div>
     </div>
     <br><br>
