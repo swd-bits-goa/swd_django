@@ -193,7 +193,7 @@ class BonafidePDFView(views.LoginRequiredMixin, views.PermissionRequiredMixin, P
         b.printed = True
         b.save()
 
-        return super(HelloPDFView, self).get_context_data(
+        return super(BonafidePDFView, self).get_context_data(
             bonafide=Bonafide.objects.get(pk=self.request.GET.get('bonafide')),
             date = datetime.today().date(),
             pagesize='A4',
