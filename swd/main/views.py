@@ -27,15 +27,9 @@ def login_success(request):
 def dashboard(request):
     student = Student.objects.get(user=request.user)
 
-    #leaves = Leave.objects.filter(student=student)
-    #leaves = leaves.objects.latest('id')
-    #leaves = leaves1[len(leaves1) - 1]
-    leaves = Leave.objects.filter(student=student).order_by('-id')[0]
-    #bonafides = Bonafide.objects.filter(student=student)
-    #bonafides = bonafides.objects.latest('id')
-    bonafides = Bonafide.objects.filter(student=student).order_by('-id')[0]
+    leaves = Leave.objects.filter(student=student).last()
+    bonafides = Bonafide.objects.filter(student=student).last()
 
-    #bonafides = bonafides1[len(bonafides1) - 1]
     context = {
         'student': student,
         'leaves': leaves,
