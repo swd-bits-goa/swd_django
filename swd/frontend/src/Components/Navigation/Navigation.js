@@ -13,6 +13,7 @@ import IconMenu from 'material-ui/IconMenu';
 import RaisedButton from 'material-ui/RaisedButton';
 import ActionSearch from 'material-ui/svg-icons/action/search';
 import Avatar from 'material-ui/Avatar';
+import {withApollo} from 'react-apollo';
 import { grey200, grey50 } from 'material-ui/styles/colors';
 // Import custom navigation styles
 import s from './Navigation.css';
@@ -25,6 +26,8 @@ class Navigation extends React.Component {
     isLoggedIn: PropTypes.bool.isRequired,
     toggleFunc: PropTypes.func.isRequired,
     sideBarOpen: PropTypes.bool.isRequired,
+    login: PropTypes.func.isRequired,
+    logout: PropTypes.func.isRequired
   };
 
 constructor(props) {
@@ -45,7 +48,8 @@ constructor(props) {
 
   handleLogout = () => {
     localStorage.removeItem('token')
-    window.location.replace('/')
+    this.props.logout()
+    this.props.client.resetStore()
   }
 
   render() {
@@ -69,13 +73,19 @@ console.log(this.state);
             </ToolbarGroup>
             <ToolbarGroup lastChild>
               <IconButton iconStyle={filledIcon}><ActionSearch color={darkGreen} /></IconButton>
+              { !(this.props.isLoggedIn) ? 
               <RaisedButton label="Login" backgroundColor={darkGreen} labelColor={grey50} onTouchTap={this.handleLoginOpen} />
+              :
+             <RaisedButton label="Logout" backgroundColor={darkGreen} labelColor={grey50} onTouchTap={this.handleLogout} />
+              }
+
             </ToolbarGroup>
             
           </Toolbar>
           <LoginModal
             open={this.state.loginModalOpen}
-            onRequestClose={this.handleLoginClose} />
+            onRequestClose={this.handleLoginClose}
+            login={this.props.login} />
         </div>
       </Mobile>
     );
@@ -170,4 +180,4 @@ console.log(this.state);
   }
 }
 
-export default (Navigation);
+export default withApollo(Navigation);
