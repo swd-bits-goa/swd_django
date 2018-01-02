@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block content %}
+<div>
+    <div class="collection">
+      <div class="row">
+              <div class="col s6 l6">
+                <div class="card grey lighten-4">
+                    <div class="card-content">
+                <span class="card-title">Details</span>
+                <td>Name: {{ student.name }}</td></br>
+                <td>BITS ID: {{ student.bitsId }}</td></br>
+              </div>
+            </div>
+          </div>
+          <div class="col s6 l6">
+            <div class="card">
+                <div class="card-content">
+              <span class="card-title">Mess Option</span>
+              {% if option == 0 %}<p> Mess Option : -- </p>
+              {% elif option == 1 %} Mess Option : <b> Dining Hall {{mess}} </b>
+              {% else %}<p> Mess Option : -- </p>
+              {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+      <div class="card">
+          <div class="card-content">
+            <div class="row">
+              <div class="col s6 l12">
+                <table class="centered bordered striped">
+                  <thead>
+                    <tr>
+                      <th>Domain</th>
+                      <th>Application ID</th>
+                      <th>Approval Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Latest Leave Application</td>
+                      <td>{{ leaves.id }}</td>
+                      <td>{% if leaves.approved == 0 and leaves.approvedBy == ''%}
+                          <span class="blue-text text-darken-2">In Process</span>
+                          {% elif leaves.approved == 0 %}
+                          <span class="red-text text-darken-2">Not Approved</span>
+                          {% else %}
+                          <span class="green-text text-darken-2">Approved</span>
+                          {% endif %}
+                      </td>
+                  </tr>
+                  <tr>
+                    <td>Latest Bonafide Application</td>
+                    <td>{{ bonafides.id }}</td>
+                    <td>{% if bonafides.printed == 0 %}
+                      <span class="red-text text-darken-2">Not Printed</span>
+                      {% else %}
+                      <span class="green-text text-darken-2">Printed</span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+  </div>
+</div>
+{% endblock %}
