@@ -10,6 +10,8 @@ class Header extends React.Component {
     isLoggedIn: PropTypes.bool.isRequired,
     toggleFunc: PropTypes.func.isRequired,
     sideBarOpen: PropTypes.bool.isRequired,
+    login: PropTypes.func.isRequired,
+    logout: PropTypes.func.isRequired
   };
 
   render() {
@@ -19,6 +21,8 @@ class Header extends React.Component {
           toggleFunc={this.props.toggleFunc}
           sideBarOpen={this.props.sideBarOpen}
           isLoggedIn={this.props.isLoggedIn}
+          login={this.props.login}
+          logout={this.props.logout}
         />
         {/* <div className={s.container}>
           <Link className={s.brand} to="/">
