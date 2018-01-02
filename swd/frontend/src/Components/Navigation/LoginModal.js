@@ -4,12 +4,37 @@ import PropTypes from 'prop-types';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
+import {withApollo} from 'react-apollo';
+
 
 class LoginModal extends React.Component {
+
+  // Validate form data
+  validate(formData) {
+    const fieldError = {}
+    if(!formData.get("username")) fieldError.username = "Username required"
+    if(!formData.get("password")) fieldError.password = "Password required"
+    return fieldError
+  }
+
+
   // to get token from django using REST framework
   handleSubmit(e) {
+
     e.preventDefault()
     let data = new FormData(this.form)
+    const fieldError = this.validate(data)
+    this.setState({ fieldError: fieldError})
+      
+    // If we have any field errors, prevent sending login request
+    if (Object.keys(fieldError).length) return
+
+    // Since we're sending the request, reset field errors
+    this.setState({ fieldError: {
+      username : "",
+      password : ""
+    }})
+
     fetch('http://localhost:8000/api-token-auth/', {
       method: 'POST',
       body: data,
@@ -18,12 +43,24 @@ class LoginModal extends React.Component {
         res.json().then(res => {
           if (res.token) {
             localStorage.setItem('token', res.token)
-            window.location.replace('/')
+            this.props.login()
+            // No need to refresh, component will rerender
+            // Request LoginModal close
+            this.props.onRequestClose()
+            
+            // Reset Apollo's cache store so that it can refetch all active queries
+            this.props.client.resetStore()
           }
+          // Error handling
+          if (res.non_field_errors)
+          {
+            this.setState({ nonFieldError: res.non_field_errors[0]})
+          }
+
         })
       })
       .catch(err => {
-        console.log('Network error')
+        this.setState({ nonFieldError: "Oops! Network error"})
       })
   }
 
@@ -31,12 +68,19 @@ class LoginModal extends React.Component {
     open: PropTypes.bool.isRequired, // Handles modal state
     // Closure to allow child component to handle state data
     onRequestClose: PropTypes.func.isRequired,
+    login: PropTypes.func.isRequired
   };
 
-  login() {
-    /* eslint class-methods-use-this: ["error", { "exceptMethods": ["login"] }] */
-    // Code to submit login credentials
+//  TODO: Convert form into a controlled React component 
+
+  state = {
+    fieldError : {
+      username : "",
+      password : ""
+    },
+    nonFieldError : "",
   }
+
   render() {
     const actions = [
       <FlatButton
@@ -48,7 +92,8 @@ class LoginModal extends React.Component {
         label="Login"
         primary
         keyboardFocused
-        onTouchTap={this.login}
+        type="submit"
+        form="form"
       />,
     ];
 
@@ -60,20 +105,25 @@ class LoginModal extends React.Component {
           modal={true}
           open={this.props.open}
           onRequestClose={this.props.onRequestClose}
+          contentStyle= {{ width: "98%"}} // Not full for aesthetic purposes
         >
           Username same as BITS mail. Use your LDAP Authentication password to login.
+
           <form
           ref={ref => (this.form = ref)}
           onSubmit={e => this.handleSubmit(e)}
+          id="form"
           >
-          <div>
-            <label>Username:</label>
-            <input type="text" name="username" />
-          </div>
-          <div>
-            <label>Password:</label>
-            <input type="password" name="password" />
-          </div>
+          <span style={{ color: 'red' }}>{ this.state.nonFieldError }</span>
+          <br/> 
+          <TextField
+          floatingLabelText = "Username" name = "username" autoComplete = "username" 
+          errorText={this.state.fieldError.username} />
+          <br/> 
+          <TextField
+          floatingLabelText="Password" name="password" type="password" 
+          autoComplete="current-password" errorText={this.state.fieldError.password}/> 
+          <br/> 
         </form>
         </Dialog>
       </div>
@@ -81,4 +131,4 @@ class LoginModal extends React.Component {
   }
 }
 
-export default LoginModal;
+export default withApollo(LoginModal);

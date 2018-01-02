@@ -15,6 +15,8 @@ class Layout extends React.Component {
   static propTypes = {
     children: PropTypes.node.isRequired,
     isLoggedIn: PropTypes.bool.isRequired,
+    login: PropTypes.func.isRequired,
+    logout: PropTypes.func.isRequired
   };
 
   state = {
@@ -42,6 +44,8 @@ class Layout extends React.Component {
               toggleFunc={this.handleSideBarToggle}
               sideBarOpen={this.state.sideBarOpen}
               isLoggedIn={this.props.isLoggedIn}
+              login={this.props.login}
+              logout={this.props.logout}
             />
             {this.props.children}
             <Footer
