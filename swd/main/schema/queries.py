@@ -1,92 +1,9 @@
 import graphene
 from graphene_django.types import DjangoObjectType
 from django.contrib.auth.models import User
-from .models import *
-
-class UserType(DjangoObjectType):
-    class Meta:
-        model = User
-
-class FacultyType(DjangoObjectType):
-    class Meta:
-        model = Faculty
-
-class WardenType(DjangoObjectType):
-    class Meta:
-        model = Warden
-
-class NucleusType(DjangoObjectType):
-    class Meta:
-        model = Nucleus
-
-class SuperintendentType(DjangoObjectType):
-    class Meta:
-        model = Superintendent
-
-class FacultyInchargeType(DjangoObjectType):
-    class Meta:
-        model = FacultyIncharge
-
-class StaffType(DjangoObjectType):
-    class Meta:
-        model = Staff
-   
-class StudentType(DjangoObjectType):
-    class Meta:
-        model = Student
-
-class DayScholarType(DjangoObjectType):
-    class Meta:
-        model = DayScholar
-
-class HostelPSType(DjangoObjectType):
-    class Meta:
-        model = HostelPS
-
-class CSAType(DjangoObjectType):
-    class Meta:
-        model = CSA
-
-class MessOptionType(DjangoObjectType):
-    class Meta:
-        model = MessOption
-    
-class BonafideType(DjangoObjectType):
-    class Meta:
-        model = Bonafide
-    
-class LeaveType(DjangoObjectType):
-    class Meta:
-        model = Leave
-
-class DayPassType(DjangoObjectType):
-    class Meta:
-        model = DayPass
-
-class LateComerType(DjangoObjectType):
-    class Meta:
-        model = LateComer
-
-class InOutType(DjangoObjectType):
-    class Meta:
-        model = InOut
-
-class DiscoType(DjangoObjectType):
-    class Meta:
-        model = Disco
-
-class MessOptionOpenType(DjangoObjectType):
-    class Meta:
-        model = MessOptionOpen
-
-class TransactionType(DjangoObjectType):
-    class Meta:
-        model = Transaction
-
-class MessBillType(DjangoObjectType):   
-    class Meta:
-        model = MessBill
-
+from datetime import date, datetime
+from main.models import *
+from .types import *
 
 class Query(graphene.AbstractType):
     # used to get all data to the frontend
@@ -431,7 +348,7 @@ class Query(graphene.AbstractType):
             return CSA.objects.get(student=student)
 
         return None
-
+    
     def resolve_all_mess_options(self, args, **kwargs):
         return MessOption.objects.all()
 
@@ -445,8 +362,15 @@ class Query(graphene.AbstractType):
         if username is not None:
             user = User.objects.get(username=username)
             student = Student.objects.get(user=user)
-            return MessOption.objects.filter(student=student)
+            return MessOption.objects.get(student=student)
 
+        if args.context.user.is_authenticated:
+            student = Student.objects.get(user=args.context.user)
+            try:
+                return MessOption.objects.get(student=student)
+            except:
+                return None
+            
         return None
 
     def resolve_all_bonafides(self, args, **kwargs):
@@ -533,23 +457,19 @@ class Query(graphene.AbstractType):
             return Disco.objects.filter(student=student)
 
         return None
-
+    
     def resolve_all_mess_option_opens(self, args, **kwargs):
         return MessOptionOpen.objects.all()
 
     def resolve_messoptionopen(self, args, **kwargs):
-        id = kwargs.get('id')
-        username = kwargs.get('username')
+        messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
+        messopen = messopen.exclude(dateOpen__gte=date.today())
 
-        if id is not None:
-           return MessOptionOpen.objects.get(id=id)
+        if messopen:
+            return messopen[0]
+        else:
+            return None
 
-        if username is not None:
-            user = User.objects.get(username=username)
-            student = Student.objects.get(user=user)
-            return MessOptionOpen.objects.filter(student=student)
-
-        return None
 
     def resolve_all_transactions(self, args, **kwargs):
         return Transaction.objects.all()
