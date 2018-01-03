@@ -2,7 +2,10 @@ import graphene
 from graphene_django.types import DjangoObjectType
 from django.contrib.auth.models import User
 from .models import *
-from datetime import datetime, date
+from datetime import date, datetime
+from main.models import *
+from .types import *
+
 
 
 class UserType(DjangoObjectType):
@@ -393,7 +396,7 @@ class Query(object):
             return CSA.objects.get(student=student)
 
         return None
-
+    
     def resolve_all_mess_options(self, args, **kwargs):
         return MessOption.objects.all()
 
@@ -510,23 +513,19 @@ class Query(object):
             return Disco.objects.filter(student=student)
 
         return None
-
+    
     def resolve_all_mess_option_opens(self, args, **kwargs):
         return MessOptionOpen.objects.all()
 
     def resolve_messoptionopen(self, args, **kwargs):
-        id = kwargs.get('id')
-        username = kwargs.get('username')
+        messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
+        messopen = messopen.exclude(dateOpen__gte=date.today())
 
-        if id is not None:
-           return MessOptionOpen.objects.get(id=id)
+        if messopen:
+            return messopen[0]
+        else:
+            return None
 
-        if username is not None:
-            user = User.objects.get(username=username)
-            student = Student.objects.get(user=user)
-            return MessOptionOpen.objects.filter(student=student)
-
-        return None
 
     def resolve_all_transactions(self, args, **kwargs):
         return Transaction.objects.all()
