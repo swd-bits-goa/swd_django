@@ -26,10 +26,47 @@ def login_success(request):
 @login_required
 def dashboard(request):
     student = Student.objects.get(user=request.user)
+
+    leaves = Leave.objects.filter(student=student).last()
+    bonafides = Bonafide.objects.filter(student=student).last()
+
     context = {
         'student': student,
+        'leaves': leaves,
+        'bonafides': bonafides,
     }
-    return render(request, "index.html", context)
+    #mess
+    messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
+    messopen = messopen.exclude(dateOpen__gte=date.today())
+    if messopen:
+        messoption = MessOption.objects.filter(monthYear=messopen[0].monthYear, student=student)
+
+    if messopen and not messoption and datetime.today().date() < messopen[0].dateClose:
+        form = MessForm(request.POST)
+        context = {
+            'option': 0,
+            'student': student,
+            'leaves': leaves,
+            'bonafides': bonafides,
+            }
+    elif messopen and messoption:
+        context = {
+            'option': 1,
+            'mess': messoption[0].mess,
+            'student': student,
+            'leaves': leaves,
+            'bonafides': bonafides,
+            }
+    else:
+        context = {
+            'option': 2,
+            'student': student,
+            'leaves': leaves,
+            'bonafides': bonafides,
+            }
+
+
+    return render(request, "dashboard.html", context)
 
 
 @login_required
@@ -241,7 +278,7 @@ def wardenapprove(request, leave):
         else:
             leave.approved=False
             leave.approvedBy = None
-        
+
         leave.comment = comment
         leave.save()
         return redirect('warden')

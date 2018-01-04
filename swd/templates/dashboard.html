@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block content %}
+<div class="container">
+  
+    <div class="card grey lighten-4">
+      <div class="card-content">
+        <div class="row">
+          <div class="col s6 l12">
+            <table class="bordered striped">
+              <thead>
+                <tr>
+                  <th>Details</th>
+                  <th><span class="black-text text-darken-2"> {{ student.name }} </span></th>
+                  <th><span class="black-text text-darken-2"> {{ student.bitsId }} </span></th>
+                </tr>
+              </thead>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card grey lighten-4">
+      <div class="card-content">
+        <div class="row">
+          <div class="col s6 l12">
+            <table class="bordered white centered">
+              <tbody>
+                <tr>
+                  <td>Mess Option</td>
+                  <td>
+                      {% if option == 0 %}
+                          <span class="new badge blue comm" data-badge-caption="Option open"></span>
+                          {% elif option == 1 %}
+                          <span class="new badge green comm" data-badge-caption="Option filled: {{mess}} Mess"></span>
+                          {% else %}
+                          <span class="new badge red comm" data-badge-caption="Option closed"></span>
+                          {% endif %}
+                  </td>
+                  <td> <a class="waves-effect waves-light btn" href="/messoption">Check</a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Leave Application</td>
+                  <td>
+                    {% if leaves.approved == 0 and leaves.approvedBy == ''%}
+                    <span class="new badge blue comm" data-badge-caption="In Process"></span> {% elif leaves.approved
+                    == 0 %}
+                    <span class="new badge red comm" data-badge-caption="Not Approved"></span> {% else %}
+                    <span class="new badge green comm" data-badge-caption="Approved"></span> {% endif %}
+                  </td>
+                  <td><a class="waves-effect waves-light btn" href="/leave">Check</a></td>
+                </tr>
+                <tr>
+                  <td>Bonafide Application</td>
+                  <td>
+                    {% if bonafides.printed == 0 %}
+                    <span class="new badge red comm" data-badge-caption="Not Printed"></span> {% else %}
+                    <span class="new badge green comm" data-badge-caption="Printed"></span> {% endif %}
+                  </td>
+                  <td><a class="waves-effect waves-light btn" href="/certificates">Check</a></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+</div>
+<style>
+  .comm {
+    width:100px;
+  }
+</style>
+{% endblock %}
