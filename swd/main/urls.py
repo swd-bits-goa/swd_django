@@ -31,5 +31,7 @@ urlpatterns = [
 
     url(r'^warden/$', views.warden, name="warden"),
     url(r'^warden/([0-9]+)/$', views.wardenapprove, name="wardenapprove"),
+    url(r'^daypass/', views.daypass, name="daypass"),
+    
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

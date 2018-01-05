@@ -40,6 +40,7 @@
                 <li class="tab"><a href="/messoption" class="{% active_page request 'messoption' %}" target="_self">Mess Option</a></li>
                 <li class="tab"><a href="/leave"  class="{% active_page request 'leave' %}" target="_self">Leave</a></li>
                 <li class="tab"><a href="/certificates" class="{% active_page request 'certificates' %}" target="_self">Certificates</a></li>
+                <li class="tab"><a href="/daypass" class="{% active_page request 'daypass' %}" target="_self">Daypass</a></li>
             </ul>
         </div>
     </nav>
@@ -82,7 +83,7 @@
             <div class="divider"></div>
         </li>
     </ul> {% endcomment %}
-{% block content %} 
+{% block content %}
 {% endblock %}
 
     <!-- <footer class="page-footer orange">
@@ -138,7 +139,7 @@
             close: 'Ok',
             closeOnSelect: false // Close upon selecting a date,
         });
-        
+
         $('.timepicker').pickatime({
             default: 'now', // Set default time: 'now', '1:30AM', '16:30'
             fromnow: 0,       // set default time to * milliseconds from now (using with default = 'now')
@@ -150,7 +151,7 @@
             ampmclickable: true, // make AM PM clickable
             aftershow: function () { } //Function for after opening timepicker
         });
-        
+
     </script>
 
 </body>

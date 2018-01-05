@@ -2,9 +2,9 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .models import Student, MessOptionOpen, MessOption, Leave, Bonafide, Faculty, Warden
+from .models import Student, MessOptionOpen, MessOption, Leave, Bonafide, Faculty, Warden, DayPass
 from datetime import date, datetime
-from .forms import MessForm, LeaveForm, BonafideForm
+from .forms import MessForm, LeaveForm, BonafideForm, DayPassForm
 from django.contrib import messages
 from django.utils.timezone import make_aware
 
@@ -284,3 +284,39 @@ def wardenapprove(request, leave):
         return redirect('warden')
 
     return render(request, "warden.html", context)
+
+
+@login_required
+def daypass(request):
+    student = Student.objects.get(user=request.user)
+    form = DayPassForm()
+    context = {
+        'option' : 0,
+        'student': student,
+        'form': form
+    }
+
+    daypassContext = {
+        'daypass': DayPass.objects.filter(student=student),
+    }
+
+    if request.POST:
+        form = DayPassForm(request.POST)
+        if form.is_valid():
+            daypassform = form.save(commit=False)
+            date = datetime.strptime(request.POST.get('dateStart'), '%d %B, %Y').date()
+            daypassform.date = make_aware(date)
+            daypassform.student = student
+            daypassform.save()
+
+            context = {
+                'option': 1,
+                'date': request.POST.get('date'),
+
+            }
+        else:
+            context = {
+                'option': 2,
+            }
+            print(form.errors)
+    return render(request, "daypass.html", dict(context, **daypassContext))
