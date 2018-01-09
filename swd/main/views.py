@@ -89,16 +89,19 @@ def loginform(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
         user = authenticate(request, username=username, password=password)
+        print(username, password)
         if user is None:
             try:
                 with urlopen("http://10.10.10.20/auth.php?" + urlencode({'u': username, 'p': password}), timeout=5) as authfile:
                     string = authfile.read()
+                    print(string)
                     if string=="b'true":
                         try:
                             u = User.objects.get(username__exact=username)
                             u.set_password(password)
                             u.save()
                         except:
+                            print('user fail')
                             pass
                     else:
                         print("User doesn't exist")
