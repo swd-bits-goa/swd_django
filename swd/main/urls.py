@@ -7,7 +7,7 @@ from django.views.generic import TemplateView
 
 
 from . import views
-from .views import BonafidePDFView
+# from .views import BonafidePDFView
 
 urlpatterns = [
     url(r'^$', views.index, name='index'),
@@ -27,7 +27,7 @@ urlpatterns = [
     url(r'^certificates/', views.certificates, name="certificates"),
     url(r'^bonafidepdf/', views.bonafidepdf, name="bonafidepdf"),
 
-    url('bonafide/', BonafidePDFView.as_view()),
+    # url('bonafide/', BonafidePDFView.as_view()),
 
     url(r'^warden/$', views.warden, name="warden"),
     url(r'^warden/([0-9]+)/$', views.wardenapprove, name="wardenapprove"),

@@ -8,12 +8,12 @@ from .forms import MessForm, LeaveForm, BonafideForm, DayPassForm
 from django.contrib import messages
 from django.utils.timezone import make_aware
 
-from reportlab.lib.pagesizes import letter
-from reportlab.pdfgen import canvas
-
-from easy_pdf.views import PDFTemplateView
-
 from braces import views
+
+from urllib.request import urlopen
+from urllib.parse import urlencode
+
+from django.contrib.auth.models import User
 
 def index(request):
     return render(request, 'home1.html',{})
@@ -84,6 +84,22 @@ def loginform(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
         user = authenticate(request, username=username, password=password)
+        if user is None:
+            try:
+                with urlopen("http://10.10.10.20/auth.php?" + urlencode({'u': username, 'p': password}), timeout=5) as authfile:
+                    string = authfile.read()
+                    if string=="b'true":
+                        try:
+                            u = User.objects.get(username__exact=username)
+                            u.set_password(password)
+                            u.save()
+                        except:
+                            pass
+                    else:
+                        print("User doesn't exist")
+            except:
+                print("URL not reachable")
+                    
         if user is not None:
             login(request, user)
             if user.is_staff:
@@ -220,23 +236,23 @@ def bonafidepdf(request):
 def printBonafide(request):
     pass
 
-class BonafidePDFView(views.LoginRequiredMixin, views.PermissionRequiredMixin, PDFTemplateView):
-    permission_required = "auth.change_user"
-    context_object_name = 'contexts'
-    template_name = 'bonafidepdf.html'
+# class BonafidePDFView(views.LoginRequiredMixin, views.PermissionRequiredMixin, PDFTemplateView):
+#     permission_required = "auth.change_user"
+#     context_object_name = 'contexts'
+#     template_name = 'bonafidepdf.html'
 
-    def get_context_data(self, **kwargs):
-        b = Bonafide.objects.get(pk=self.request.GET.get('bonafide'))
-        b.printed = True
-        b.save()
+#     def get_context_data(self, **kwargs):
+#         b = Bonafide.objects.get(pk=self.request.GET.get('bonafide'))
+#         b.printed = True
+#         b.save()
 
-        return super(BonafidePDFView, self).get_context_data(
-            bonafide=Bonafide.objects.get(pk=self.request.GET.get('bonafide')),
-            date = datetime.today().date(),
-            pagesize='A4',
-            title='Bonafide Certificates',
-            **kwargs
-        )
+#         return super(BonafidePDFView, self).get_context_data(
+#             bonafide=Bonafide.objects.get(pk=self.request.GET.get('bonafide')),
+#             date = datetime.today().date(),
+#             pagesize='A4',
+#             title='Bonafide Certificates',
+#             **kwargs
+#         )
 
 def is_member(user):
     return user.groups.filter(name='warden').exists()
