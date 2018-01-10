@@ -103,12 +103,14 @@ def loginform(request):
                             u = User.objects.get(username__exact=username)
                             u.set_password(password)
                             u.save()
-                        except:
+                        except Exception as e:
+                            print(e)
                             print('user fail')
                             pass
                     else:
                         print("User doesn't exist")
-            except:
+            except Exception as e:
+                print(e)
                 print("URL not reachable")
                     
         if user is not None:
