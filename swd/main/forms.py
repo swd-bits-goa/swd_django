@@ -40,7 +40,7 @@ class BonafideForm(forms.ModelForm):
 class printBonafideForm(forms.Form):
     text = forms.CharField(required=True, label='Body Text', widget=forms.Textarea(attrs={'class': 'materialize-textarea'}))
 
-class DayPassForm(forms.Form):
+class DayPassForm(forms.ModelForm):
     class Meta:
         model = DayPass
         exclude = ['student', 'approvedBy',
