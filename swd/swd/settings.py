@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 
 import os
 
-production = True if os.environ['PROD'] == 'True' else False
+production = True if "PROD" in os.environ and os.environ.get("PROD") == "True" else False
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
