@@ -97,8 +97,7 @@ def loginform(request):
                 with urlopen("http://10.10.10.20/auth.php?" + urlencode({'u': username, 'p': password}), timeout=5) as authfile:
                     string = authfile.read()
                     print(string)
-                    print(re.findall("'([^']*)'", string))
-                    if string=="b'true'":
+                    if string.decode('utf-8')=='true':
                         try:
                             u = User.objects.get(username__exact=username)
                             u.set_password(password)
