@@ -20,6 +20,8 @@ from urllib.parse import urlencode
 
 from django.contrib.auth.models import User
 
+import re
+
 def index(request):
     return render(request, 'home1.html',{})
 
@@ -95,6 +97,7 @@ def loginform(request):
                 with urlopen("http://10.10.10.20/auth.php?" + urlencode({'u': username, 'p': password}), timeout=5) as authfile:
                     string = authfile.read()
                     print(string)
+                    print(re.findall("'([^']*)'", string)[0])
                     if string=="b'true'":
                         try:
                             u = User.objects.get(username__exact=username)
