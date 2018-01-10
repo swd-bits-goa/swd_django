@@ -37,5 +37,11 @@ class BonafideForm(forms.ModelForm):
             'otherReason': _('Please mention if other reason'),
         }
 
+class StudentSearchForm(forms.ModelForm):
+    class Meta:
+        model = Student
+        fields = ['bitsId', 'name']
+        
+
 class printBonafideForm(forms.Form):
     text = forms.CharField(required=True, label='Body Text', widget=forms.Textarea(attrs={'class': 'materialize-textarea'}))
