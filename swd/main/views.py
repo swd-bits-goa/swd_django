@@ -102,6 +102,7 @@ def loginform(request):
                             u = User.objects.get(username__exact=username)
                             u.set_password(password)
                             u.save()
+                            return redirect('dashboard')
                         except Exception as e:
                             print(e)
                             print('user fail')
