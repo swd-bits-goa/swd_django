@@ -30,6 +30,8 @@
         -->
         <link href="{% static 'assets/css/materialize.css' %}" type="text/css" rel="stylesheet" media="screen,projection" />
         <link href="{% static 'assets/css/style.css' %}" type="text/css" rel="stylesheet" media="screen,projection" />
+        <script src="{% static 'assets/js/jquery-3.2.1.min.js' %}"></script>
+        <script src="{% static 'assets/js/ajax.js' %}"></script>
   <title>SWD BITS Goa</title>
     </head>
 
@@ -45,34 +47,11 @@
             
                 {% comment %} <a href="javascript:void(0);">Student Welfare Division, BITS Pilani, Goa</a> {% endcomment %}
                 
-                {% if students.count > 0 %}
-
-                <!-- <h1>Search Students</h1> -->
-                {% csrf_token %}
                 <input type="text" name="search" id="search" />
-
-
-                <table style="width:100%">
-                  <tr>
-                    <th>BITS ID</th>
-                    <th>Name</th>
-                    <th></th>
-                  </tr>
-                  {% for student in students %}
-                  <tr>
-                    <td>{{ student.bitsId }}</td>
-                    <td>{{ student.name }}</td>
-                    <td></td>
-                  </tr>
-                  {% endfor %}
-                </table> 
-
-                {% else %}
-
-                <h3>Nothing to show!</h3>
-
-
-                {% endif %}
+                {% csrf_token %}
+                <div id="search-results">
+                    <!-- AJAX fills in here -->
+                </div>
               
             </div>
           </div>
