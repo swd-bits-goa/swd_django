@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
-from tools import user, profile
+from tools import user, profile, hostel
 from django.contrib.auth import views as auth_views
 from django.conf.urls.static import static
 from django.conf import settings
