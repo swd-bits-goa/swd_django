@@ -1,11 +1,16 @@
 
+{% load staticfiles %}
+<head>
+	<script src="{% static 'assets/js/jquery-3.2.1.min.js' %}"></script>
+    <script src="{% static 'assets/js/ajax.js' %}"></script>
+</head>
 
-{% if students.count > 0 %}
+{% if students.number > 0 %}
 
 
 
 
-<table style="width:100%">
+<table style="width:50%">
   <tr>
     <th>BITS ID</th>
     <th>Name</th>
@@ -19,6 +24,8 @@
   </tr>
   {% endfor %}
 </table> 
+
+
 
 {% else %}
 

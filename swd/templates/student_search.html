@@ -52,7 +52,24 @@
                 <div id="search-results">
                     <!-- AJAX fills in here -->
                 </div>
-              
+                <div class="pagination">
+                    <span class="step-links">
+                        {% if students.has_previous %}
+                            <a href="#" data-page="1" class="page">&laquo; first</a>
+                            <a href="#" data-page="{{ students.previous_page_number }}" class="page">previous</a>
+                        {% endif %}
+
+                        <span class="current">
+                            Page {{ students.number }} of {{ students.paginator.num_pages }}.
+                        </span>
+
+                        {% if students.has_next %}
+                            <a href="#" data-page="{{ students.next_page_number }}" class="page">next</a>
+                            <a href="#" data-page="{{ students.paginator.num_pages }}" class="page">last &raquo;</a>
+                        {% endif %}
+                    </span>
+
+                </div>
             </div>
           </div>
         </div>

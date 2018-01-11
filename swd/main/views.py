@@ -17,10 +17,12 @@ from braces import views
 
 from urllib.request import urlopen
 from urllib.parse import urlencode
+import re
 
 from django.contrib.auth.models import User
 
 from django.views.decorators.csrf import csrf_protect
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 def index(request):
     return render(request, 'home1.html',{})
@@ -308,18 +310,18 @@ def wardenapprove(request, leave):
 
     return render(request, "warden.html", context)
 
-# def normalize_query(query_string,
-#     findterms=re.compile(r'"([^"]+)"|(\S+)').findall,
-#     normspace=re.compile(r'\s{2,}').sub):
+def normalize_query(query_string,
+    findterms=re.compile(r'"([^"]+)"|(\S+)').findall,
+    normspace=re.compile(r'\s{2,}').sub):
 
-#     '''
-#     Splits the query string in invidual keywords, getting rid of unecessary spaces and grouping quoted words together.
-#     Example:
-#     >>> normalize_query('  some random  words "with   quotes  " and   spaces')
-#         ['some', 'random', 'words', 'with quotes', 'and', 'spaces']
-#     '''
+    '''
+    Splits the query string in invidual keywords, getting rid of unecessary spaces and grouping quoted words together.
+    Example:
+    >>> normalize_query('  some random  words "with   quotes  " and   spaces')
+        ['some', 'random', 'words', 'with quotes', 'and', 'spaces']
+    '''
 
-#     return [normspace('',(t[0] or t[1]).strip()) for t in findterms(query_string)]
+    return [normspace('',(t[0] or t[1]).strip()) for t in findterms(query_string)]
 
 # def get_query(query_string, search_fields):
 
@@ -345,15 +347,48 @@ def wardenapprove(request, leave):
 
 def search_home(request):
     
-    return render(request, "student_search.html", {'searched': False})
+    return render(request, "student_search1.html", {'searched': False})
 
 @csrf_protect
 def search_student(request):
     if request.method == "POST":
-        search_text = request.POST['search_text']
+        name = request.POST['name']
+        bitsid = request.POST['bitsid']
+        hostel = request.POST['hostel']
+        roomno = request.POST['roomno']
+        branch = request.POST['branch']
     else:
-        search_text = ''
+        name = ' '
+        bitsid = ' '
+        hostel = ' '
+        roomno = ' '
+        branch = ' '
 
-    students = Student.objects.filter(name__icontains=search_text)
+    info_list = [name, bitsid, hostel, roomno, branch]
 
-    return render_to_response('ajax_search.html', {'students': students})
+    for i in info_list:
+        if i == '':
+            i = " "
+
+    students_list = Student.objects.filter(name__startswith=name, bitsId__startswith=bitsid).order_by('name')
+    
+    paginator = Paginator(students_list, 10) # Show 10 contacts per page
+    # print(students_list)
+    page = request.GET.get('page')
+    try:
+        students = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        students = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        students = paginator.page(paginator.num_pages)
+    
+    print(students.number)
+    return render_to_response('ajax_search.html', { 'students': students,
+                                                    # 'name': name,
+                                                    # 'bitsid': bitsid,
+                                                    # 'hostel': hostel,
+                                                    # 'roomno': roomno,
+                                                    # 'branch': branch, 
+                                                    })
