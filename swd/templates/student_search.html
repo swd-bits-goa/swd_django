@@ -1,70 +1,102 @@
-{% extends 'base.html' %} {% block content %}
+
+{% load staticfiles %}
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <!--Import Google Icon Font-->
+      <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+      <!--Import materialize.css
+
+        <link type="text/css" rel="stylesheet" href="{% static 'assets/css/materialize.css' %}"  media="screen,projection"/>
+        -->
+        <link href="{% static 'assets/css/materialize.css' %}" type="text/css" rel="stylesheet" media="screen,projection" />
+        <link href="{% static 'assets/css/style.css' %}" type="text/css" rel="stylesheet" media="screen,projection" />
+        <script src="{% static 'assets/js/jquery-3.2.1.min.js' %}"></script>
+        <script src="{% static 'assets/js/ajax.js' %}"></script>
+  <title>SWD BITS Goa</title>
+    </head>
+
+    <body>
+      
+{% load staticfiles %}
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <!--Import Google Icon Font-->
+      <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+      <!--Import materialize.css
+
+        <link type="text/css" rel="stylesheet" href="{% static 'assets/css/materialize.css' %}"  media="screen,projection"/>
+        -->
+        <link href="{% static 'assets/css/materialize.css' %}" type="text/css" rel="stylesheet" media="screen,projection" />
+        <link href="{% static 'assets/css/style.css' %}" type="text/css" rel="stylesheet" media="screen,projection" />
+  <title>SWD BITS Goa</title>
+    </head>
+
+    <body>
+      <div class="container">
+        <div class="row valign-wrapper" id="bodyWrap">
+
+          <div class="col s12 m6 offset-m3">
+            <h2 class="white-text" align="center">Student Welfare Division</h2>
+            <div class="card darken-1">
+              <div class="card-content">
+                <span class="card-title">Search Students</span>
+            
+                {% comment %} <a href="javascript:void(0);">Student Welfare Division, BITS Pilani, Goa</a> {% endcomment %}
+                
+                {% if students.count > 0 %}
+
+                <!-- <h1>Search Students</h1> -->
+                {% csrf_token %}
+                <input type="text" name="search" id="search" />
 
 
-<div>
-    <div class="section">
+                <table style="width:100%">
+                  <tr>
+                    <th>BITS ID</th>
+                    <th>Name</th>
+                    <th></th>
+                  </tr>
+                  {% for student in students %}
+                  <tr>
+                    <td>{{ student.bitsId }}</td>
+                    <td>{{ student.name }}</td>
+                    <td></td>
+                  </tr>
+                  {% endfor %}
+                </table> 
 
-        <!--   Icon Section   -->
-        <div class="row">
-            <div class="col s6 l6">
-                <div class="card">
-                    <div class="card-content">
-                        <span class="card-title">Student Search</span>
-                        {% if option == 0 %}
-                        <form method="POST">
-                            {% csrf_token %}
-                            <div class="col-md-12">
-                                {% for field in form %}
-                                <div class="input-field col s12">
-                                    {{ field }} {{ field.label_tag }}
-                                </div>
-                                {% endfor %}
-                            </div>
-                            <div class="col-xs-4">
-                                <button class="btn btn-block bg-green waves-effect" type="submit">SUBMIT</button>
-                            </div>
-                        </form>
-                        {% elif option == 1 %}
-                            <p>Leave Successfully applied. Please wait for approval</p>
-                            <p>Leave applied from {{ dateStart }}({{ timeStart }}) to {{ dateEnd }}({{ timeEnd }})</p>
-                        {% else %}
-                            <p>Sorry, there was some problem with form submission. Please fill all the fields correct. All fields are required.</p>
-                        {% endif %}
-                    </div>
-                </div>
+                {% else %}
+
+                <h3>Nothing to show!</h3>
+
+
+                {% endif %}
+              
             </div>
-
-            <div class="col s6 l6">
-                <div class="card">
-                    <div class="card-content">
-                        <span class="card-title">Leave Applications</span>
-                        <table class="striped">
-                            <thead>
-                                <tr>
-                                    <th>Leave No.</th>
-                                    <th>Duration</th>
-                                    <th>Approval Status</th>
-                                    <th>Comments</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for leave in leaves %}
-                                <tr>
-                                    <td>{{ leave.id }}</td>
-                                    <td>{{ leave.dateTimeStart }} to {{ leave.dateTimeEnd }}</td>
-                                    <td>{% if leave.approved == 0 and leave.approvedBy == ''%}In Process{% elif leave.approved == 0 %}Not Approved{% else %}Approved{% endif %}</td>
-                                    <td>{{ leave.comment }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-
+          </div>
         </div>
+
+
+      </div>
+      <style>
+        #bodyWrap {
+          height:90vh;
+        }
+        body {
+          background: #00BCD4;
+        }
+      </style>
+
     </div>
-    <br><br>
-</div>
-{% endblock %}
+
+      <!--Import jQuery before materialize.js-->
+      <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+      <script src="{% static 'assets/js/materialize.js' %}"></script>
+    </html>
+
+      <!--Import jQuery before materialize.js-->
+      <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+      <script src="{% static 'assets/js/materialize.js' %}"></script>
+    </html>

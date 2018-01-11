@@ -1,5 +1,5 @@
 from django import forms
-from .models import MessOption, Leave, Bonafide
+from .models import MessOption, Leave, Bonafide, Student
 from django.forms.widgets import TextInput, Textarea
 from django.utils.translation import ugettext_lazy as _
 

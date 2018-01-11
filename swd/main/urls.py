@@ -31,8 +31,8 @@ urlpatterns = [
 
     url(r'^warden/$', views.warden, name="warden"),
     url(r'^warden/([0-9]+)/$', views.wardenapprove, name="wardenapprove"),
-    url(r'^search/$', views.search_home, name="search_home"),
-    url(r'^search/([0-9]+)/$', views.search_student, name="search_student"),
+    url(r'^search/$', views.search_student, name="search_student"),
+    # url(r'^search/([0-9]+)/$', views.search_student, name="search_student"),
 
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

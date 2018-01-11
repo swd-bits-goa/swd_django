@@ -1,0 +1,30 @@
+
+
+{% if students.count > 0 %}
+
+<h1>Search Students</h1>
+{% csrf_token %}
+<input type="text" name="search" id="search" />
+
+
+<table style="width:100%">
+  <tr>
+    <th>BITS ID</th>
+    <th>Name</th>
+    <th></th>
+  </tr>
+  {% for student in students %}
+  <tr>
+    <td>{{ student.bitsId }}</td>
+    <td>{{ student.name }}</td>
+    <td></td>
+  </tr>
+  {% endfor %}
+</table> 
+
+{% else %}
+
+<h3>Nothing to show!</h3>
+
+
+{% endif %}

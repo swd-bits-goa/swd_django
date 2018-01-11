@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, render_to_response
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -349,18 +349,13 @@ def search_home(request):
     form = StudentSearchForm()
     return render(request, "search.html", {'searched': False})
 
-@login_required
+
 def search_student(request):
-    form = StudentSearchForm()
-    query_string = ''
-    found_entries = None
-    if ('q' in request.GET) and request.GET['q'].strip():
-        query_string = request.GET['q']
+    if request.method == "POST":
+        search_text = request.POST['search_text']
+    else:
+        search_text = 'rahul '
 
-        entry_query = get_query(query_string, ['bitsId', 'name',])
+    students = Student.objects.filter(name__icontains=search_text)
 
-        found_entries = Entry.objects.filter(entry_query).order_by('name')
-
-    return render_to_response('search.html',
-                          { 'query_string': query_string, 'found_entries': found_entries, 'searched': True },
-                          context_instance=RequestContext(request))
+    return render_to_response('student_search.html', {'students': students})
