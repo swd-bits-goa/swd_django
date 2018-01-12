@@ -104,9 +104,21 @@ def loginform(request):
             login(request, user)
             if user.is_staff:
                 return redirect('/admin')
-            if user.groups.filter(name='warden').exists():
-                return redirect('/warden')
-            return redirect('dashboard')
+            
+            try:
+                faculty = Faculty.objects.get(user=user)
+            except Faculty.DoesNotExist:
+                faculty = None 
+            
+            if faculty is not None:
+                warden =  Warden.objects.get(faculty=faculty)
+                if warden is not None:
+                    return redirect('/warden')
+
+            student = Student.objects.get(user=user)
+
+            if student is not None:
+                return redirect('dashboard')
 
     return render(request, "sign-in.html", {})
 
@@ -254,14 +266,25 @@ def printBonafide(request):
 #             **kwargs
 #         )
 
-def is_member(user):
-    return user.groups.filter(name='warden').exists()
+def is_warden(user):
+    try:
+        faculty = Faculty.objects.get(user=user)
+    except Faculty.DoesNotExist:
+        faculty = None 
+    
+    if faculty is not None:
+        warden =  Warden.objects.get(faculty=faculty)
+        if warden is not None:
+            return True
+    
+    return False
 
 @login_required
-@user_passes_test(is_member)
+@user_passes_test(is_warden)
 def warden(request):
     warden = Warden.objects.get(faculty__user=request.user)
-    leaves = Leave.objects.filter(student__hostelps__hostel='AH4').order_by('approved', '-id')
+    hostel = warden.hostel
+    leaves = Leave.objects.filter(student__hostelps__hostel=hostel)
     context = {
         'option':1,
         'warden': warden,
@@ -270,7 +293,7 @@ def warden(request):
     return render(request, "warden.html", context)
 
 @login_required
-@user_passes_test(is_member)
+@user_passes_test(is_warden)
 def wardenapprove(request, leave):
     leave = Leave.objects.get(id=leave)
     warden = Warden.objects.get(faculty__user=request.user)
