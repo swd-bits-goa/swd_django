@@ -12,6 +12,10 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 
 import os
 
+from .config import PRODUCTION, DB_NAME, DB_PASSWORD, DB_USER
+
+# production = True if "PROD" in os.environ and os.environ.get("PROD") == "True" else False
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -25,7 +29,10 @@ SECRET_KEY = '=uins3dwlbbvgfqs7u&uh*luth_n*!#+rk9a19-0hv3l+-z+e4'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+if PRODUCTION:
+    ALLOWED_HOSTS = ['10.10.10.121']
+else:
+    ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -79,6 +86,11 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'main.auth_backend.LDAPAuthBackend',
+    )
+
 ROOT_URLCONF = 'swd.urls'
 
 GRAPHENE = {
@@ -109,12 +121,24 @@ WSGI_APPLICATION = 'swd.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+if PRODUCTION:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': DB_NAME,
+            'USER': DB_USER,
+            'PASSWORD': DB_PASSWORD,
+            'HOST': '127.0.0.1',
+            'PORT': '5432',
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
+    }
 
 
 # Password validation
@@ -171,3 +195,5 @@ WEBPACK_LOADER = {
 LOGIN_URL = '/login'
 
 # STATIC_ROOT = os.path.join(BASE_DIR, "static")
+
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 2000

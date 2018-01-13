@@ -15,10 +15,9 @@ from easy_pdf.views import PDFTemplateView
 
 from braces import views
 
-from urllib.request import urlopen
-from urllib.parse import urlencode
-
 from django.contrib.auth.models import User
+
+import re
 
 def index(request):
     return render(request, 'home1.html',{})
@@ -89,22 +88,7 @@ def loginform(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
         user = authenticate(request, username=username, password=password)
-        if user is None:
-            try:
-                with urlopen("http://10.10.10.20/auth.php?" + urlencode({'u': username, 'p': password}), timeout=5) as authfile:
-                    string = authfile.read()
-                    if string=="b'true":
-                        try:
-                            u = User.objects.get(username__exact=username)
-                            u.set_password(password)
-                            u.save()
-                        except:
-                            pass
-                    else:
-                        print("User doesn't exist")
-            except:
-                print("URL not reachable")
-                    
+        print(username, password)                  
         if user is not None:
             login(request, user)
             if user.is_staff:
@@ -112,6 +96,8 @@ def loginform(request):
             if user.groups.filter(name='warden').exists():
                 return redirect('/warden')
             return redirect('dashboard')
+        else:
+            print('Not able to authenticate')
 
     return render(request, "sign-in.html", {})
 
