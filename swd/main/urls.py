@@ -1,13 +1,11 @@
 from django.conf.urls import include, url
 from django.contrib import admin
-from tools import user, profile
 from django.conf.urls.static import static
 from django.conf import settings
 from django.views.generic import TemplateView
 
 
 from . import views
-from .views import BonafidePDFView
 
 urlpatterns = [
     url(r'^$', views.index, name='index'),
@@ -26,8 +24,6 @@ urlpatterns = [
     url(r'^leave/', views.leave, name="leave"),
     url(r'^certificates/', views.certificates, name="certificates"),
     url(r'^bonafidepdf/', views.bonafidepdf, name="bonafidepdf"),
-
-    url('bonafide/', BonafidePDFView.as_view()),
 
     url(r'^warden/$', views.warden, name="warden"),
     url(r'^warden/([0-9]+)/$', views.wardenapprove, name="wardenapprove"),

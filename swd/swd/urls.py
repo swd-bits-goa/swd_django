@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
-from tools import user, profile, hostel
+from tools import user, address, other_info, cgpa
 from django.contrib.auth import views as auth_views
 from django.conf.urls.static import static
 from django.conf import settings
@@ -50,7 +50,9 @@ urlpatterns = [
 
     url(r'^', include('main.urls')),
     url(r'^create-users/', user.index, name='user'),
-    url(r'^create-profiles/', profile.index, name='profile'),
+    url(r'^create-address/', address.index, name='address'),
+    url(r'^other_info/', other_info.index, name='other_info'),
+    url(r'^cgpa/', cgpa.index, name='cgpa'),
 
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
