@@ -53,7 +53,6 @@ INSTALLED_APPS = [
     'graphene_django',
     'rest_framework',
     'corsheaders',
-    'easy_pdf',
     'braces',
 ]
 
