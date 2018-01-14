@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import Student, MessOptionOpen, MessOption, Leave, Bonafide, Faculty, Warden
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from .forms import MessForm, LeaveForm, BonafideForm
 from django.contrib import messages
 from django.utils.timezone import make_aware
@@ -26,7 +26,7 @@ def login_success(request):
 def dashboard(request):
     student = Student.objects.get(user=request.user)
 
-    leaves = Leave.objects.filter(student=student).last()
+    leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
     bonafides = Bonafide.objects.filter(student=student).last()
 
     context = {

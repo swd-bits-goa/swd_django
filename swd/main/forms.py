@@ -19,8 +19,8 @@ class LeaveForm(forms.ModelForm):
         exclude = ['dateTimeStart', 'dateTimeEnd', 'student',
                    'approvedBy', 'approved', 'comment']
         widgets = {
-            'reason': forms.Textarea(attrs={'class': 'materialize-textarea'}),
-            'corrAddress': forms.Textarea(attrs={'class': 'materialize-textarea'}),
+            'reason': forms.Textarea(attrs={'class': 'materialize-textarea validate'}),
+            'corrAddress': forms.Textarea(attrs={'class': 'materialize-textarea validate'}),
         }
         labels = {
             'consent': _('Parent Consent Type'),
