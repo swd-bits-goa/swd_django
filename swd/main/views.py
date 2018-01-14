@@ -113,8 +113,12 @@ def messoption(request):
         messoption = MessOption.objects.filter(monthYear=messopen[0].monthYear, student=student)
 
     context = {'student': student}
+    edit = 0
 
-    if messopen and not messoption and datetime.today().date() < messopen[0].dateClose:
+    if request.GET: 
+        edit = request.GET.get('edit')
+
+    if (messopen and not messoption and datetime.today().date() < messopen[0].dateClose) or (messopen and edit):
         form = MessForm(request.POST)
         context = {'option': 0, 'form': form, 'dateClose': messopen[0].dateClose, 'student': student}
     elif messopen and messoption:
@@ -124,6 +128,7 @@ def messoption(request):
 
     if request.POST:
         mess = request.POST.get('mess')
+        if edit: messoption.delete()
         messoptionfill = MessOption(student=student, monthYear=messopen[0].monthYear, mess=mess)
         messoptionfill.save()
         return redirect('messoption')
