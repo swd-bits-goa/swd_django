@@ -43,11 +43,10 @@
                 <tr>
                   <td>Leave Application</td>
                   <td>
-                    {% if leaves.approved == 0 and leaves.approvedBy == ''%}
-                    <span class="new badge blue comm" data-badge-caption="In Process"></span> {% elif leaves.approved
-                    == 0 %}
+                    {% if leaves.approved == 1%}
+                    <span class="new badge green comm" data-badge-caption="Approved"></span> {% elif leaves.disapproved == 1 %}
                     <span class="new badge red comm" data-badge-caption="Not Approved"></span> {% else %}
-                    <span class="new badge green comm" data-badge-caption="Approved"></span> {% endif %}
+                    <span class="new badge blue comm" data-badge-caption="In Process"></span> {% endif %}
                   </td>
                   <td><a class="waves-effect waves-light btn" href="/leave">Check</a></td>
                 </tr>

@@ -102,17 +102,17 @@ class Student(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
     bitsId = models.CharField(max_length=15)
-    gender = models.CharField(max_length=1)
-    bDay = models.DateField()
-    phone = models.CharField(max_length=15)
-    email = models.EmailField()
-    address = models.TextField()
-    bloodGroup = models.CharField(max_length=10)
-    cgpa = models.FloatField(null=True)
-    admit = models.DateField()
-    parentName = models.CharField(max_length=50)
-    parentPhone = models.CharField(max_length=20)
-    parentEmail = models.CharField(max_length=50)
+    gender = models.CharField(max_length=1, null=True, blank=True)
+    bDay = models.DateField(null=True, blank=True)
+    phone = models.CharField(max_length=15, blank=True)
+    email = models.EmailField(null=True, blank=True)
+    address = models.TextField(null=True, blank=True)
+    bloodGroup = models.CharField(max_length=10, null=True, blank=True)
+    cgpa = models.FloatField(null=True, blank=True)
+    admit = models.DateField(null=True, blank=True)
+    parentName = models.CharField(max_length=50, null=True, blank=True)
+    parentPhone = models.CharField(max_length=20, null=True, blank=True)
+    parentEmail = models.CharField(max_length=50, null=True, blank=True)
 
     def __str__(self):
         return self.bitsId + ' (' + self.name + ')'
@@ -189,10 +189,12 @@ class Leave(models.Model):
     corrPhone = models.CharField(max_length=15)
     approvedBy = models.ForeignKey('Warden', blank=True, null=True)
     approved = models.BooleanField(default=0, blank=True)
+    disapproved = models.BooleanField(default=0, blank=True)
+    inprocess = models.BooleanField(default=1, blank=True)
     comment = models.TextField(default='', blank=True)
 
     def __str__(self):
-        return self.student.bitsId + ' '+ self.student.name 
+        return self.student.bitsId + ' '+ self.student.name
 
 class DayPass(models.Model):
     student = models.ForeignKey('Student', on_delete = models.CASCADE)

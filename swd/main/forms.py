@@ -17,7 +17,7 @@ class LeaveForm(forms.ModelForm):
     class Meta:
         model = Leave
         exclude = ['dateTimeStart', 'dateTimeEnd', 'student',
-                   'approvedBy', 'approved', 'comment']
+                   'approvedBy', 'approved', 'disapproved', 'inprocess', 'comment']
         widgets = {
             'reason': forms.Textarea(attrs={'class': 'materialize-textarea'}),
             'corrAddress': forms.Textarea(attrs={'class': 'materialize-textarea'}),

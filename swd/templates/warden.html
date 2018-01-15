@@ -62,7 +62,7 @@
                                         <td>{{ leave.id }}</td>
                                         <td>{{ leave.student.name }} ({{ leave.student.bitsId }})</td>
                                         <td>{{ leave.dateTimeStart|date:"d/M/y" }} to {{ leave.dateTimeEnd|date:"d/M/y" }}</td>
-                                        <td>{% if leave.approved == 0 and leave.approvedBy == ''%}In Process{% elif leave.approved == 0 %}Not Approved{% else %}Approved{% endif %}</td>
+                                        <td>{% if leave.approved == 1 %}Approved{% elif leave.disapproved == 1 %}Disapproved{% else %}In Process{% endif %}</td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>
@@ -145,11 +145,11 @@
                                         <label for="leave-approve">Approve</label>
                                     </div>
                                     <div class="col s4">
-                                        <input name="group1" type="radio" class="with-gap" id="leave-disapprove" value="2" {% if leave.approved == False and leave.approvedBy != '' %}checked="checked" {% endif %}/>
+                                        <input name="group1" type="radio" class="with-gap" id="leave-disapprove" value="2" {% if leave.disapproved == True %} checked="checked" {% endif %}/>
                                         <label for="leave-disapprove">Disapprove</label>
                                     </div>
                                     <div class="col s4">
-                                        <input name="group1" type="radio" class="with-gap" id="leave-process" value="3" {% if leave.approved == False %}{% if leave.approvedBy == '' or leave.approvedBy == None %}checked="checked" {% endif %}{% endif %}/>
+                                        <input name="group1" type="radio" class="with-gap" id="leave-process" value="3" {% if leave.inprocess == True %} checked="checked" {% endif %}/>
                                         <label for="leave-process">In Process</label>
                                     </div>
                                 </div>
