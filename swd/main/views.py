@@ -27,7 +27,7 @@ def dashboard(request):
     student = Student.objects.get(user=request.user)
 
     leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
-    bonafides = Bonafide.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
+    bonafides = Bonafide.objects.filter(student=student, reqDate__gte=date.today() - timedelta(days=7))
 
     context = {
         'student': student,
