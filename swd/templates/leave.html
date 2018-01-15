@@ -52,7 +52,7 @@
                                 <tr>
                                     <td>{{ leave.id }}</td>
                                     <td>{{ leave.dateTimeStart }} to {{ leave.dateTimeEnd }}</td>
-                                    <td>{% if leave.approved == 0 and leave.approvedBy == ''%}In Process{% elif leave.approved == 0 %}Not Approved{% else %}Approved{% endif %}</td>
+                                    <td>{% if leave.approved == 1%}Approved{% elif leave.disapproved == 1 %}Approved{% else %}In Process{% endif %}</td>
                                     <td>{{ leave.comment }}</td>
                                 </tr>
                                 {% endfor %}

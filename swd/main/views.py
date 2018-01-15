@@ -273,12 +273,18 @@ def wardenapprove(request, leave):
 
         if '1' in approved:
             leave.approved=True
+            leave.disapproved = False
+            leave.inprocess = False
             leave.approvedBy = warden
         elif '2' in approved:
-            leave.approved=False
+            leave.disapproved=True
+            leave.approved = False
+            leave.inprocess = False
             leave.approvedBy = warden
         else:
-            leave.approved=False
+            leave.inprocess = True
+            leave.approved = False
+            leave.disapproved = False
             leave.approvedBy = None
 
         leave.comment = comment
