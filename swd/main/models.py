@@ -96,8 +96,8 @@ class Staff(models.Model):
     phone = models.CharField(max_length=15)
 
     def __str__(self):
-        return self.staffType + ' ' + self.name 
-   
+        return self.staffType + ' ' + self.name
+
 class Student(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
@@ -154,7 +154,7 @@ class MessOption(models.Model):
 
     def __str__(self):
         return self.mess + ' ' + self.student.bitsId
-    
+
 class Bonafide(models.Model):
     student = models.ForeignKey('Student', on_delete = models.CASCADE)
     reason = models.CharField(max_length=20, choices=BONAFIDE_REASON_CHOICES)
@@ -168,7 +168,7 @@ class Bonafide(models.Model):
         branch = BRANCH[self.student.bitsId[4:6]]
         reason = self.reason if self.reason is not 'Other' else self.otherReason
         return '''This is to certify that ''' + gender + self.student.name.title() + ''', ID No.''' + self.student.bitsId + ''' is a bonafide student of third year class. He was admitted to the Institute on 30/07/2015, for pursuing the ''' + branch + ''' programme of studies. He is residing in the Hostel AH4 - 206 of this Institute. Date of joining the current academic session is 1 August, 2017.
-    
+
     This certificate is issues for the purpose of applying for ''' + reason + ''' from 11th December 2017 to 16th December 2017 and he needs to return back to Campus on 6th January 2018 to attend his regular classes.'''
 
     def save(self, *args, **kwargs):
@@ -201,8 +201,8 @@ class DayPass(models.Model):
     date = models.DateField()
     reason = models.TextField()
     consent = models.CharField(max_length=10)
-    approvedBy = models.CharField(max_length=50)
-    approved = models.BooleanField()
+    approvedBy = models.ForeignKey('Warden', blank=True, null=True)
+    approved = models.BooleanField(default=0, blank=True)
     comment = models.TextField()
 
     def __str__(self):
@@ -259,4 +259,4 @@ class MessBill(models.Model):
     amount = models.FloatField()
 
     def __str__(self):
-        return 
+        return

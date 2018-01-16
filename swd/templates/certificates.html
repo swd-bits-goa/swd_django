@@ -41,7 +41,10 @@
                                 <tr>
                                     <th>Bonafide No.</th>
                                     <th>Reason</th>
-                                    <th>Print Status</th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -49,7 +52,12 @@
                                 <tr>
                                     <td>{{ bonafide.id }}</td>
                                     <td>{% if bonafide.reason == 'Other' %} {{ bonafide.otherReason|default_if_none:"" }} {% else %} {{ bonafide.reason }} {% endif %}</td>
-                                    <td>{% if bonafide.printed == 0 %}Not Printed {% else %}Printed{% endif %}</td>
+                                    <td>{% if bonafide.printed == 0 %}<span class="new badge red comm" data-badge-caption="Not Printed"></span>
+                                        {% else %}<span class="new badge green comm" data-badge-caption="Printed"></span> {% endif %}</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -63,4 +71,9 @@
     </div>
     <br><br>
 </div>
+<style>
+  .comm {
+    width:100px;
+  }
+</style>
 {% endblock %}
