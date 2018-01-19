@@ -41,22 +41,22 @@
                         <table class="striped">
                             <thead>
                                 <tr>
-                                    <th>Leave No.</th>
-                                    <th>Duration</th>
-                                    <th>Approval Status</th>
-                                    <th>Comments</th>
+                                    <th class="center-align">Leave No.</th>
+                                    <th class="center-align">Duration</th>
+                                    <th class="center-align">Approval Status</th>
+                                    <th class="center-align">Comments</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for leave in leaves %}
                                 <tr>
-                                    <td>{{ leave.id }}</td>
-                                    <td>{{ leave.dateTimeStart }} to {{ leave.dateTimeEnd }}</td>
-                                    <td>{% if leaves.approved == 1%}
-                                      <span class="new badge green comm" data-badge-caption="Approved"></span> {% elif leaves.disapproved == 1 %}
+                                    <td class="center-align">{{ leave.id }}</td>
+                                    <td class="center-align">{{ leave.dateTimeStart }} to {{ leave.dateTimeEnd }}</td>
+                                    <td class="center-align badge-container">{% if leaves.approved == 1%}
+                                      <span class="new badge green comm center-align" data-badge-caption="Approved"></span> {% elif leaves.disapproved == 1 %}
                                       <span class="new badge red comm" data-badge-caption="Not Approved"></span> {% else %}
-                                      <span class="new badge blue comm" data-badge-caption="In Process"></span> {% endif %}</td>
-                                    <td>{{ leave.comment }}</td>
+                                      <span class="new badge blue comm center-align" data-badge-caption="In Process"></span> {% endif %}</td>
+                                    <td class="center-align">{{ leave.comment }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -73,6 +73,10 @@
 <style>
   .comm {
     width:100px;
+  }
+  .badge-container {
+      width: 33%;
+      padding-right:11%;
   }
 </style>
 {% endblock %}

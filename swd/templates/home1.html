@@ -29,11 +29,11 @@
   <div class="section no-pad-bot" id="index-banner">
     <div class="container">
       <br><br>
-  <div class="card black">
+  <div class="card">
     <div class="card-content">
       <h1 class="header center orange-text darken-5">BITS Pilani, K.K. Birla Goa Campus</h1>
       <div class="row center">
-        <h5 class="header col s12 light grey-text">BITS Pilani, Goa Campus is one of the premier technical and science institutes for higher education in India. It was
+        <h5 class="header col s12 light">BITS Pilani, Goa Campus is one of the premier technical and science institutes for higher education in India. It was
         started in 2004, with the first batch graduating in 2008.</h5>
       </div>
       {% comment %} <div class="row center">
@@ -52,12 +52,12 @@
       <!--   Icon Section   -->
   <div class="row">
     <div class="col s12 m4">
-    <div class="card black">
+    <div class="card">
       <div class="card-content">
           <div class="icon-block">
             <h2 class="center light-blue-text"><i class="material-icons">computer</i></h2>
-            <h5 class="center white-text">Computer Centre</h5>
-            <p class="light white-text">We did most of the heavy lifting for you to provide a default stylings that incorporate our custom components.
+            <h5 class="center">Computer Centre</h5>
+            <p class="light">We did most of the heavy lifting for you to provide a default stylings that incorporate our custom components.
               Additionally, we refined animations and transitions to provide a smoother experience for developers.<br> Link: <a href="cc.bits-goa.ac.in">cc.bits-goa.ac.in</a></p>
           </div>
         </div>
@@ -65,13 +65,13 @@
     </div>
 
     <div class="col s12 m4">
-      <div class="card black">
+      <div class="card">
         <div class="card-content">
           <div class="icon-block">
             <h2 class="center light-blue-text"><i class="material-icons">chrome_reader_mode</i></h2>
-            <h5 class="center white-text">E.R.P</h5>
+            <h5 class="center">E.R.P.</h5>
 
-            <p class="light white-text">By utilizing elements and principles of Material Design, we were able to create a framework that incorporates
+            <p class="light">By utilizing elements and principles of Material Design, we were able to create a framework that incorporates
               components and animations that provide more feedback to users. Additionally, a single underlying responsive
               system across all platforms allow for a more unified user experience.<br> Link: <a href="cc.bits-goa.ac.in">cc.bits-goa.ac.in</a></p>
           </div>
@@ -80,13 +80,13 @@
     </div>
 
     <div class="col s12 m4">
-      <div class="card black">
+      <div class="card">
         <div class="card-content">
           <div class="icon-block">
             <h2 class="center light-blue-text"><i class="material-icons">folder</i></h2>
-            <h5 class="center white-text">F.T.P.</h5>
+            <h5 class="center">F.T.P.</h5>
 
-            <p class="light white-text">We have provided detailed documentation as well as specific code examples to help new users get started. We are
+            <p class="light">We have provided detailed documentation as well as specific code examples to help new users get started. We are
               also always open to feedback and can answer any questions a user may have about Materialize.<br> Link: <a href="cc.bits-goa.ac.in">cc.bits-goa.ac.in</a></p>
           </div>
         </div>
@@ -98,7 +98,7 @@
     <br><br>
   </div>
 
-  <footer class="page-footer orange">
+  {% comment %} <footer class="page-footer orange">
     <div class="container">
       <div class="row">
         <div class="col l6 s12">
@@ -132,14 +132,15 @@
         Made by <a class="orange-text text-lighten-3" href="http://materializecss.com">OSDLabs</a>
       </div>
     </div>
-  </footer>
+  </footer> {% endcomment %}
 
   <style>
     img{
       object-fit: cover;
     }
     body {
-      background-image: url("{% static 'assets/img/bits-goa1.jpg' %}"); opacity: .75;filter: alpha(opacity=.75);
+      background-image: url("{% static 'assets/img/bits-goa1.jpg' %}"); opacity: .9;filter: alpha(opacity=.9);
+      background-attachment: fixed;
       background-repeat: no-repeat;
       height: 100px;
       background-position: center;

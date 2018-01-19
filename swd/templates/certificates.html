@@ -39,25 +39,18 @@
                         <table class="striped">
                             <thead>
                                 <tr>
-                                    <th>Bonafide No.</th>
-                                    <th>Reason</th>
-                                    <th></th>
-                                    <th></th>
-                                    <th></th>
-                                    <th></th>
+                                    <th class="center-align">Bonafide No.</th>
+                                    <th class="center-align">Reason</th>
+                                    <th class="center-align">Status</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for bonafide in bonafides %}
                                 <tr>
-                                    <td>{{ bonafide.id }}</td>
-                                    <td>{% if bonafide.reason == 'Other' %} {{ bonafide.otherReason|default_if_none:"" }} {% else %} {{ bonafide.reason }} {% endif %}</td>
-                                    <td>{% if bonafide.printed == 0 %}<span class="new badge red comm" data-badge-caption="Not Printed"></span>
-                                        {% else %}<span class="new badge green comm" data-badge-caption="Printed"></span> {% endif %}</td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
+                                    <td class="center-align">{{ bonafide.id }}</td>
+                                    <td class="center-align reason-container">{% if bonafide.reason == 'Other' %} {{ bonafide.otherReason|default_if_none:"" }} {% else %} {{ bonafide.reason }} {% endif %}</td>
+                                    <td class="center-align badge-container">{% if bonafide.printed == 0 %}<span class="new badge red comm" data-badge-caption="Not Printed"></span>
+                                        {% else %}<span align="center" class="new badge green comm" data-badge-caption="Printed"></span> {% endif %}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -74,6 +67,14 @@
 <style>
   .comm {
     width:100px;
+  }
+
+  .badge-container {
+      width: 33%;
+      padding-right:10%;
+  }
+  .reason-container {
+      width: 45%;
   }
 </style>
 {% endblock %}
