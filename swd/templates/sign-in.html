@@ -1,4 +1,3 @@
-
 {% load staticfiles %}
   <!DOCTYPE html>
   <html>
@@ -6,7 +5,6 @@
       <!--Import Google Icon Font-->
       <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
       <!--Import materialize.css
-
         <link type="text/css" rel="stylesheet" href="{% static 'assets/css/materialize.css' %}"  media="screen,projection"/>
         -->
         <link href="{% static 'assets/css/materialize.css' %}" type="text/css" rel="stylesheet" media="screen,projection" />
@@ -17,31 +15,30 @@
     <body>
       <div class="container">
         <div class="row valign-wrapper" id="bodyWrap">
-
           <div class="col s12 m6 offset-m3">
-            <h2 class="white-text" align="center">Student Welfare Division</h2>
-            <div class="card darken-1">
-              <div class="card-content">
-                <span class="card-title">Sign in to access SWD</span>
-            
+            <h2 class="black-text" align="center">Student Welfare Division</h2>
+              <div class="card darken-1">
+                <div class="card-content">
+                  <span class="card-title">Sign in to access SWD</span>
+
                 {% comment %} <a href="javascript:void(0);">Student Welfare Division, BITS Pilani, Goa</a> {% endcomment %}
-                
+
                 <form id="sign_in" method="POST">
                    {% csrf_token %}
                   <div class="input-field" id="username">
                       <input  type="text" class="validate" name="username">
                       <label for="username">Username</label>
                   </div>
-                  
+
                   <div class="input-field" id="password">
                     <input  type="password" class="validate" name="password">
                     <label for="password">Password</label>
                   </div>
-                  
+
                   <button type="submit" class="waves-effect waves-light btn" id="loginbtn">Login</button>
-                
+
                 </form>
-              
+
             </div>
           </div>
         </div>
@@ -53,7 +50,10 @@
           height:90vh;
         }
         body {
-          background: #00BCD4;
+          background-image: url("{% static 'assets/img/bits-goa-campus.jpg' %}"); opacity: .9;filter: alpha(opacity=.9);
+          background-repeat: no-repeat;
+          height: 100vh;
+          background-size: cover;
         }
       </style>
 
@@ -62,4 +62,4 @@
       <!--Import jQuery before materialize.js-->
       <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
       <script src="{% static 'assets/js/materialize.js' %}"></script>
-    </html>
+</html>
