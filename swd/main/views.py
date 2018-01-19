@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import Student, MessOptionOpen, MessOption, Leave, Bonafide, Faculty, Warden
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from .forms import MessForm, LeaveForm, BonafideForm
 from django.contrib import messages
 from django.utils.timezone import make_aware
@@ -26,8 +26,8 @@ def login_success(request):
 def dashboard(request):
     student = Student.objects.get(user=request.user)
 
-    leaves = Leave.objects.filter(student=student).last()
-    bonafides = Bonafide.objects.filter(student=student).last()
+    leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
+    bonafides = Bonafide.objects.filter(student=student, reqDate__gte=date.today() - timedelta(days=7))
 
     context = {
         'student': student,
@@ -113,8 +113,12 @@ def messoption(request):
         messoption = MessOption.objects.filter(monthYear=messopen[0].monthYear, student=student)
 
     context = {'student': student}
+    edit = 0
 
-    if messopen and not messoption and datetime.today().date() < messopen[0].dateClose:
+    if request.GET: 
+        edit = request.GET.get('edit')
+
+    if (messopen and not messoption and datetime.today().date() < messopen[0].dateClose) or (messopen and edit):
         form = MessForm(request.POST)
         context = {'option': 0, 'form': form, 'dateClose': messopen[0].dateClose, 'student': student}
     elif messopen and messoption:
@@ -124,6 +128,7 @@ def messoption(request):
 
     if request.POST:
         mess = request.POST.get('mess')
+        if edit: messoption.delete()
         messoptionfill = MessOption(student=student, monthYear=messopen[0].monthYear, mess=mess)
         messoptionfill.save()
         return redirect('messoption')
