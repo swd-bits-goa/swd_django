@@ -7,30 +7,14 @@ class UserType(DjangoObjectType):
     class Meta:
         model = User
 
-class FacultyType(DjangoObjectType):
-    class Meta:
-        model = Faculty
-
 class WardenType(DjangoObjectType):
     class Meta:
         model = Warden
 
-class NucleusType(DjangoObjectType):
-    class Meta:
-        model = Nucleus
-
-class SuperintendentType(DjangoObjectType):
-    class Meta:
-        model = Superintendent
-
-class FacultyInchargeType(DjangoObjectType):
-    class Meta:
-        model = FacultyIncharge
-
 class StaffType(DjangoObjectType):
     class Meta:
         model = Staff
-   
+
 class StudentType(DjangoObjectType):
     class Meta:
         model = Student
@@ -50,11 +34,11 @@ class CSAType(DjangoObjectType):
 class MessOptionType(DjangoObjectType):
     class Meta:
         model = MessOption
-    
+
 class BonafideType(DjangoObjectType):
     class Meta:
         model = Bonafide
-    
+
 class LeaveType(DjangoObjectType):
     class Meta:
         model = Leave
@@ -83,7 +67,7 @@ class TransactionType(DjangoObjectType):
     class Meta:
         model = Transaction
 
-class MessBillType(DjangoObjectType):   
+class MessBillType(DjangoObjectType):
     class Meta:
         model = MessBill
 
@@ -92,7 +76,7 @@ class Query(graphene.AbstractType):
     # used to get all data to the frontend
     current_user = graphene.Field(UserType)
 
-    
+
     all_users = graphene.List(UserType)
     user = graphene.Field(
         UserType,
@@ -100,37 +84,9 @@ class Query(graphene.AbstractType):
         username = graphene.String()
     )
 
-    all_facultys = graphene.List(FacultyType)
-    faculty = graphene.Field(
-        FacultyType,
-        id=graphene.Int(),
-        username = graphene.String()
-    )
-
     all_wardens = graphene.List(WardenType)
     warden = graphene.Field(
         WardenType,
-        id=graphene.Int(),
-        username = graphene.String()
-    )
-
-    all_nucleuss = graphene.List(NucleusType)
-    nucleus = graphene.Field(
-        NucleusType,
-        id=graphene.Int(),
-        username = graphene.String()
-    )
-
-    all_superintedents = graphene.List(SuperintendentType)
-    superintedent = graphene.Field(
-        SuperintendentType,
-        id=graphene.Int(),
-        username = graphene.String()
-    )
-
-    all_faculty_incharges = graphene.List(FacultyInchargeType)
-    facultyincharge = graphene.Field(
-        FacultyInchargeType,
         id=graphene.Int(),
         username = graphene.String()
     )
@@ -212,7 +168,7 @@ class Query(graphene.AbstractType):
         id=graphene.Int(),
         username = graphene.String()
     )
-    
+
     all_discos = graphene.List(DiscoType)
     disco = graphene.Field(
         DiscoType,
@@ -240,7 +196,7 @@ class Query(graphene.AbstractType):
         id=graphene.Int(),
         username = graphene.String()
     )
-    
+
     def resolve_current_user(self, args, **kwargs):
         context = args.context
         if not context.user.is_authenticated:
@@ -263,22 +219,6 @@ class Query(graphene.AbstractType):
 
         return None
 
-    def resolve_all_facultys(self, args, **kwargs):
-        return Faculty.objects.all()
-
-    def resolve_faculty(self, args, **kwargs):
-        id = kwargs.get('id')
-        username = kwargs.get('username')
-
-        if id is not None:
-           return Faculty.objects.get(id=id)
-
-        if username is not None:
-            user = User.objects.get(username=username)
-            return Faculty.objects.get(user=user)
-
-        return None
-
     def resolve_all_wardens(self, args, **kwargs):
         return Warden.objects.all()
 
@@ -291,59 +231,7 @@ class Query(graphene.AbstractType):
 
         if username is not None:
             user = User.objects.get(username=username)
-            faculty = Faculty.objects.get(user=user)
-            return Warden.objects.get(faculty=faculty)
-
-        return None
-
-    def resolve_all_nucleuss(self, args, **kwargs):
-        return Nucleus.objects.all()
-
-    def resolve_nucleus(self, args, **kwargs):
-        id = kwargs.get('id')
-        username = kwargs.get('username')
-
-        if id is not None:
-           return Nucleus.objects.get(id=id)
-
-        if username is not None:
-            user = User.objects.get(username=username)
-            faculty = Faculty.objects.get(user=user)
-            return Nucleus.objects.get(faculty=faculty)
-
-        return None
-
-    def resolve_all_superintendents(self, args, **kwargs):
-        return Superintendent.objects.all()
-
-    def resolve_superintendent(self, args, **kwargs):
-        id = kwargs.get('id')
-        username = kwargs.get('username')
-
-        if id is not None:
-           return Superintendent.objects.get(id=id)
-
-        if username is not None:
-            user = User.objects.get(username=username)
-            faculty = Faculty.objects.get(user=user)
-            return Superintendent.objects.get(faculty=faculty)
-
-        return None
-
-    def resolve_all_faculty_incharges(self, args, **kwargs):
-        return FacultyIncharge.objects.all()
-
-    def resolve_facultyincharge(self, args, **kwargs):
-        id = kwargs.get('id')
-        username = kwargs.get('username')
-
-        if id is not None:
-           return FacultyIncharge.objects.get(id=id)
-
-        if username is not None:
-            user = User.objects.get(username=username)
-            faculty = Faculty.objects.get(user=user)
-            return FacultyIncharge.objects.get(faculty=faculty)
+            return Warden.objects.get(user=user)
 
         return None
 
@@ -584,5 +472,3 @@ class Query(graphene.AbstractType):
             return MessBill.objects.filter(student=student)
 
         return None
-
-
