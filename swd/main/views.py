@@ -7,7 +7,6 @@ from datetime import date, datetime, timedelta
 from .forms import MessForm, LeaveForm, BonafideForm
 from django.contrib import messages
 from django.utils.timezone import make_aware
-import requests
 
 from braces import views
 
