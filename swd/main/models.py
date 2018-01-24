@@ -48,46 +48,17 @@ HOSTELS = (
     ('CH7', 'CH7'),
 )
 
-class Faculty(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    name = models.CharField(max_length=50)
-    chamber = models.CharField(max_length=10)
-    residence = models.CharField(max_length=10)
-    phone = models.CharField(max_length=15)
-    email = models.EmailField()
-
-    def __str__(self):
-        return self.name + ' ' + self.email + ' ' + self.chamber
-
 class Warden(models.Model):
-    faculty = models.OneToOneField('Faculty', on_delete=models.CASCADE)
-    hostel = models.CharField(max_length=5, choices=HOSTELS)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=50, null=True, blank=True)
+    chamber = models.CharField(max_length=10, null=True, blank=True)
+    residence = models.CharField(max_length=10, null=True, blank=True)
+    phone = models.CharField(max_length=15, null=True, blank=True)
+    email = models.EmailField(null=True, blank=True)
+    hostel = models.CharField(max_length=5, choices=HOSTELS, null=True, blank=True)
 
     def __str__(self):
-        return self.hostel + ' ' + self.faculty.name + ' ' + self.faculty.email + ' ' + self.faculty.chamber
-
-class Nucleus(models.Model):
-    faculty = models.OneToOneField('Faculty', on_delete=models.CASCADE)
-    function = models.CharField(max_length=20)
-
-    def __str__(self):
-        return self.function + ' ' + self.faculty.name + ' ' + self.faculty.email + ' ' + self.faculty.chamber
-
-class Superintendent(models.Model):
-    faculty = models.OneToOneField('Faculty', on_delete=models.CASCADE)
-    function = models.CharField(max_length=20)
-
-    def __str__(self):
-        return self.function + ' ' + self.faculty.name + ' ' + self.faculty.email + ' ' + self.faculty.chamber
-
-class FacultyIncharge(models.Model):
-    faculty = models.OneToOneField('Faculty', on_delete=models.CASCADE)
-    function = models.CharField(max_length=20)
-
-    def __str__(self):
-        return self.function + ' ' + self.faculty.name + ' ' + self.faculty.email + ' ' + self.faculty.chamber
-
-
+        return self.hostel + ' ' + self.name + ' ' + self.email + ' ' + self.chamber
 
 class Staff(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
