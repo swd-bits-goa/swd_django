@@ -52,10 +52,12 @@
                                 <tr>
                                     <td class="center-align">{{ leave.id }}</td>
                                     <td class="center-align">{{ leave.dateTimeStart }} to {{ leave.dateTimeEnd }}</td>
-                                    <td class="center-align badge-container">{% if leaves.approved == 1%}
-                                      <span class="new badge green comm center-align" data-badge-caption="Approved"></span> {% elif leaves.disapproved == 1 %}
-                                      <span class="new badge red comm" data-badge-caption="Not Approved"></span> {% else %}
-                                      <span class="new badge blue comm center-align" data-badge-caption="In Process"></span> {% endif %}</td>
+                                    <td class="center-align badge-container">
+                                        {% if leave.approved == 1%}
+                                        <span class="new badge green comm" data-badge-caption="Approved"></span> {% elif leave.disapproved == 1 %}
+                                        <span class="new badge red comm" data-badge-caption="Not Approved"></span> {% else %}
+                                        <span class="new badge blue comm" data-badge-caption="In Process"></span> {% endif %}
+                                    </td>
                                     <td class="center-align">{{ leave.comment }}</td>
                                 </tr>
                                 {% endfor %}

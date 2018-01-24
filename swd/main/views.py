@@ -84,7 +84,6 @@ def loginform(request):
         password = request.POST.get('password')
         user = authenticate(request, username=username, password=password)
         print(username, password)
-        print(Warden.objects.filter(user=request.user).count())
         if user is not None:
             login(request, user)
             if user.is_staff:
