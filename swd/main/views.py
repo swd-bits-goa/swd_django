@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .models import Student, MessOptionOpen, MessOption, Leave, Bonafide, Faculty, Warden
+from .models import Student, MessOptionOpen, MessOption, Leave, Bonafide, Warden
 from datetime import date, datetime, timedelta
 from .forms import MessForm, LeaveForm, BonafideForm
 from django.contrib import messages
@@ -83,12 +83,12 @@ def loginform(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
         user = authenticate(request, username=username, password=password)
-        print(username, password)                  
+        print(username, password)
         if user is not None:
             login(request, user)
             if user.is_staff:
                 return redirect('/admin')
-            if user.groups.filter(name='warden').exists():
+            if Warden.objects.filter(user=request.user):
                 return redirect('/warden')
             return redirect('dashboard')
         else:
@@ -115,7 +115,7 @@ def messoption(request):
     context = {'student': student}
     edit = 0
 
-    if request.GET: 
+    if request.GET:
         edit = request.GET.get('edit')
 
     if (messopen and not messoption and datetime.today().date() < messopen[0].dateClose) or (messopen and edit):
@@ -245,13 +245,13 @@ def printBonafide(request):
 #             **kwargs
 #         )
 
-def is_member(user):
-    return user.groups.filter(name='warden').exists()
+def is_warden(user):
+    return False if not Warden.objects.filter(user=user) else True
 
 @login_required
-@user_passes_test(is_member)
+@user_passes_test(is_warden)
 def warden(request):
-    warden = Warden.objects.get(faculty__user=request.user)
+    warden = Warden.objects.get(user=request.user)
     leaves = Leave.objects.filter(student__hostelps__hostel='AH4').order_by('approved', '-id')
     context = {
         'option':1,
@@ -261,10 +261,10 @@ def warden(request):
     return render(request, "warden.html", context)
 
 @login_required
-@user_passes_test(is_member)
+@user_passes_test(is_warden)
 def wardenapprove(request, leave):
     leave = Leave.objects.get(id=leave)
-    warden = Warden.objects.get(faculty__user=request.user)
+    warden = Warden.objects.get(user=request.user)
     context = {
         'option': 2,
         'warden': warden,

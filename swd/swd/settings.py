@@ -85,9 +85,13 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-AUTHENTICATION_BACKENDS = (
-    'django.contrib.auth.backends.ModelBackend',
-    'main.auth_backend.LDAPAuthBackend',
+if PRODUCTION:
+    AUTHENTICATION_BACKENDS = (
+        'main.auth_backend.LDAPAuthBackend',
+        )
+else:
+    AUTHENTICATION_BACKENDS = (
+        'django.contrib.auth.backends.ModelBackend',
     )
 
 ROOT_URLCONF = 'swd.urls'
