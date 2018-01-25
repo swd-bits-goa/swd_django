@@ -51,7 +51,7 @@
                                 {% for leave in leaves %}
                                 <tr>
                                     <td class="center-align">{{ leave.id }}</td>
-                                    <td class="center-align">{{ leave.dateTimeStart }} to {{ leave.dateTimeEnd }}</td>
+                                    <td class="center-align">[{{ leave.dateTimeStart }}] to [{{ leave.dateTimeEnd }}]</td>
                                     <td class="center-align badge-container">
                                         {% if leave.approved == 1%}
                                         <span class="new badge green comm" data-badge-caption="Approved"></span> {% elif leave.disapproved == 1 %}
