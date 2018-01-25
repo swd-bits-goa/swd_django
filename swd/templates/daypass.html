@@ -41,7 +41,8 @@
                         <table class="striped">
                             <thead>
                                 <tr>
-                                    <th>Daypass ID.</th>
+                                    <th>ID</th>
+                                    <th>Date</th>
                                     <th>Approval Status</th>
                                     <th>Comments</th>
                                 </tr>
@@ -50,7 +51,13 @@
                                 {% for daypass_o in daypass %}
                                 <tr>
                                     <td>{{ daypass_o.id }}</td>
-                                    <td>{% if daypass_o.approved == 0 and daypass_o.approvedBy == ''%}In Process{% elif daypass_o.approved == 0 %}Not Approved{% else %}Approved{% endif %}</td>
+                                    <td>{{ daypass_o.dateTime|date:"d/M/y" }}</td>
+                                    <td class="center-align badge-container">
+                                        {% if daypass_o.approved == 1%}
+                                        <span class="new badge green comm" data-badge-caption="Approved"></span> {% elif daypass_o.disapproved == 1 %}
+                                        <span class="new badge red comm" data-badge-caption="Not Approved"></span> {% else %}
+                                        <span class="new badge blue comm" data-badge-caption="In Process"></span> {% endif %}
+                                    </td>
                                     <td>{{ daypass_o.comment }}</td>
                                 </tr>
                                 {% endfor %}
@@ -65,4 +72,13 @@
     </div>
     <br><br>
 </div>
+<style>
+  .comm {
+    width:100px;
+  }
+  .badge-container {
+      width: 33%;
+      padding-right:11%;
+  }
+</style>
 {% endblock %}
