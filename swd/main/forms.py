@@ -1,5 +1,5 @@
 from django import forms
-from .models import MessOption, Leave, Bonafide
+from .models import MessOption, Leave, Bonafide, DayPass
 from django.forms.widgets import TextInput, Textarea
 from django.utils.translation import ugettext_lazy as _
 
@@ -39,3 +39,17 @@ class BonafideForm(forms.ModelForm):
 
 class printBonafideForm(forms.Form):
     text = forms.CharField(required=True, label='Body Text', widget=forms.Textarea(attrs={'class': 'materialize-textarea'}))
+
+class DayPassForm(forms.ModelForm):
+    date = forms.CharField(label='Date', widget=forms.TextInput(attrs={'class': 'datepicker'}))
+    time = forms.CharField(label='Time', widget=forms.TextInput(attrs={'class': 'timepicker'}))
+    class Meta:
+        model = DayPass
+        exclude = ['student', 'approvedBy',
+                    'approved', 'comment', 'disapproved', 'inprocess', 'dateTime']
+        widgets = {
+            'reason': forms.Textarea(attrs={'class': 'materialize-textarea'}),
+        }
+        labels = {
+            'consent': _('Parent Consent Type'),
+        }

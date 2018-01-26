@@ -8,11 +8,12 @@ MESS_CHOICES = (
 CONSENT_CHOICES = (
     ('Letter', 'Letter'),
     ('Fax', 'Fax'),
-    ('Email', 'Email'))
+    ('Email', 'Email')
+    )
 
 BONAFIDE_REASON_CHOICES = (
     ('Bank Loan', 'Bank Loan'),
-    ('Fax', 'Fax'),
+    ('Passport', 'Passport'),
     ('Other', 'Other'))
 
 BRANCH = {
@@ -169,11 +170,13 @@ class Leave(models.Model):
 
 class DayPass(models.Model):
     student = models.ForeignKey('Student', on_delete = models.CASCADE)
-    date = models.DateField()
+    dateTime = models.DateTimeField()
     reason = models.TextField()
-    consent = models.CharField(max_length=10)
+    consent = models.CharField(max_length=10, choices=CONSENT_CHOICES)
     approvedBy = models.ForeignKey('Warden', blank=True, null=True)
     approved = models.BooleanField(default=0, blank=True)
+    disapproved = models.BooleanField(default=0, blank=True)
+    inprocess = models.BooleanField(default=1, blank=True)
     comment = models.TextField()
 
     def __str__(self):

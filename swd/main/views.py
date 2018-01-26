@@ -2,9 +2,9 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .models import Student, MessOptionOpen, MessOption, Leave, Bonafide, Warden
+from .models import Student, MessOptionOpen, MessOption, Leave, Bonafide, Warden, DayPass
 from datetime import date, datetime, timedelta
-from .forms import MessForm, LeaveForm, BonafideForm
+from .forms import MessForm, LeaveForm, BonafideForm, DayPassForm
 from django.contrib import messages
 from django.utils.timezone import make_aware
 
@@ -25,14 +25,15 @@ def login_success(request):
 @login_required
 def dashboard(request):
     student = Student.objects.get(user=request.user)
-
     leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
+    daypasss = DayPass.objects.filter(student=student, dateTime__gte=date.today() - timedelta(days=7))
     bonafides = Bonafide.objects.filter(student=student, reqDate__gte=date.today() - timedelta(days=7))
 
     context = {
         'student': student,
         'leaves': leaves,
         'bonafides': bonafides,
+        'daypasss': daypasss,
     }
     #mess
     messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
@@ -47,6 +48,7 @@ def dashboard(request):
             'student': student,
             'leaves': leaves,
             'bonafides': bonafides,
+            'daypasss': daypasss,
             }
     elif messopen and messoption:
         context = {
@@ -55,6 +57,7 @@ def dashboard(request):
             'student': student,
             'leaves': leaves,
             'bonafides': bonafides,
+            'daypasss': daypasss,
             }
     else:
         context = {
@@ -62,6 +65,7 @@ def dashboard(request):
             'student': student,
             'leaves': leaves,
             'bonafides': bonafides,
+            'daypasss': daypasss,
             }
 
 
@@ -252,23 +256,28 @@ def is_warden(user):
 @user_passes_test(is_warden)
 def warden(request):
     warden = Warden.objects.get(user=request.user)
-    leaves = Leave.objects.filter(student__hostelps__hostel='AH4').order_by('approved', '-id')
+    leaves = Leave.objects.filter(student__hostelps__hostel=warden.hostel).order_by('approved', '-id')
+    daypasss = DayPass.objects.filter(student__hostelps__hostel=warden.hostel).order_by('approved', '-id')
     context = {
         'option':1,
         'warden': warden,
         'leaves': leaves,
+        'daypasss': daypasss
     }
     return render(request, "warden.html", context)
 
 @login_required
 @user_passes_test(is_warden)
-def wardenapprove(request, leave):
+def wardenleaveapprove(request, leave):
     leave = Leave.objects.get(id=leave)
     warden = Warden.objects.get(user=request.user)
+    daypasss = DayPass.objects.filter(student__hostelps__hostel=warden.hostel).order_by('approved', '-id')
+
     context = {
         'option': 2,
         'warden': warden,
         'leave': leave,
+        'daypasss' : daypasss,
     }
 
     if request.POST:
@@ -297,3 +306,81 @@ def wardenapprove(request, leave):
         return redirect('warden')
 
     return render(request, "warden.html", context)
+
+@login_required
+@user_passes_test(is_warden)
+def wardendaypassapprove(request, daypass):
+    daypass = DayPass.objects.get(id=daypass)
+    warden = Warden.objects.get(user=request.user)
+    leaves = Leave.objects.filter(student__hostelps__hostel=warden.hostel).order_by('approved', '-id')
+    context = {
+        'option': 3,
+        'warden': warden,
+        'daypass': daypass,
+        'leaves' : leaves,
+    }
+
+    if request.POST:
+        approved = request.POST.getlist('group1')
+        print(approved)
+        comment = request.POST.get('comment')
+
+        if '1' in approved:
+            daypass.approved=True
+            daypass.disapproved = False
+            daypass.inprocess = False
+            daypass.approvedBy = warden
+        elif '2' in approved:
+            daypass.disapproved=True
+            daypass.approved = False
+            daypass.inprocess = False
+            daypass.approvedBy = warden
+        else:
+            daypass.inprocess = True
+            daypass.approved = False
+            daypass.disapproved = False
+            daypass.approvedBy = None
+
+        daypass.comment = comment
+        daypass.save()
+        return redirect('warden')
+
+    return render(request, "warden.html", context)
+
+
+@login_required
+def daypass(request):
+    student = Student.objects.get(user=request.user)
+    form = DayPassForm()
+    context = {
+        'option' : 0,
+        'student': student,
+        'form': form
+    }
+
+    daypassContext = {
+        'daypass': DayPass.objects.filter(student=student),
+    }
+
+    if request.POST:
+        form = DayPassForm(request.POST)
+        if form.is_valid():
+            daypassform = form.save(commit=False)
+            date = datetime.strptime(request.POST.get('date'), '%d %B, %Y').date()
+            time = datetime.strptime(request.POST.get('time'), '%H:%M').time()
+            dateTime = datetime.combine(date, time)
+            daypassform.dateTime = make_aware(dateTime)
+            daypassform.student = student
+            daypassform.save()
+
+            context = {
+                'option': 1,
+                'date': request.POST.get('date'),
+
+            }
+        else:
+            context = {
+                'option': 2,
+            }
+            print(form.errors)
+    return render(request, "daypass.html", dict(context, **daypassContext))
