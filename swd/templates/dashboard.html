@@ -2,7 +2,7 @@
 {% load staticfiles %}
 {% block content %}
 <div class="container">
-  
+
     <div class="card grey lighten-4">
       <div class="card-content">
         <div class="row">
@@ -52,6 +52,7 @@
                   <td><a class="waves-effect waves-light btn" href="/leave">Check</a></td>
                 </tr>
                 {% endfor %}
+
                 {% for bonafide in bonafides|slice:":1" %}
                 <tr>
                   <td>Bonafide Application</td>
@@ -63,6 +64,20 @@
                   <td><a class="waves-effect waves-light btn" href="/certificates">Check</a></td>
                 </tr>
                 {% endfor %}
+
+                {% for daypass in daypasss|slice:":1" %}
+                <tr>
+                  <td>DayPass Application</td>
+                  <td>
+                    {% if daypass.approved == 1%}
+                    <span class="new badge green comm" data-badge-caption="Approved"></span> {% elif daypass.disapproved == 1 %}
+                    <span class="new badge red comm" data-badge-caption="Not Approved"></span> {% else %}
+                    <span class="new badge blue comm" data-badge-caption="In Process"></span> {% endif %}
+                  </td>
+                  <td><a class="waves-effect waves-light btn" href="/daypass">Check</a></td>
+                </tr>
+                {% endfor %}
+
               </tbody>
             </table>
           </div>

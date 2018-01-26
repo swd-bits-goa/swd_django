@@ -26,6 +26,9 @@ urlpatterns = [
     url(r'^bonafidepdf/', views.bonafidepdf, name="bonafidepdf"),
 
     url(r'^warden/$', views.warden, name="warden"),
-    url(r'^warden/([0-9]+)/$', views.wardenapprove, name="wardenapprove"),
+    url(r'^warden/([0-9]+)/$', views.wardenleaveapprove, name="wardenleaveapprove"),
+    url(r'^warden/daypass/([0-9]+)/$', views.wardendaypassapprove, name="wardendaypassapprove"),
+    url(r'^daypass/', views.daypass, name="daypass"),
+
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
