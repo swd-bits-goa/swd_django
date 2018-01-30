@@ -92,8 +92,8 @@ class Home extends React.Component {
           {/* TODO: Handle apollo errors */}
           {this.props.userInfoQuery && this.props.userInfoQuery.networkStatus === 7 ? ( 
             <div>
-              {this.props.data.currentUser &&
-                this.props.data.currentUser.username}
+              {this.props.userInfoQuery.currentUser &&
+                this.props.userInfoQuery.currentUser.username}
             </div>
           ) : (
             <div>loading</div>
