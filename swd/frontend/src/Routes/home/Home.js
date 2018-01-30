@@ -10,15 +10,18 @@ import {
   CardTitle,
   CardText
 } from "material-ui/Card";
+import MessCard from "./MessCard";
 import { Mobile } from "../../Components/Responsive";
 import InfoCard from "../../Components/InfoCard";
+import ExpandableCard from "../../Components/ExpandableCard";
 import background from "./Background.svg";
 import bdome from "./BDome.svg";
 import s from "./Home.css";
 import gql from "graphql-tag";
-import { graphql } from "react-apollo";
+import { graphql, compose } from "react-apollo";
 
-const query = gql`
+// All the queries
+const userInfoQuery = gql`
   query GetCurrentUser {
     currentUser {
       id
@@ -27,27 +30,36 @@ const query = gql`
   }
 `;
 
-class ErrorBoundary extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { hasError: false };
-  }
-
-  componentDidCatch(error, info) {
-    // Display fallback UI
-    this.setState({ hasError: true });
-    // You can also log the error to an error reporting service
-    // logErrorToMyService(error, info);
-  }
-
-  render() {
-    if (this.state.hasError) {
-      // You can render any custom fallback UI
-      return <h1>Something went wrong.</h1>;
+const messOptionOpenQuery = gql`
+  query optionOpen { 
+    messoptionopen{
+    openNow,
+    month
     }
-    return this.props.children;
   }
-}
+  `
+const messCurrentChoiceQuery= gql`
+query currentChoice {
+    currentChoice {
+      monthYear,
+      mess
+    }
+  }
+  `;
+
+  // HoC
+const MessCardWithData = compose(graphql(messOptionOpenQuery, {
+  name: "messOptionOpen",
+  options: {
+    errorPolicy: "all"
+  }
+}),
+graphql(messCurrentChoiceQuery, {
+  name: "messCurrentChoice",
+  options: {
+    errorPolicy: "all"
+  }
+})) (MessCard);
 
 class Home extends React.Component {
   static propTypes = {
@@ -60,20 +72,25 @@ class Home extends React.Component {
     ).isRequired
 
   };
+
   render() {
+
     return (
          <div
           className={s.container}
           >
       <Mobile>
        <div>
+        <MessCardWithData/>
+
           <Card>
             <CardMedia>
               <img src={bdome} style={{ width: "100%" }} alt="SWD" />
             </CardMedia>
           </Card>
           <InfoCard title="Latest News" list={this.props.news} />
-          {this.props.data && this.props.data.networkStatus === 7 ? (
+          {/* TODO: Handle apollo errors */}
+          {this.props.userInfoQuery && this.props.userInfoQuery.networkStatus === 7 ? ( 
             <div>
               {this.props.data.currentUser &&
                 this.props.data.currentUser.username}
@@ -89,10 +106,11 @@ class Home extends React.Component {
   }
 }
 
-Home = graphql(query, {
+export default graphql(userInfoQuery, {
+  name: "userInfoQuery",
   options: {
     errorPolicy: "all"
   }
-})(Home);
+}) (Home);
 
-export default Home;
+
