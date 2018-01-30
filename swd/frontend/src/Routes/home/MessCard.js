@@ -2,8 +2,30 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Card, CardActions, CardHeader, CardText} from 'material-ui/Card';
 import FlatButton from 'material-ui/FlatButton';
+import {RadioButton, RadioButtonGroup} from 'material-ui/RadioButton';
 import ExpandableCard from "../../Components/ExpandableCard";
 
+const MessChoice = (props) => {
+
+    const chooseMess = () => {
+        // Send mutations here
+    }
+    return(
+        <div>
+    <RadioButtonGroup name="messChoice" >
+      <RadioButton
+        value="A"
+        label="A"
+      />
+      <RadioButton
+        value="C"
+        label="C"
+      />
+    </RadioButtonGroup>
+    <FlatButton label="Submit" onClick={chooseMess} primary={true} />
+    </div>
+    );
+}
 
 const MessCard = (props) => {
 
@@ -21,7 +43,13 @@ if (messOptionOpen && messOptionOpen.networkStatus === 7 && messCurrentChoice &&
 }
 
   return(
-<ExpandableCard title={cardTitle}/> 
+<ExpandableCard title={cardTitle}> 
+<MessChoice/>
+ {/* { messOptionOpen.messoptionopen.openNow 
+//     ? <MessChoice/>
+//     : "Next Mess is at"
+//  } */}
+ </ExpandableCard>
   );
 };
 
