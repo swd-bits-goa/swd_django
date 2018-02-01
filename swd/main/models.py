@@ -22,6 +22,15 @@ BRANCH = {
     'A4': 'B.E.(Hons) Mechanical Engineering',
     'A7': 'B.E.(Hons) Computer Science',
     'A8': 'B.E.(Hons) Electronics and Instrumentation Engineering',
+    'B1': 'MSc. (Hons) Biology',
+    'B2': 'MSc. (Hons) Chemistry',
+    'B3': 'MSc. (Hons) Economics',
+    'B4': 'MSc. (Hons) Mathematics',
+    'B5': 'MSc. (Hons) Physics',
+    'AA': 'B.E.(Hons) Electronics and Communication Engineering',
+    'PH': 'PhD.',
+    'H1': 'M.E. (Hons) Computer Science',
+
 }
 
 STUDENT_STATUS = (
