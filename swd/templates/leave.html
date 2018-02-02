@@ -15,9 +15,9 @@
                             {% csrf_token %}
                             <div class="col-md-12">
                                 {% for field in form %}
-                                <div class="input-field col s12">
+                                  <div class="input-field col s12">
                                     {{ field }} {{ field.label_tag }}
-                                </div>
+                                  </div>
                                 {% endfor %}
                             </div>
                             <div class="col-xs-4">
@@ -28,7 +28,36 @@
                             <p>Leave Successfully applied. Please wait for approval</p>
                             <p>Leave applied from {{ dateStart }}({{ timeStart }}) to {{ dateEnd }}({{ timeEnd }})</p>
                         {% else %}
+                            {% if form.errors %}
+                                {% for field in form %}
+                                    {% for error in field.errors %}
+                                        <div class="red-text alert alert-danger">
+                                            <strong>{{ error|escape }}</strong>
+                                        </div>
+                                    {% endfor %}
+                                {% endfor %}
+                                {% for error in form.non_field_errors %}
+                                    <div class="red-text alert alert-danger">
+                                        <strong>{{ error|escape }}</strong>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                            <div class=red-text>
                             <p>Sorry, there was some problem with form submission. Please fill all the fields correct. All fields are required.</p>
+                            <h1></h1></div>
+                            <form method="POST">
+                                {% csrf_token %}
+                                <div class="col-md-12">
+                                    {% for field in form %}
+                                      <div class="input-field col s12">
+                                        {{ field }} {{ field.label_tag }}
+                                      </div>
+                                    {% endfor %}
+                                </div>
+                                <div class="col-xs-4">
+                                    <button class="btn btn-block bg-green waves-effect" type="submit">SUBMIT</button>
+                                </div>
+                            </form>
                         {% endif %}
                     </div>
                 </div>
@@ -41,7 +70,7 @@
                         <table class="striped">
                             <thead>
                                 <tr>
-                                    <th class="center-align">Leave No.</th>
+                                    <th class="center-align">Leave ID.</th>
                                     <th class="center-align">Duration</th>
                                     <th class="center-align">Approval Status</th>
                                     <th class="center-align">Comments</th>
@@ -77,8 +106,8 @@
     width:100px;
   }
   .badge-container {
-      width: 33%;
-      padding-right:11%;
+      width: 35%;
+      padding-right:9%;
   }
 </style>
 {% endblock %}

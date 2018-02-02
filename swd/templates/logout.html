@@ -20,7 +20,7 @@
       <div class="row valign-wrapper" id="bodyWrap">
 
         <div class="col s12 m6 offset-m3">
-          <h2 class="white-text" align="center">Student Welfare Division</h2>
+          <h2 class="black-text" align="center">Student Welfare Division</h2>
           <div class="card darken-1">
             <div class="card-content">
               <span class="card-title"></span> {% comment %} <a href="javascript:void(0);">Student Welfare Division, BITS Pilani, Goa</a>              {% endcomment %}
@@ -41,11 +41,13 @@
       </div>
       <style>
         #bodyWrap {
-          height: 90vh;
+          height:90vh;
         }
-
         body {
-          background: #00BCD4;
+          background-image: url("{% static 'assets/img/bits-goa-campus.jpg' %}"); opacity: .9;filter: alpha(opacity=.9);
+          background-repeat: no-repeat;
+          height: 100vh;
+          background-size: cover;
         }
       </style>
 
