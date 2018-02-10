@@ -37,4 +37,9 @@ $ python manage.py createsuperuser
 
 ```
 $ python manage.py runserver
+```
+
+## Importing Data
+
+To import data, there are a set of scripts created. On hitting the urls mentioned in [swd/swd/urls.py#L52-L58](https://github.com/SebastinSanty/swd_django/blob/master/swd/swd/urls.py#L52-L58), the data will get imported. Please be patient as there are ~9000 records to be inserted. You don't necessarily need to use all the data. Scripts are designed to handle failures, so no worries :). If you need more data, just hit the url again.
 
