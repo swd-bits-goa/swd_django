@@ -88,6 +88,7 @@ MIDDLEWARE = [
 if PRODUCTION:
     AUTHENTICATION_BACKENDS = (
         'main.auth_backend.LDAPAuthBackend',
+        'django.contrib.auth.backends.ModelBackend',
         )
 else:
     AUTHENTICATION_BACKENDS = (
