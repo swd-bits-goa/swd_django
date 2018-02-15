@@ -50,8 +50,10 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      //Check if we're already logged in when starting the app.
+      // However this is an offline method
       loggedIn: localStorage.getItem('token') ? true : false , 
-      //Check if we're already logged in when starting the app
+
       latestNews: [
         {
           title: "Winner of Aditya Birla Group scholarship 2017",
@@ -67,14 +69,9 @@ class App extends React.Component {
 
   }
 
-  static childContextTypes = {
-    loggedIn: PropTypes.bool
+  getChildContext() {
+    return {loggedIn: this.state.loggedIn}
   }
-
-
-  getChildContext = () => ({
-    loggedIn: this.state.loggedIn
-  })
 
   login = () => {
     this.setState({ loggedIn: true})
@@ -92,6 +89,7 @@ class App extends React.Component {
         <MuiThemeProvider muiTheme={muiTheme}>
         <Router>
           <Switch>
+            {/* // Might need to add routing behaviour to take care of expired sessions */}
             <Route
               path="/login"
               render={() => (
@@ -136,6 +134,10 @@ class App extends React.Component {
             
     );
   }
+}
+
+App.childContextTypes = {
+  loggedIn: PropTypes.bool
 }
 
 export default App;
