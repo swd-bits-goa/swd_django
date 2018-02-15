@@ -6,7 +6,8 @@
 }
 
 .container {
-  padding: 3%;
+  padding: 0.5%;
+  padding-top: 1%;
   max-width: 100vw;
   height: 100vh;
   background-repeat: no-repeat;

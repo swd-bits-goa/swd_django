@@ -15,6 +15,7 @@ import ActionSearch from 'material-ui/svg-icons/action/search';
 import Avatar from 'material-ui/Avatar';
 import {withApollo} from 'react-apollo';
 import { grey200, grey50 } from 'material-ui/styles/colors';
+import Sidebar from '../Sidebar/Sidebar.js';
 // Import custom navigation styles
 import s from './Navigation.css';
 import logoUrl from './logo-small.png';
@@ -27,15 +28,20 @@ class Navigation extends React.Component {
     toggleFunc: PropTypes.func.isRequired,
     sideBarOpen: PropTypes.bool.isRequired,
     login: PropTypes.func.isRequired,
-    logout: PropTypes.func.isRequired
+    logout: PropTypes.func.isRequired,
   };
 
 constructor(props) {
   super(props);
   this.state = {
     loginModalOpen : false,
+    open: false
   };
+  this.handleSideClick = this.handleSideClick.bind(this);
 }
+  handleSideClick = () => {
+    this.setState({ open: !this.state.open});
+  }
 
   handleLoginOpen = () => {
     this.setState({ loginModalOpen: true });
@@ -67,7 +73,8 @@ console.log(this.state);
         <div className={s.AppBar}>
           <Toolbar>
             <ToolbarGroup firstChild>
-              <IconButton><NavigationMenu color={darkGreen} /></IconButton>
+              <IconButton onClick={this.handleSideClick}><NavigationMenu color={darkGreen} /></IconButton>
+              <Sidebar open={this.state.open}/>
               <ToolbarTitle text="SWD" />
               <ToolbarSeparator />
             </ToolbarGroup>

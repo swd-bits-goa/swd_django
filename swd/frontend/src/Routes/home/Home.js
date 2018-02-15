@@ -65,11 +65,10 @@ class Home extends React.Component {
       <Mobile>
         <div
           className={s.container}
-          style={{ backgroundImage: `url(${background})` }}
         >
           <Card>
-            <CardMedia>
-              <img src={bdome} style={{ maxWidth: "80%" }} alt="SWD" />
+            <CardMedia style={{width: '100%'}}>
+              <img src={bdome} style={{ width: "100%" }} alt="SWD" />
             </CardMedia>
           </Card>
           <InfoCard title="Latest News" list={this.props.news} />

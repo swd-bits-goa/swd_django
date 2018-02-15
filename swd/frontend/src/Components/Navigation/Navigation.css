@@ -10,6 +10,7 @@
 .AppBar {
   display: block;
   width: 100%;
+  height: 55px;
 }
 
 .title {
