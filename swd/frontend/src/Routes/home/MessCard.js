@@ -5,9 +5,9 @@ import FlatButton from 'material-ui/FlatButton';
 import {RadioButton, RadioButtonGroup} from 'material-ui/RadioButton';
 import ExpandableCard from "../../Components/ExpandableCard";
 
-const MessChoice = (props) => {
-
-    const chooseMess = () => {
+const MessChoiceForm = (props) => {
+  
+    const chooseMessAction = () => {
         // Send mutations here
     }
     return(
@@ -22,7 +22,7 @@ const MessChoice = (props) => {
         label="C"
       />
     </RadioButtonGroup>
-    <FlatButton label="Submit" onClick={chooseMess} primary={true} />
+    <FlatButton label="Submit" onClick={chooseMessAction} primary={true} />
     </div>
     );
 }
@@ -31,33 +31,26 @@ const MessCard = (props) => {
 
   const { messOptionOpen, messCurrentChoice } = props;
 
-var cardTitle = "Couldnt load mess option!"
 console.log(messOptionOpen)
 console.log(messCurrentChoice)
+let cardTitle = messOptionOpen.messoptionopen.openNow
+  ? ("Mess option for the month of " + messOptionOpen.messoptionopen.month + " is open")
+  : "Your current mess is " + messCurrentChoice.currentChoice.mess
+console.log(messOptionOpen, "messOptionOpen")
 
-if (messOptionOpen && messOptionOpen.networkStatus === 7 && messCurrentChoice && messCurrentChoice.networkStatus === 7) {
-  cardTitle = messOptionOpen.messoptionopen.openNow 
-  ? ("Mess option for the month of "+ messOptionOpen.messoptionopen.month + " is open") 
-: "Your current mess is " + messCurrentChoice.currentChoice.mess
-  console.log(messOptionOpen)
-}
 
   return(
 <ExpandableCard title={cardTitle}> 
-<MessChoice/>
- {/* { messOptionOpen.messoptionopen.openNow 
-//     ? <MessChoice/>
-//     : "Next Mess is at"
-//  } */}
+<MessChoiceForm/>
  </ExpandableCard>
   );
 };
 
 // Change these proptypes depedning on whether the error-handling mechanisms are
-// implicit or explicit. Currently, they are assumed to be implicit.
+// implicit or explicit. Currently, they are assumed to be explicit.
 MessCard.propTypes = {
-  messOptionData: PropTypes.object,
-  messCurrentChoice: PropTypes.object
+  messOptionOpen: PropTypes.object.isRequired,
+  messCurrentChoice: PropTypes.object.isRequired
 };
 
 export default MessCard;
