@@ -6,6 +6,43 @@ import MenuItem from 'material-ui/MenuItem';
 import {Link} from "react-router-dom";
 import logoUrl from '../Navigation/logo-small.png';
 import {withRouter} from 'react-router-dom';
+import profileIcon from './profile.svg';
+import certificatesIcon from './certificates.svg';
+import counselorIcon from './counselor.svg';
+import contactsIcon from './contacts.svg';
+
+const options = [
+    {
+      name: 'Profile',
+      icon: profileIcon,
+      link: ''
+    },
+    {
+      name: 'Certificates',
+      icon: certificatesIcon,
+      link: ''
+    },
+    {
+      name: 'Counselor',
+      icon: counselorIcon,
+      link: ''
+    },
+    {
+      name: 'CSA',
+      icon: counselorIcon,
+      link: ''
+    },
+    {
+      name: 'About SWD',
+      icon: counselorIcon,
+      link: '/aboutSWD'
+    },
+    {
+      name: 'Contacts',
+      icon: contactsIcon,
+      link: ''
+    }
+];
 
 class Sidebar extends React.Component {
   static propTypes = {
@@ -15,45 +52,28 @@ class Sidebar extends React.Component {
     push: PropTypes.func.isRequired,
   }).isRequired,
   };
+  
 
-  handleMenuItemClick = (event) => {
-    var clickedItem = event.target.innerHTML
-    switch(clickedItem)
-    {
-      case "About SWD":
-        // Redirect
-         this.props.history.push("/aboutSWD")
-         break
-      case "Menu Item 2":
-        this.props.history.push("/")
-        break;
-      default:
-        this.props.history.push("/")
-    }
+  handleMenuItemClick = (link) => {
+    this.props.history.push(link);
     // Close the sidebar as soon as we've finished navigation
     this.props.toggleOpen()
   }
 
   render() {
     return (
-        <Drawer open={this.props.open} style={{ zIndex: '-5000' }} zDepth={0} >
-          <div style={{ width: '100%', textAlign: 'center' }}>
-              <img
-                src={logoUrl}
-                width="100"
-                height="100"
-                style={{ padding: 20 }}
-                alt="SWD"
-                onTouchTap={this.handleMenuItemClick}
-              />
-          </div>
-          <Menu onItemTouchTap={this.handleMenuItemClick}>
-          <MenuItem >About SWD</MenuItem>
-          <MenuItem>Menu Item 2</MenuItem>
-          </Menu>
+      <div>
+        <Drawer docked={false} open={this.props.open} onRequestChange={this.props.toggleOpen} containerStyle={{marginTop: 55}}>
+          {
+            options.map(option => 
+    <MenuItem style={{paddingTop: 10}} onTouchTap={() => this.handleMenuItemClick(option.link)} key={option.name} ><img src={option.icon} style={{padding: 5, paddingRight: 10}}/> {option.name}</MenuItem>
+  )
+          }
         </Drawer>
+        </div>
     );
   }
 }
 
-export default withRouter(Sidebar)
+export default withRouter(Sidebar);
+

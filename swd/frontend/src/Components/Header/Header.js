@@ -8,8 +8,6 @@ class Header extends React.Component {
 
   static propTypes = {
     isLoggedIn: PropTypes.bool.isRequired,
-    toggleSideBar: PropTypes.func.isRequired,
-    sideBarOpen: PropTypes.bool.isRequired,
     login: PropTypes.func.isRequired,
     logout: PropTypes.func.isRequired
   };
@@ -18,8 +16,6 @@ class Header extends React.Component {
     return (
       <div className={s.root}>
         <Navigation
-          toggleSideBar={this.props.toggleSideBar}
-          sideBarOpen={this.props.sideBarOpen}
           isLoggedIn={this.props.isLoggedIn}
           login={this.props.login}
           logout={this.props.logout}

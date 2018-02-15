@@ -19,30 +19,14 @@ class Layout extends React.Component {
     logout: PropTypes.func.isRequired
   };
 
-  state = {
-    sideBarOpen: false,
-  };
-
-  handleSideBarToggle = () => {
-    this.setState({ sideBarOpen: !this.state.sideBarOpen });
-  };
 
   render() {
-    const contentBodyStyle = { transition: 'margin-left 450ms cubic-bezier(0.23, 1, 0.32, 1)' };
-
-    if (this.state.sideBarOpen) {
-      contentBodyStyle.marginLeft = 256;
-    } else {
-      contentBodyStyle.marginLeft = 0;
-    }
 
     return (
       <MuiThemeProvider muiTheme={muiTheme}>
         <div className={s.container}>
-          <div style={contentBodyStyle}>
+          <div>
             <Header
-              toggleSideBar={this.handleSideBarToggle}
-              sideBarOpen={this.state.sideBarOpen}
               isLoggedIn={this.props.isLoggedIn}
               login={this.props.login}
               logout={this.props.logout}
@@ -52,11 +36,6 @@ class Layout extends React.Component {
               isLoggedIn={this.props.isLoggedIn}
             />
           </div>
-
-            <Sidebar
-              open={this.state.sideBarOpen}
-              toggleOpen={this.handleSideBarToggle}
-            />
 
         </div>
       </MuiThemeProvider>
