@@ -15,6 +15,7 @@ import ActionSearch from 'material-ui/svg-icons/action/search';
 import Avatar from 'material-ui/Avatar';
 import {withApollo} from 'react-apollo';
 import { grey200, grey50 } from 'material-ui/styles/colors';
+import Sidebar from '../Sidebar/Sidebar.js';
 // Import custom navigation styles
 import s from './Navigation.css';
 import logoUrl from './logo-small.png';
@@ -24,17 +25,22 @@ import { Mobile } from '../Responsive';
 class Navigation extends React.Component {
   static propTypes = {
     isLoggedIn: PropTypes.bool.isRequired,
-    toggleSideBar: PropTypes.func.isRequired,
-    sideBarOpen: PropTypes.bool.isRequired,
     login: PropTypes.func.isRequired,
-    logout: PropTypes.func.isRequired
+    logout: PropTypes.func.isRequired,
   };
 
 constructor(props) {
   super(props);
   this.state = {
     loginModalOpen : false,
+    sidebarOpen: false
   };
+  this.handleSideBarToggle = this.handleSideBarToggle.bind(this);
+}
+  handleSideBarToggle = () => {
+    this.setState( prevState => ({
+  sidebarOpen: !prevState.sidebarOpen
+}));
 }
 
   handleLoginOpen = () => {
@@ -66,7 +72,8 @@ constructor(props) {
         <div className={s.AppBar}>
           <Toolbar>
             <ToolbarGroup firstChild>
-              <IconButton onTouchTap={this.props.toggleSideBar}><NavigationMenu color={darkGreen} /></IconButton>
+              <IconButton onClick={this.handleSideBarToggle}><NavigationMenu color={darkGreen} /></IconButton>
+              <Sidebar open={this.state.sidebarOpen} toggleOpen={this.handleSideBarToggle} />
               <ToolbarTitle text="SWD" />
               <ToolbarSeparator />
             </ToolbarGroup>
@@ -89,93 +96,6 @@ constructor(props) {
       </Mobile>
     );
 
-    // if (!this.props.isLoggedIn) {
-    //   return (
-    //     <div>
-    //       <Toolbar>
-    //         <ToolbarGroup>
-    //           <a href="/">
-    //             <img
-    //               src={logoUrl}
-    //               width="50"
-    //               height="50"
-    //               style={{ padding: 20 }}
-    //               alt="SWD"
-    //             />
-    //           </a>
-    //           <ToolbarTitle text="SWD" href="/" />
-    //         </ToolbarGroup>
-    //         <ToolbarGroup>
-    //           <IconButton tooltip="Search Students" href="/search">
-    //             <ActionSearch />
-    //           </IconButton>
-    //           <ToolbarSeparator />
-    //           <RaisedButton label="Login" primary onTouchTap={this.handleLoginOpen} />
-    //           <IconMenu
-    //             iconButtonElement={
-    //               <IconButton touch>
-    //                 <NavigationExpandMoreIcon />
-    //               </IconButton>
-    //           }
-    //           >
-    //             <MenuItem primaryText="Migration" />
-    //             <MenuItem primaryText="Contact us" />
-    //           </IconMenu>
-    //         </ToolbarGroup>
-    //       </Toolbar>
-    //       <LoginModal
-    //         open={this.state.loginModalOpen}
-    //         onRequestClose={this.handleLoginClose}
-    //       />
-    //     </div>
-    //   );
-    // }
-    // return (
-    //   <Toolbar>
-    //     <ToolbarGroup>
-    //       <RaisedButton
-    //         label={this.props.sideBarOpen ? 'Close' : 'Open'}
-    //         onTouchTap={this.props.toggleFunc}
-    //         primary
-    //       />
-    //       { !this.props.sideBarOpen ? (
-    //         <a href="/">
-    //           <img
-    //             src={logoUrl}
-    //             width="50"
-    //             height="50"
-    //             style={{ padding: 20 }}
-    //             alt="SWD"
-    //           />
-    //         </a>
-    //           ) : '' }
-    //       <ToolbarTitle text="SWD" href="/" />
-    //     </ToolbarGroup>
-    //     <ToolbarGroup>
-    //       <IconButton tooltip="Search Students" href="/search">
-    //         <ActionSearch />
-    //       </IconButton>
-    //       <ToolbarSeparator />
-    //       <RaisedButton label="Logout" primary />
-    //       <Avatar
-    //         src={logoUrl.default}
-    //         size={45}
-    //         style={{ margin: 5 }}
-    //       />
-    //       <IconMenu
-    //         iconButtonElement={
-    //           <IconButton touch>
-    //             <NavigationExpandMoreIcon />
-    //           </IconButton>
-
-    //         }
-    //       >
-    //         <MenuItem primaryText="My Profile" />
-    //         <MenuItem primaryText="Logout" />
-    //       </IconMenu>
-    //     </ToolbarGroup>
-    //   </Toolbar>
-    // );
   }
 }
 
