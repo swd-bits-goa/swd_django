@@ -348,7 +348,7 @@ class Query(object):
                     else:
                         students=[]
                     for student in students:
-                        if student.bitsId.startswith(search):
+                        if student.bitsId.startswith(search.upper()):
                             searchresults.append(student)
                 else:
                     searchresults = searchresults
