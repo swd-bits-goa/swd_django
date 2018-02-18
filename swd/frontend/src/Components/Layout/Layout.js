@@ -16,12 +16,13 @@ class Layout extends React.Component {
     children: PropTypes.node.isRequired,
     isLoggedIn: PropTypes.bool.isRequired,
     login: PropTypes.func.isRequired,
-    logout: PropTypes.func.isRequired
+    logout: PropTypes.func.isRequired,
+    search: PropTypes.bool.isRequired,
+    setPutSearch: PropTypes.func.isRequired
   };
 
 
   render() {
-
     return (
       <MuiThemeProvider muiTheme={muiTheme}>
         <div className={s.container}>
@@ -30,11 +31,11 @@ class Layout extends React.Component {
               isLoggedIn={this.props.isLoggedIn}
               login={this.props.login}
               logout={this.props.logout}
-            />
+              search={this.props.search}
+              setPutSearch={this.props.setPutSearch}/>
             {this.props.children}
             <Footer
-              isLoggedIn={this.props.isLoggedIn}
-            />
+              isLoggedIn={this.props.isLoggedIn}/>
           </div>
 
         </div>
