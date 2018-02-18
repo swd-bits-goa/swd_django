@@ -1,0 +1,12 @@
+.searchbox-appear {
+    opacity: 0.01;
+}
+
+.searchbox-appear.searchbox-appear-active {
+    opacity: 1;
+    transition: opacity 0.7s ease-in;
+}
+
+h3{
+	font-family: 'Open Sans';
+}
