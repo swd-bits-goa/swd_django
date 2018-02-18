@@ -32,6 +32,8 @@ class Navigation extends React.Component {
     isLoggedIn: PropTypes.bool.isRequired,
     login: PropTypes.func.isRequired,
     logout: PropTypes.func.isRequired,
+    setPutSearch: PropTypes.func.isRequired,
+    search: PropTypes.bool.isRequired
   };
 
 constructor(props) {
@@ -40,7 +42,7 @@ constructor(props) {
     loginModalOpen : false,
     sidebarOpen: false,
     open: false,
-    search: false,
+    search: props.search,
     putSearch: " "
   };
   this.handleSideBarToggle = this.handleSideBarToggle.bind(this);
@@ -59,15 +61,16 @@ constructor(props) {
   
   getSearch = (e) => {
     this.setState({putSearch: e});
+    this.props.setPutSearch(e);
   }
 
   handleSideClick = () => {
-    this.setState({ open: !this.state.open});
+    this.setState({ sideBarOpen: !this.state.sideBarOpen});
   }
 
-  handleSearch = () => {
+  /*handleSearch = () => {
     this.setState({ search: true });
-  }
+  }*/
 
   handleCloseSearch = () => {
     this.setState({ search: false });
@@ -125,11 +128,6 @@ constructor(props) {
             open={this.state.loginModalOpen}
             onRequestClose={this.handleLoginClose}
             login={this.props.login} />
-        </div>
-        <div>
-          <Route
-              path="/Search"
-              render={()=>(<Search search={this.state.putSearch}/>)}/>
         </div>
       </div>
       </BrowserRouter>

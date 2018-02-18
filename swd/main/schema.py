@@ -3,22 +3,7 @@ from graphene_django.types import DjangoObjectType
 from django.contrib.auth.models import User
 from .models import *
 
-BRANCH = {
-    'A1': 'B.E.(Hons) Chemical Engineering',
-    'A3': 'B.E.(Hons) Electrical and Electronics Engineering',
-    'A4': 'B.E.(Hons) Mechanical Engineering',
-    'A7': 'B.E.(Hons) Computer Science',
-    'A8': 'B.E.(Hons) Electronics and Instrumentation Engineering',
-    'B1': 'MSc. (Hons) Biology',
-    'B2': 'MSc. (Hons) Chemistry',
-    'B3': 'MSc. (Hons) Economics',
-    'B4': 'MSc. (Hons) Mathematics',
-    'B5': 'MSc. (Hons) Physics',
-    'AA': 'B.E.(Hons) Electronics and Communication Engineering',
-    'PH': 'PhD.',
-    'H1': 'M.E. (Hons) Computer Science',
 
-}
 
 class UserType(DjangoObjectType):
     class Meta:
@@ -304,8 +289,6 @@ class Query(object):
             hostels=[]
             for host in hostel:
                 hostels.extend(HostelPS.objects.all().filter(hostel=host))
-                print(hostels)
-                print(host)
             for hostel in hostels:
                 searchresults.append(hostel.student)
             if len(searchresults)==0:
@@ -344,7 +327,7 @@ class Query(object):
                         students = searchresults
                         searchresults = []
                     elif flag==0:    
-                        students = Student.objects.all()
+                        students = Student.objects.all().filter(bitsId__icontains=search)
                     else:
                         students=[]
                     for student in students:

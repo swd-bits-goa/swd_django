@@ -26,7 +26,6 @@ export default class SearchBar1 extends React.Component{
 		      		transitionEnter={false}
 		      		transitionLeave={false}>
 				<SearchBar
-	                onChange={this.handleChange}
 	                onRequestSearch={() => console.log('onRequestSearch')}
 	                spellCheck={false}
 	                placeholder={"Search by name or ID"}
