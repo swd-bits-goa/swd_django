@@ -79,10 +79,12 @@ export default class Filters extends React.Component{
         if(this.state.hostelValues.find((hostel) => hostel==e)){
             const index = this.state.hostelValues.indexOf(e);
             this.setState({hostelValues: this.state.hostelValues.slice(0,index).concat(this.state.hostelValues.slice(index+1))});
+            this.props.handleSort("hostel", this.state.hostelValues.slice(0,index).concat(this.state.hostelValues.slice(index+1)));
         }
         else{
             const index = this.state.branchValues.indexOf(e);
             this.setState({branchValues: this.state.branchValues.slice(0,index).concat(this.state.branchValues.slice(index+1))});
+            this.props.handleSort("branch", this.state.branchValues.slice(0,index).concat(this.state.branchValues.slice(index+1)));
         }
         }
 
