@@ -21,6 +21,11 @@ import s from './Navigation.css';
 import logoUrl from './logo-small.png';
 import LoginModal from './LoginModal';
 import { Mobile } from '../Responsive';
+import Search from '../Search/Search.js';
+import SearchBar from '../Search/SearchBar.js';
+import {Link, BrowserRouter, Route} from 'react-router-dom';
+import Layout from "../Layout/Layout";
+import closeIcon from './close.svg';
 
 class Navigation extends React.Component {
   static propTypes = {
@@ -35,12 +40,31 @@ constructor(props) {
   super(props);
   this.state = {
     loginModalOpen : false,
-    open: false
+    open: false,
+    search: false,
+    putSearch: " "
   };
   this.handleSideClick = this.handleSideClick.bind(this);
+  this.getSearch = this.getSearch.bind(this);
 }
+  componentWillMount(){
+    window.location.pathname==='/Search'?this.setState({search: true}):this.setState({search: false});
+  }
+  
+  getSearch = (e) => {
+    this.setState({putSearch: e});
+  }
+
   handleSideClick = () => {
     this.setState({ open: !this.state.open});
+  }
+
+  handleSearch = () => {
+    this.setState({ search: true });
+  }
+
+  handleCloseSearch = () => {
+    this.setState({ search: false });
   }
 
   handleLoginOpen = () => {
@@ -70,21 +94,24 @@ console.log(this.state);
       // There's a noticeable lag when rendering components based on
       // media queries for the first time
       <Mobile>
+      <BrowserRouter>
+      <div>
         <div className={s.AppBar}>
           <Toolbar>
             <ToolbarGroup firstChild>
               <IconButton onClick={this.handleSideClick}><NavigationMenu color={darkGreen} /></IconButton>
               <Sidebar open={this.state.open}/>
-              <ToolbarTitle text="SWD" />
-              <ToolbarSeparator />
+              {this.state.search?<SearchBar style={{width: '90%'}} getSearch={this.getSearch}/>:<ToolbarTitle text="SWD" />}
+              {this.state.search?<span/>:<ToolbarSeparator style={{marginLeft:0}} />}
             </ToolbarGroup>
-            <ToolbarGroup lastChild>
-              <IconButton iconStyle={filledIcon}><ActionSearch color={darkGreen} /></IconButton>
-              { !(this.props.isLoggedIn) ? 
-              <RaisedButton label="Login" backgroundColor={darkGreen} labelColor={grey50} onTouchTap={this.handleLoginOpen} />
+            <ToolbarGroup lastChild style={{position: 'relative'}}>
+              {this.state.search?<span/>:<Link to='/Search' style={{position: 'absolute', left: 5}}><IconButton iconStyle={filledIcon} style={{paddingLeft: 0, paddingRight: 20}} onClick={this.handleSearch}><ActionSearch color={darkGreen} /></IconButton></Link>}
+              {this.state.search?<span/>:<ToolbarSeparator style={{position: 'absolute', left: 20}}/>}
+              {!this.state.search? !(this.props.isLoggedIn) ? 
+              <FlatButton label="Login" onTouchTap={this.handleLoginOpen}  style={{paddingLeft: 20}}/>
               :
-             <RaisedButton label="Logout" backgroundColor={darkGreen} labelColor={grey50} onTouchTap={this.handleLogout} />
-              }
+             <FlatButton label="Logout" onTouchTap={this.handleLogout}  style={{paddingLeft: 20}}/>
+              :<FlatButton onClick={this.handleCloseSearch} style={{position: 'relative', left: 20}}><img src={closeIcon} style={{position: 'relative', left: 5, height: 20}}/></FlatButton>}
 
             </ToolbarGroup>
             
@@ -94,6 +121,13 @@ console.log(this.state);
             onRequestClose={this.handleLoginClose}
             login={this.props.login} />
         </div>
+        <div>
+          <Route
+              path="/Search"
+              render={()=>(<Search search={this.state.putSearch}/>)}/>
+        </div>
+      </div>
+      </BrowserRouter>
       </Mobile>
     );
 
