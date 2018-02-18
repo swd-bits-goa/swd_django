@@ -21,11 +21,13 @@ const styles = {
 }
 
 export default class FilterChips extends React.Component{
-	handleRequestDelete = () => console.log('delete');
+	handleRequestDelete = (e) => {
+		this.props.deleteFilters(e);
+	}
 	render(){
 		return(
 			<div style={styles.container}>
-				<Filters filters={this.props.filters} handleRequestDelete={this.handleRequestDelete}/>
+				<Filters filters={this.props.filters} deleteFilters={this.handleRequestDelete.bind(this)}/>
 			</div>
 		);
 	}
@@ -36,7 +38,7 @@ const Filters = (props) => {
 	return allFilters.map( (filter)=> {
 		return <Chip 
 				style={styles.chip} 
-				onRequestDelete={props.handleRequestDelete}
+				onRequestDelete={() => props.deleteFilters(filter)}
 				>
 				{filter}</Chip>
 	})

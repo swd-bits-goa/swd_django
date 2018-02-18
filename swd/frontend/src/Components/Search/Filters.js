@@ -73,6 +73,21 @@ export default class Filters extends React.Component{
         })
         this.props.handleSort('branch', branchArray);
     }
+    handleDelete = (e) => {
+        console.log(e);
+        console.log(this.state.hostelValues.indexOf(e));
+        if(this.state.hostelValues.find((hostel) => hostel==e)){
+            const index = this.state.hostelValues.indexOf(e);
+            this.setState({hostelValues: this.state.hostelValues.slice(0,index).concat(this.state.hostelValues.slice(index+1))});
+            this.props.handleSort("hostel", this.state.hostelValues.slice(0,index).concat(this.state.hostelValues.slice(index+1)));
+        }
+        else{
+            const index = this.state.branchValues.indexOf(e);
+            this.setState({branchValues: this.state.branchValues.slice(0,index).concat(this.state.branchValues.slice(index+1))});
+            this.props.handleSort("branch", this.state.branchValues.slice(0,index).concat(this.state.branchValues.slice(index+1)));
+        }
+        }
+
 
   	menuItems(val, values) {
 	    return val.map((name) => (
@@ -124,7 +139,7 @@ export default class Filters extends React.Component{
                         </div>
                 </div>
 			</Paper>
-            <FilterChips filters={this.state.hostelValues.concat(this.state.branchValues)}/>
+            <FilterChips filters={this.state.hostelValues.concat(this.state.branchValues)} deleteFilters={this.handleDelete.bind(this)}/>
             </div>
 
 		);
