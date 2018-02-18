@@ -344,7 +344,7 @@ class Query(graphene.AbstractType):
                         students = searchresults
                         searchresults = []
                     elif flag==0:    
-                        students = Student.objects.all()
+                        students = Student.objects.all().filter(bitsId__icontains=search)
                     else:
                         students=[]
                     for student in students:
