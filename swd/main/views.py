@@ -3,10 +3,12 @@ from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import Student, MessOptionOpen, MessOption, Leave, Bonafide, Warden, DayPass, MessBill
+from django.views.decorators.csrf import csrf_protect
 from datetime import date, datetime, timedelta
 from .forms import MessForm, LeaveForm, BonafideForm, DayPassForm
 from django.contrib import messages
 from django.utils.timezone import make_aware
+import datetime
 
 from braces import views
 
@@ -84,6 +86,7 @@ def profile(request):
     return render(request, "profile.html", context)
 
 
+@csrf_protect
 def loginform(request):
     if request.POST:
         username = request.POST.get('username')
@@ -199,23 +202,34 @@ def certificates(request):
     bonafideContext = {
         'bonafides': Bonafide.objects.filter(student=student),
     }
+    queryset=Bonafide.objects.filter(student=student);
+    sem_count=[0,0]
+    for bonafide in queryset:
+        year,month,date=bonafide.reqDate.strftime('%Y-%m-%d').split('-')
+        if datetime.datetime.now().year==int(year):
+            sem_count[(int(month)-1)//6]+=1
+    if sem_count[(datetime.datetime.now().month-1)//6] < 3:
+        if request.POST:
+            form = BonafideForm(request.POST)
+            if form.is_valid():
+                bonafideform = form.save(commit=False)
+                bonafideform.reqDate = datetime.date.today()
+                bonafideform.student = student
+                bonafideform.save()
 
-    if request.POST:
-        form = BonafideForm(request.POST)
-        if form.is_valid():
-            bonafideform = form.save(commit=False)
-            bonafideform.reqDate = datetime.today()
-            bonafideform.student = student
-            bonafideform.save()
-
-            context = {
-                'option': 1,
+                context = {
+                    'option': 1,
+                }
+            else:
+                context = {
+                    'option': 2,
+                }
+                print(form.errors)
+    else:
+        context = {
+              'option': 3,
             }
-        else:
-            context = {
-                'option': 2,
-            }
-            print(form.errors)
+        print(form.errors)
 
     return render(request, "certificates.html", dict(context, **bonafideContext))
 
