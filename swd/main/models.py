@@ -237,9 +237,9 @@ class Transaction(models.Model):
         return self.timestamp + ' ' + student.user
 
 class MessBill(models.Model):
-    transaction = models.OneToOneField('Transaction', on_delete=models.CASCADE)
     month = models.DateField()
     amount = models.FloatField()
+    rebate = models.FloatField()
 
     def __str__(self):
-        return
+        return str(self.month) + ' ' + str(self.amount) + ' ' + str(self.rebate)

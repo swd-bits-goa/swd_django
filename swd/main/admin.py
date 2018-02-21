@@ -3,11 +3,11 @@ from main.models import *
 from django.utils.html import format_html
 from django.core.urlresolvers import reverse
 import urllib
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
+import datetime
+from .models import MessBill, Leave
+from calendar import monthrange
 # import django.models.queryset as QuerySet
-
-class StudentAdmin(admin.ModelAdmin):
-    search_fields = ['name','bitsId']
 
 class HostelPSAdmin(admin.ModelAdmin):
     search_fields = ['student__name', 'student__bitsId']
@@ -35,6 +35,17 @@ class BonafideAdmin(admin.ModelAdmin):
         )
     bonafide_actions.short_description = 'Bonafide Actions'
     bonafide_actions.allow_tags = True
+
+def export_xls(modeladmin, request, queryset):
+    select = [ i.bitsId for i in queryset]
+    return HttpResponseRedirect("/messbill/?ids=%s" % (",".join(select)))
+
+
+export_xls.short_description = u"Export Mess Bill"
+
+class StudentAdmin(admin.ModelAdmin):
+    search_fields = ['name', 'bitsId']
+    actions = [export_xls, ]
 
 admin.site.register(Student, StudentAdmin)
 admin.site.register(HostelPS, HostelPSAdmin)
