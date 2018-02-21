@@ -7,7 +7,9 @@ from datetime import date, datetime, timedelta
 from .forms import MessForm, LeaveForm, BonafideForm, DayPassForm
 from django.contrib import messages
 from django.utils.timezone import make_aware
-
+from django.core.files.storage import FileSystemStorage
+import random
+import string
 from braces import views
 
 from django.contrib.auth.models import User
@@ -26,6 +28,7 @@ def login_success(request):
 
 @login_required
 def dashboard(request):
+    print(request.user)
     student = Student.objects.get(user=request.user)
     leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
     daypasss = DayPass.objects.filter(student=student, dateTime__gte=date.today() - timedelta(days=7))
@@ -80,9 +83,23 @@ def profile(request):
     context = {
         'student': student,
     }
-    print(student.name)
+    print(student)
     return render(request, "profile.html", context)
 
+@login_required
+def updatephoto(request):
+    im = request.FILES['image']
+    fs = FileSystemStorage()
+    name = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
+    print(name)
+    path = "static/img/students/"+name+request.POST.get('extension')
+    print(path)
+    filename = fs.save(path, im)
+    uploaded_file_url = "/"+fs.url(filename)
+    student = Student.objects.get(user=request.user)
+    student.photoURL = uploaded_file_url
+    student.save()
+    return HttpResponse(uploaded_file_url)
 
 def loginform(request):
     if request.POST:
