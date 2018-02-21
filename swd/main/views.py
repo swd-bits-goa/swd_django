@@ -90,6 +90,7 @@ def loginform(request):
         password = request.POST.get('password')
         user = authenticate(request, username=username, password=password)
         print(username, password)
+        #user = True 
         if user is not None:
             login(request, user)
             if user.is_staff:
