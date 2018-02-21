@@ -4,6 +4,7 @@ from urllib.parse import urlencode
 
 class LDAPAuthBackend:
     def authenticate(self, username=None, password=None):
+        print("FUCCCCCC")
         try:
             with urlopen("http://10.10.10.20/auth.php?" + urlencode({'u': username, 'p': password}), timeout=5) as authfile:
                 string = authfile.read()
