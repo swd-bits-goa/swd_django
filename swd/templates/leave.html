@@ -29,13 +29,6 @@
                             <p>Leave applied from {{ dateStart }}({{ timeStart }}) to {{ dateEnd }}({{ timeEnd }})</p>
                         {% else %}
                             {% if form.errors %}
-                                {% for field in form %}
-                                    {% for error in field.errors %}
-                                        <div class="red-text alert alert-danger">
-                                            <strong>{{ error|escape }}</strong>
-                                        </div>
-                                    {% endfor %}
-                                {% endfor %}
                                 {% for error in form.non_field_errors %}
                                     <div class="red-text alert alert-danger">
                                         <strong>{{ error|escape }}</strong>
@@ -43,15 +36,22 @@
                                 {% endfor %}
                             {% endif %}
                             <div class=red-text>
-                            <p>Sorry, there was some problem with form submission. Please fill all the fields correct. All fields are required.</p>
+                            <p>There was a problem with form submission. Please refill.</p>
                             <h1></h1></div>
                             <form method="POST">
                                 {% csrf_token %}
                                 <div class="col-md-12">
                                     {% for field in form %}
-                                      <div class="input-field col s12">
-                                        {{ field }} {{ field.label_tag }}
-                                      </div>
+                                        {% if form.errors %}
+                                        {% for error in field.errors %}
+                                            <div class="red-text alert alert-danger">
+                                                <strong>{{ error|escape }}</strong>
+                                            </div>
+                                        {% endfor %}
+                                        {% endif %}
+                                        <div class="input-field col s12">
+                                            {{ field }} {{ field.label_tag }}
+                                        </div>
                                     {% endfor %}
                                 </div>
                                 <div class="col-xs-4">
@@ -80,7 +80,7 @@
                                 {% for leave in leaves %}
                                 <tr>
                                     <td class="center-align">{{ leave.id }}</td>
-                                    <td class="center-align">[{{ leave.dateTimeStart }}] to [{{ leave.dateTimeEnd }}]</td>
+                                    <td class="center-align">{{ leave.dateTimeStart|date:"d/M/y" }} --- {{ leave.dateTimeEnd|date:"d/M/y" }}</td>
                                     <td class="center-align badge-container">
                                         {% if leave.approved == 1%}
                                         <span class="new badge green comm" data-badge-caption="Approved"></span> {% elif leave.disapproved == 1 %}

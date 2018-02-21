@@ -14,20 +14,26 @@ class LeaveForm(forms.ModelForm):
     timeStart = forms.CharField(label='Departure Time', widget=forms.TextInput(attrs={'class': 'timepicker'}))
     dateEnd = forms.CharField(label='Arrival Date', widget=forms.TextInput(attrs={'class': 'datepicker'}))
     timeEnd = forms.CharField(label='Arrival Time', widget=forms.TextInput(attrs={'class': 'timepicker'}))
-    
+    phone_number = forms.CharField(label='Contact No. during leave', widget=TextInput(attrs={'type':'number'}))
+
     def clean(self):
         cleaned_data = super(LeaveForm, self).clean()
         dateStart = datetime.strptime(cleaned_data['dateStart'], '%d %B, %Y').date()
         dateEnd = datetime.strptime(cleaned_data['dateEnd'], '%d %B, %Y').date()
+        timeStart = datetime.strptime(cleaned_data['timeStart'], '%H:%M').time()
+        date_time_start = datetime.combine(dateStart, timeStart)
+        if (len(cleaned_data['phone_number']) > 15):
+            self.add_error('phone_number', "Phone No. can't be longer than 15 numbers!")
         if (dateStart > dateEnd):
             self.add_error('dateEnd', "Arrival cannot be before Departure!")
-        if (dateStart < date.today()):
-            self.add_error('dateStart', "Departure cannot be before today!")
+        if (datetime.now() >= date_time_start):
+            self.add_error('dateStart', "Departure cannot be before the present date and time!")
+        return cleaned_data
 
     class Meta:
         model = Leave
         exclude = ['dateTimeStart', 'dateTimeEnd', 'student',
-                   'approvedBy', 'approved', 'disapproved', 'inprocess', 'comment']
+                   'approvedBy', 'approved', 'disapproved', 'inprocess', 'comment', 'corrPhone']
         widgets = {
             'reason': forms.Textarea(attrs={'class': 'materialize-textarea validate'}),
             'corrAddress': forms.Textarea(attrs={'class': 'materialize-textarea validate'}),
@@ -57,8 +63,10 @@ class DayPassForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super(DayPassForm, self).clean()
         date = datetime.strptime(cleaned_data['date'], '%d %B, %Y').date()
-        if (date < date.today()):
-            self.add_error('date', "Daypass cannot be issued for dates before today!")
+        time = datetime.strptime(cleaned_data['time'], '%H:%M').time()
+        date_time_start = datetime.combine(date, time)
+        if datetime.now() >= date_time_start:
+            self.add_error('date', "Daypass cannot be issued before the present date and time!")
         return cleaned_data
 
     class Meta:
