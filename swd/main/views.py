@@ -224,12 +224,10 @@ def certificates(request):
                 context = {
                     'option': 2,
                 }
-                print(form.errors)
     else:
         context = {
               'option': 3,
             }
-        print(form.errors)
 
     return render(request, "certificates.html", dict(context, **bonafideContext))
 
