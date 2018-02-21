@@ -1,0 +1,4 @@
+.container {
+    /* To ensure sidebar transition does not cause a restyling of internal components */
+    width: 100vw;
+}
