@@ -82,6 +82,7 @@ class Staff(models.Model):
 class Student(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
+    password = models.CharField(max_length=100, default="password")
     bitsId = models.CharField(max_length=15)
     gender = models.CharField(max_length=1, blank=True)
     bDay = models.DateField(blank=True, null=True)
@@ -91,6 +92,7 @@ class Student(models.Model):
     bloodGroup = models.CharField(max_length=10, blank=True, null=True)
     cgpa = models.FloatField(blank=True, null=True)
     admit = models.DateField(blank=True, null=True)
+    photoURL = models.CharField(max_length=200, default="https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg")
     parentName = models.CharField(max_length=50, blank=True, null=True)
     parentPhone = models.CharField(max_length=20, blank=True, null=True)
     parentEmail = models.CharField(max_length=50, blank=True, null=True)
