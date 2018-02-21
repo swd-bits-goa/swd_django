@@ -199,10 +199,10 @@ def certificates(request):
         'student': student,
         'form': form
     }
-    bonafideContext = {
-        'bonafides': Bonafide.objects.filter(student=student),
-    }
     queryset=Bonafide.objects.filter(student=student);
+    bonafideContext = {
+        'bonafides': queryset,
+    }
     sem_count=[0,0]
     for bonafide in queryset:
         year,month,date=bonafide.reqDate.strftime('%Y-%m-%d').split('-')
