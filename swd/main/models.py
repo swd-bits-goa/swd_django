@@ -196,8 +196,8 @@ class Leave(models.Model):
 
 class DayPass(models.Model):
     student = models.ForeignKey('Student', on_delete = models.CASCADE)
-    dateTime = models.DateTimeField()
     reason = models.TextField()
+    dateTime = models.DateTimeField(null=True)
     consent = models.CharField(max_length=10, choices=CONSENT_CHOICES)
     approvedBy = models.ForeignKey('Warden', blank=True, null=True, on_delete="PROTECT")
     approved = models.BooleanField(default=0, blank=True)

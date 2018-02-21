@@ -168,9 +168,11 @@ def leave(request):
             dateEnd = datetime.strptime(request.POST.get('dateEnd'), '%d %B, %Y').date()
             timeEnd = datetime.strptime(request.POST.get('timeEnd'), '%H:%M').time()
             dateTimeEnd = datetime.combine(dateEnd, timeEnd)
+            leaveform.corrPhone = request.POST.get('phone_number')
             leaveform.dateTimeStart = make_aware(dateTimeStart)
             leaveform.dateTimeEnd = make_aware(dateTimeEnd)
             leaveform.student = student
+            print(request.POST.get('consent'))
             leaveform.save()
 
             context = {
