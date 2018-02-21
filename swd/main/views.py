@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .models import Student, MessOptionOpen, MessOption, Leave, Bonafide, Warden, DayPass
+from .models import Student, MessOptionOpen, MessOption, Leave, Bonafide, Warden, DayPass, MessBill
 from datetime import date, datetime, timedelta
 from .forms import MessForm, LeaveForm, BonafideForm, DayPassForm
 from django.contrib import messages
@@ -11,6 +11,8 @@ from django.utils.timezone import make_aware
 from braces import views
 
 from django.contrib.auth.models import User
+
+from calendar import monthrange
 
 import re
 
@@ -384,3 +386,75 @@ def daypass(request):
             }
             print(form.errors)
     return render(request, "daypass.html", dict(context, **daypassContext))
+
+@user_passes_test(lambda u: u.is_superuser)
+def messbill(request):
+    selected = request.GET['ids']
+    values = [x for x in selected.split(',')]
+    if request.POST:
+        import xlwt
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = 'attachment; filename=rebate.xls'
+        wb = xlwt.Workbook(encoding='utf-8')
+        ws = wb.add_sheet("Rebate")
+
+        row_num = 0
+
+        columns = [
+            (u"Name", 6000),
+            (u"ID", 6000),
+            (u"Amount", 3000),
+            (u"Rebate", 3000),
+            (u"Final Amount", 3000),
+        ]
+
+        font_style = xlwt.XFStyle()
+        font_style.font.bold = True
+
+        for col_num in range(len(columns)):
+            ws.write(row_num, col_num, columns[col_num][0], font_style)
+            # set column width
+            ws.col(col_num).width = columns[col_num][1]
+
+        font_style = xlwt.XFStyle()
+        font_style.alignment.wrap = 1
+
+        print(request.POST.get('start_date'))
+        start_date = datetime.strptime(request.POST.get('start_date'), '%d %B, %Y').date()
+        end_date = datetime.strptime(request.POST.get('end_date'), '%d %B, %Y').date()
+
+        messbill = MessBill.objects.first()
+        amount = messbill.amount
+        rebate = messbill.rebate
+
+        end_date = end_date if end_date<date.today() else date.today()
+
+        days = end_date - start_date
+        days = days.days
+
+        for k in values:
+            obj = Student.objects.get(bitsId=k)
+            row_num += 1
+            leaves = Leave.objects.filter(student=obj)
+            noofdays = 0
+            for leave in leaves:
+                if leave.approved == True:
+                    if leave.dateTimeStart.date() > start_date and leave.dateTimeStart.date() < end_date:
+                        noofdays += abs(leave.dateTimeStart.date() -
+                                        leave.dateTimeEnd.date()).days + 1
+                        print(noofdays)
+            finalamt = amount * days - rebate * noofdays
+            row = [
+                obj.name,
+                obj.bitsId,
+                amount * days,
+                rebate * noofdays,
+                finalamt
+            ]
+            for col_num in range(len(row)):
+                ws.write(row_num, col_num, row[col_num], font_style)
+
+        wb.save(response)
+        return response
+
+    return render(request, "messbill.html", {})
