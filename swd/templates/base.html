@@ -9,8 +9,8 @@
 
     <!-- CSS  -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link href="{% static 'assets/css/materialize.css' %}" type="text/css" rel="stylesheet" media="screen,projection" />
-    <link href="{% static 'assets/css/style.css' %}" type="text/css" rel="stylesheet" media="screen,projection" />
+    <link href="{% static 'css/materialize.css' %}" type="text/css" rel="stylesheet" media="screen,projection" />
+    <link href="{% static 'css/style.css' %}" type="text/css" rel="stylesheet" media="screen,projection" />
 </head>
 
 <body>
@@ -19,11 +19,11 @@
             <a href="#" class="brand-logo">&nbsp;Student Welfare Division</a>
             <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
             <ul id="nav-mobile" class="right hide-on-med-and-down">
-                <li class=""><a href="/profile" class="valign-wrapper"><img class="circle profileImg" src="{% static 'assets/img/profile-swd.jpg' %}">&nbsp;{{ student.name|title }}</a></li>
+                <li class=""><a href="/profile" class="valign-wrapper"><img class="circle profileImg" src="{% static 'img/profile-swd.jpg' %}">&nbsp;{{ student.name|title }}</a></li>
                 <li><a href="/logout">Logout</a></li>
             </ul>
             <ul class="side-nav" id="mobile-demo">
-                <li><a href="/profile" class="valign-wrapper"><img class="circle profileImg" src="{% static 'assets/img/profile-swd.jpg' %}">&nbsp;{{ student.name|title }}</a></li>
+                <li><a href="/profile" class="valign-wrapper"><img class="circle profileImg" src="{% static 'img/profile-swd.jpg' %}">&nbsp;{{ student.name|title }}</a></li>
                 <li><a href="/logout">Logout</a></li>
             </ul>
             <style>
@@ -67,9 +67,9 @@
         <li>
             <div class="user-view">
                 <div class="background">
-                    <img src="{% static 'assets/img/office.jpg' %}">
+                    <img src="{% static 'img/office.jpg' %}">
                 </div>
-                <a href="#!user"><img class="circle" src="{% static 'assets/img/profile-swd.jpg' %}"></a>
+                <a href="#!user"><img class="circle" src="{% static 'img/profile-swd.jpg' %}"></a>
                 <a href="#!name"><span class="white-text name">{{ student.name|title }}</span></a>
                 <a href="#!email"><span class="white-text email">{{ student.bitsId }}</span></a>
             </div>
@@ -123,8 +123,8 @@
     </footer> -->
     <!--  Scripts-->
     <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
-    <script src="{% static 'assets/js/materialize.js' %}"></script>
-    <script src="{% static 'assets/js/init.js' %}"></script>
+    <script src="{% static 'js/materialize.js' %}"></script>
+    <script src="{% static 'js/init.js' %}"></script>
 
     <script>
         $(document).ready(function () {
