@@ -127,8 +127,7 @@ class App extends React.Component {
                 <Layout isLoggedIn={this.state.loggedIn} login={this.login} logout={this.logout}>
                   <Home news={this.state.latestNews} />
                 </Layout>
-              )}
-            />
+              )}/>
           </Switch>
         </Router>
       </ApolloProvider>
