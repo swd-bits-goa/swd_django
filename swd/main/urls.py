@@ -20,6 +20,7 @@ urlpatterns = [
 
     url(r'^dashboard/', views.dashboard, name="dashboard"),
     url(r'^profile/', views.profile, name="profile"),
+    url(r'^updatephoto/', views.updatephoto, name="updatephoto"),
     url(r'^messoption/', views.messoption, name="messoption"),
     url(r'^leave/', views.leave, name="leave"),
     url(r'^certificates/', views.certificates, name="certificates"),
