@@ -62,18 +62,18 @@ class Home extends React.Component {
   };
   render() {
     return (
-      <Mobile>
-        <div
+         <div
           className={s.container}
           style={{ backgroundImage: `url(${background})` }}
         >
+      <Mobile>
+       <div>
           <Card>
             <CardMedia>
               <img src={bdome} style={{ maxWidth: "80%" }} alt="SWD" />
             </CardMedia>
           </Card>
           <InfoCard title="Latest News" list={this.props.news} />
-          {/* TODO: Handle apollo errors */}
           {this.props.data && this.props.data.networkStatus === 7 ? (
             <div>
               {this.props.data.currentUser &&
@@ -82,8 +82,10 @@ class Home extends React.Component {
           ) : (
             <div>loading</div>
           )}
+
         </div>
       </Mobile>
+      </div>
     );
   }
 }
