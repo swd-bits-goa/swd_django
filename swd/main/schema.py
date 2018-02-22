@@ -72,7 +72,7 @@ class MessBillType(DjangoObjectType):
         model = MessBill
 
 
-class Query(graphene.AbstractType):
+class Query(object):
     # used to get all data to the frontend
     current_user = graphene.Field(UserType)
 
