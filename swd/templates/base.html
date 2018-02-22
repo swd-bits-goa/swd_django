@@ -20,11 +20,11 @@
             <a href="#" class="brand-logo">&nbsp;Student Welfare Division</a>
             <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
             <ul id="nav-mobile" class="right hide-on-med-and-down">
-                <li class=""><a href="/profile" class="valign-wrapper"><img class="circle profileImg" src="{% static 'assets/img/profile-swd.jpg' %}">&nbsp;{{ student.name|title }}</a></li>
+                <li class=""><a href="/profile" class="valign-wrapper"><img class="circle profileImg" src="{% block photoURLMobile %} {% endblock %}">&nbsp;{{ student.name|title }}</a></li>
                 <li><a href="/logout">Logout</a></li>
             </ul>
             <ul class="side-nav" id="mobile-demo">
-                <li><a href="/profile" class="valign-wrapper"><img class="circle profileImg" src="{% static 'assets/img/profile-swd.jpg' %}">&nbsp;{{ student.name|title }}</a></li>
+                <li><a href="/profile" class="valign-wrapper"><img class="circle profileImg" src="{% block photoURLDesktop %} {% endblock %}">&nbsp;{{ student.name|title }}</a></li>
                 <li><a href="/logout">Logout</a></li>
             </ul>
             <style>

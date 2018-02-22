@@ -92,7 +92,7 @@ class Student(models.Model):
     cgpa = models.FloatField(blank=True, null=True)
     admit = models.DateField(blank=True, null=True)
     #photo = models.ImageField(upload_to="studentimages", blank=True)
-    photoURL = models.CharField(max_length=200, default="https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg")
+    photoURL = models.CharField(max_length=200, default="/static/assets/img/profile-swd.jpg")
     parentName = models.CharField(max_length=50, blank=True, null=True)
     parentPhone = models.CharField(max_length=20, blank=True, null=True)
     parentEmail = models.CharField(max_length=50, blank=True, null=True)

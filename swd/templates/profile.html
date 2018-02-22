@@ -4,6 +4,9 @@
 <link rel="stylesheet" href="{% static 'assets/css/profile.css' %}">
 {% endblock %}
 
+{% block photoURLDesktop %}{{ student.photoURL }}{% endblock %}
+{% block photoURLMobile %}{{ student.photoURL }}{% endblock %}
+
 {% block content %}
 
 <div>
@@ -43,9 +46,7 @@
                                     <td>Change your profile picture</td>
                                     <td>
                                         <div id="uploadImageContainer">
-                                                {% csrf_token %}
                                             <img class="profilePic" src="{{ student.photoURL }}">
-                                            <input type="file" name="profilePic" class="hupload" accept="image/*" onchange="changePhoto(event.target)">
                                         </div>
                                     </td>
                                 </tr>
@@ -60,33 +61,5 @@
     </div>
     <br><br>
 </div>
-
-<script>
-    // frontend people, refactor and move this code to appropirate place(s)
-
-function changePhoto(target) {
-    debugger
-    const file = target.files[0]
-    ajax(file)
-}
-
-function ajax(image) {
-    const formData = new FormData()
-    formData.append("image", image);
-    formData.append("extension", image.name.split('.').pop())
-    formData.append("csrfmiddlewaretoken", document.querySelector('input[name="csrfmiddlewaretoken"]').value)
-    fetch('/updatephoto/', {
-        method: 'POST',
-        body: formData,
-        credentials: 'same-origin'
-    }).then(res => {
-        console.log(res)
-        alert('Your profile photo is updated')
-        location.reload()
-    })
-}
-
-
-</script>
 
 {% endblock %}

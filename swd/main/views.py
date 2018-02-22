@@ -91,9 +91,7 @@ def updatephoto(request):
     im = request.FILES['image']
     fs = FileSystemStorage()
     name = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
-    print(name)
-    path = "static/img/students/"+name+request.POST.get('extension')
-    print(path)
+    path = "static/img/students/"+name+"."+request.POST.get('extension')
     filename = fs.save(path, im)
     uploaded_file_url = "/"+fs.url(filename)
     student = Student.objects.get(user=request.user)
