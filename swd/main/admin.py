@@ -1,7 +1,6 @@
 from django.contrib import admin
 from main.models import *
 from django.utils.html import format_html
-from django.core.urlresolvers import reverse
 import urllib
 from django.http import HttpResponseRedirect, HttpResponse
 import datetime
@@ -13,7 +12,7 @@ class HostelPSAdmin(admin.ModelAdmin):
     search_fields = ['student__name', 'student__bitsId']
 
 models = [Warden, Staff, DayScholar, CSA, MessOption, Leave, DayPass, LateComer, InOut, Disco, MessOptionOpen, Transaction, MessBill]
-    
+
 
 @admin.register(Bonafide)
 class BonafideAdmin(admin.ModelAdmin):
