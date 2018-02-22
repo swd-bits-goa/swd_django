@@ -10,6 +10,7 @@ import Layout from "./Components/Layout";
 import logo from "./logo.svg";
 import PropTypes from "prop-types";
 import injectTapEventPlugin from "react-tap-event-plugin";
+import Search from './Components/Search/Search.js';
 
 // react-tap-event-plugin provides onTouchTap() to all React Components.
 // It's a mobile-friendly onClick() alternative for components in Material-UI,
@@ -81,6 +82,7 @@ class App extends React.Component {
     this.state = {
       loggedIn: localStorage.getItem('token') ? true : false , 
       //Check if we're already logged in when starting the app
+      putSearch: " ",
       latestNews: [
         {
           title: "Winner of Aditya Birla Group scholarship 2017",
@@ -113,6 +115,13 @@ class App extends React.Component {
     this.setState({ loggedIn: false})
   }
 
+  putSearch = (e) => {
+    this.setState({putSearch: e});
+  }
+
+  dPut = () => console.log('Dummy Func');
+
+
   render() {
 
     return (
@@ -121,10 +130,18 @@ class App extends React.Component {
       <ApolloProvider client={client}>
         <Router>
           <Switch>
+
             <Route
-              path="/"
-              render={() => (
-                <Layout isLoggedIn={this.state.loggedIn} login={this.login} logout={this.logout}>
+              exact path="/Search"
+                component={()=>(
+                  <Layout isLoggedIn={this.state.loggedIn} login={this.login} logout={this.logout} search={true} setPutSearch={this.putSearch.bind(this)}>
+                    <Search search={this.state.putSearch}/>
+                  </Layout>
+                )}/>
+            <Route
+              exact path="/"
+              component={() => (
+                <Layout isLoggedIn={this.state.loggedIn} login={this.login} logout={this.logout} search={false} setPutSearch={this.dPut.bind(this)}>
                   <Home news={this.state.latestNews} />
                 </Layout>
               )}/>

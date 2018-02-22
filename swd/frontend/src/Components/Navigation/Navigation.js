@@ -34,34 +34,37 @@ class Navigation extends React.Component {
     sideBarOpen: PropTypes.bool.isRequired,
     login: PropTypes.func.isRequired,
     logout: PropTypes.func.isRequired,
+    setPutSearch: PropTypes.func.isRequired,
+    search: PropTypes.bool.isRequired
   };
 
 constructor(props) {
   super(props);
   this.state = {
     loginModalOpen : false,
-    open: false,
-    search: false,
+    sideBarOpen: false,
+    search: props.search,
     putSearch: " "
   };
   this.handleSideClick = this.handleSideClick.bind(this);
   this.getSearch = this.getSearch.bind(this);
 }
-  componentWillMount(){
+  /*componentWillMount(){
     window.location.pathname==='/Search'?this.setState({search: true}):this.setState({search: false});
-  }
+  }*/
   
   getSearch = (e) => {
     this.setState({putSearch: e});
+    this.props.setPutSearch(e);
   }
 
   handleSideClick = () => {
-    this.setState({ open: !this.state.open});
+    this.setState({ sideBarOpen: !this.state.sideBarOpen});
   }
 
-  handleSearch = () => {
+  /*handleSearch = () => {
     this.setState({ search: true });
-  }
+  }*/
 
   handleCloseSearch = () => {
     this.setState({ search: false });
@@ -100,7 +103,7 @@ console.log(this.state);
           <Toolbar>
             <ToolbarGroup firstChild>
               <IconButton onClick={this.handleSideClick}><NavigationMenu color={darkGreen} /></IconButton>
-              <Sidebar open={this.state.open}/>
+              <Sidebar open={this.state.sideBarOpen}/>
               {this.state.search?<SearchBar style={{width: '90%'}} getSearch={this.getSearch}/>:<ToolbarTitle text="SWD" />}
               {this.state.search?<span/>:<ToolbarSeparator style={{marginLeft:0}} />}
             </ToolbarGroup>
@@ -120,11 +123,6 @@ console.log(this.state);
             open={this.state.loginModalOpen}
             onRequestClose={this.handleLoginClose}
             login={this.props.login} />
-        </div>
-        <div>
-          <Route
-              path="/Search"
-              render={()=>(<Search search={this.state.putSearch}/>)}/>
         </div>
       </div>
       </BrowserRouter>
