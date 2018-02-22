@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import Student, MessOptionOpen, MessOption, Leave, Bonafide, Warden, DayPass, MessBill
+from django.views.decorators.csrf import csrf_protect
 from datetime import date, datetime, timedelta
 from .forms import MessForm, LeaveForm, BonafideForm, DayPassForm
 from django.contrib import messages
@@ -99,6 +100,7 @@ def updatephoto(request):
     student.save()
     return HttpResponse(uploaded_file_url)
 
+@csrf_protect
 def loginform(request):
     if request.POST:
         username = request.POST.get('username')
@@ -212,26 +214,35 @@ def certificates(request):
         'student': student,
         'form': form
     }
+    queryset=Bonafide.objects.filter(student=student);
     bonafideContext = {
-        'bonafides': Bonafide.objects.filter(student=student),
+        'bonafides': queryset,
     }
+    sem_count=[0,0]
+    for bonafide in queryset:
+        year,month,date=bonafide.reqDate.strftime('%Y-%m-%d').split('-')
+        if datetime.datetime.now().year==int(year):
+            sem_count[(int(month)-1)//6]+=1
+    if sem_count[(datetime.datetime.now().month-1)//6] < 3:
+        if request.POST:
+            form = BonafideForm(request.POST)
+            if form.is_valid():
+                bonafideform = form.save(commit=False)
+                bonafideform.reqDate = datetime.date.today()
+                bonafideform.student = student
+                bonafideform.save()
 
-    if request.POST:
-        form = BonafideForm(request.POST)
-        if form.is_valid():
-            bonafideform = form.save(commit=False)
-            bonafideform.reqDate = datetime.today()
-            bonafideform.student = student
-            bonafideform.save()
-
-            context = {
-                'option': 1,
+                context = {
+                    'option': 1,
+                }
+            else:
+                context = {
+                    'option': 2,
+                }
+    else:
+        context = {
+              'option': 3,
             }
-        else:
-            context = {
-                'option': 2,
-            }
-            print(form.errors)
 
     return render(request, "certificates.html", dict(context, **bonafideContext))
 
@@ -412,9 +423,13 @@ def messbill(request):
         response = HttpResponse(content_type='application/ms-excel')
         response['Content-Disposition'] = 'attachment; filename=rebate.xls'
         wb = xlwt.Workbook(encoding='utf-8')
-        ws = wb.add_sheet("Rebate")
+        ws = wb.add_sheet("A Mess")
+        ws2 = wb.add_sheet("C Mess")
+        ws3 = wb.add_sheet("Indeterminate")
 
         row_num = 0
+        row_num_2 = 0
+        row_num_3 = 0
 
         columns = [
             (u"Name", 6000),
@@ -429,13 +444,16 @@ def messbill(request):
 
         for col_num in range(len(columns)):
             ws.write(row_num, col_num, columns[col_num][0], font_style)
+            ws2.write(row_num, col_num, columns[col_num][0], font_style)
+            ws3.write(row_num, col_num, columns[col_num][0], font_style)
             # set column width
             ws.col(col_num).width = columns[col_num][1]
+            ws2.col(col_num).width = columns[col_num][1]
+            ws3.col(col_num).width = columns[col_num][1]
 
         font_style = xlwt.XFStyle()
         font_style.alignment.wrap = 1
 
-        print(request.POST.get('start_date'))
         start_date = datetime.strptime(request.POST.get('start_date'), '%d %B, %Y').date()
         end_date = datetime.strptime(request.POST.get('end_date'), '%d %B, %Y').date()
 
@@ -446,20 +464,42 @@ def messbill(request):
         end_date = end_date if end_date<date.today() else date.today()
 
         days = end_date - start_date
-        days = days.days
+        days = days.days + 1
 
+        if request.POST.get('mess') is not 'N':
+            values = MessOption.objects.filter(mess=request.POST.get(
+                'mess'), monthYear=start_date.replace(day=1))
         for k in values:
-            obj = Student.objects.get(bitsId=k)
-            row_num += 1
+            if request.POST.get('mess') is not 'N':
+                obj = k.student
+            else:
+                obj = Student.objects.get(bitsId=k)
+                try:
+                    mess = MessOption.objects.get(
+                        student=obj, monthYear=start_date.replace(day=1))
+                except:
+                    mess = MessOption.objects.create(
+                        student=obj, monthYear=start_date.replace(day=1), mess='N')
+
             leaves = Leave.objects.filter(student=obj)
+
             noofdays = 0
+
             for leave in leaves:
                 if leave.approved == True:
-                    if leave.dateTimeStart.date() > start_date and leave.dateTimeStart.date() < end_date:
-                        noofdays += abs(leave.dateTimeStart.date() -
-                                        leave.dateTimeEnd.date()).days + 1
-                        print(noofdays)
+                    if leave.dateTimeStart.date() >= start_date and leave.dateTimeStart.date() <= end_date and leave.dateTimeEnd.date() >= end_date:
+                        noofdays += abs(end_date -
+                                        leave.dateTimeStart.date()).days + 1
+                    elif leave.dateTimeEnd.date() >= start_date and leave.dateTimeEnd.date() <= end_date and leave.dateTimeStart.date() <= start_date:
+                        noofdays += abs(leave.dateTimeEnd.date() -
+                                        start_date).days + 1
+                    elif leave.dateTimeStart.date() >= start_date and leave.dateTimeEnd.date() <= end_date:
+                        noofdays += abs(leave.dateTimeEnd.date() -
+                                        leave.dateTimeStart.date()).days + 1
+                    elif leave.dateTimeStart.date() <= start_date and leave.dateTimeEnd.date() >= end_date:
+                        noofdays += abs(end_date - start_date).days + 1
             finalamt = amount * days - rebate * noofdays
+
             row = [
                 obj.name,
                 obj.bitsId,
@@ -467,8 +507,24 @@ def messbill(request):
                 rebate * noofdays,
                 finalamt
             ]
-            for col_num in range(len(row)):
-                ws.write(row_num, col_num, row[col_num], font_style)
+
+            if request.POST.get('mess') is not 'N':
+                row_num += 1
+                for col_num in range(len(row)):
+                    ws.write(row_num, col_num, row[col_num], font_style)
+            else:
+                if mess.mess == 'A':
+                    row_num += 1
+                    for col_num in range(len(row)):
+                        ws.write(row_num, col_num, row[col_num], font_style)
+                elif mess.mess == 'C':
+                    row_num_2 += 1
+                    for col_num in range(len(row)):
+                        ws2.write(row_num_2, col_num, row[col_num], font_style)
+                else:
+                    row_num_3 += 1
+                    for col_num in range(len(row)):
+                        ws3.write(row_num_3, col_num, row[col_num], font_style)
 
         wb.save(response)
         return response
