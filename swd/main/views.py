@@ -204,15 +204,14 @@ def certificates(request):
     }
     sem_count=[0,0]
     for bonafide in queryset:
-        year,month,date=bonafide.reqDate.strftime('%Y-%m-%d').split('-')
-        if datetime.datetime.now().year==int(year):
-            sem_count[(int(month)-1)//6]+=1
-    if sem_count[(datetime.datetime.now().month-1)//6] < 3:
+        if datetime.now().year==bonafide.reqDate.year:
+            sem_count[(int(bonafide.reqDate.month)-1)//6]+=1
+    if sem_count[(datetime.now().month-1)//6] < 3:
         if request.POST:
             form = BonafideForm(request.POST)
             if form.is_valid():
                 bonafideform = form.save(commit=False)
-                bonafideform.reqDate = datetime.date.today()
+                bonafideform.reqDate = date.today()
                 bonafideform.student = student
                 bonafideform.save()
 
