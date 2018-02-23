@@ -33,6 +33,14 @@ BRANCH = {
 
 }
 
+YEARNAMES = {
+     0: 'First',
+     1: 'Second',
+     2: 'Third',
+     3: 'Forth',
+     4: 'Fifth',
+}
+
 STUDENT_STATUS = (
     ('Student', 'Student'),
     ('Thesis', 'Thesis'),
@@ -145,12 +153,21 @@ class Bonafide(models.Model):
     text = models.TextField(default='', blank=True)
 
     def createText(self):
-        gender = "Mr." if self.student.gender == 'M' else "Ms."
-        branch = BRANCH[self.student.bitsId[4:6]]
-        reason = self.reason if self.reason is not 'Other' else self.otherReason
-        return '''This is to certify that ''' + gender + self.student.name.title() + ''', ID No.''' + self.student.bitsId + ''' is a bonafide student of third year class. He was admitted to the Institute on 30/07/2015, for pursuing the ''' + branch + ''' programme of studies. He is residing in the Hostel AH4 - 206 of this Institute. Date of joining the current academic session is 1 August, 2017.
+        gender = "Mr." if self.student.gender.lower() == 'm' else "Ms."
+        pronoun = "He " if gender=="Mr." else "She "
+        firstDeg=self.student.bitsId[4:6]
+        secondDeg=self.student.bitsId[6:8]
+        branch = BRANCH[firstDeg]
+        if secondDeg != 'PS' and firstDeg != 'H1' and firstDeg != 'PH':
+            branch = branch +' and '+ BRANCH[secondDeg]
+        yearNum=self.reqDate.year-int(self.student.bitsId[0:4])
+        if(self.reqDate.month <5):
+            yearNum=yearNum-1
+        yearName=YEARNAMES[yearNum]
 
-    This certificate is issues for the purpose of applying for ''' + reason + ''' from 11th December 2017 to 16th December 2017 and he needs to return back to Campus on 6th January 2018 to attend his regular classes.'''
+        reason = self.otherReason if self.reason.lower()=='Other' else self.reason
+
+        return '''This is to certify that ''' + gender +self.student.name.title() + ''', ID No.''' + self.student.bitsId + ''' is a bonafide student of '''+ yearName + ''' year at Birla Institute of Technology and Science (BITS) Pilani University, K.K Birla Goa campus, persuing ''' + branch + '''. This certificate is issued for the purpose of applying for ''' + reason + '''.'''
 
     def save(self, *args, **kwargs):
         if self.text == '':
