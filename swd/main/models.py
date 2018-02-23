@@ -165,9 +165,9 @@ class Bonafide(models.Model):
             yearNum=yearNum-1
         yearName=YEARNAMES[yearNum]
 
-        reason = self.otherReason if self.reason.lower()=='Other' else self.reason
+        reason = self.otherReason if self.reason.lower()=='other' else self.reason
 
-        return '''This is to certify that ''' + gender +self.student.name.title() + ''', ID No.''' + self.student.bitsId + ''' is a bonafide student of '''+ yearName + ''' year at Birla Institute of Technology and Science (BITS) Pilani University, K.K Birla Goa campus, persuing ''' + branch + '''. This certificate is issued for the purpose of applying for ''' + reason + '''.'''
+        return '''This is to certify that ''' + gender +self.student.name.title() + ''', ID No.''' + self.student.bitsId + ''' is a bonafide student of '''+ yearName + ''' year at Birla Institute of Technology and Science (BITS) Pilani University, K.K Birla Goa campus, pursuing ''' + branch + '''. This certificate is issued for the purpose of applying for ''' + reason + '''.'''
 
     def save(self, *args, **kwargs):
         if self.text == '':
