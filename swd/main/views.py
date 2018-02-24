@@ -239,36 +239,6 @@ def printBonafide(request,id=None):
     }
     return render(request,"bonafidepage.html",context)
 
-# def bonafidepdf(request):
-#     response = HttpResponse(content_type='application/pdf')
-#     p = canvas.Canvas(response, pagesize=letter)
-#     width, height = letter
-#     text = '''
-#     '''
-#     p.drawString(100, 700, text)
-#     p.showPage()
-#     p.save()
-#     return response
-
-
-# class BonafidePDFView(views.LoginRequiredMixin, views.PermissionRequiredMixin, PDFTemplateView):
-#     permission_required = "auth.change_user"
-#     context_object_name = 'contexts'
-#     template_name = 'bonafidepdf.html'
-
-#     def get_context_data(self, **kwargs):
-#         b = Bonafide.objects.get(pk=self.request.GET.get('bonafide'))
-#         b.printed = True
-#         b.save()
-
-#         return super(BonafidePDFView, self).get_context_data(
-#             bonafide=Bonafide.objects.get(pk=self.request.GET.get('bonafide')),
-#             date = datetime.today().date(),
-#             pagesize='A4',
-#             title='Bonafide Certificates',
-#             **kwargs
-#         )
-
 def is_warden(user):
     return False if not Warden.objects.filter(user=user) else True
 
