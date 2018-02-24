@@ -229,19 +229,27 @@ def certificates(request):
 
     return render(request, "certificates.html", dict(context, **bonafideContext))
 
-def bonafidepdf(request):
-    response = HttpResponse(content_type='application/pdf')
-    p = canvas.Canvas(response, pagesize=letter)
-    width, height = letter
-    text = '''
-    '''
-    p.drawString(100, 700, text)
-    p.showPage()
-    p.save()
-    return response
+@user_passes_test(lambda u: u.is_superuser)
+def printBonafide(request,id=None):
+    instance = Bonafide.objects.get(id=id)
+    context = {
+            "text"  :instance.text,
+            "date"  :instance.reqDate,
+            "id"    :id
+    }
+    return render(request,"bonafidepage.html",context)
 
-def printBonafide(request):
-    pass
+# def bonafidepdf(request):
+#     response = HttpResponse(content_type='application/pdf')
+#     p = canvas.Canvas(response, pagesize=letter)
+#     width, height = letter
+#     text = '''
+#     '''
+#     p.drawString(100, 700, text)
+#     p.showPage()
+#     p.save()
+#     return response
+
 
 # class BonafidePDFView(views.LoginRequiredMixin, views.PermissionRequiredMixin, PDFTemplateView):
 #     permission_required = "auth.change_user"

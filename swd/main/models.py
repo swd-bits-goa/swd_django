@@ -34,11 +34,11 @@ BRANCH = {
 }
 
 YEARNAMES = {
-     0: 'First',
-     1: 'Second',
-     2: 'Third',
-     3: 'Forth',
-     4: 'Fifth',
+     0: 'first',
+     1: 'second',
+     2: 'third',
+     3: 'forth',
+     4: 'fifth',
 }
 
 STUDENT_STATUS = (
