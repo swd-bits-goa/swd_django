@@ -34,11 +34,11 @@ BRANCH = {
 }
 
 YEARNAMES = {
-     0: 'first',
-     1: 'second',
-     2: 'third',
-     3: 'forth',
-     4: 'fifth',
+     1: 'first',
+     2: 'second',
+     3: 'third',
+     4: 'forth',
+     5: 'fifth',
 }
 
 STUDENT_STATUS = (
@@ -160,7 +160,7 @@ class Bonafide(models.Model):
         branch = BRANCH[firstDeg]
         if secondDeg != 'PS' and firstDeg != 'H1' and firstDeg != 'PH':
             branch = branch +' and '+ BRANCH[secondDeg]
-        yearNum=self.reqDate.year-int(self.student.bitsId[0:4])
+        yearNum=self.reqDate.year-int(self.student.bitsId[0:4]) + 1
         if(self.reqDate.month <5):
             yearNum=yearNum-1
         yearName=YEARNAMES[yearNum]
