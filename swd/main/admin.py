@@ -25,7 +25,7 @@ class BonafideAdmin(admin.ModelAdmin):
         'bonafide_actions',
     )
     def get_url(self, pk):
-        url = '/bonafide/?bonafide=' + str(Bonafide.objects.get(pk=pk).id)
+        url = '/bonafide/' + str(Bonafide.objects.get(pk=pk).id)
         return url
 
     def bonafide_actions(self, obj):
