@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Bonafide Certificate</title>
+<style type="text/css" media="print">
+@page {
+    size: auto;   
+    margin: 0;  /* this affects the margin in the printer settings */
+}
+</style>
+<style>
+div.container3 {
+	height: 10;
+	position: relative 
+	}
+div.container3 p {
+   margin: 0;
+   position: absolute;
+   top: 50%;
+   transform: translate(0, -50%) } 
+    body {
+		height: 842px;
+		width: 595px;
+		margin-left: auto;
+		margin-right: auto;
+    }
+</style> 
+</head>
+<body bgcolor="white">
+<div id="content" >
+    <div class="top">
+        <h3 class="ref" align="left">SWD/CERT/{{ id }}</h3>
+        <h3 class="date" align="right">{{ date }}</h3>
+    </div>
+    <h1 align="center">CERTIFICATE</h1>
+    <p>
+    	{{text}}
+    </p> 
+</div>
+<font size="2" font color ="grey">
+<h6 align="center">
+BIRLA INSTITUTE OF TECHNOLOGY & SCIENCE, PILANI - K.K. Birla Goa Campus
+<br>NH 17B, Bypass Road, Zuari Nagar 403726, GOA, India, Phone +0832-2580300
+</h6>
+</font>
+</body>
+</html>
