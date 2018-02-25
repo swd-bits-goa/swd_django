@@ -204,15 +204,14 @@ def certificates(request):
     }
     sem_count=[0,0]
     for bonafide in queryset:
-        year,month,date=bonafide.reqDate.strftime('%Y-%m-%d').split('-')
-        if datetime.datetime.now().year==int(year):
-            sem_count[(int(month)-1)//6]+=1
-    if sem_count[(datetime.datetime.now().month-1)//6] < 3:
+        if datetime.now().year==bonafide.reqDate.year:
+            sem_count[(int(bonafide.reqDate.month)-1)//6]+=1
+    if sem_count[(datetime.now().month-1)//6] < 3:
         if request.POST:
             form = BonafideForm(request.POST)
             if form.is_valid():
                 bonafideform = form.save(commit=False)
-                bonafideform.reqDate = datetime.date.today()
+                bonafideform.reqDate = date.today()
                 bonafideform.student = student
                 bonafideform.save()
 
@@ -230,37 +229,17 @@ def certificates(request):
 
     return render(request, "certificates.html", dict(context, **bonafideContext))
 
-def bonafidepdf(request):
-    response = HttpResponse(content_type='application/pdf')
-    p = canvas.Canvas(response, pagesize=letter)
-    width, height = letter
-    text = '''
-    '''
-    p.drawString(100, 700, text)
-    p.showPage()
-    p.save()
-    return response
-
-def printBonafide(request):
-    pass
-
-# class BonafidePDFView(views.LoginRequiredMixin, views.PermissionRequiredMixin, PDFTemplateView):
-#     permission_required = "auth.change_user"
-#     context_object_name = 'contexts'
-#     template_name = 'bonafidepdf.html'
-
-#     def get_context_data(self, **kwargs):
-#         b = Bonafide.objects.get(pk=self.request.GET.get('bonafide'))
-#         b.printed = True
-#         b.save()
-
-#         return super(BonafidePDFView, self).get_context_data(
-#             bonafide=Bonafide.objects.get(pk=self.request.GET.get('bonafide')),
-#             date = datetime.today().date(),
-#             pagesize='A4',
-#             title='Bonafide Certificates',
-#             **kwargs
-#         )
+@user_passes_test(lambda u: u.is_superuser)
+def printBonafide(request,id=None):
+    instance = Bonafide.objects.get(id=id)
+    context = {
+            "text"  :instance.text,
+            "date"  :date.today(),
+            "id"    :id
+    }
+    instance.printed=True;
+    instance.save();
+    return render(request,"bonafidepage.html",context)
 
 def is_warden(user):
     return False if not Warden.objects.filter(user=user) else True
