@@ -23,8 +23,7 @@ urlpatterns = [
     url(r'^messoption/', views.messoption, name="messoption"),
     url(r'^leave/', views.leave, name="leave"),
     url(r'^certificates/', views.certificates, name="certificates"),
-    url(r'^bonafidepdf/', views.bonafidepdf, name="bonafidepdf"),
-
+    url(r'bonafide/(?P<id>\d+)/$',views.printBonafide, name="printBonafide"),
     url(r'^warden/$', views.warden, name="warden"),
     url(r'^warden/([0-9]+)/$', views.wardenleaveapprove, name="wardenleaveapprove"),
     url(r'^warden/daypass/([0-9]+)/$', views.wardendaypassapprove, name="wardendaypassapprove"),
