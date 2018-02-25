@@ -1,4 +1,12 @@
 {% extends 'base.html' %}
+{% load staticfiles %}
+{% block head %}
+<link rel="stylesheet" href="{% static 'assets/css/profile.css' %}">
+{% endblock %}
+
+{% block photoURLDesktop %}{{ student.photoURL }}{% endblock %}
+{% block photoURLMobile %}{{ student.photoURL }}{% endblock %}
+
 {% block content %}
 
 <div>
@@ -33,6 +41,14 @@
                                 <tr>
                                     <td>CGPA</td>
                                     <td>{{ student.cgpa }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Change your profile picture</td>
+                                    <td>
+                                        <div id="uploadImageContainer">
+                                            <img class="profilePic" src="{{ student.photoURL }}">
+                                        </div>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
