@@ -234,9 +234,11 @@ def printBonafide(request,id=None):
     instance = Bonafide.objects.get(id=id)
     context = {
             "text"  :instance.text,
-            "date"  :instance.reqDate,
+            "date"  :date.today(),
             "id"    :id
     }
+    instance.printed=True;
+    instance.save();
     return render(request,"bonafidepage.html",context)
 
 def is_warden(user):
