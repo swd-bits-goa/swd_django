@@ -16,7 +16,6 @@ from django.contrib.auth.models import User
 from calendar import monthrange
 
 import re
-
 def index(request):
     return render(request, 'home1.html',{})
 
@@ -169,9 +168,11 @@ def leave(request):
             dateEnd = datetime.strptime(request.POST.get('dateEnd'), '%d %B, %Y').date()
             timeEnd = datetime.strptime(request.POST.get('timeEnd'), '%H:%M').time()
             dateTimeEnd = datetime.combine(dateEnd, timeEnd)
+            leaveform.corrPhone = request.POST.get('phone_number')
             leaveform.dateTimeStart = make_aware(dateTimeStart)
             leaveform.dateTimeEnd = make_aware(dateTimeEnd)
             leaveform.student = student
+            print(request.POST.get('consent'))
             leaveform.save()
 
             context = {
@@ -184,6 +185,7 @@ def leave(request):
         else:
             context = {
                 'option': 2,
+                'form': form
             }
             print(form.errors)
     return render(request, "leave.html", dict(context, **leaveContext))
@@ -373,6 +375,7 @@ def daypass(request):
         else:
             context = {
                 'option': 2,
+                'form': form
             }
             print(form.errors)
     return render(request, "daypass.html", dict(context, **daypassContext))
