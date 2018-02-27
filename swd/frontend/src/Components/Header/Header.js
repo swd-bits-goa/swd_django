@@ -10,8 +10,7 @@ class Header extends React.Component {
     isLoggedIn: PropTypes.bool.isRequired,
     login: PropTypes.func.isRequired,
     logout: PropTypes.func.isRequired,
-    setPutSearch: PropTypes.func.isRequired,
-    search:PropTypes.bool.isRequired
+    searchMode:PropTypes.bool.isRequired
   };
 
   render() {
@@ -21,8 +20,7 @@ class Header extends React.Component {
           isLoggedIn={this.props.isLoggedIn}
           login={this.props.login}
           logout={this.props.logout}
-          setPutSearch={this.props.setPutSearch}
-          search={this.props.search}/>
+          searchMode={this.props.searchMode}/>
         {/* <div className={s.container}>
           <Link className={s.brand} to="/">
             <span className={s.brandTxt}>BITS Pilani, Goa</span>

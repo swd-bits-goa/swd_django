@@ -1,21 +1,22 @@
 import React from 'react';
 import SearchBar from 'material-ui-search-bar';
+import {withRouter} from 'react-router';
 import CSSTransitionGroup from 'react-addons-css-transition-group';
 
-export default class SearchBar1 extends React.Component{
-	constructor(){
-		super();
+class SearchBarWithAnimation extends React.Component{
+	constructor(props){
+		super(props);
+		this.state = {
+			// Search value depends on search route param
+    searchText: props.match.params.query
+  };
 	}
-	/*handleChange(e){
-		if(e != ""){
-			this.setState({active: true, search: e});
-		}
-		else{
-			this.setState({active: false, search: e});
-		}
-		const { fetchMore } = this.props.data;
-		console.log('alri');
-	}*/
+
+	 getSearch = (e) => {
+    this.setState({searchText: e});
+    console.log("Pushing to history", e)
+    this.props.history.push("/search/" + e )
+  }
 
 	render(){
 		return(
@@ -26,16 +27,17 @@ export default class SearchBar1 extends React.Component{
 		      		transitionEnter={false}
 		      		transitionLeave={false}>
 				<SearchBar
+					value={this.state.searchText}
 	                onRequestSearch={() => console.log('onRequestSearch')}
 	                spellCheck={false}
 	                placeholder={"Search by name or ID"}
 	                id="searchbar"
 	                style={{width:'120%'}}
-	                onChange={this.props.getSearch}/>
+	                onChange={this.getSearch}/>
 	        </CSSTransitionGroup>
 		);
 
 	}
 }
 
-
+export default withRouter(SearchBarWithAnimation);
