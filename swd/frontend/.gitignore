@@ -15,4 +15,5 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+~/projects/swd_django/src/swd/tools/dev_info.py
 
