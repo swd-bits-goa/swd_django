@@ -1,6 +1,5 @@
 {% extends 'base.html' %} {% block content %}
 
-
 <div>
     <div class="section">
 
@@ -28,7 +27,37 @@
                             <p>Daypass Successfully applied. Please wait for approval</p>
                             <p>Daypass applied for {{ date }}</p>
                         {% else %}
-                            <p>Sorry, there was some problem with form submission. Please fill all the fields correct. All fields are required.</p>
+                            {% if form.errors %}
+                                {% for error in form.non_field_errors %}
+                                    <div class="red-text alert alert-danger">
+                                        <strong>{{ error|escape }}</strong>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                            <div class=red-text>
+                                <p>There was a problem with form submission. Please refill.</p>
+                                <h1></h1>
+                            </div>
+                            <form method="POST">
+                                {% csrf_token %}
+                                <div class="col-md-12">
+                                    {% for field in form %}
+                                        {% if form.errors %}
+                                        {% for error in field.errors %}
+                                            <div class="red-text alert alert-danger">
+                                                <strong>{{ error|escape }}</strong>
+                                            </div>
+                                        {% endfor %}
+                                        {% endif %}
+                                    <div class="input-field col s12">
+                                        {{ field }} {{ field.label_tag }}
+                                    </div>
+                                {% endfor %}
+                                </div>
+                                <div class="col-xs-4">
+                                    <button class="btn btn-block bg-green waves-effect" type="submit">SUBMIT</button>
+                                </div>
+                            </form>
                         {% endif %}
                     </div>
                 </div>
