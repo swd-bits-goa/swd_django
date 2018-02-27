@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .models import Student, MessOptionOpen, MessOption, Leave, Bonafide, Warden, DayPass, MessBill
+from .models import Student, MessOptionOpen, MessOption, Leave, Bonafide, Warden, DayPass, MessBill, HostelPS
 from django.views.decorators.csrf import csrf_protect
 from datetime import date, datetime, timedelta
 from .forms import MessForm, LeaveForm, BonafideForm, DayPassForm
@@ -10,8 +10,6 @@ from django.contrib import messages
 from django.utils.timezone import make_aware
 from django.core.mail import send_mail
 from django.conf import settings
-from django.http import HttpResponseRedirect
-from django.urls import reverse
 
 from braces import views
 
@@ -177,6 +175,15 @@ def leave(request):
             leaveform.dateTimeEnd = make_aware(dateTimeEnd)
             leaveform.student = student
             leaveform.save()
+            #email_to=[Warden.objects.get(hostel=HostelPS.objects.get(student=student).hostel).email]             #For production
+            #email_to=["youremail@site.com"]                                                                      #For testing 
+            mailObj=Leave.objects.latest('id')
+            mail_subject="New Leave ID: "+ str(mailObj.id)
+            mail_message="Leave Application applied by "+ mailObj.student.name +" with leave id: " + str(mailObj.id) + ".\n"
+            mail_message=mail_message + "Parent name: " + mailObj.student.parentName + "\nParent Email: "+ mailObj.student.parentEmail + "\nParent Phone: " + mailObj.student.parentPhone
+            mail_message=mail_message + "Consent type: " + mailObj.consent
+            send_mail(mail_subject,mail_message,settings.EMAIL_HOST_USER,email_to,fail_silently=False)
+
             context = {
                 'option': 1,
                 'dateStart': request.POST.get('dateStart'),
