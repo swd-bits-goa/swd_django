@@ -23,11 +23,11 @@ class LeaveForm(forms.ModelForm):
         timeStart = datetime.strptime(cleaned_data['timeStart'], '%H:%M').time()
         date_time_start = datetime.combine(dateStart, timeStart)
         if (len(cleaned_data['phone_number']) > 10):
-            self.add_error('phone_number', "Phone No. can't be longer than 15 numbers!")
+            self.add_error('phone_number', "Phone No. can't be longer than 15 numbers")
         if (dateStart > dateEnd):
-            self.add_error('dateEnd', "Arrival cannot be before Departure!")
+            self.add_error('dateEnd', "Arrival cannot be before Departure")
         if (datetime.now() >= date_time_start):
-            self.add_error('dateStart', "Departure cannot be before the present date and time!")
+            self.add_error('dateStart', "Departure cannot be before the present date and time")
         return cleaned_data
 
     class Meta:
@@ -66,7 +66,7 @@ class DayPassForm(forms.ModelForm):
         time = datetime.strptime(cleaned_data['time'], '%H:%M').time()
         date_time_start = datetime.combine(date, time)
         if datetime.now() >= date_time_start:
-            self.add_error('date', "Daypass cannot be issued before the present date and time!")
+            self.add_error('date', "Daypass cannot be issued before the present date and time")
         return cleaned_data
 
     class Meta:
