@@ -38,7 +38,7 @@ class SearchResults extends React.Component{
 		if(loading)
 			return(<div style={{width: '100%', height: '100%',marginLeft: 'auto', marginRight: 'auto'}}><CircularProgress style={{marginLeft: 'auto', marginRight: 'auto'}}/></div>);
 		if(error)
-			return(<p>{error}</p>);
+			return(<p>{error.message}</p>);
 		console.log(searchStudent[0]);
 		return(
 			<Students students={this.props.data.searchStudent}/>
