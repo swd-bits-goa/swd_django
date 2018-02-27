@@ -2,6 +2,7 @@
 /* eslint no-unused-vars:0 */
 import React from 'react';
 import PropTypes from 'prop-types';
+import {withRouter} from 'react-router';
 import AppBar from 'material-ui/AppBar';
 import IconButton from 'material-ui/IconButton';
 import FlatButton from 'material-ui/FlatButton';
@@ -22,7 +23,7 @@ import logoUrl from './logo-small.png';
 import LoginModal from './LoginModal';
 import { Mobile } from '../Responsive';
 import Search from '../Search/Search.js';
-import SearchBar from '../Search/SearchBar.js';
+import SearchBarWithAnimation from '../Search/SearchBar.js';
 import {Link, BrowserRouter, Route} from 'react-router-dom';
 import Layout from "../Layout/Layout";
 import closeIcon from './close.svg';
@@ -34,8 +35,7 @@ class Navigation extends React.Component {
     sideBarOpen: PropTypes.bool.isRequired,
     login: PropTypes.func.isRequired,
     logout: PropTypes.func.isRequired,
-    setPutSearch: PropTypes.func.isRequired,
-    search: PropTypes.bool.isRequired
+    searchMode: PropTypes.bool.isRequired
   };
 
 constructor(props) {
@@ -43,31 +43,19 @@ constructor(props) {
   this.state = {
     loginModalOpen : false,
     sideBarOpen: false,
-    search: props.search,
-    putSearch: " "
+    searchMode: props.searchMode,
   };
   this.handleSideClick = this.handleSideClick.bind(this);
-  this.getSearch = this.getSearch.bind(this);
 }
-  /*componentWillMount(){
-    window.location.pathname==='/Search'?this.setState({search: true}):this.setState({search: false});
-  }*/
-  
-  getSearch = (e) => {
-    this.setState({putSearch: e});
-    this.props.setPutSearch(e);
-  }
 
   handleSideClick = () => {
     this.setState({ sideBarOpen: !this.state.sideBarOpen});
   }
 
-  /*handleSearch = () => {
-    this.setState({ search: true });
-  }*/
-
   handleCloseSearch = () => {
     this.setState({ search: false });
+    // Closing search returns to home for now
+    this.props.history.push("/");
   }
 
   handleLoginOpen = () => {
@@ -91,26 +79,25 @@ constructor(props) {
       width: 24,
       height: 24,
     };
-console.log(this.state);
+
     return (
 
       // There's a noticeable lag when rendering components based on
       // media queries for the first time
       <Mobile>
-      <BrowserRouter>
       <div>
         <div className={s.AppBar}>
           <Toolbar>
             <ToolbarGroup firstChild>
               <IconButton onClick={this.handleSideClick}><NavigationMenu color={darkGreen} /></IconButton>
               <Sidebar open={this.state.sideBarOpen}/>
-              {this.state.search?<SearchBar style={{width: '90%'}} getSearch={this.getSearch}/>:<ToolbarTitle text="SWD" />}
-              {this.state.search?<span/>:<ToolbarSeparator style={{marginLeft:0}} />}
+              {this.state.searchMode?<SearchBarWithAnimation style={{width: '90%'}}/>:<ToolbarTitle text="SWD" />}
+              {this.state.searchMode?<span/>:<ToolbarSeparator style={{marginLeft:0}} />}
             </ToolbarGroup>
             <ToolbarGroup lastChild style={{position: 'relative'}}>
-              {this.state.search?<span/>:<Link to='/Search' style={{position: 'absolute', left: 5}}><IconButton iconStyle={filledIcon} style={{paddingLeft: 0, paddingRight: 20}} onClick={this.handleSearch}><ActionSearch color={darkGreen} /></IconButton></Link>}
-              {this.state.search?<span/>:<ToolbarSeparator style={{position: 'absolute', left: 20}}/>}
-              {!this.state.search? !(this.props.isLoggedIn) ? 
+              {this.state.searchMode?<span/>:<Link to='/search/' style={{position: 'absolute', left: 5}}><IconButton iconStyle={filledIcon} style={{paddingLeft: 0, paddingRight: 20}} onClick={this.handleSearch}><ActionSearch color={darkGreen} /></IconButton></Link>}
+              {this.state.searchMode?<span/>:<ToolbarSeparator style={{position: 'absolute', left: 20}}/>}
+              {!this.state.searchMode? !(this.props.isLoggedIn) ? 
               <FlatButton label="Login" onTouchTap={this.handleLoginOpen}  style={{paddingLeft: 20}}/>
               :
              <FlatButton label="Logout" onTouchTap={this.handleLogout}  style={{paddingLeft: 20}}/>
@@ -125,7 +112,6 @@ console.log(this.state);
             login={this.props.login} />
         </div>
       </div>
-      </BrowserRouter>
       </Mobile>
     );
 
@@ -219,4 +205,4 @@ console.log(this.state);
   }
 }
 
-export default withApollo(Navigation);
+export default withRouter(withApollo(Navigation));

@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { BrowserRouter as Router, Route, Switch, Link } from "react-router-dom";
+import {BrowserRouter as Router, Route, Switch, Link } from "react-router-dom";
 import { ApolloProvider } from "react-apollo";
 import { ApolloClient } from "apollo-client";
 import { HttpLink } from "apollo-link-http";
@@ -54,35 +54,12 @@ const client = new ApolloClient({
   cache: new InMemoryCache()
 });
 
-class ErrorBoundary extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { hasError: false };
-  }
-
-  componentDidCatch(error, info) {
-    // Display fallback UI
-    this.setState({ hasError: true });
-    // You can also log the error to an error reporting service
-    // logErrorToMyService(error, info);
-  }
-
-  render() {
-    if (this.state.hasError) {
-      // You can render any custom fallback UI
-      return <h1>Something went wrong.</h1>;
-    }
-    return this.props.children;
-  }
-}
-
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       loggedIn: localStorage.getItem('token') ? true : false , 
       //Check if we're already logged in when starting the app
-      putSearch: " ",
       latestNews: [
         {
           title: "Winner of Aditya Birla Group scholarship 2017",
@@ -115,13 +92,6 @@ class App extends React.Component {
     this.setState({ loggedIn: false})
   }
 
-  putSearch = (e) => {
-    this.setState({putSearch: e});
-  }
-
-  dPut = () => console.log('Dummy Func');
-
-
   render() {
 
     return (
@@ -130,18 +100,17 @@ class App extends React.Component {
       <ApolloProvider client={client}>
         <Router>
           <Switch>
-
             <Route
-              exact path="/Search"
-                component={()=>(
-                  <Layout isLoggedIn={this.state.loggedIn} login={this.login} logout={this.logout} search={true} setPutSearch={this.putSearch.bind(this)}>
-                    <Search search={this.state.putSearch}/>
+              path="/search/:query?"
+                component={({ match })=>(
+                  <Layout isLoggedIn={this.state.loggedIn} login={this.login} logout={this.logout} searchMode={true}>
+                    <Search searchQuery={match.params.query}/>
                   </Layout>
                 )}/>
             <Route
               exact path="/"
               component={() => (
-                <Layout isLoggedIn={this.state.loggedIn} login={this.login} logout={this.logout} search={false} setPutSearch={this.dPut.bind(this)}>
+                <Layout isLoggedIn={this.state.loggedIn} login={this.login} logout={this.logout} searchMode={false}>
                   <Home news={this.state.latestNews} />
                 </Layout>
               )}/>

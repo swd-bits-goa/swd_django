@@ -17,8 +17,7 @@ class Layout extends React.Component {
     isLoggedIn: PropTypes.bool.isRequired,
     login: PropTypes.func.isRequired,
     logout: PropTypes.func.isRequired,
-    search: PropTypes.bool.isRequired,
-    setPutSearch: PropTypes.func.isRequired
+    searchMode: PropTypes.bool.isRequired,
   };
 
   state = {
@@ -48,8 +47,8 @@ class Layout extends React.Component {
               isLoggedIn={this.props.isLoggedIn}
               login={this.props.login}
               logout={this.props.logout}
-              search={this.props.search}
-              setPutSearch={this.props.setPutSearch}/>
+              searchMode={this.props.searchMode}
+              />
             {this.props.children}
             <Footer
               isLoggedIn={this.props.isLoggedIn}/>
