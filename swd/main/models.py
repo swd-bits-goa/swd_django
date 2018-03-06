@@ -99,6 +99,8 @@ class Student(models.Model):
     bloodGroup = models.CharField(max_length=10, blank=True, null=True)
     cgpa = models.FloatField(blank=True, null=True)
     admit = models.DateField(blank=True, null=True)
+    #photo = models.ImageField(upload_to="studentimages", blank=True)
+    photoURL = models.CharField(max_length=200, default="/static/assets/img/profile-swd.jpg")
     parentName = models.CharField(max_length=50, blank=True, null=True)
     parentPhone = models.CharField(max_length=20, blank=True, null=True)
     parentEmail = models.CharField(max_length=50, blank=True, null=True)
