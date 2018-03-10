@@ -53,7 +53,6 @@ urlpatterns = [
     url(r'^create-address/', address.index, name='address'),
     url(r'^other_info/', other_info.index, name='other_info'),
     url(r'^cgpa/', cgpa.index, name='cgpa'),
-    url(r'^other_info/', other_info.index, name='other_info'),
     url(r'^create-bonafide/', bonafide.index, name='bonafide'),
     url(r'^create-leave/', leave.index, name='leave'),
     url(r'^create-mess/', mess.index, name='mess'),
