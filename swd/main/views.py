@@ -403,6 +403,7 @@ def messbill(request):
             (u"Amount", 3000),
             (u"Rebate", 3000),
             (u"Final Amount", 3000),
+            (u"Leaves", 12000),
         ]
 
         font_style = xlwt.XFStyle()
@@ -451,6 +452,8 @@ def messbill(request):
 
             noofdays = 0
 
+            leaves_display = []
+
             for leave in leaves:
                 if leave.approved == True:
                     if leave.dateTimeStart.date() >= start_date and leave.dateTimeStart.date() <= end_date and leave.dateTimeEnd.date() >= end_date:
@@ -464,6 +467,9 @@ def messbill(request):
                                         leave.dateTimeStart.date()).days + 1
                     elif leave.dateTimeStart.date() <= start_date and leave.dateTimeEnd.date() >= end_date:
                         noofdays += abs(end_date - start_date).days + 1
+                    leaves1 = leave.dateTimeStart.strftime("%d/%m/%y") + '--' + leave.dateTimeEnd.strftime("%d/%m/%y")
+                    leaves_display.append(leaves1)
+            leaves2 = "  ||  ".join(str(x) for x in leaves_display)
             finalamt = amount * days - rebate * noofdays
 
             row = [
@@ -471,7 +477,8 @@ def messbill(request):
                 obj.bitsId,
                 amount * days,
                 rebate * noofdays,
-                finalamt
+                finalamt,
+                leaves2
             ]
 
             if request.POST.get('mess') is not 'N':
