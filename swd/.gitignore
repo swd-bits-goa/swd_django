@@ -10,3 +10,4 @@ node_modules
 migrations
 config.py
 static
+dev_info.py
