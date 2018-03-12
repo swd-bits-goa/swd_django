@@ -3,16 +3,53 @@ import PropTypes from 'prop-types';
 import {Card, CardActions, CardHeader, CardText} from 'material-ui/Card';
 import FlatButton from 'material-ui/FlatButton';
 import {RadioButton, RadioButtonGroup} from 'material-ui/RadioButton';
+import gql from "graphql-tag";
+import {graphql, compose} from "react-apollo";
+import Snackbar from 'material-ui/Snackbar';
 import ExpandableCard from "../../Components/ExpandableCard";
 
-const MessChoiceForm = (props) => {
+
+const messChoiceMutation = gql`
+mutation updateMess($mess: String!){
+  updateMessOption(mess: $mess, month: "2016-03-01") {
+ 		messoption {
+ 		  id
+ 		}
+  }
+}`;
+
+class MessChoiceForm extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = { messChangeStatus: false,
+    selectedRadio: "A" };
+
+  }
   
-    const chooseMessAction = () => {
+  chooseMessAction = async () => {
         // Send mutations here
+        await this.props.mutate({
+          variables: {
+            mess: this.state.selectedRadio
+          },
+          update: (data) => {
+            // Seems like request is successful
+            this.setState({messChangeStatus: true});
+          }
+        });
     }
+
+  reflectRadio = (event, value) => {
+    this.setState({selectedRadio: value,
+    messChangeStatus: false});
+  }
+
+    render() {
+
     return(
         <div>
-    <RadioButtonGroup name="messChoice" >
+    <RadioButtonGroup name="messChoice" defaultSelected="A" onChange={this.reflectRadio}>
       <RadioButton
         value="A"
         label="A"
@@ -22,9 +59,16 @@ const MessChoiceForm = (props) => {
         label="C"
       />
     </RadioButtonGroup>
-    <FlatButton label="Submit" onClick={chooseMessAction} primary={true} />
+    <FlatButton label="Submit" onClick={this.chooseMessAction} primary={true} />
+    <Snackbar
+          open={this.state.messChangeStatus}
+          message={"Mess succesfully changed to " + this.state.selectedRadio + "!"}
+          autoHideDuration={4000}
+          
+        />
     </div>
     );
+}
 }
 
 const MessCard = (props) => {
@@ -39,11 +83,11 @@ let cardTitle = messoptionopen.openNow
   ? ("Mess option for the month of " + messoptionopen.month + " is open")
   : "Your current mess is " + messoption.mess
 console.log(messoptionopen, "messoptionopen")
-
+const MessChoiceFormWithMut = graphql(messChoiceMutation)(MessChoiceForm);
 
   return(
 <ExpandableCard title={cardTitle}> 
-<MessChoiceForm/>
+<MessChoiceFormWithMut/>
  </ExpandableCard>
   );
 };
