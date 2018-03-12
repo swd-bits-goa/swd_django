@@ -8,25 +8,25 @@ class UserType(DjangoObjectType):
     class Meta:
         model = User
 
-class FacultyType(DjangoObjectType):
-    class Meta:
-        model = Faculty
+# class FacultyType(DjangoObjectType):
+#     class Meta:
+#         model = Faculty
 
 class WardenType(DjangoObjectType):
     class Meta:
         model = Warden
 
-class NucleusType(DjangoObjectType):
-    class Meta:
-        model = Nucleus
+# class NucleusType(DjangoObjectType):
+#     class Meta:
+#         model = Nucleus
 
-class SuperintendentType(DjangoObjectType):
-    class Meta:
-        model = Superintendent
+# class SuperintendentType(DjangoObjectType):
+#     class Meta:
+#         model = Superintendent
 
-class FacultyInchargeType(DjangoObjectType):
-    class Meta:
-        model = FacultyIncharge
+# class FacultyInchargeType(DjangoObjectType):
+#     class Meta:
+#         model = FacultyIncharge
 
 class StaffType(DjangoObjectType):
     class Meta:
