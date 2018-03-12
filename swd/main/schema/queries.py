@@ -1,81 +1,9 @@
 import graphene
 from graphene_django.types import DjangoObjectType
 from django.contrib.auth.models import User
-from .models import *
 from datetime import date, datetime
 from main.models import *
 from .types import *
-
-
-
-class UserType(DjangoObjectType):
-    class Meta:
-        model = User
-
-class WardenType(DjangoObjectType):
-    class Meta:
-        model = Warden
-
-class StaffType(DjangoObjectType):
-    class Meta:
-        model = Staff
-
-class StudentType(DjangoObjectType):
-    class Meta:
-        model = Student
-
-class DayScholarType(DjangoObjectType):
-    class Meta:
-        model = DayScholar
-
-class HostelPSType(DjangoObjectType):
-    class Meta:
-        model = HostelPS
-
-class CSAType(DjangoObjectType):
-    class Meta:
-        model = CSA
-
-class MessOptionType(DjangoObjectType):
-    class Meta:
-        model = MessOption
-
-class BonafideType(DjangoObjectType):
-    class Meta:
-        model = Bonafide
-
-class LeaveType(DjangoObjectType):
-    class Meta:
-        model = Leave
-
-class DayPassType(DjangoObjectType):
-    class Meta:
-        model = DayPass
-
-class LateComerType(DjangoObjectType):
-    class Meta:
-        model = LateComer
-
-class InOutType(DjangoObjectType):
-    class Meta:
-        model = InOut
-
-class DiscoType(DjangoObjectType):
-    class Meta:
-        model = Disco
-
-class MessOptionOpenType(DjangoObjectType):
-    class Meta:
-        model = MessOptionOpen
-
-class TransactionType(DjangoObjectType):
-    class Meta:
-        model = Transaction
-
-class MessBillType(DjangoObjectType):
-    class Meta:
-        model = MessBill
-
 
 class Query(object):
     # used to get all data to the frontend
