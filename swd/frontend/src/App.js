@@ -12,6 +12,7 @@ import logo from "./logo.svg";
 import PropTypes from "prop-types";
 import injectTapEventPlugin from "react-tap-event-plugin";
 import Search from './Components/Search/Search.js';
+import Profile from "./Routes/profile/Profile";
 
 // react-tap-event-plugin provides onTouchTap() to all React Components.
 // It's a mobile-friendly onClick() alternative for components in Material-UI,
@@ -108,6 +109,14 @@ class App extends React.Component {
                     <Search searchQuery={match.params.query}/>
                   </Layout>
                 )}/>
+             <Route
+              path="/profile"
+              render={() => (
+                <Layout isLoggedIn={this.state.loggedIn} login={this.login} logout={this.logout} searchMode={false}>
+                <Profile/>
+                </Layout>
+              )}
+            />
             <Route
               path="/aboutSWD"
               render={() => (
