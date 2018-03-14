@@ -1,5 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
+import os
+import hashlib
+
+SALT="9120273977"
 
 MESS_CHOICES = (
     ('A','Dining Hall A'),
@@ -88,11 +92,24 @@ class Staff(models.Model):
         return self.staffType + ' ' + self.name
 
 class Student(models.Model):
+
+    def path_and_rename(path):
+        def wrapper(instance, filename):
+            #print("filename is " + filename)
+            #print(instance.bitsId)
+            ext = filename.split('.')[-1]
+            tempname = (SALT+instance.bitsId).encode('utf-8') # creating temp filename
+            filename = '{}.{}'.format(hashlib.md5(tempname).hexdigest(), ext) # creating md5 of SALT+roll number of student as filename
+            # return the whole path to the file
+            return os.path.join(path, filename)
+        return wrapper
+
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
     bitsId = models.CharField(max_length=15)
     gender = models.CharField(max_length=1, blank=True)
     bDay = models.DateField(blank=True, null=True)
+    profile_picture=models.FileField(upload_to=path_and_rename('studentimgs/'), blank=True, null=True)
     phone = models.CharField(max_length=15, blank=True, null=True)
     email = models.EmailField(blank=True, null=True)
     address = models.TextField(blank=True, null=True)
@@ -102,6 +119,8 @@ class Student(models.Model):
     parentName = models.CharField(max_length=50, blank=True, null=True)
     parentPhone = models.CharField(max_length=20, blank=True, null=True)
     parentEmail = models.CharField(max_length=50, blank=True, null=True)
+
+    
 
     def __str__(self):
         return self.bitsId + ' (' + self.name + ')'
