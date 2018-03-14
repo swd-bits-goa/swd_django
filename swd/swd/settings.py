@@ -14,6 +14,9 @@ import os
 
 from .config import PRODUCTION, DB_NAME, DB_PASSWORD, DB_USER
 
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = True
+
 from tools.dev_info import SECRET_KEY
 
 # production = True if "PROD" in os.environ and os.environ.get("PROD") == "True" else False
@@ -28,8 +31,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: keep the secret key used in production secret!
 
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+
 
 if PRODUCTION:
     ALLOWED_HOSTS = ['10.10.10.121']
