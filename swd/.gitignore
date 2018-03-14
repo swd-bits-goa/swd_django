@@ -11,3 +11,6 @@ migrations
 config.py
 static
 dev_info.py
+.vscode/
+studentimgs
+studentimg

@@ -1,5 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
+import os
+import hashlib
+from tools.dev_info import SALT_IMG as SALT
 
 MESS_CHOICES = (
     ('A','Dining Hall A'),
@@ -87,12 +90,19 @@ class Staff(models.Model):
     def __str__(self):
         return self.staffType + ' ' + self.name
 
-class Student(models.Model):
+class Student(models.Model):    
+    def hash_upload(instance, filename):
+        ext = filename.split('.')[-1]
+        tempname = (SALT+instance.bitsId).encode('utf-8')
+        filename = '{}.{}'.format(hashlib.md5(tempname).hexdigest(), ext)
+        return os.path.join('studentimg/', filename)
+
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
     bitsId = models.CharField(max_length=15)
     gender = models.CharField(max_length=1, blank=True)
     bDay = models.DateField(blank=True, null=True)
+    profile_picture=models.FileField(upload_to=hash_upload, blank=True, null=True)
     phone = models.CharField(max_length=15, blank=True, null=True)
     email = models.EmailField(blank=True, null=True)
     address = models.TextField(blank=True, null=True)
@@ -102,6 +112,8 @@ class Student(models.Model):
     parentName = models.CharField(max_length=50, blank=True, null=True)
     parentPhone = models.CharField(max_length=20, blank=True, null=True)
     parentEmail = models.CharField(max_length=50, blank=True, null=True)
+
+    
 
     def __str__(self):
         return self.bitsId + ' (' + self.name + ')'
