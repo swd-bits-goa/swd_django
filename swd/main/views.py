@@ -23,6 +23,18 @@ def index(request):
 def login_success(request):
     return HttpResponse("Success!")
 
+@login_required
+def studentimg(request):
+    url = Student.objects.get(user=request.user).profile_picture
+    print(url)
+    ext = url.name.split('.')[-1]
+    
+    try:
+        with open(url.name, "rb") as f:
+            return HttpResponse(f.read(), content_type="image/"+ext)
+    except IOError:
+        with open("assets/img/profile-swd.jpg", "rb") as f:
+            return HttpResponse(f.read(), content_type="image/jpg")
 
 @login_required
 def dashboard(request):

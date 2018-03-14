@@ -28,6 +28,7 @@ urlpatterns = [
     url(r'^warden/([0-9]+)/$', views.wardenleaveapprove, name="wardenleaveapprove"),
     url(r'^warden/daypass/([0-9]+)/$', views.wardendaypassapprove, name="wardendaypassapprove"),
     url(r'^daypass/', views.daypass, name="daypass"),
+    url(r'^studentimg/', views.studentimg, name="studentimg"),
 
     url(r'^messbill/', views.messbill, name='messbill'),
 

@@ -109,7 +109,7 @@ class Student(models.Model):
     bitsId = models.CharField(max_length=15)
     gender = models.CharField(max_length=1, blank=True)
     bDay = models.DateField(blank=True, null=True)
-    profile_picture=models.FileField(upload_to=path_and_rename('studentimgs/'), blank=True, null=True)
+    profile_picture=models.FileField(upload_to=path_and_rename('studentimg/'), blank=True, null=True)
     phone = models.CharField(max_length=15, blank=True, null=True)
     email = models.EmailField(blank=True, null=True)
     address = models.TextField(blank=True, null=True)
