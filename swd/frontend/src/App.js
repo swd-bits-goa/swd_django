@@ -12,6 +12,7 @@ import logo from "./logo.svg";
 import PropTypes from "prop-types";
 import injectTapEventPlugin from "react-tap-event-plugin";
 import Profile from "./Routes/profile/Profile";
+import LoggedIn from "./Routes/loggedIn/LoggedIn"
 
 // react-tap-event-plugin provides onTouchTap() to all React Components.
 // It's a mobile-friendly onClick() alternative for components in Material-UI,
@@ -136,6 +137,14 @@ class App extends React.Component {
                             render={() => (
                                 <Layout isLoggedIn={this.state.loggedIn}>
                                     <Profile/>
+                                </Layout>
+                            )}
+                        />
+                        <Route
+                            path="/loggedIn"
+                            render={() => (
+                                <Layout isLoggedIn={this.state.loggedIn}>
+                                    <LoggedIn/>
                                 </Layout>
                             )}
                         />
