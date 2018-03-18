@@ -2,8 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 import os
 import hashlib
-
-SALT="9120273977"
+from tools.dev_info import SALT_IMG as SALT
 
 MESS_CHOICES = (
     ('A','Dining Hall A'),
@@ -91,16 +90,11 @@ class Staff(models.Model):
     def __str__(self):
         return self.staffType + ' ' + self.name
 
-class Student(models.Model):
-
-    
+class Student(models.Model):    
     def hash_upload(instance, filename):
-        #print("filename is " + filename)
-        #print(instance.bitsId)
         ext = filename.split('.')[-1]
-        tempname = (SALT+instance.bitsId).encode('utf-8') # creating temp filename
-        filename = '{}.{}'.format(hashlib.md5(tempname).hexdigest(), ext) # creating md5 of SALT+roll number of student as filename
-        # return the whole path to the file
+        tempname = (SALT+instance.bitsId).encode('utf-8')
+        filename = '{}.{}'.format(hashlib.md5(tempname).hexdigest(), ext)
         return os.path.join('studentimg/', filename)
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
