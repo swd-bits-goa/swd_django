@@ -153,7 +153,7 @@ class Bonafide(models.Model):
     text = models.TextField(default='', blank=True)
 
     def createText(self):
-        gender = "Mr." if self.student.gender.lower() == 'm' else "Ms."
+        gender = "Mr. " if self.student.gender.lower() == 'm' else "Ms. "
         pronoun = "He " if gender=="Mr." else "She "
         firstDeg=self.student.bitsId[4:6]
         secondDeg=self.student.bitsId[6:8]
@@ -167,7 +167,7 @@ class Bonafide(models.Model):
 
         reason = self.otherReason if self.reason.lower()=='other' else self.reason
 
-        return '''This is to certify that ''' + gender +self.student.name.title() + ''', ID No.''' + self.student.bitsId + ''' is a bonafide student of '''+ yearName + ''' year at Birla Institute of Technology and Science (BITS) Pilani University, K.K Birla Goa campus, pursuing ''' + branch + '''. This certificate is issued for the purpose of applying for ''' + reason + '''.'''
+        return '''This is to certify that <i>''' + gender + self.student.name.title() + '''</i>, ID No. <i>''' + self.student.bitsId + '''</i> is a bonafide student of '''+ yearName + ''' year at Birla Institute of Technology and Science (BITS) Pilani University, K.K Birla Goa campus, pursuing ''' + branch + '''. This certificate is issued for the purpose of applying for ''' + reason + '''.'''
 
     def save(self, *args, **kwargs):
         if self.text == '':

@@ -15,4 +15,4 @@ def index(request):
             messoption = MessOption.objects.create(student=student, monthYear=date, mess = mess[0])
         except Exception as e:
             print(e)
-return HttpResponse("Success")
+    return HttpResponse("Success")
