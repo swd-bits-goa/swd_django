@@ -15,7 +15,7 @@ const options = [
     {
       name: 'Profile',
       icon: profileIcon,
-      link: ''
+      link: '/profile'
     },
     {
       name: 'Certificates',
@@ -44,6 +44,7 @@ const options = [
     }
 ];
 
+import Divider from 'material-ui/Divider';
 class Sidebar extends React.Component {
   static propTypes = {
     open: PropTypes.bool.isRequired,

@@ -6,21 +6,23 @@ import s from "./Profile.css";
 import {Card, CardMedia, Paper} from "material-ui";
 import pic from "./DefaultPic.svg";
 
-class Profile extends React.Component {
+import gql from "graphql-tag";
+import { graphql } from "react-apollo";
 
+class Profile extends React.Component {
     render() {
         const { loading, error, currentUser } = this.props.data;
         if(loading){
-            return <p>loading..</p>
+            return <h4>loading..</h4>
         }
         if(error){
-            return <p>Some error occured</p>
+            return <h4>{error.message}</h4>
         } 
         console.log(this.props.data);
         return (
             <Mobile>
                 <div className={s.container}>
-                    <h2>Profile</h2>
+                <h2>Profile</h2>
                     <div className={s.profileImg}>
                         <CardMedia>
                             <img src={pic} style={{width: "100%", minWidth: "20%"}} alt="profile_pic"/>
@@ -35,7 +37,7 @@ class Profile extends React.Component {
                                         <p><b>Name</b></p>
                                     </div>
                                     <div className={s.column2}>
-                                        <p>John Carter</p>
+                                        <p>{currentUser.firstName+" "+currentUser.lastName}</p>
                                     </div>
                                 </div>
                                 <div className={s.paperElement}>
@@ -43,7 +45,7 @@ class Profile extends React.Component {
                                         <p><b>ID</b></p>
                                     </div>
                                     <div className={s.column2}>
-                                        <p>2016AAPS0001G</p>
+                                        <p>{currentUser.student.bitsId}</p>
                                     </div>
                                 </div>
                                 <div className={s.paperElement}>
@@ -51,49 +53,50 @@ class Profile extends React.Component {
                                         <p><b>DOB</b></p>
                                     </div>
                                     <div className={s.column2}>
-                                        <p>06/06/1996</p>
+                                        <p>{currentUser.student.bDay}</p>
                                     </div>
                                 </div>
                                 <div className={s.paperElement}>
                                     <div className={s.column1}>
-                                        <p><b>Hostel No.</b></p>
+                                        {currentUser.student.hostelps.acadstudent?<p><b>Hostel No.</b></p>:<p><b>PS Station</b></p>}
                                     </div>
                                     <div className={s.column2}>
-                                        <p>AH2</p>
+                                        {currentUser.student.hostelps.acadstudent?<p>{currentUser.student.hostelps.hostel}</p>:<p>{currentUser.student.hostelps.psStation}</p>}
                                     </div>
                                 </div>
-                                <div className={s.paperElement}>
-                                    <div className={s.column1}>
-                                        <p><b>Room No.</b></p>
-                                    </div>
-                                    <div className={s.column2}>
-                                        <p>345</p>
-                                    </div>
-                                </div>
+                                {currentUser.student.hostelps.acadstudent?
+                                    <div className={s.paperElement}>
+                                        <div className={s.column1}>
+                                            <p><b>Room No.</b></p>
+                                        </div>
+                                        <div className={s.column2}>
+                                            <p>{currentUser.student.hostelps.room}</p>
+                                        </div>
+                                    </div>:null}
                                 <div className={s.paperElement}>
                                     <div className={s.column1}>
                                         <p><b>CGPA</b></p>
                                     </div>
                                     <div className={s.column2}>
-                                        <p>7.409</p>
+                                        <p>{currentUser.student.cgpa}</p>
                                     </div>
                                 </div>
                             </div>
                         </Paper>
                     </div>
                     <div className={s.paperDiv}>
-                        <Paper zDepth={2} style={{borderRadius: 8, margin: 4, padding: 3}}>
+                        <Paper zDepth={1} style={{borderRadius: 4, margin: 4, padding: 3}}>
                             <div className={s.infoPaper}>
                                 <p><b>Permanent Address</b></p>
-                                <p>Plot no. 45, Blacolony, Goa,444444</p>
+                                <p style={{lineHeight: 2}}>{currentUser.student.address}</p>
                             </div>
                         </Paper>
                     </div>
                     <div className={s.paperDiv}>
-                        <Paper zDepth={2} style={{borderRadius: 8, margin: 4, padding: 3}}>
+                        <Paper zDepth={1} style={{borderRadius: 4, margin: 4, padding: 3}}>
                             <div className={s.infoPaper}>
                                 <p><b>Contact Details</b></p>
-                                <p>123456789</p>
+                                <p>{currentUser.student.phone}</p>
                             </div>
 
                         </Paper>
@@ -105,5 +108,29 @@ class Profile extends React.Component {
     }
 }
 
+const GetCurrentUser = gql`
+  query GetCurrentUser {
+    currentUser {
+      id
+      username
+      firstName
+      lastName
+      student{
+        bDay
+        hostelps{
+            psStation
+            acadstudent
+            hostel
+            room
+        }
+        bitsId
+        cgpa
+        address
+        phone
+      }
+  }
+}
+`;
 
-export default Profile;
+
+export default graphql(GetCurrentUser)(Profile);
