@@ -119,7 +119,9 @@ export default class Filters extends React.Component{
                                 style={styles.selectHostel}
                                 floatingLabelStyle={{color: "#777"}}
                                 menuStyle={{marginLeft: -10}}
-                                listStyle={{position: 'relative', left: -10}}>
+                                autoWidth={true}
+                                listStyle={{position: 'relative', left: -10}}
+                        >
                                 {this.menuItems(hostels, hostelValues)}
                         </SelectField>
                         </div>
@@ -133,6 +135,7 @@ export default class Filters extends React.Component{
                                 floatingLabelText="Degree"
                                 underlineStyle={{display: 'none'}}
                                 style={styles.selectBranch}
+                                autoWidth={true}
                                 floatingLabelStyle={{color: "#777"}}>
                                 {this.menuItems(branch, branchValues)}
                         </SelectField>

@@ -32,7 +32,7 @@ class SearchBarWithAnimation extends React.Component{
 	                spellCheck={false}
 	                placeholder={"Search by name or ID"}
 	                id="searchbar"
-	                style={{width:'120%'}}
+	                style={{width:'87vw'}}
 	                onChange={this.getSearch}/>
 	        </CSSTransitionGroup>
 		);

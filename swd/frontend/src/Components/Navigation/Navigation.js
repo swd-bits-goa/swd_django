@@ -26,7 +26,7 @@ import Search from '../Search/Search.js';
 import SearchBarWithAnimation from '../Search/SearchBar.js';
 import {Link, BrowserRouter, Route} from 'react-router-dom';
 import Layout from "../Layout/Layout";
-import closeIcon from './close.svg';
+import backIcon from './back.svg';
 
 class Navigation extends React.Component {
   static propTypes = {
@@ -79,7 +79,12 @@ constructor(props) {
       width: 24,
       height: 24,
     };
-    
+      const toolbarStyle = {
+          backgroundColor: "#00BCD4"
+      }
+      const appBarColor = {
+          color:"#fff"
+      }
     return (
 
       // There's a noticeable lag when rendering components based on
@@ -87,21 +92,24 @@ constructor(props) {
       <Mobile>
       <div>
         <div className={s.AppBar}>
-          <Toolbar>
+          <Toolbar style={toolbarStyle}>
             <ToolbarGroup firstChild>
-              <IconButton onClick={this.handleSideBarToggle}><NavigationMenu color={darkGreen} /></IconButton>
+                {!this.state.searchMode?
+                    <IconButton onClick={this.handleSideBarToggle}><NavigationMenu color={"#fff"} /></IconButton>
+                    :<IconButton onClick={this.handleCloseSearch} ><img src={backIcon} height={25}/></IconButton>}
+
               <Sidebar open={this.state.sidebarOpen} toggleOpen={this.handleSideBarToggle} />
-              {this.state.searchMode?<SearchBarWithAnimation style={{width: '90%'}}/>:<ToolbarTitle text="SWD" />}
+              {this.state.searchMode?<SearchBarWithAnimation style={{width: '80%'}}/>:<ToolbarTitle style={appBarColor} text="Student Welfare Division" />}
               {this.state.searchMode?<span/>:<ToolbarSeparator style={{marginLeft:0}} />}
             </ToolbarGroup>
             <ToolbarGroup lastChild style={{position: 'relative'}}>
-              {this.state.searchMode?<span/>:<Link to='/search/' style={{position: 'absolute', left: 5}}><IconButton iconStyle={filledIcon} style={{paddingLeft: 0, paddingRight: 20}} onClick={this.handleSearch}><ActionSearch color={darkGreen} /></IconButton></Link>}
+              {this.state.searchMode?<span/>:<Link to='/search/' style={{position: 'absolute', left: 5}}><IconButton iconStyle={filledIcon} style={{paddingLeft: 0, paddingRight: 20}} onClick={this.handleSearch}><ActionSearch color={"#fff"} /></IconButton></Link>}
               {this.state.searchMode?<span/>:<ToolbarSeparator style={{position: 'absolute', left: 20}}/>}
               {!this.state.searchMode? !(this.props.isLoggedIn) ? 
-              <FlatButton label="Login" onTouchTap={this.handleLoginOpen}  style={{paddingLeft: 20}}/>
+              <FlatButton label="Login" onTouchTap={this.handleLoginOpen}  style={{left: 20}}/>
               :
-             <FlatButton label="Logout" onTouchTap={this.handleLogout}  style={{paddingLeft: 20}}/>
-              :<FlatButton onClick={this.handleCloseSearch} style={{position: 'relative', left: 20}}><img src={closeIcon} style={{position: 'relative', left: 5, height: 20}}/></FlatButton>}
+             <FlatButton label="Logout" onTouchTap={this.handleLogout}  style={{left: 20}}/>
+              :<span/>}
 
             </ToolbarGroup>
             

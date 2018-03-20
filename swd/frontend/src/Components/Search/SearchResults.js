@@ -61,8 +61,8 @@ const Students = ({students}) => {
 						<h3>Branch</h3>
 					</div>
 					<div style={{marginLeft: 30}}>
-						<h3>{student.bitsId}</h3>
-						{student.hostelps!==null?student.hostelps.acadstudent?<h3>{student.hostelps.hostel}</h3>:<h3>{student.hostelps.psStation}</h3>:<span/>}
+						<p>{student.bitsId}</p>
+						{student.hostelps!==null?student.hostelps.acadstudent?<p>{student.hostelps.hostel}</p>:<p>{student.hostelps.psStation}</p>:<span/>}
 						{student.hostelps!==null?student.hostelps.acadstudent?<h3>{student.hostelps.room}</h3>:null:<span/>}
 						<h3>{branch[student.bitsId.substr(4,2)]}</h3>
 					</div>

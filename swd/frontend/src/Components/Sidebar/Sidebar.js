@@ -64,7 +64,7 @@ class Sidebar extends React.Component {
   render() {
     return (
       <div>
-        <Drawer docked={false} open={this.props.open} onRequestChange={this.props.toggleOpen} containerStyle={{marginTop: 55}}>
+        <Drawer open={this.props.open} onRequestChange={this.props.toggleOpen} containerStyle={{marginTop: 55, backgroundColor: "#EDF1F2", width: "50%"}}>
           {
             options.map(option => 
     <MenuItem style={{paddingTop: 10}} onTouchTap={() => this.handleMenuItemClick(option.link)} key={option.name} ><img src={option.icon} style={{padding: 5, paddingRight: 10}}/> {option.name}</MenuItem>
