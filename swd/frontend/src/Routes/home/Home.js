@@ -64,9 +64,7 @@ class Home extends React.Component {
     return (
          <div
           className={s.container}
-          style={{ backgroundImage: `url(${background})` }}
-
-        >
+          >
       <Mobile>
        <div>
           <Card>
