@@ -27,6 +27,7 @@ import SearchBarWithAnimation from '../Search/SearchBar.js';
 import {Link, BrowserRouter, Route} from 'react-router-dom';
 import Layout from "../Layout/Layout";
 import backIcon from './back.svg';
+import {cyan500} from "material-ui/styles/colors";
 
 class Navigation extends React.Component {
   static propTypes = {
@@ -80,7 +81,7 @@ constructor(props) {
       height: 24,
     };
       const toolbarStyle = {
-          backgroundColor: "#00BCD4"
+          backgroundColor: cyan500
       }
       const appBarColor = {
           color:"#fff"
@@ -99,8 +100,8 @@ constructor(props) {
                     :<IconButton onClick={this.handleCloseSearch} ><img src={backIcon} height={25}/></IconButton>}
 
               <Sidebar open={this.state.sidebarOpen} toggleOpen={this.handleSideBarToggle} />
-              {this.state.searchMode?<SearchBarWithAnimation style={{width: '80%'}}/>:<ToolbarTitle style={appBarColor} text="Student Welfare Division" />}
-              {this.state.searchMode?<span/>:<ToolbarSeparator style={{marginLeft:0}} />}
+                {this.state.searchMode?<SearchBarWithAnimation style={{width: '80%'}}/>:<Link to='/' style={{textDecoration : "none"}}><ToolbarTitle style={appBarColor} text="SWD" /></Link>}
+
             </ToolbarGroup>
             <ToolbarGroup lastChild style={{position: 'relative'}}>
               {this.state.searchMode?<span/>:<Link to='/search/' style={{position: 'absolute', left: 5}}><IconButton iconStyle={filledIcon} style={{paddingLeft: 0, paddingRight: 20}} onClick={this.handleSearch}><ActionSearch color={"#fff"} /></IconButton></Link>}
