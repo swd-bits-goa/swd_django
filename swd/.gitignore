@@ -10,3 +10,11 @@ node_modules
 migrations
 config.py
 static
+<<<<<<< HEAD
+dev_info.py
+.vscode/
+studentimgs
+studentimg
+=======
+dev_info.py
+>>>>>>> 4066bce... Add scripts to import data after sanitization (#70)

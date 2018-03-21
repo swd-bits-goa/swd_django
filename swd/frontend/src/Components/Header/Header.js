@@ -8,22 +8,19 @@ class Header extends React.Component {
 
   static propTypes = {
     isLoggedIn: PropTypes.bool.isRequired,
-    toggleSideBar: PropTypes.func.isRequired,
-    sideBarOpen: PropTypes.bool.isRequired,
     login: PropTypes.func.isRequired,
-    logout: PropTypes.func.isRequired
+    logout: PropTypes.func.isRequired,
+    searchMode:PropTypes.bool.isRequired
   };
 
   render() {
     return (
       <div className={s.root}>
         <Navigation
-          toggleSideBar={this.props.toggleSideBar}
-          sideBarOpen={this.props.sideBarOpen}
           isLoggedIn={this.props.isLoggedIn}
           login={this.props.login}
           logout={this.props.logout}
-        />
+          searchMode={this.props.searchMode}/>
         {/* <div className={s.container}>
           <Link className={s.brand} to="/">
             <span className={s.brandTxt}>BITS Pilani, Goa</span>

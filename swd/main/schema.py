@@ -3,6 +3,8 @@ from graphene_django.types import DjangoObjectType
 from django.contrib.auth.models import User
 from .models import *
 
+
+
 class UserType(DjangoObjectType):
     class Meta:
         model = User
@@ -105,6 +107,12 @@ class Query(object):
         username = graphene.String(),
         name = graphene.String(),
         bitsId = graphene.String()
+    )
+    search_student = graphene.Field(
+        graphene.List(StudentType),
+        search=graphene.String(),
+        hostel=graphene.List(graphene.String),
+        branch=graphene.List(graphene.String)
     )
 
     all_day_scholars = graphene.List(DayScholarType)
@@ -270,6 +278,64 @@ class Query(object):
             return Student.objects.get(user=user)
 
         return None
+
+    def resolve_search_student(self, args, **kwargs):
+        search = kwargs.get('search')
+        hostel = kwargs.get('hostel')
+        branch = kwargs.get('branch')
+        searchresults = []
+        flag=0
+        if hostel:
+            hostels=[]
+            for host in hostel:
+                hostels.extend(HostelPS.objects.all().filter(hostel=host))
+            for hostel in hostels:
+                searchresults.append(hostel.student)
+            if len(searchresults)==0:
+                flag=1
+        if branch:
+            if len(searchresults):
+                students = searchresults
+                searchresults = []
+            else: 
+                students = Student.objects.all()
+            for student in students:
+                for bran in branch:
+                    if student.bitsId[4:6]==bran:
+                        searchresults.append(student)
+            if len(searchresults)==0:
+                flag=1
+        if search:
+            if search[0].isalpha():
+                if len(searchresults):
+                    students = searchresults
+                    searchresults = []
+                elif flag==0:    
+                    students = Student.objects.all().filter(name__icontains=search)
+                else:
+                    students=[]
+                for student in students:
+                    names = student.name.split()
+                    for name in names:
+                        if name.startswith(search.upper()):
+                            searchresults.append(student)
+                    if(len(searchresults)>9):
+                        break
+            elif search[0].isdigit():
+                if len(search)>2:
+                    if len(searchresults):
+                        students = searchresults
+                        searchresults = []
+                    elif flag==0:    
+                        students = Student.objects.all().filter(bitsId__icontains=search)
+                    else:
+                        students=[]
+                    for student in students:
+                        if student.bitsId.startswith(search.upper()):
+                            searchresults.append(student)
+                else:
+                    searchresults = searchresults
+        return searchresults
 
     def resolve_all_day_scholars(self, args, **kwargs):
         return DayScholar.objects.all()
