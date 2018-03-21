@@ -27,7 +27,7 @@ import SearchBarWithAnimation from '../Search/SearchBar.js';
 import {Link, BrowserRouter, Route} from 'react-router-dom';
 import Layout from "../Layout/Layout";
 import backIcon from './back.svg';
-import {cyan500} from "material-ui/styles/colors";
+import {cyan500, cyan900, white} from "material-ui/styles/colors";
 
 class Navigation extends React.Component {
   static propTypes = {
@@ -75,16 +75,15 @@ constructor(props) {
   }
 
   render() {
-    const darkGreen = '#0B2326';
     const filledIcon = {
       width: 24,
       height: 24,
     };
       const toolbarStyle = {
-          backgroundColor: cyan500
+          backgroundColor: cyan500,
       }
       const appBarColor = {
-          color:"#fff"
+          color: white
       }
     return (
 
@@ -96,7 +95,7 @@ constructor(props) {
           <Toolbar style={toolbarStyle}>
             <ToolbarGroup firstChild>
                 {!this.state.searchMode?
-                    <IconButton onClick={this.handleSideBarToggle}><NavigationMenu color={"#fff"} /></IconButton>
+                    <IconButton onClick={this.handleSideBarToggle}><NavigationMenu color={white} /></IconButton>
                     :<IconButton onClick={this.handleCloseSearch} ><img src={backIcon} height={25}/></IconButton>}
 
               <Sidebar open={this.state.sidebarOpen} toggleOpen={this.handleSideBarToggle} />
@@ -107,7 +106,7 @@ constructor(props) {
               {this.state.searchMode?<span/>:<Link to='/search/' style={{position: 'absolute', left: 5}}><IconButton iconStyle={filledIcon} style={{paddingLeft: 0, paddingRight: 20}} onClick={this.handleSearch}><ActionSearch color={"#fff"} /></IconButton></Link>}
               {this.state.searchMode?<span/>:<ToolbarSeparator style={{position: 'absolute', left: 20}}/>}
               {!this.state.searchMode? !(this.props.isLoggedIn) ? 
-              <FlatButton label="Login" onTouchTap={this.handleLoginOpen}  style={{left: 20}}/>
+              <FlatButton label="Login" onTouchTap={this.handleLoginOpen}  style={{left: 20, color: cyan900}}/>
               :
              <FlatButton label="Logout" onTouchTap={this.handleLogout}  style={{left: 20}}/>
               :<span/>}
