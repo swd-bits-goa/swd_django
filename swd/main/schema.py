@@ -400,8 +400,7 @@ class Query(object):
             user = User.objects.get(username=username)
             student = Student.objects.get(user=user)
             messoption = MessOption.objects.filter(student=student).latest('monthYear')
-            if messoption and datetime.today().date() < MessOptionOpen.objects.latest('dateClose').dateClose:
-                return messoption
+            return messoption
 
         return None
 
