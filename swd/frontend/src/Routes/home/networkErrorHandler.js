@@ -27,6 +27,7 @@ function networkErrorHandler(LoadingComponent, FallbackComponent, Component) {
           // Update state if error happens
           this.setState({hasError: true})
           console.log("Error while loading data!")
+          // We also have to differentiate between GraphQL and network errors
           console.log(query.error)
           break;
         } else if (query.loading) {
@@ -47,6 +48,15 @@ function networkErrorHandler(LoadingComponent, FallbackComponent, Component) {
       //  this.setState({ hasError: true })     } }
 
     }
+
+    // This is meant for client-side errors!
+    componentDidCatch(error, info) {
+    // Display fallback UI
+    this.setState({ hasError: true });
+    // You can also log the error to an error reporting service
+    // logErrorToMyService(error, info);
+    console.log("Error in JS", info);
+  }
 
     // Report errors if any
 // Here's a good link to follow:
