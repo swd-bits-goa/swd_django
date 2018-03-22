@@ -25,7 +25,7 @@ export default class Search extends React.Component{
 			<div style={{zIndex: 10, position: 'absolute', top: 65, width: '100%', height: '100%', backgroundColor: 'white', opacity: 1}}>
 				<Filters handleSort={this.handleSort.bind(this)}/>
 				{/* Check if search query is valid */}
-		{ this.props.searchQuery ? <SearchResults search={this.props.searchQuery} hostel={this.state.hostel} branch={this.state.branch}/> : null }
+		{ this.props.searchQuery ? <SearchResults search={this.props.searchQuery} hostel={this.state.hostel} branch={this.state.branch}/> : <SearchResults search="" hostel={this.state.hostel} branch={this.state.branch}/> }
 				
 			</div>
 		);
