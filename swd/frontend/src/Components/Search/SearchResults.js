@@ -3,6 +3,7 @@ import Paper from 'material-ui/Paper';
 import {graphql} from 'react-apollo';
 import gql from 'graphql-tag';
 import CircularProgress from 'material-ui/CircularProgress';
+import s from './search.css';
 
 const branch = {
     'A1': 'B.E.(Hons) Chemical Engineering',
@@ -19,10 +20,6 @@ const branch = {
     'PH': 'PhD.',
     'H1': 'M.E. (Hons) Computer Science',
 
-}
-
-const styles = {
-	name: {margin: 5, padding: 15, paddingBottom: 0, fontSize: 21, marginBottom: 0},
 }
 class SearchResults extends React.Component{
 	constructor(){
@@ -51,23 +48,55 @@ const Students = ({students}) => {
 	return students.map((student) => {
 		console.log(student.bitsId.substr(4,6));
 		return (
-			<Paper zDepth={1} style={{borderRadius: 8, margin: 7}}>
-				<h3 style={styles.name}>{student.name}</h3>
-				<div style={{display: 'flex'}}>
-					<div style={{marginLeft: 20}}>
-						<h3>ID</h3>
-						{student.hostelps!==null?student.hostelps.acadstudent?<h3>Hostel</h3>:<h3>PS Station:</h3>:<span/>}
-						{student.hostelps!==null?student.hostelps.acadstudent?<h3>Room no.</h3>:null:<span/>}
-						<h3>Branch</h3>
-					</div>
-					<div style={{marginLeft: 30}}>
-						<p>{student.bitsId}</p>
-						{student.hostelps!==null?student.hostelps.acadstudent?<p>{student.hostelps.hostel}</p>:<p>{student.hostelps.psStation}</p>:<span/>}
-						{student.hostelps!==null?student.hostelps.acadstudent?<h3>{student.hostelps.room}</h3>:null:<span/>}
-						<h3>{branch[student.bitsId.substr(4,2)]}</h3>
-					</div>
-				</div>
-			</Paper>
+
+            <div className={s.paperDiv}>
+                <Paper zDepth={1} style={{borderRadius: 4, margin: 4, padding: 3}}>
+
+                    <div className={s.infoPaper}>
+                        <div className={s.paperElement}>
+                            <div className={s.column1}>
+                                <p><b>Name</b></p>
+                            </div>
+                            <div className={s.column2}>
+                                <p>{student.name}</p>
+                            </div>
+                        </div>
+                        <div className={s.paperElement}>
+                            <div className={s.column1}>
+                                <p><b>ID</b></p>
+                            </div>
+                            <div className={s.column2}>
+                                <p>{student.bitsId}</p>
+                            </div>
+                        </div>
+                        <div className={s.paperElement}>
+                            <div className={s.column1}>
+                                {student.hostelps!==null?student.hostelps.acadstudent?<p><b>Hostel</b></p>:<p><b>PS Station:</b></p>:<span/>}
+                            </div>
+                            <div className={s.column2}>
+                                {student.hostelps!==null?student.hostelps.acadstudent?<p>{student.hostelps.hostel}</p>:<p>{student.hostelps.psStation}</p>:<span/>}
+                            </div>
+                        </div>
+
+                        <div className={s.paperElement}>
+                            <div className={s.column1}>
+                                {student.hostelps!==null?student.hostelps.acadstudent?<p><b>Room no.</b></p>:null:<span/>}
+                            </div>
+                            <div className={s.column2}>
+                                {student.hostelps!==null?student.hostelps.acadstudent?<h3>{student.hostelps.room}</h3>:null:<span/>}
+                            </div>
+                        </div>
+                        <div className={s.paperElement}>
+                            <div className={s.column1}>
+                                <p><b>Branch</b></p>
+                            </div>
+                            <div className={s.column2}>
+                                <p>{branch[student.bitsId.substr(4,2)]}</p>
+                            </div>
+                        </div>
+                    </div>
+                </Paper>
+            </div>
 		);
 	});
 }
