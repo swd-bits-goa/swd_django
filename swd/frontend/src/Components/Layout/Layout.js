@@ -13,7 +13,6 @@ class Layout extends React.Component {
   static propTypes = {
     children: PropTypes.node.isRequired,
     isLoggedIn: PropTypes.bool.isRequired,
-    login: PropTypes.func.isRequired,
     logout: PropTypes.func.isRequired,
     searchMode: PropTypes.bool.isRequired,
   };
@@ -26,7 +25,6 @@ class Layout extends React.Component {
           <div>
             <Header
               isLoggedIn={this.props.isLoggedIn}
-              login={this.props.login}
               logout={this.props.logout}
               searchMode={this.props.searchMode}
               />
