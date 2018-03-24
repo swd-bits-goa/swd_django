@@ -101,14 +101,14 @@ class App extends React.Component {
             <Route
               path="/search/:query?"
                 component={({ match })=>(
-                  <Layout isLoggedIn={this.state.loggedIn} login={this.login} logout={this.logout} searchMode={true}>
+                  <Layout isLoggedIn={this.state.loggedIn} logout={this.logout} searchMode={true}>
                     <Search searchQuery={match.params.query}/>
                   </Layout>
                 )}/>
              <Route
               path="/profile"
               render={() => (
-                <Layout isLoggedIn={this.state.loggedIn} login={this.login} logout={this.logout} searchMode={false}>
+                <Layout isLoggedIn={this.state.loggedIn} logout={this.logout} searchMode={false}>
                 <Profile/>
                 </Layout>
               )}
@@ -116,7 +116,7 @@ class App extends React.Component {
             <Route
               path="/aboutSWD"
               render={() => (
-                <Layout isLoggedIn={this.state.loggedIn} login={this.login} logout={this.logout} searchMode={false}>
+                <Layout isLoggedIn={this.state.loggedIn} logout={this.logout} searchMode={false}>
                 <AboutSWD/>
                 </Layout>
               )}
@@ -124,7 +124,7 @@ class App extends React.Component {
             <Route
                path="/"
               component={() => (
-                <Layout isLoggedIn={this.state.loggedIn} login={this.login} logout={this.logout} searchMode={false}>
+                <Layout isLoggedIn={this.state.loggedIn} logout={this.logout} searchMode={false}>
                   <Home news={this.state.latestNews} />
                 </Layout>
               )}
