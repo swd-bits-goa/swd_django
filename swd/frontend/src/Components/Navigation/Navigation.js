@@ -60,8 +60,8 @@ constructor(props) {
     this.props.history.push("/");
   }
 
-  handleLoginOpen = () => {
-    this.setState({ loginModalOpen: true });
+  goToLogin = () => {
+    this.props.history.push("/login");
   };
 
   handleLoginClose = () => {
@@ -106,7 +106,7 @@ constructor(props) {
               {this.state.searchMode?<span/>:<Link to='/search/' style={{position: 'absolute', left: 5}}><IconButton iconStyle={filledIcon} style={{paddingLeft: 0, paddingRight: 20}} onClick={this.handleSearch}><ActionSearch color={"#fff"} /></IconButton></Link>}
               {this.state.searchMode?<span/>:<ToolbarSeparator style={{position: 'absolute', left: 20}}/>}
               {!this.state.searchMode? !(this.props.isLoggedIn) ? 
-              <FlatButton label="Login" onTouchTap={this.handleLoginOpen}  style={{left: 20, color: cyan900}}/>
+              <FlatButton label="Login" onTouchTap={this.goToLogin}  style={{left: 20, color: cyan900}}/>
               :
              <FlatButton label="Logout" onTouchTap={this.handleLogout}  style={{left: 20}}/>
               :<span/>}
