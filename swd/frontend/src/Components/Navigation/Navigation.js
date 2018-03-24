@@ -46,6 +46,7 @@ constructor(props) {
     searchMode: props.searchMode
   };
   this.handleSideBarToggle = this.handleSideBarToggle.bind(this);
+  this.handleLoginOpen = this.handleLoginOpen.bind(this);
 }
 
   handleSideBarToggle = () => {
@@ -98,7 +99,7 @@ constructor(props) {
                     <IconButton onClick={this.handleSideBarToggle}><NavigationMenu color={white} /></IconButton>
                     :<IconButton onClick={this.handleCloseSearch} ><img src={backIcon} height={25}/></IconButton>}
 
-              <Sidebar open={this.state.sidebarOpen} toggleOpen={this.handleSideBarToggle} />
+              <Sidebar open={this.state.sidebarOpen} docked={false} toggleOpen={this.handleSideBarToggle} openLogin={this.handleLoginOpen} isLoggedIn={this.props.isLoggedIn}/>
                 {this.state.searchMode?<SearchBarWithAnimation style={{width: '80%'}}/>:<Link to='/' style={{textDecoration : "none"}}><ToolbarTitle style={appBarColor} text="SWD" /></Link>}
 
             </ToolbarGroup>
