@@ -5,6 +5,8 @@ import { ApolloClient } from "apollo-client";
 import { HttpLink } from "apollo-link-http";
 import { ApolloLink, concat } from "apollo-link";
 import { InMemoryCache } from "apollo-cache-inmemory";
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import Home from "./Routes/home/Home";
 import AboutSWD from "./Routes/aboutSWD/AboutSWD";
 import Layout from "./Components/Layout";
@@ -13,11 +15,15 @@ import PropTypes from "prop-types";
 import injectTapEventPlugin from "react-tap-event-plugin";
 import Search from './Components/Search/Search.js';
 import Profile from "./Routes/profile/Profile";
+import Login from "./Routes/login/Login";
 
 // react-tap-event-plugin provides onTouchTap() to all React Components.
 // It's a mobile-friendly onClick() alternative for components in Material-UI,
 // especially useful for the buttons.
 injectTapEventPlugin();
+
+//Sets the material-ui theme colors and settings
+const muiTheme = getMuiTheme({userAgent: navigator.userAgent});
 
 const link = new HttpLink({
   uri: "http://localhost:8000/graphql",
@@ -34,22 +40,6 @@ const authMiddleware = new ApolloLink((operation, next) => {
 
   return next(operation);
 });
-
-// networkInterface.use([
-// {
-//   applyBatchMiddleware(req, next) {
-//     if (!req.options.headers) {
-//       req.options.headers = {}How
-//     }
-
-//     const token = localStorage.getItem('token')
-//       ? localStorage.getItem('token')
-//       : null
-//     req.options.headers['authorization'] = `JWT ${token}`
-//     next()
-//   },
-// },
-// ])
 
 const client = new ApolloClient({
   link: concat(authMiddleware, link),
@@ -98,10 +88,16 @@ class App extends React.Component {
 
     return (
       // apollo interfacing
-
       <ApolloProvider client={client}>
+        <MuiThemeProvider muiTheme={muiTheme}>
         <Router>
           <Switch>
+            <Route
+              path="/login"
+              render={() => (
+                <Login login={this.login}/>
+              )}
+            />
             <Route
               path="/search/:query?"
                 component={({ match })=>(
@@ -135,7 +131,9 @@ class App extends React.Component {
             /> 
           </Switch>
         </Router>
+        </MuiThemeProvider>
       </ApolloProvider>
+            
     );
   }
 }
