@@ -10,6 +10,13 @@
                 <div class="card">
                     <div class="card-content">
                         <span class="card-title">Apply for Bonafide Certificate</span>{% if option == 0 %}
+                        {% if messages %}
+                        <ul class="messages green-text">
+                            {% for message in messages %}
+                            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
                         <form method="POST">
                             {% csrf_token %}
                             <div class="col-md-12">
@@ -23,12 +30,22 @@
                                 <button class="btn btn-block bg-green waves-effect" type="submit">SUBMIT</button>
                             </div>
                         </form>
-                        {% elif option == 1 %}
-                        <p>Applied for Bonafide Certificate. Please check SWD office in 3 days.</p>
                         {% elif option == 3 %}
-                        <p>Application for Bonafide Certificate is 3 per sem. </p>
+                            {% if messages %}
+                            <ul class="messages red-text">
+                                {% for message in messages %}
+                                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
                         {% else %}
-                        <p>Sorry, there was some problem with form submission. Please fill all the fields correctly.</p>
+                            {% if messages %}
+                            <ul class="messages red-text">
+                                {% for message in messages %}
+                                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
                         {% endif %}
                     </div>
                 </div>

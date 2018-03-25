@@ -8,6 +8,13 @@
             <div class="col s6 l6">
                 <div class="card">
                     <div class="card-content">
+                        {% if messages %}
+                        <ul class="messages green-text">
+                            {% for message in messages %}
+                            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
                         <span class="card-title">Apply for Daypass</span>
                         {% if option == 0 %}
                         <form method="POST">
@@ -23,9 +30,6 @@
                                 <button class="btn btn-block bg-green waves-effect" type="submit">SUBMIT</button>
                             </div>
                         </form>
-                        {% elif option == 1 %}
-                            <p>Daypass Successfully applied. Please wait for approval</p>
-                            <p>Daypass applied for {{ date }}</p>
                         {% else %}
                             {% if form.errors %}
                                 {% for error in form.non_field_errors %}
