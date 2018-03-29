@@ -280,9 +280,11 @@ class Query(object):
         return None
 
     def resolve_search_student(self, args, **kwargs):
-        search = kwargs.get('search')
+        #Getting all the arguments
+        searches = kwargs.get('search')
         hostel = kwargs.get('hostel')
         branch = kwargs.get('branch')
+        #initializing final search results array
         searchresults = []
         flag=0
         if hostel:
@@ -305,36 +307,41 @@ class Query(object):
                         searchresults.append(student)
             if len(searchresults)==0:
                 flag=1
-        if search:
-            if search[0].isalpha():
-                if len(searchresults):
-                    students = searchresults
-                    searchresults = []
-                elif flag==0:    
-                    students = Student.objects.all().filter(name__icontains=search)
-                else:
-                    students=[]
-                for student in students:
-                    names = student.name.split()
-                    for name in names:
-                        if name.startswith(search.upper()):
-                            searchresults.append(student)
-                    if(len(searchresults)>9):
-                        break
-            elif search[0].isdigit():
-                if len(search)>2:
-                    if len(searchresults):
-                        students = searchresults
-                        searchresults = []
-                    elif flag==0:    
-                        students = Student.objects.all().filter(bitsId__icontains=search)
-                    else:
-                        students=[]
-                    for student in students:
-                        if student.bitsId.startswith(search.upper()):
-                            searchresults.append(student)
-                else:
-                    searchresults = searchresults
+        if searches:
+            #for multi word searches splitting the string into an array of words
+            searchArr=searches.split(' ')
+            for search in searchArr:
+                #for every word in the array of words.......
+                if search:
+                    if search[0].isalpha():
+                        if len(searchresults):
+                            students = searchresults
+                            searchresults = []
+                        elif flag==0:    
+                            students = Student.objects.all().filter(name__icontains=search)
+                        else:
+                            students=[]
+                        for student in students:
+                            names = student.name.split()
+                            for name in names:
+                                if name.startswith(search.upper()):
+                                    searchresults.append(student)
+                            if(len(searchresults)>9):
+                                break
+                    elif search[0].isdigit():
+                        if len(search)>2:
+                            if len(searchresults):
+                                students = searchresults
+                                searchresults = []
+                            elif flag==0:    
+                                students = Student.objects.all().filter(bitsId__icontains=search)
+                            else:
+                                students=[]
+                            for student in students:
+                                if student.bitsId.startswith(search.upper()):
+                                    searchresults.append(student)
+                        else:
+                            searchresults = searchresults
         return searchresults
 
     def resolve_all_day_scholars(self, args, **kwargs):
