@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import {BrowserRouter as Router, Route, Switch, Link } from "react-router-dom";
+import {BrowserRouter as Router, Route, Switch, Link, Redirect } from "react-router-dom";
 import { ApolloProvider } from "react-apollo";
 import { ApolloClient } from "apollo-client";
 import { HttpLink } from "apollo-link-http";
@@ -45,6 +45,15 @@ const client = new ApolloClient({
   link: concat(authMiddleware, link),
   cache: new InMemoryCache()
 });
+
+const PrivateRoute = ({ render, loggedIn, ...rest}) => (
+  <Route {...rest} render={props => (
+loggedIn ?
+    render()
+    : <Redirect to="/login"/> 
+
+  )} />
+);
 
 class App extends React.Component {
   constructor(props) {
@@ -103,8 +112,9 @@ class App extends React.Component {
                     <Search searchQuery={match.params.query}/>
                   </Layout>
                 )}/>
-             <Route
+             <PrivateRoute
               path="/profile"
+              loggedIn={this.state.loggedIn}
               render={() => (
                 <Layout isLoggedIn={this.state.loggedIn} logout={this.logout} searchMode={false}>
                 <Profile/>
