@@ -12,7 +12,7 @@ import {
 } from "material-ui/Card";
 import MessCard from "./MessCard";
 import { Mobile } from "../../Components/Responsive";
-import {CardLoader} from "../../Components/Loaders";
+import {CardContentLoader} from "../../Components/Loaders";
 import InfoCard from "../../Components/InfoCard";
 import ExpandableCard from "../../Components/ExpandableCard";
 import background from "./Background.svg";
@@ -100,7 +100,7 @@ options : {
      username: this.state.username
   }
 }
-}))(networkErrorHandler(CardLoader, fallback, MessCard));
+}))(networkErrorHandler(CardContentLoader, fallback, MessCard));
     
 
     return (
