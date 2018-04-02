@@ -17,6 +17,7 @@ import Search from './Components/Search/Search.js';
 import Profile from "./Routes/profile/Profile";
 import Login from "./Routes/login/Login";
 import Certificates from './Routes/Certificates/Certificates.js';
+import Login from "./Routes/login/Login";
 
 // react-tap-event-plugin provides onTouchTap() to all React Components.
 // It's a mobile-friendly onClick() alternative for components in Material-UI,
@@ -27,24 +28,21 @@ injectTapEventPlugin();
 const muiTheme = getMuiTheme({userAgent: navigator.userAgent});
 
 const link = new HttpLink({
-  uri: "http://localhost:8000/graphql",
-  credentials: "same-origin"
+    uri: "http://localhost:8000/graphql",
+    credentials: "same-origin"
 });
 
 const authMiddleware = new ApolloLink((operation, next) => {
-  operation.setContext(({ headers = {} }) => ({
-    headers: {
-      ...headers,
-      authorization: `JWT ${localStorage.getItem("token") || null}`
-    }
-  }));
-
-  return next(operation);
-});
+    operation.setContext(({headers = {}}) => ({
+        headers: {
+            ...headers,
+            authorization: `JWT ${localStorage.getItem("token") || null}`
+        }
+    }));
 
 const client = new ApolloClient({
-  link: concat(authMiddleware, link),
-  cache: new InMemoryCache()
+    link: concat(authMiddleware, link),
+    cache: new InMemoryCache()
 });
 
 const PrivateRoute = ({ render, loggedIn, ...rest}) => (
