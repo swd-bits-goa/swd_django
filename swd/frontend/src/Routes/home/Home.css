@@ -6,9 +6,8 @@
 }
 
 .container {
-  padding: 3%;
   /* Fullscreen is occupied at this width */
-  width: 94vw; 
+
 /* =======
   padding: 0.5%;
   padding-top: 1%;
@@ -20,6 +19,9 @@
   background-blend-mode: color-dodge;
   overflow-x: hidden;
 }
+.container2 {
+  padding: 3%;
+}
 
 .newsItem {
   margin: 0 0 2rem;
@@ -28,4 +30,15 @@
 .newsTitle {
   font-size: 1.5rem;
 }
-
+.imgContainer{
+  position: relative;
+  color: white;
+}
+.bottomleft {
+  position: absolute;
+  font-size: 18px;
+  bottom: 0;
+  padding: 10px 0 10px 10px;
+  background: rgba(0, 188, 212, 0.4);
+  width: 100vw;
+}

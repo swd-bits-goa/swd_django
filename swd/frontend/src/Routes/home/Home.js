@@ -106,8 +106,6 @@ options : {
     return (
          <div
           className={s.container}
-          style={{ backgroundImage: `url(${background})` }}
-
         >
 {
 this.context.loggedIn
@@ -117,25 +115,25 @@ this.context.loggedIn
 {
   !this.context.loggedIn
   ? (
-          <Card>
-            <CardMedia>
-              <img src={bdome} style={{ width: "100%" }} alt="SWD" />
-            </CardMedia>
-          </Card>
+            <div className={s.imgContainer}>
+                 <img src={bdome} style={{ width: "100%"}} alt="BITS Pilani, KK Birla Goa Campus" />
+                <div className={s.bottomleft}>BITS Pilani, Goa Campus</div>
+            </div>
   )
   : null
 }
-          <InfoCard title="Latest News" list={this.props.news} />
-          {/* TODO: Handle apollo errors */}
-          {this.props.userInfoQuery && this.props.userInfoQuery.networkStatus === 7 ? ( 
-            <div>
-              {this.props.userInfoQuery.currentUser &&
-                this.props.userInfoQuery.currentUser.username}
+            <div className={s.container2}>
+              <InfoCard title="Latest News" list={this.props.news} />
+              {/* TODO: Handle apollo errors */}
+              {this.props.userInfoQuery && this.props.userInfoQuery.networkStatus === 7 ? (
+                <div>
+                  {this.props.userInfoQuery.currentUser &&
+                    this.props.userInfoQuery.currentUser.username}
+                </div>
+              ) : (
+                <div>loading</div>
+              )}
             </div>
-          ) : (
-            <div>loading</div>
-          )}
-
         </div>
     );
   }
