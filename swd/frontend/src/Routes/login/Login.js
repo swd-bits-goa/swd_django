@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Dialog from 'material-ui/Dialog';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
+import Snackbar from 'material-ui/Snackbar';
 import {withApollo} from 'react-apollo';
 import {withRouter} from 'react-router-dom';
 import Paper from 'material-ui/Paper';
@@ -152,12 +153,23 @@ class Login extends React.Component {
     nonFieldError: ""
   }
 
-  render() {
-
-      return (
+  render() { 
+    // Refers to the preceding private route that might have redirected to login
+  let privateRoute = this.props.location.state;
+      return (              
         <div
           style={styles.container}
         >
+        {
+      privateRoute
+      ? <Snackbar
+          open={true}
+          message={"You must log in to view " + privateRoute.from.pathname.slice(1) + "!"}
+          autoHideDuration={4000}          
+        />
+      
+      : null
+        }
           <Paper zDepth={1} style={styles.headerDiv}>
             <div style={{
               marginBottom: 'auto'
