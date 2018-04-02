@@ -113,11 +113,17 @@ this.context.loggedIn
   ? <MessCardWithData/>
   : null
 }
+{
+  !this.context.loggedIn
+  ? (
           <Card>
             <CardMedia>
               <img src={bdome} style={{ width: "100%" }} alt="SWD" />
             </CardMedia>
           </Card>
+  )
+  : null
+}
           <InfoCard title="Latest News" list={this.props.news} />
           {/* TODO: Handle apollo errors */}
           {this.props.userInfoQuery && this.props.userInfoQuery.networkStatus === 7 ? ( 
