@@ -18,16 +18,18 @@ h3{
     flex-direction: column;
 }
 .infoPaper p{
-    line-height: 0;
     margin-left: 5vw;
 }
 .column1{
 
-    width: 30%;
+    width: 34%;
 }
 .column2{
     margin-left: 5vw;
 }
 .paperDiv{
     margin-bottom: 2vh;
+}
+p{
+    margin: 5px;
 }
