@@ -8,10 +8,10 @@ import {graphql, compose} from "react-apollo";
 import Snackbar from 'material-ui/Snackbar';
 import ExpandableCard from "../../Components/ExpandableCard";
 
-
+// TODO: Remove the need to provide date for mutation
 const messChoiceMutation = gql`
 mutation updateMess($mess: String!){
-  updateMessOption(mess: $mess, month: "2016-03-01") {
+  updateMessOption(mess: $mess, month: "2016-04-01") {
  		messoption {
  		  id
  		}
@@ -77,17 +77,31 @@ const MessCard = (props) => {
  
   const { messoptionopen, messoption } = messOption;
 
-console.log(messoptionopen)
-console.log(messoption)
-let cardTitle = messoptionopen.openNow
-  ? ("Mess option for the month of " + messoptionopen.month + " is open")
-  : "Your current mess is " + messoption.mess
+let showMessForm = false;
+let cardTitle = "";
+
+// Here we're assuming that messoptionopen return null if it is not open
+if (messoptionopen && !messoption)
+{
+  cardTitle = "Mess option for the month of " + messoptionopen.month + " is open";
+  
+}
+else
+{
+  cardTitle = "Your current mess is " + messoption.mess;
+  showMessForm = false;
+}
+
 console.log(messoptionopen, "messoptionopen")
 const MessChoiceFormWithMut = graphql(messChoiceMutation)(MessChoiceForm);
 
   return(
 <ExpandableCard title={cardTitle}> 
-<MessChoiceFormWithMut/>
+{ 
+  showMessForm
+? <MessChoiceFormWithMut/>
+: null
+}
  </ExpandableCard>
   );
 };
@@ -95,6 +109,7 @@ const MessChoiceFormWithMut = graphql(messChoiceMutation)(MessChoiceForm);
 // Change these proptypes depedning on whether the error-handling mechanisms are
 // implicit or explicit. Currently, they are assumed to be explicit.
 MessCard.propTypes = {
+  // Prop should be renamed to convey better meaning
   messOption: PropTypes.object.isRequired,
 };
 
