@@ -84,7 +84,7 @@ let cardTitle = "";
 if (messoptionopen && !messoption)
 {
   cardTitle = "Mess option for the month of " + messoptionopen.month + " is open";
-  
+  showMessForm = true;
 }
 else
 {
