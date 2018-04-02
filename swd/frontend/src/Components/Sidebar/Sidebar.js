@@ -64,10 +64,14 @@ class Sidebar extends React.Component {
   render() {
     return (
       <div>
-        <Drawer open={this.props.open} docked={false} onRequestChange={this.props.toggleOpen} containerStyle={{marginTop: 55, backgroundColor: "#EDF1F2", width: "50%"}}>
+        <Drawer open={this.props.open} onRequestChange={this.props.toggleOpen} containerStyle={{marginTop: 55, backgroundColor: "#EDF1F2", width: "50%"}}>
           {
-            options.map(option => 
-    <MenuItem style={{paddingTop: 10}} onTouchTap={() => this.handleMenuItemClick(option.link)} key={option.name} ><img src={option.icon} style={{padding: 5, paddingRight: 10}}/> {option.name}</MenuItem>
+            options.map(option => {
+              if(option.name=="Profile"&&!this.props.isLoggedIn)
+                return <MenuItem style={{paddingTop: 10}} onTouchTap={() => {this.props.openLogin();this.props.toggleOpen()}} key={option.name} ><img src={option.icon} style={{padding: 5, paddingRight: 10}}/> {option.name}</MenuItem>
+              else
+                return <MenuItem style={{paddingTop: 10}} onTouchTap={() => this.handleMenuItemClick(option.link)} key={option.name} ><img src={option.icon} style={{padding: 5, paddingRight: 10}}/> {option.name}</MenuItem>
+            }
   )
           }
         </Drawer>
