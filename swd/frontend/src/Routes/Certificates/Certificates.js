@@ -85,6 +85,26 @@ class Certificates extends React.Component{
     }
 }
 
+/*const UserCertificates = (props) => {
+    const {loading, error, bonafide } = props.data;
+    if(loading)
+        return <p>loading</p>
+    if(error)
+        return <p>error</p>
+    return bonafide.map((bon) => {
+        return (
+            <Paper zDepth={1} style={styles.formContainer}>
+                <h2 style={styles.header}>Bonafide Applications</h2>
+                <div style={{display: 'flex'}}>
+                    <div>No.</div>
+                    <div>{bon.reason}</div>
+                    <div>{bon.status}</div>
+                </div>
+            </Paper>
+        )
+    })
+}*/
+
 
 
 const currentUser = gql`

@@ -10,20 +10,16 @@ import {
   CardTitle,
   CardText
 } from "material-ui/Card";
-import MessCard from "./MessCard";
 import { Mobile } from "../../Components/Responsive";
 import {CardContentLoader} from "../../Components/Loaders";
 import InfoCard from "../../Components/InfoCard";
-import ExpandableCard from "../../Components/ExpandableCard";
 import background from "./Background.svg";
-import networkErrorHandler from "./networkErrorHandler";
 import bdome from "./BDome.svg";
 import s from "./Home.css";
 import gql from "graphql-tag";
-import { graphql, compose } from "react-apollo";
+import { graphql } from "react-apollo";
 
-// GraphQL queries
-const userInfoQuery = gql`
+const query = gql`
   query GetCurrentUser {
     currentUser {
       id
@@ -31,38 +27,30 @@ const userInfoQuery = gql`
     }
   }
 `;
-const messCardQuery = gql `
-  query messCard($username: String) { 
-    messoptionopen{
-    openNow,
-    month
-    }
-    messoption(username: $username) {
-      mess
-    }
-  }
-  `
 
-const fallback = props => (
-    <h1>Something Went Wrong</h1>
-);
-const loading = props => (
-  <h1>Loading...</h1>
-);
-
-let MessCardWithData;
-
-class Home extends React.Component {
+class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      // Home currently maintains username state until it is made as context to 
-      // be provided to the whole app
-      username: null,
-    };
-
+    this.state = { hasError: false };
   }
 
+  componentDidCatch(error, info) {
+    // Display fallback UI
+    this.setState({ hasError: true });
+    // You can also log the error to an error reporting service
+    // logErrorToMyService(error, info);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      // You can render any custom fallback UI
+      return <h1>Something went wrong.</h1>;
+    }
+    return this.props.children;
+  }
+}
+
+class Home extends React.Component {
   static propTypes = {
     news: PropTypes.arrayOf(
       PropTypes.shape({
@@ -73,22 +61,6 @@ class Home extends React.Component {
     ).isRequired
 
   };
-
-  componentWillReceiveProps(nextProps)
-  {
-    if(nextProps.userInfoQuery.currentUser)
-    {
-    let username = nextProps.userInfoQuery.currentUser.username
-    if(username)
-    {
-      this.setState({ username: username})
-    }
-    else{
-      this.setState({ username: null})
-    }
-  }
-  }
-
   render() {
 
   // HoC
@@ -135,16 +107,16 @@ this.context.loggedIn
               )}
             </div>
         </div>
+      </Mobile>
+      </div>
     );
   }
 }
 
-Home.contextTypes = {
-  loggedIn: PropTypes.bool,
-};
+Home = graphql(query, {
+  options: {
+    errorPolicy: "all"
+  }
+})(Home);
 
-export default graphql(userInfoQuery, {
-  name: "userInfoQuery"
-}) (Home);
-
-
+export default Home;

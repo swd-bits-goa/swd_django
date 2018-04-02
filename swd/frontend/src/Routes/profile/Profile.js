@@ -128,7 +128,7 @@ const GetCurrentUser = gql`
         address
         phone
       }
-    }
+  }
 }
 `;
 

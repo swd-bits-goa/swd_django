@@ -18,10 +18,6 @@ const styles = {
     tableEntry: {
         paddingLeft: 15,
         fontFamily: 'Open Sans'
-    },
-    noCertificate: {
-        marginLeft: 30,
-        paddingBottom: 20
     }
 }
 
@@ -34,15 +30,15 @@ class UserCertificates extends React.Component{
                 return <p>{error.message}</p>
             return (<Paper zDepth={1} style={styles.formContainer}>
                         <h2 style={styles.header}>Bonafide Applications</h2>
-                        {bonafide.length?bonafide.map((bon) => {
+                        {bonafide.map((bon) => {
                             return (
-                                <div style={{display: 'flex', marginLeft: 20}} key={bonafide.indexOf(bon)}>
+                                <div style={{display: 'flex', marginLeft: 20}}>
                                     <div style={{flexGrow: 1}}><h4 style={styles.tableEntry}>{bonafide.indexOf(bon)+1}</h4></div>
                                     <div style={{flexGrow: 3}}><h4 style={styles.tableEntry}>{bon.reason=="OTHER"?bon.otherReason:bon.reason.replace('_',' ')}</h4></div>
                                     <div style={{flexGrow: 3}}><h4 style={styles.tableEntry}>{bon.printed? "Printed": "Not Printed"}</h4></div>
                                 </div>
                             )
-                        }):<p style={styles.noCertificate}>No Certificates to show</p>}
+                        })}
                     </Paper>
                 )
     }

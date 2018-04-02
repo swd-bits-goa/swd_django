@@ -1,9 +1,78 @@
 import graphene
 from graphene_django.types import DjangoObjectType
 from django.contrib.auth.models import User
-from datetime import date, datetime
-from main.models import *
-from .types import *
+from .models import *
+
+
+
+class UserType(DjangoObjectType):
+    class Meta:
+        model = User
+
+class WardenType(DjangoObjectType):
+    class Meta:
+        model = Warden
+
+class StaffType(DjangoObjectType):
+    class Meta:
+        model = Staff
+
+class StudentType(DjangoObjectType):
+    class Meta:
+        model = Student
+
+class DayScholarType(DjangoObjectType):
+    class Meta:
+        model = DayScholar
+
+class HostelPSType(DjangoObjectType):
+    class Meta:
+        model = HostelPS
+
+class CSAType(DjangoObjectType):
+    class Meta:
+        model = CSA
+
+class MessOptionType(DjangoObjectType):
+    class Meta:
+        model = MessOption
+
+class BonafideType(DjangoObjectType):
+    class Meta:
+        model = Bonafide
+
+class LeaveType(DjangoObjectType):
+    class Meta:
+        model = Leave
+
+class DayPassType(DjangoObjectType):
+    class Meta:
+        model = DayPass
+
+class LateComerType(DjangoObjectType):
+    class Meta:
+        model = LateComer
+
+class InOutType(DjangoObjectType):
+    class Meta:
+        model = InOut
+
+class DiscoType(DjangoObjectType):
+    class Meta:
+        model = Disco
+
+class MessOptionOpenType(DjangoObjectType):
+    class Meta:
+        model = MessOptionOpen
+
+class TransactionType(DjangoObjectType):
+    class Meta:
+        model = Transaction
+
+class MessBillType(DjangoObjectType):
+    class Meta:
+        model = MessBill
+
 
 class Query(object):
     # used to get all data to the frontend
@@ -230,7 +299,7 @@ class Query(object):
             if len(searchresults):
                 students = searchresults
                 searchresults = []
-            else:
+            else: 
                 students = Student.objects.all()
             for student in students:
                 for bran in branch:
@@ -238,7 +307,6 @@ class Query(object):
                         searchresults.append(student)
             if len(searchresults)==0:
                 flag=1
-
         if searches:
             #for multi word searches splitting the string into an array of words
             searchArr=searches.split(' ')
@@ -324,7 +392,7 @@ class Query(object):
             return CSA.objects.get(student=student)
 
         return None
-    
+
     def resolve_all_mess_options(self, args, **kwargs):
         return MessOption.objects.all()
 
@@ -338,22 +406,7 @@ class Query(object):
         if username is not None:
             user = User.objects.get(username=username)
             student = Student.objects.get(user=user)
-            try:
-                messoption = MessOption.objects.filter(student=student).latest('monthYear')
-            except:
-                messoption = None
-            try:
-                messoptionopen = MessOptionOpen.objects.filter(dateOpen__lte=date.today()).latest('monthYear')
-            except:
-                messoptionopen = None
-
-            if messoptionopen is not None:
-                if (datetime.today().date() < messoptionopen.dateClose) and messoption.monthYear != messoptionopen.monthYear:
-                    return None
-                else:
-                    return messoption
-
-                return messoption
+            return MessOption.objects.filter(student=student)
 
         return None
 
@@ -437,19 +490,23 @@ class Query(object):
             return Disco.objects.filter(student=student)
 
         return None
-    
+
     def resolve_all_mess_option_opens(self, args, **kwargs):
         return MessOptionOpen.objects.all()
 
     def resolve_messoptionopen(self, args, **kwargs):
-        messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
-        messopen = messopen.exclude(dateOpen__gte=date.today())
+        id = kwargs.get('id')
+        username = kwargs.get('username')
 
-        if messopen:
-            return messopen[0]
-        else:
-            return None
+        if id is not None:
+           return MessOptionOpen.objects.get(id=id)
 
+        if username is not None:
+            user = User.objects.get(username=username)
+            student = Student.objects.get(user=user)
+            return MessOptionOpen.objects.filter(student=student)
+
+        return None
 
     def resolve_all_transactions(self, args, **kwargs):
         return Transaction.objects.all()
