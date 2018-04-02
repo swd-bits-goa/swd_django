@@ -2,7 +2,7 @@ import graphene
 from graphene_django.types import DjangoObjectType
 from django.contrib.auth.models import User
 from .models import *
-
+from datetime import datetime, date
 
 
 class UserType(DjangoObjectType):
@@ -299,7 +299,7 @@ class Query(object):
             if len(searchresults):
                 students = searchresults
                 searchresults = []
-            else: 
+            else:
                 students = Student.objects.all()
             for student in students:
                 for bran in branch:
@@ -307,6 +307,7 @@ class Query(object):
                         searchresults.append(student)
             if len(searchresults)==0:
                 flag=1
+
         if searches:
             #for multi word searches splitting the string into an array of words
             searchArr=searches.split(' ')
@@ -406,7 +407,22 @@ class Query(object):
         if username is not None:
             user = User.objects.get(username=username)
             student = Student.objects.get(user=user)
-            return MessOption.objects.filter(student=student)
+            try:
+                messoption = MessOption.objects.filter(student=student).latest('monthYear')
+            except:
+                messoption = None
+            try:
+                messoptionopen = MessOptionOpen.objects.filter(dateOpen__lte=date.today()).latest('monthYear')
+            except:
+                messoptionopen = None
+
+            if messoptionopen is not None:
+                if (datetime.today().date() < messoptionopen.dateClose) and messoption.monthYear != messoptionopen.monthYear:
+                    return None
+                else:
+                    return messoption
+
+                return messoption
 
         return None
 
