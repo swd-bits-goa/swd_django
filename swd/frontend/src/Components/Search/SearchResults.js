@@ -54,16 +54,13 @@ const Students = ({students}) => {
 
                     <div className={s.infoPaper}>
                         <div className={s.paperElement}>
-                            <div className={s.column1}>
-                                <p><b>Name</b></p>
-                            </div>
-                            <div className={s.column2}>
+                            <div>
                                 <p>{student.name}</p>
                             </div>
                         </div>
                         <div className={s.paperElement}>
                             <div className={s.column1}>
-                                <p><b>ID</b></p>
+                                <p>ID</p>
                             </div>
                             <div className={s.column2}>
                                 <p>{student.bitsId}</p>
@@ -71,7 +68,7 @@ const Students = ({students}) => {
                         </div>
                         <div className={s.paperElement}>
                             <div className={s.column1}>
-                                {student.hostelps!==null?student.hostelps.acadstudent?<p><b>Hostel</b></p>:<p><b>PS Station:</b></p>:<span/>}
+                                {student.hostelps!==null?student.hostelps.acadstudent?<p>Hostel</p>:<p>PS Station:</p>:<span/>}
                             </div>
                             <div className={s.column2}>
                                 {student.hostelps!==null?student.hostelps.acadstudent?<p>{student.hostelps.hostel}</p>:<p>{student.hostelps.psStation}</p>:<span/>}
@@ -80,7 +77,7 @@ const Students = ({students}) => {
 
                         <div className={s.paperElement}>
                             <div className={s.column1}>
-                                {student.hostelps!==null?student.hostelps.acadstudent?<p><b>Room no.</b></p>:null:<span/>}
+                                {student.hostelps!==null?student.hostelps.acadstudent?<p>Room no.</p>:null:<span/>}
                             </div>
                             <div className={s.column2}>
                                 {student.hostelps!==null?student.hostelps.acadstudent?<h3>{student.hostelps.room}</h3>:null:<span/>}
@@ -88,7 +85,7 @@ const Students = ({students}) => {
                         </div>
                         <div className={s.paperElement}>
                             <div className={s.column1}>
-                                <p><b>Branch</b></p>
+                                <p>Branch</p>
                             </div>
                             <div className={s.column2}>
                                 <p>{branch[student.bitsId.substr(4,2)]}</p>
