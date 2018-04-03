@@ -80,7 +80,7 @@ const Students = ({students}) => {
                                 {student.hostelps!==null?student.hostelps.acadstudent?<p>Room no.</p>:null:<span/>}
                             </div>
                             <div className={s.column2}>
-                                {student.hostelps!==null?student.hostelps.acadstudent?<h3>{student.hostelps.room}</h3>:null:<span/>}
+                                {student.hostelps!==null?student.hostelps.acadstudent?<p>{student.hostelps.room}</p>:null:<span/>}
                             </div>
                         </div>
                         <div className={s.paperElement}>
