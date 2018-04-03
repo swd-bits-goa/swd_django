@@ -16,6 +16,7 @@ import injectTapEventPlugin from "react-tap-event-plugin";
 import Search from './Components/Search/Search.js';
 import Profile from "./Routes/profile/Profile";
 import Login from "./Routes/login/Login";
+import Certificates from './Routes/Certificates/Certificates.js';
 
 // react-tap-event-plugin provides onTouchTap() to all React Components.
 // It's a mobile-friendly onClick() alternative for components in Material-UI,
@@ -102,6 +103,12 @@ class App extends React.Component {
         <Router>
           <Switch>
             {/* // Might need to add routing behaviour to take care of expired sessions */}
+            <Route
+              path="/certificates"
+              render={() => (
+                <Layout isLoggedIn={this.state.loggedIn} logout={this.logout} searchMode={false}><Certificates/></Layout>
+              )}
+            />
             <Route
               path="/login"
               render={() => (
