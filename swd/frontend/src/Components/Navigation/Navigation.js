@@ -32,6 +32,7 @@ import {cyan500, cyan900, white} from "material-ui/styles/colors";
 class Navigation extends React.Component {
   static propTypes = {
     isLoggedIn: PropTypes.bool.isRequired,
+    login: PropTypes.func.isRequired,
     logout: PropTypes.func.isRequired,
     searchMode: PropTypes.bool.isRequired
   };
@@ -39,7 +40,9 @@ class Navigation extends React.Component {
 constructor(props) {
   super(props);
   this.state = {
+    loginModalOpen : false,
     sidebarOpen: false,
+    open: false,
     searchMode: props.searchMode
   };
   this.handleSideBarToggle = this.handleSideBarToggle.bind(this);
@@ -57,8 +60,12 @@ constructor(props) {
     this.props.history.push("/");
   }
 
-  goToLogin = () => {
-    this.props.history.push("/login");
+  handleLoginOpen = () => {
+    this.setState({ loginModalOpen: true });
+  };
+
+  handleLoginClose = () => {
+    this.setState({ loginModalOpen: false });
   };
 
   handleLogout = () => {
@@ -99,14 +106,18 @@ constructor(props) {
               {this.state.searchMode?<span/>:<Link to='/search/' style={{position: 'absolute', left: 5}}><IconButton iconStyle={filledIcon} style={{paddingLeft: 0, paddingRight: 20}} onClick={this.handleSearch}><ActionSearch color={"#fff"} /></IconButton></Link>}
               {this.state.searchMode?<span/>:<ToolbarSeparator style={{position: 'absolute', left: 20}}/>}
               {!this.state.searchMode? !(this.props.isLoggedIn) ? 
-              <FlatButton label="Login" onTouchTap={this.goToLogin}  style={{left: 20, color: cyan900}}/>
+              <FlatButton label="Login" onTouchTap={this.handleLoginOpen}  style={{left: 20, color: cyan900}}/>
               :
-             <FlatButton label="Logout" onTouchTap={this.handleLogout}  style={{left: 20, color: cyan900}}/>
+             <FlatButton label="Logout" onTouchTap={this.handleLogout}  style={{left: 20}}/>
               :<span/>}
 
             </ToolbarGroup>
             
           </Toolbar>
+          <LoginModal
+            open={this.state.loginModalOpen}
+            onRequestClose={this.handleLoginClose}
+            login={this.props.login} />
         </div>
       </div>
       </Mobile>

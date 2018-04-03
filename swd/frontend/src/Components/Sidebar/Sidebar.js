@@ -20,7 +20,7 @@ const options = [
     {
       name: 'Certificates',
       icon: certificatesIcon,
-      link: ''
+      link: '/certificates'
     },
     {
       name: 'Counselor',
