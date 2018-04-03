@@ -106,8 +106,8 @@ export default class Filters extends React.Component{
 		return(
             <div>
 			<Paper zDepth={1} style={{marginTop: -10}}>
-				<div style={{display: 'flex', marginLeft: 30}}>
-                        <div style={{maxWidth: 180}}>
+				<div style={{display: 'flex'}}>
+                        <div style={{maxWidth: "47%"}}>
 
                         <SelectField
                                 multiple={true}
@@ -125,7 +125,7 @@ export default class Filters extends React.Component{
                                 {this.menuItems(hostels, hostelValues)}
                         </SelectField>
                         </div>
-                        <div style={{maxWidth: 180}}>
+                        <div style={{maxWidth: "47%"}}>
 
                         <SelectField
                                 multiple={true}
