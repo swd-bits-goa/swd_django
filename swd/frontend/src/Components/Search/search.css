@@ -10,3 +10,26 @@
 h3{
 	font-family: 'Open Sans';
 }
+.paperElement{
+    display: flex;
+}
+.infoPaper{
+    display: flex;
+    flex-direction: column;
+}
+.infoPaper p{
+    margin-left: 5vw;
+}
+.column1{
+
+    width: 34%;
+}
+.column2{
+    margin-left: 5vw;
+}
+.paperDiv{
+    margin-bottom: 2vh;
+}
+p{
+    margin: 5px;
+}
