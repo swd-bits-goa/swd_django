@@ -249,7 +249,7 @@ class Query(object):
                         if len(searchresults):
                             students = searchresults
                             searchresults = []
-                        elif flag==0:    
+                        elif flag==0:
                             students = Student.objects.all().filter(name__icontains=search)
                         else:
                             students=[]
@@ -265,7 +265,7 @@ class Query(object):
                             if len(searchresults):
                                 students = searchresults
                                 searchresults = []
-                            elif flag==0:    
+                            elif flag==0:
                                 students = Student.objects.all().filter(bitsId__icontains=search)
                             else:
                                 students=[]
@@ -324,7 +324,7 @@ class Query(object):
             return CSA.objects.get(student=student)
 
         return None
-    
+
     def resolve_all_mess_options(self, args, **kwargs):
         return MessOption.objects.all()
 
@@ -338,22 +338,12 @@ class Query(object):
         if username is not None:
             user = User.objects.get(username=username)
             student = Student.objects.get(user=user)
+            print(student)
             try:
-                messoption = MessOption.objects.filter(student=student).latest('monthYear')
+                messoption = MessOption.objects.filter(student=student).latest('messoptionopen__monthYear')
+                return messoption
             except:
                 messoption = None
-            try:
-                messoptionopen = MessOptionOpen.objects.filter(dateOpen__lte=date.today()).latest('monthYear')
-            except:
-                messoptionopen = None
-
-            if messoptionopen is not None:
-                if (datetime.today().date() < messoptionopen.dateClose) and messoption.monthYear != messoptionopen.monthYear:
-                    return None
-                else:
-                    return messoption
-
-                return messoption
 
         return None
 
@@ -437,7 +427,7 @@ class Query(object):
             return Disco.objects.filter(student=student)
 
         return None
-    
+
     def resolve_all_mess_option_opens(self, args, **kwargs):
         return MessOptionOpen.objects.all()
 
