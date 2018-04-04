@@ -3,6 +3,7 @@ import React, { PropTypes } from 'react';
 import { BottomNavigation, BottomNavigationItem } from 'material-ui/BottomNavigation';
 import Paper from 'material-ui/Paper';
 import IconLocationOn from 'material-ui/svg-icons/communication/location-on';
+import {Mobile, Tablet} from '../Responsive';
 // Import custom footer styles
 import s from './Footer.css';
 
@@ -21,8 +22,9 @@ class Footer extends React.Component {
   select = index => this.setState({ selectedIndex: index });
 
   render() {
-    if (!this.props.isLoggedIn) {
       return (
+        <div>
+        <Tablet>
         <footer className={s.footer} >
           <div className={s.container}>
             <div>
@@ -56,9 +58,8 @@ class Footer extends React.Component {
             <span className={s.whiteText}>Developed By OSDLabs</span>
           </div>
         </footer>
-      );
-    }
-    return (
+        </Tablet>
+      <Mobile>
       <Paper zDepth={1} style={{ bottom: 0, position: 'fixed', width: '100%' }}>
         <BottomNavigation selectedIndex={this.state.selectedIndex}>
           <BottomNavigationItem
@@ -78,8 +79,10 @@ class Footer extends React.Component {
           />
         </BottomNavigation>
       </Paper>
-    );
-  }
+    </Mobile>
+    </div>
+      )
+}
 }
 
 export default (Footer);
