@@ -90,7 +90,7 @@ class Staff(models.Model):
     def __str__(self):
         return self.staffType + ' ' + self.name
 
-class Student(models.Model):    
+class Student(models.Model):
     def hash_upload(instance, filename):
         ext = filename.split('.')[-1]
         tempname = (SALT+instance.bitsId).encode('utf-8')
@@ -112,7 +112,7 @@ class Student(models.Model):
     parentPhone = models.CharField(max_length=20, blank=True, null=True)
     parentEmail = models.CharField(max_length=50, blank=True, null=True)
 
-    
+
 
     def __str__(self):
         return self.bitsId + ' (' + self.name + ')'
@@ -149,8 +149,11 @@ class CSA(models.Model):
 
 class MessOption(models.Model):
     student = models.ForeignKey('Student', on_delete = models.CASCADE)
-    monthYear = models.DateField()
+    messoptionopen = models.ForeignKey('MessOptionOpen', on_delete = models.CASCADE, null=True)
     mess = models.CharField(max_length=1, choices=MESS_CHOICES)
+
+    class Meta:
+        unique_together = ('student', 'messoptionopen',)
 
     def __str__(self):
         return self.mess + ' ' + self.student.bitsId
