@@ -99,7 +99,6 @@ class App extends React.Component {
       // apollo interfacing
       <ApolloProvider client={client}>
         <MuiThemeProvider muiTheme={muiTheme}>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
         <Router>
           <Switch>
             {/* // Might need to add routing behaviour to take care of expired sessions */}
