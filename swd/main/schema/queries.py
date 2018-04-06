@@ -74,7 +74,7 @@ class Query(object):
     )
 
     all_bonafides = graphene.List(BonafideType)
-    bonafide = graphene.Field(
+    bonafide = graphene.List(
         BonafideType,
         id=graphene.Int(),
         username = graphene.String()
@@ -361,13 +361,9 @@ class Query(object):
         return Bonafide.objects.all()
 
     def resolve_bonafide(self, args, **kwargs):
-        id = kwargs.get('id')
         username = kwargs.get('username')
 
-        if id is not None:
-           return Bonafide.objects.get(id=id)
-
-        if username is not None:
+        if username:
             user = User.objects.get(username=username)
             student = Student.objects.get(user=user)
             return Bonafide.objects.filter(student=student)
