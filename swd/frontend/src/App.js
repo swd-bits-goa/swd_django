@@ -133,8 +133,9 @@ class App extends React.Component {
                 </Layout>
               )}
             />
-            <Route
+            <PrivateRoute
               path="/certificates"
+              loggedIn={this.state.loggedIn}
               render={() => (
                 <Layout isLoggedIn={this.state.loggedIn} logout={this.logout} searchMode={false}>
                   <Certificates/>
