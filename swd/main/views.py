@@ -2,13 +2,15 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .models import Student, MessOptionOpen, MessOption, Leave, Bonafide, Warden, DayPass, MessBill, ShopItems
+from .models import Student, MessOptionOpen, MessOption, Leave, Bonafide, Warden, DayPass, MessBill, HostelPS, ShopItems
 from django.views.decorators.csrf import csrf_protect
 from datetime import date, datetime, timedelta
 from .forms import MessForm, LeaveForm, BonafideForm, DayPassForm
 from django.contrib import messages
 from django.utils.timezone import make_aware
 import json
+from django.core.mail import send_mail
+from django.conf import settings
 from braces import views
 
 from django.contrib.auth.models import User
@@ -245,6 +247,14 @@ def leave(request):
             leaveform.student = student
             print(request.POST.get('consent'))
             leaveform.save()
+            #email_to=[Warden.objects.get(hostel=HostelPS.objects.get(student=student).hostel).email]             # For production
+            #email_to=["youremail@site.com"]                                                                      # For testing 
+            mailObj=Leave.objects.latest('id')
+            mail_subject="New Leave ID: "+ str(mailObj.id)
+            mail_message="Leave Application applied by "+ mailObj.student.name +" with leave id: " + str(mailObj.id) + ".\n"
+            mail_message=mail_message + "Parent name: " + mailObj.student.parentName + "\nParent Email: "+ mailObj.student.parentEmail + "\nParent Phone: " + mailObj.student.parentPhone
+            mail_message=mail_message + "\nConsent type: " + mailObj.consent
+            send_mail(mail_subject,mail_message,settings.EMAIL_HOST_USER,email_to,fail_silently=False)
 
             context = {
                 'option': 1,
@@ -321,8 +331,8 @@ def is_warden(user):
 @user_passes_test(is_warden)
 def warden(request):
     warden = Warden.objects.get(user=request.user)
-    leaves = Leave.objects.filter(student__hostelps__hostel=warden.hostel).order_by('approved', '-id')
-    daypasss = DayPass.objects.filter(student__hostelps__hostel=warden.hostel).order_by('approved', '-id')
+    leaves = Leave.objects.filter(student__hostelps__hostel__icontains=warden.hostel).order_by('approved', '-id')
+    daypasss = DayPass.objects.filter(student__hostelps__hostel__icontains=warden.hostel).order_by('approved', '-id')
     context = {
         'option':1,
         'warden': warden,
@@ -349,17 +359,26 @@ def wardenleaveapprove(request, leave):
         approved = request.POST.getlist('group1')
         print(approved)
         comment = request.POST.get('comment')
+        mail_message={}
+        #email_to = [leave.student.email]                         # For production
+        #email_to = ["youremail@site.com"]                        # For testing
+        mail_subject="Leave Status - "
+        mail_message=leave.student.name+",\n"
 
         if '1' in approved:
             leave.approved=True
             leave.disapproved = False
             leave.inprocess = False
             leave.approvedBy = warden
+            mail_subject=mail_subject + "Successful!"
+            mail_message=mail_message+ "Success! Your leave application with leave id: " + str(leave.id) + " from " + leave.dateTimeStart.strftime('%d/%m/%Y') + " to "+leave.dateTimeEnd.strftime('%d/%m/%Y')+" has been approved."
         elif '2' in approved:
             leave.disapproved=True
             leave.approved = False
             leave.inprocess = False
             leave.approvedBy = warden
+            mail_subject=mail_subject + "Unsuccessful!"
+            mail_message=mail_message+"Unsuccessful! Your leave application with leave id: "+ str(leave.id) + " from " + leave.dateTimeStart.strftime('%d/%m/%Y') + " to "+leave.dateTimeEnd.strftime('%d/%m/%Y')+" has been disapproved."
         else:
             leave.inprocess = True
             leave.approved = False
@@ -367,6 +386,9 @@ def wardenleaveapprove(request, leave):
             leave.approvedBy = None
 
         leave.comment = comment
+        if(leave.comment != ''):
+            mail_message=mail_message+"\nComments: " + leave.comment
+        send_mail(mail_subject,mail_message,settings.EMAIL_HOST_USER,email_to,fail_silently=False)
         leave.save()
         return redirect('warden')
 
@@ -377,7 +399,7 @@ def wardenleaveapprove(request, leave):
 def wardendaypassapprove(request, daypass):
     daypass = DayPass.objects.get(id=daypass)
     warden = Warden.objects.get(user=request.user)
-    leaves = Leave.objects.filter(student__hostelps__hostel=warden.hostel).order_by('approved', '-id')
+    leaves = Leave.objects.filter(student__hostelps__hostel__icontains=warden.hostel).order_by('approved', '-id')
     context = {
         'option': 3,
         'warden': warden,

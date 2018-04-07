@@ -18,7 +18,7 @@ from .config import PRODUCTION, DB_NAME, DB_PASSWORD, DB_USER
 DEBUG = True
 
 from tools.dev_info import SECRET_KEY
-
+from tools.dev_info import EMAIL_HOST_PASSWORD
 # production = True if "PROD" in os.environ and os.environ.get("PROD") == "True" else False
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -38,6 +38,10 @@ if PRODUCTION:
 else:
     ALLOWED_HOSTS = []
 
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'swdstatus@gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
 
 # Application definition
 

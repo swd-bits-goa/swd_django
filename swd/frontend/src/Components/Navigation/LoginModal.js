@@ -2,13 +2,73 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Dialog from 'material-ui/Dialog';
-import FlatButton from 'material-ui/FlatButton';
+import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 import {withApollo} from 'react-apollo';
+import Paper from 'material-ui/Paper';
+import {white, cyan400, cyan500} from 'material-ui/styles/colors';
+import backIcon from './back.svg';
 
+const styles = {
+  container: {
+    zIndex: 10,
+    position: 'fixed',
+    overflowX: 'hidden',
+    overflowY: 'hidden',
+    top: 0,
+    backgroundColor: 'white',
+    width: '100%',
+    height: '100%'
+  },
+  headerDiv: {
+    backgroundColor: cyan500,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'flex-end',
+    height: '40%',
+    margin: 6
+  },
+  header: {
+    fontFamily: 'Open Sans',
+    color: 'white',
+    paddingLeft: 10,
+    paddingBottom: 0,
+    marginBottom: 0
+  },
+  para: {
+    margin: 0,
+    color: 'white',
+    padding: 10
+  },
+  username: {
+    fontSize: 25,
+    marginTop: 0
+  },
+  password: {
+    fontSize: 25
+  },
+  form: {
+    width: '92%',
+    margin: 'auto',
+    marginTop: -5
+  },
+  submitButton: {
+    width: '100%',
+    marginTop: 30
+  },
+  back: {
+    height: 25,
+    width: 25,
+    marginLeft: 15,
+    alignContent: 'flex-start',
+    marginTop: 15,
+    padding: 5,
+    paddingLeft: 0
+  }
+}
 
 class LoginModal extends React.Component {
-
+  
   // Validate form data
   validate(formData) {
     const fieldError = {}
@@ -80,54 +140,65 @@ class LoginModal extends React.Component {
     },
     nonFieldError : "",
   }
-
+  
+  componentDidUpdate(){
+    //to prevent scrolling
+    if(this.props.open){
+      this.mainContainer.addEventListener('touchmove', function(e) {
+        e.preventDefault();
+      });
+    }
+  }
   render() {
-    const actions = [
-      <FlatButton
-        label="Cancel"
-        primary
-        onTouchTap={this.props.onRequestClose}
-      />,
-      <FlatButton
-        label="Login"
-        primary
-        keyboardFocused
-        type="submit"
-        form="form"
-      />,
-    ];
-
-    return (
-      <div>
-        <Dialog
-          title="Log In"
-          actions={actions}
-          modal={true}
-          open={this.props.open}
-          onRequestClose={this.props.onRequestClose}
-          contentStyle= {{ width: "98%"}} // Not full for aesthetic purposes
-        >
-          Username same as BITS mail. Use your LDAP Authentication password to login.
+   
+    const LoginComponent = this.props.open?
+      (<div style={styles.container} ref={(container) => { this.mainContainer=container; }}>
+        <Paper zDepth={1} style={styles.headerDiv}>
+          <div style={{marginBottom: 'auto'}}>
+            <img src={backIcon} style={styles.back}
+              onClick={this.props.onRequestClose}/>
+          </div>
+          <h2 style={styles.header}>Welcome!</h2>
+          <p style={styles.para}>Username same as BITS mail.<br/> Use your LDAP Authentication password to login.</p>
+        </Paper>
+        <div>
+          
 
           <form
           ref={ref => (this.form = ref)}
           onSubmit={e => this.handleSubmit(e)}
           id="form"
+          style={styles.form}
           >
           <span style={{ color: 'red' }}>{ this.state.nonFieldError }</span>
           <br/> 
           <TextField
           floatingLabelText = "Username" name = "username" autoComplete = "username" 
-          errorText={this.state.fieldError.username} />
+          errorText={this.state.fieldError.username} 
+          style={styles.username}
+          fullWidth={true}/>
           <br/> 
           <TextField
           floatingLabelText="Password" name="password" type="password" 
-          autoComplete="current-password" errorText={this.state.fieldError.password}/> 
+          autoComplete="current-password" errorText={this.state.fieldError.password}
+          style={styles.password}
+          fullWidth={true}/> 
           <br/> 
+        
+          <RaisedButton
+            label="Login"
+            backgroundColor={cyan400}
+            labelColor={white}
+            keyboardFocused
+            type="submit"
+            form="form"
+            style={styles.submitButton}
+          />
         </form>
-        </Dialog>
-      </div>
-    );
+        </div>
+      </div>):null;
+    
+    return LoginComponent;
   }
 }
 

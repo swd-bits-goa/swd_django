@@ -1,3 +1,4 @@
+{%load staticfiles %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -37,17 +38,7 @@ div.container3 p {
 }
 </style> 
 <div id="letterhead">
-  <h3 align=center >
-    Birla Institute of Technology and Science-Pilani
-  </h3>
-  <div id="adress">
-    <h3 align=center>
-      K.K Birla Goa Campus
-    </h3>
-    <h4 align=center>
-      Zuarinagar, Goa 403726, India
-    </h4>
-  </div>
+  <img src="{% static 'img/bonafide_header.png' %}" width=595px>
 </div>
 <hr>
 </head>
@@ -55,18 +46,15 @@ div.container3 p {
 <div id="content" >
     <div class="top">
         <h3 class="ref" align="left">SWD/CERT/{{ id }}</h3>
-        <h3 class="date" align="right">{{ date }}</h3>
+        <h3 class="date" align="right">{{ date|date:"d/F/Y"  }}</h3>
     </div>
     <h1 align="center">CERTIFICATE</h1>
     <p>
-      {{ text | linebreaks }}
+      {{ text | safe | linebreaks}}
     </p> 
 </div>
 <div id="footer">
-<h6 align="center">
-BIRLA INSTITUTE OF TECHNOLOGY & SCIENCE, PILANI - K.K. Birla Goa Campus
-<br>NH 17B, Bypass Road, Zuari Nagar 403726, GOA, India, Phone +0832-2580300
-</h6>
+  <img src="{% static 'img/bonafide_footer.png' %}"  width=595px >
 </div>  
 </body>
 </html>
