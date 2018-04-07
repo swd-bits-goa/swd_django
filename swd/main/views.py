@@ -2,13 +2,13 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .models import Student, MessOptionOpen, MessOption, Leave, Bonafide, Warden, DayPass, MessBill
+from .models import Student, MessOptionOpen, MessOption, Leave, Bonafide, Warden, DayPass, MessBill, ShopItems
 from django.views.decorators.csrf import csrf_protect
 from datetime import date, datetime, timedelta
-from .forms import MessForm, LeaveForm, BonafideForm, DayPassForm, ShopForm
+from .forms import MessForm, LeaveForm, BonafideForm, DayPassForm
 from django.contrib import messages
 from django.utils.timezone import make_aware
-
+import json
 from braces import views
 
 from django.contrib.auth.models import User
@@ -26,13 +26,61 @@ def login_success(request):
 @login_required
 def shop(request):
     if request.method == 'POST':
-        form = ShopForm(request.POST)
-        if form.is_valid():
-            print(form.cleaned_data)
+        print(request.POST)
+        print(request.POST.get('productid'))#[0])
+        student = Student.objects.get(user=request.user)
+        product = ShopItems.objects.get(productID=request.POST.get('productid'))
+        if student.bitsId in product.orderedUsers:
+            return HttpResponse("Already ordered!")
+        product.orderedUsers += student.bitsId+";" # need to convert this to ArrayField
+        product.save()
     else:
-        form = ShopForm()
+        data = ShopItems.objects.all()
+        otherData = 1#data.
 
-    return render(request, "shop.html", {'form': form})
+        customHTML = "<div id='items'>"
+
+        for o in data:
+
+            if Student.objects.get(user=request.user).bitsId in o.orderedUsers:
+                continue
+
+            item = ""
+            item += "<div class='item'>"
+            item += "<div class='productimage'><img src='"+o.productImage+"'>"
+            item += "<input type='hidden' name='productid' value='"+o.productID+"'>"
+            item += "<div class='itemname'>"+o.name+"</div>"
+            item += "<div class='itemdesc'>"+o.desc+"</div>"
+            item += "<div class='colors'>"
+
+            jsonData = json.loads(o.jsonData)
+
+            # hard-coded specific models
+            for color in jsonData['colors']:
+                item += '''
+                <div class='colorgroup'>
+                    <label name='itemcolor'>{color}</label>
+                    <input type='radio' name='itemcolor' value='{color}'>
+                </div>'''.format(color=color)
+
+            item += "</div>" #colors
+            item += "<div class='sizes'>"
+
+            for size in jsonData['sizes']:
+                item += '''
+                <div class='sizegroup'>
+                    <label name='itemsizes'>{size}</label>
+                    <input type='radio' name='itemsizes' value='{size}'>
+                </div>'''.format(size=size)
+
+            item += "</div>" # sizes
+            item += "</div>" # item
+
+            customHTML += item
+        customHTML += "</div><style>input[type='radio']{ display:block!important;position:relative!important;opacity:1!important;pointer-events:visible!important; }</style>"
+        return render(request, "shop.html", {'form': customHTML})
+
+    return HttpResponse("ORDERED!")
 
 @login_required
 def studentimg(request):

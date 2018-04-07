@@ -229,8 +229,13 @@ class DayPass(models.Model):
         return self.student.bitsId + ' (' + self.student.name + ')'
 
 
-class Shop(models.Model):
+class ShopItems(models.Model):
     productID = models.CharField(max_length=100)
+    productImage = models.TextField(blank=True, null=True)
+    name = models.CharField(max_length=200, default='Sample Product Title')
+    desc = models.TextField(default='Sample description')
+    jsonData = models.TextField(default='{}')
+    orderedUsers = models.TextField(default='', blank=True)
 
 class LateComer(models.Model):
     student = models.ForeignKey('Student', on_delete = models.CASCADE)

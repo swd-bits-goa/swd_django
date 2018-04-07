@@ -12,8 +12,10 @@
                         
                         <form method="POST">
                             {% csrf_token %}
-                            {{ form }}
-                            <input type="submit" value="Submit" />
+                            {{ form | safe }}
+
+                            
+                            <input type="submit" value="Order This" />
                         </form>
 
                     </div>

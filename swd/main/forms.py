@@ -1,5 +1,5 @@
 from django import forms
-from .models import MessOption, Leave, Bonafide, DayPass, Shop
+from .models import MessOption, Leave, Bonafide, DayPass
 from django.forms.widgets import TextInput, Textarea
 from django.utils.translation import ugettext_lazy as _
 from datetime import date, datetime
@@ -9,9 +9,8 @@ class MessForm(forms.ModelForm):
         model = MessOption
         fields = ['mess']
 
-class ShopForm(forms.ModelForm):
+'''class ShopForm(forms.ModelForm):
     productID = forms.CharField(label='Product ID', widget=forms.TextInput(attrs={'class': 'productid'}), disabled=True)
-    
     #productID = forms.(label='Product ID', widget=forms.TextInput(attrs={'class': 'productid'}))
     class Meta:
         model = Shop
@@ -20,6 +19,7 @@ class ShopForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super(ShopForm, self).clean()
         return cleaned_data
+'''
 
 class LeaveForm(forms.ModelForm):
     dateStart = forms.CharField(label='Departure Date', widget=forms.TextInput(attrs={'class': 'datepicker'}))
