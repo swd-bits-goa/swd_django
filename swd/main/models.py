@@ -272,3 +272,30 @@ class MessBill(models.Model):
 
     def __str__(self):
         return str(self.month) + ' ' + str(self.amount) + ' ' + str(self.rebate)
+
+# All store options are filled here
+
+class TeeAdd(models.Model):
+    title = models.CharField(max_length=30)
+    desc = models.TextField()
+    pic = models.ImageField(upload_to='store/', blank=True, null=True)
+    price = models.FloatField()
+    nick = models.BooleanField(blank=True)
+    colors = models.CharField(max_length=100, blank=True, null=True)
+    sizes = models.CharField(max_length=100, blank=True, null=True)
+
+class ItemAdd(models.Model):
+    title = models.CharField(max_length=30)
+    desc = models.TextField()
+    pic = models.ImageField(upload_to='store/', blank=True, null=True)
+    price = models.FloatField()
+
+class TeeBuy(models.Model):
+    student = models.ForeignKey('Student', on_delete = models.CASCADE)
+    tee = models.ForeignKey('TeeAdd', on_delete = models.CASCADE)
+    qty = models.IntegerField()
+    nick = models.CharField(max_length=100, blank=True, null=True)
+  
+class ItemBuy(models.Model):
+    student = models.ForeignKey('Student', on_delete = models.CASCADE)
+    item = models.ForeignKey('ItemAdd', on_delete = models.CASCADE)
