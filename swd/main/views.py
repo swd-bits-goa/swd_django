@@ -24,6 +24,10 @@ def login_success(request):
     return HttpResponse("Success!")
 
 @login_required
+def shop(request):
+    return render(request, "shop.html", {})
+
+@login_required
 def studentimg(request):
     url = Student.objects.get(user=request.user).profile_picture
     print(url)

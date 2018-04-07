@@ -227,6 +227,10 @@ class DayPass(models.Model):
     def __str__(self):
         return self.student.bitsId + ' (' + self.student.name + ')'
 
+
+class Shop(models.Model):
+    pass
+
 class LateComer(models.Model):
     student = models.ForeignKey('Student', on_delete = models.CASCADE)
     dateTime = models.DateTimeField()

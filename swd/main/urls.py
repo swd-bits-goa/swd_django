@@ -19,6 +19,7 @@ urlpatterns = [
 
 
     url(r'^dashboard/', views.dashboard, name="dashboard"),
+    url(r'^shop/', views.shop, name="shop"),
     url(r'^profile/', views.profile, name="profile"),
     url(r'^messoption/', views.messoption, name="messoption"),
     url(r'^leave/', views.leave, name="leave"),
