@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import Student, MessOptionOpen, MessOption, Leave, Bonafide, Warden, DayPass, MessBill
 from django.views.decorators.csrf import csrf_protect
 from datetime import date, datetime, timedelta
-from .forms import MessForm, LeaveForm, BonafideForm, DayPassForm
+from .forms import MessForm, LeaveForm, BonafideForm, DayPassForm, ShopForm
 from django.contrib import messages
 from django.utils.timezone import make_aware
 
@@ -25,7 +25,14 @@ def login_success(request):
 
 @login_required
 def shop(request):
-    return render(request, "shop.html", {})
+    if request.method == 'POST':
+        form = ShopForm(request.POST)
+        if form.is_valid():
+            print(form.cleaned_data)
+    else:
+        form = ShopForm()
+
+    return render(request, "shop.html", {'form': form})
 
 @login_required
 def studentimg(request):

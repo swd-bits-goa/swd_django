@@ -91,17 +91,18 @@ class Staff(models.Model):
     def __str__(self):
         return self.staffType + ' ' + self.name
 
-class Student(models.Model):
 
+def wrapper(instance, filename):
+    #print("filename is " + filename)
+    #print(instance.bitsId)
+    ext = filename.split('.')[-1]
+    tempname = (SALT+instance.bitsId).encode('utf-8') # creating temp filename
+    filename = '{}.{}'.format(hashlib.md5(tempname).hexdigest(), ext) # creating md5 of SALT+roll number of student as filename
+    # return the whole path to the file
+    return os.path.join(path, filename)
+
+class Student(models.Model):    
     def path_and_rename(path):
-        def wrapper(instance, filename):
-            #print("filename is " + filename)
-            #print(instance.bitsId)
-            ext = filename.split('.')[-1]
-            tempname = (SALT+instance.bitsId).encode('utf-8') # creating temp filename
-            filename = '{}.{}'.format(hashlib.md5(tempname).hexdigest(), ext) # creating md5 of SALT+roll number of student as filename
-            # return the whole path to the file
-            return os.path.join(path, filename)
         return wrapper
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -229,7 +230,7 @@ class DayPass(models.Model):
 
 
 class Shop(models.Model):
-    pass
+    productID = models.CharField(max_length=100)
 
 class LateComer(models.Model):
     student = models.ForeignKey('Student', on_delete = models.CASCADE)
