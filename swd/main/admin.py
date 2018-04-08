@@ -11,7 +11,7 @@ from calendar import monthrange
 class HostelPSAdmin(admin.ModelAdmin):
     search_fields = ['student__name', 'student__bitsId']
 
-models = [Warden, Staff, DayScholar, CSA, MessOption, Leave, DayPass, LateComer, InOut, Disco, MessOptionOpen, Transaction, MessBill]
+models = [Warden, Staff, DayScholar, CSA, MessOption, Leave, DayPass, LateComer, InOut, Disco, MessOptionOpen, Transaction, MessBill, TeeAdd, TeeBuy, ItemAdd, ItemBuy]
 
 
 @admin.register(Bonafide)

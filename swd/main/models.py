@@ -278,24 +278,40 @@ class MessBill(models.Model):
 class TeeAdd(models.Model):
     title = models.CharField(max_length=30)
     desc = models.TextField()
-    pic = models.ImageField(upload_to='store/', blank=True, null=True)
+    pic = models.ImageField(blank=True, null=True)
     price = models.FloatField()
     nick = models.BooleanField(blank=True)
     colors = models.CharField(max_length=100, blank=True, null=True)
     sizes = models.CharField(max_length=100, blank=True, null=True)
+    available = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.title + ' - Rs.' + str(self.price)
 
 class ItemAdd(models.Model):
     title = models.CharField(max_length=30)
     desc = models.TextField()
-    pic = models.ImageField(upload_to='store/', blank=True, null=True)
+    pic = models.ImageField(blank=True, null=True)
     price = models.FloatField()
+    available = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.title + ' - Rs.' + str(self.price)
 
 class TeeBuy(models.Model):
     student = models.ForeignKey('Student', on_delete = models.CASCADE)
     tee = models.ForeignKey('TeeAdd', on_delete = models.CASCADE)
     qty = models.IntegerField()
     nick = models.CharField(max_length=100, blank=True, null=True)
+    color = models.CharField(max_length=10, blank=True, null=True)
+    size = models.CharField(max_length=10, blank=True, null=True)
+
+    def __str__(self):
+        return self.student.bitsId + ' ' + self.tee.title
   
 class ItemBuy(models.Model):
     student = models.ForeignKey('Student', on_delete = models.CASCADE)
     item = models.ForeignKey('ItemAdd', on_delete = models.CASCADE)
+
+    def __str__(self):
+        return self.student.bitsId + ' ' + self.item.title
