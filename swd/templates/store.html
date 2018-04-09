@@ -88,17 +88,17 @@
 
     function openItemModal(info) {
         info = parseInt(info)
-        var items = [{% for i in items %} ["{{ i.title|safe }}", "{{ i.desc|safe }}", "{{ i.pic|safe }}", "{{ i.price }}", "{{ i.available }}"], {% endfor %}]
-        $("#modalheader").html(items[info-1][0])
+        var items = { {% for i in items %} "{{ i.id }}" : ["{{ i.title|safe }}", "{{ i.desc|safe }}", "{{ i.pic|safe }}", "{{ i.price }}", "{{ i.nick|safe }}", "{{ i.colors|safe }}", "{{ i.sizes|safe }}", "{{ i.available }}"], {% endfor %} }
+        $("#modalheader").html(items[info][0])
         $("#modalinfo").html(`
         <div class="row">
             <div class="col s5 l5">
-                <img src="/media/` + items[info - 1][2] + `">
+                <img src="/media/` + items[info][2] + `">
             </div>
             <div class="col s7 l7">
 
-                <p align="justify">` + items[info - 1][1] + `</p>
-                <p align="right" id="price"><b> Rs.` + items[info - 1][3] + `</b></p>
+                <p align="justify">` + items[info][1] + `</p>
+                <p align="right" id="price"><b> Rs.` + items[info][3] + `</b></p>
                 <p>
                     <input id="agree" type="checkbox" class="filled-in"/>
                     <label for="agree">I agree to buy this item and understand that the amount will be deducted from my account</label for="agree">
@@ -126,12 +126,13 @@
 
     function openTeeModal(info) {
         info = parseInt(info)
-        var tees = [{% for i in tees %} ["{{ i.title|safe }}", "{{ i.desc|safe }}", "{{ i.pic|safe }}", "{{ i.price }}", "{{ i.nick|safe }}", "{{ i.colors|safe }}", "{{ i.sizes|safe }}", "{{ i.available }}"], {% endfor %}]
-        $("#modalheader").html(tees[info-1][0])
+        var tees = { {% for i in tees %} "{{ i.id }}" : ["{{ i.title|safe }}", "{{ i.desc|safe }}", "{{ i.pic|safe }}", "{{ i.price }}", "{{ i.nick|safe }}", "{{ i.colors|safe }}", "{{ i.sizes|safe }}", "{{ i.available }}"], {% endfor %} }
+        console.log(tees)
+        $("#modalheader").html(tees[info][0])
         var nick = "";
         var colors = "";
         var sizes = "";
-        if (tees[info-1][4] == "True") {
+        if (tees[info][4] == "True") {
             nick = `
             <div class="input-field col s12">
                 <input id="nick" name="nick" type="text" class="validate">
@@ -139,8 +140,8 @@
             </div>
             `
         }
-        if (tees[info - 1][5] != "None") {
-            colorlist = tees[info - 1][5].split(",");
+        if (tees[info][5] != "None") {
+            colorlist = tees[info][5].split(",");
             colors = `
             <div class="input-field col s6">
                 <select id="colors" name="colors">
@@ -150,8 +151,8 @@
             }
             colors += `</select><label for="colors">Colors</label></div>`
         }
-        if (tees[info - 1][6] != "") {
-            sizelist = tees[info - 1][6].split(",");
+        if (tees[info][6] != "None") {
+            sizelist = tees[info][6].split(",");
             sizes = `
             <div class="input-field col s6">
                 <select id="sizes" name="sizes">
@@ -164,13 +165,13 @@
         $("#modalinfo").html(`
         <div class="row">
             <div class="col s5 l5">
-                <img src="/media/` + tees[info - 1][2] + `">
+                <img src="/media/` + tees[info][2] + `">
             </div>
             <div class="col s7 l7">
                 <form method="POST">
                     {% csrf_token %}
-                <p align="justify">` + tees[info - 1][1] + `</p>
-                <p align="right" id="price"><b> Rs.` + tees[info - 1][3] + `</b></p>
+                <p align="justify">` + tees[info][1] + `</p>
+                <p align="right" id="price"><b> Rs.` + tees[info][3] + `</b></p>
                 ` + nick + colors + sizes + `    
                 <div class="input-field col s4 offset-s8">
                     <input id="quantity" name="quantity" type="text" class="validate">
@@ -196,7 +197,7 @@
                 $("#money").text('Please enter valid number.')
             }
             else {
-                $("#money").text('Total Amount : Rs.' + parseInt($('#quantity').val()) * tees[info - 1][3])
+                $("#money").text('Total Amount : Rs.' + parseInt($('#quantity').val()) * tees[info][3])
             }
         });
         $("#teeagree").change(function () {

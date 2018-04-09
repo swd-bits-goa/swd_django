@@ -548,13 +548,13 @@ def store(request):
 
     if request.POST:
         if request.POST.get('what') == 'item':
-            itemno = items[int(request.POST.get('info')) - 1]
+            itemno = ItemAdd.objects.get(id=int(request.POST.get('info')))
             if itemno.available == True:
                 itembuy = ItemBuy.objects.create(item = itemno, student=student)
                 messages.add_message(request, messages.INFO, itemno.title + ' item bought. Thank you for purchasing. Headover to DUES to check your purchases.', extra_tags='green')
             messages.add_message(request, messages.INFO,  'Item not available', extra_tags='red')
         if request.POST.get('what') == 'tee':
-            teeno = tees[int(request.POST.get('info')) - 1]
+            teeno = TeeAdd.objects.get(id=int(request.POST.get('info')))
             try:
                 nick = request.POST.get('nick')
                 sizes = request.POST.get('sizes')
@@ -565,9 +565,9 @@ def store(request):
                 if teeno.nick == True:
                     if nick == "":
                         message_error = "No nick provided. Please provide a nick."
-                if sizes not in teeno.sizes.split(','):
+                if teeno.sizes and sizes not in teeno.sizes.split(','):
                     message_error = "Size doesn't match the database."
-                if colors not in teeno.colors.split(','):
+                if teeno.colors and colors not in teeno.colors.split(','):
                     message_error = "Color doesn't match the database."
                 if qty is None:
                     message_error = "Provide quantity of the tees you want."
@@ -583,3 +583,17 @@ def store(request):
                 print("Failed")
             # teebuy = TeeBuy.objects.create(tee = teeno, student=student, )
     return render(request, "store.html", context)
+
+
+def dues(request):
+    student = Student.objects.get(user=request.user)
+    month = datetime.today().month
+    itemdues = ItemBuy.objects.filter(student=student, created__month=month)
+    teedues = TeeBuy.objects.filter(student=student, created__month=month)
+    context = {
+        'student' : student,
+        'itemdues' : itemdues,
+        'teedues' : teedues,
+    }
+
+    return render(request, "dues.html", context)

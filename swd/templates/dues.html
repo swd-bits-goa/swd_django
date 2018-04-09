@@ -1,0 +1,17 @@
+{% extends 'base.html' %} {% block content %}
+
+
+<div class="container">
+    <div class="section">
+        <ul class="collection">
+            {% for i in itemdues %}
+                <li class="collection-item"><div>{{ i.item.title }}<a href="#!" class="secondary-content">Rs. {{ i.item.price }}</a></div></li>
+            {% endfor %}
+            {% for i in teedues %}
+                <li class="collection-item"><div>{{ i.tee.title }}<a href="#!" class="secondary-content"> Rs. {{ i.totamt }}</a></div></li>
+            {% endfor %}
+        </ul>
+    </div>
+    <br><br>
+</div>
+{% endblock %}

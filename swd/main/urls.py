@@ -30,6 +30,7 @@ urlpatterns = [
     url(r'^daypass/', views.daypass, name="daypass"),
     url(r'^studentimg/', views.studentimg, name="studentimg"),
     url(r'^store/', views.store, name="store"),
+    url(r'^dues/', views.dues, name="dues"),
 
     url(r'^messbill/', views.messbill, name='messbill'),
 

@@ -305,13 +305,30 @@ class TeeBuy(models.Model):
     nick = models.CharField(max_length=100, blank=True, null=True)
     color = models.CharField(max_length=10, blank=True, null=True)
     size = models.CharField(max_length=10, blank=True, null=True)
+    created = models.DateTimeField(auto_now_add=True)
+    totamt = models.FloatField()
 
     def __str__(self):
         return self.student.bitsId + ' ' + self.tee.title
+
+    def save(self, *args, **kwargs):
+        self.totamt = float(self.qty) * float(self.tee.price)
+        super(TeeBuy, self).save(*args, **kwargs)
   
 class ItemBuy(models.Model):
     student = models.ForeignKey('Student', on_delete = models.CASCADE)
     item = models.ForeignKey('ItemAdd', on_delete = models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.student.bitsId + ' ' + self.item.title
+
+class Dues(models.Model):
+    student = models.ForeignKey('Student', on_delete = models.CASCADE)
+    month = models.DateField(blank=True, null=True)
+    amount = models.FloatField()
+    desc = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.student.bitsId + ' ' + self.month
+
