@@ -134,7 +134,7 @@
         if (tees[info-1][4] == "True") {
             nick = `
             <div class="input-field col s12">
-                <input id="nick" type="text" class="validate">
+                <input id="nick" name="nick" type="text" class="validate">
                 <label for="nick">Nick</label>
             </div>
             `
@@ -143,7 +143,7 @@
             colorlist = tees[info - 1][5].split(",");
             colors = `
             <div class="input-field col s6">
-                <select id="colors">
+                <select id="colors" name="colors">
             `
             for (var i = 0; i < colorlist.length; i++) {
                 colors += `<option value="` + colorlist[i] + `">` + colorlist[i] + `</option>`
@@ -154,7 +154,7 @@
             sizelist = tees[info - 1][6].split(",");
             sizes = `
             <div class="input-field col s6">
-                <select id="sizes">
+                <select id="sizes" name="sizes">
             `
             for (var i = 0; i < sizelist.length; i++) {
                 sizes += `<option value="` + sizelist[i] + `">` + sizelist[i] + `</option>`
@@ -173,7 +173,7 @@
                 <p align="right" id="price"><b> Rs.` + tees[info - 1][3] + `</b></p>
                 ` + nick + colors + sizes + `    
                 <div class="input-field col s4 offset-s8">
-                    <input id="quantity" type="text" class="validate">
+                    <input id="quantity" name="quantity" type="text" class="validate">
                     <label for="quantity">Quantity</label>
                 </div>
                 <p align="right"><b id="money"></b></p>
