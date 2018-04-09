@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .models import Student, MessOptionOpen, MessOption, Leave, Bonafide, Warden, DayPass, MessBill, HostelPS
+from .models import Student, MessOptionOpen, MessOption, Leave, Bonafide, Warden, DayPass, MessBill, HostelPS, TeeAdd, TeeBuy, ItemAdd, ItemBuy
 from django.views.decorators.csrf import csrf_protect
 from datetime import date, datetime, timedelta
 from .forms import MessForm, LeaveForm, BonafideForm, DayPassForm
@@ -16,6 +16,8 @@ from braces import views
 from django.contrib.auth.models import User
 
 from calendar import monthrange
+
+from django.contrib import messages
 
 import re
 def index(request):
@@ -530,3 +532,54 @@ def messbill(request):
         return response
 
     return render(request, "messbill.html", {})
+
+def store(request):
+    student = Student.objects.get(user=request.user)
+    tees = TeeAdd.objects.filter(available=True)
+    items = ItemAdd.objects.filter(available=True)
+    teesj = TeeAdd.objects.filter(available=True).values_list('title')
+    # tees_json = json.dumps(list(tees), cls=DjangoJSONEncoder)
+    context = {
+        'student': student,
+        'tees': tees,
+        'items': items,
+        # 'tees_json': tees_json,
+    }
+
+    if request.POST:
+        if request.POST.get('what') == 'item':
+            itemno = items[int(request.POST.get('info')) - 1]
+            if itemno.available == True:
+                itembuy = ItemBuy.objects.create(item = itemno, student=student)
+                messages.add_message(request, messages.INFO, itemno.title + ' item bought. Thank you for purchasing. Headover to DUES to check your purchases.', extra_tags='green')
+            messages.add_message(request, messages.INFO,  'Item not available', extra_tags='red')
+        if request.POST.get('what') == 'tee':
+            teeno = tees[int(request.POST.get('info')) - 1]
+            try:
+                nick = request.POST.get('nick')
+                sizes = request.POST.get('sizes')
+                colors = request.POST.get('colors')
+                qty = request.POST.get('quantity')
+                # Validation
+                message_error = ""
+                if teeno.nick == True:
+                    if nick == "":
+                        message_error = "No nick provided. Please provide a nick."
+                if sizes not in teeno.sizes.split(','):
+                    message_error = "Size doesn't match the database."
+                if colors not in teeno.colors.split(','):
+                    message_error = "Color doesn't match the database."
+                if qty is None:
+                    message_error = "Provide quantity of the tees you want."
+                print(message_error)
+                if message_error == "":
+                    teebuy = TeeBuy.objects.create(tee = teeno, student=student, nick=nick, size=sizes, color=colors, qty=qty)
+                    messages.add_message(request, messages.INFO, teeno.title + ' tee bought. Thank you for purchasing. Headover to DUES to check your purchases.', extra_tags='green')
+                else:
+                    messages.add_message(request, messages.INFO,  message_error, extra_tags='red')
+
+            except Exception as e:
+                print(e)
+                print("Failed")
+            # teebuy = TeeBuy.objects.create(tee = teeno, student=student, )
+    return render(request, "store.html", context)
