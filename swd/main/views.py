@@ -106,7 +106,6 @@ def loginform(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
         user = authenticate(request, username=username, password=password)
-        print(username, password)
         if user is not None:
             login(request, user)
             if user.is_staff:
@@ -115,6 +114,7 @@ def loginform(request):
                 return redirect('/warden')
             return redirect('dashboard')
         else:
+            messages.add_message(request, messages.INFO,  "Incorrect username or password", extra_tags='red')
             print('Not able to authenticate')
 
     return render(request, "sign-in.html", {})
