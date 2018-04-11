@@ -58,12 +58,13 @@ def dashboard(request):
     leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
     daypasss = DayPass.objects.filter(student=student, dateTime__gte=date.today() - timedelta(days=7))
     bonafides = Bonafide.objects.filter(student=student, reqDate__gte=date.today() - timedelta(days=7))
-
+    address = student.address
     context = {
         'student': student,
         'leaves': leaves,
         'bonafides': bonafides,
         'daypasss': daypasss,
+        'address': address
     }
     #mess
     messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
@@ -79,6 +80,7 @@ def dashboard(request):
             'leaves': leaves,
             'bonafides': bonafides,
             'daypasss': daypasss,
+            'address': address
             }
     elif messopen and messoption:
         context = {
@@ -88,6 +90,7 @@ def dashboard(request):
             'leaves': leaves,
             'bonafides': bonafides,
             'daypasss': daypasss,
+            'address': address
             }
     else:
         context = {
@@ -96,8 +99,15 @@ def dashboard(request):
             'leaves': leaves,
             'bonafides': bonafides,
             'daypasss': daypasss,
+            'address': address
             }
 
+    if request.POST:
+        address = request.POST.get('address')
+        #print(address)
+        student.address = address
+        student.save()
+        return HttpResponse("{ status: 'ok' }")
 
     return render(request, "dashboard.html", context)
 
