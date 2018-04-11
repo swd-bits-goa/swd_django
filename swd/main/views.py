@@ -157,6 +157,14 @@ def profile(request):
 
 @csrf_protect
 def loginform(request):
+
+    if request.user.is_authenticated:
+        if request.user.is_staff:
+                return redirect('/admin')
+        if Warden.objects.filter(user=request.user):
+            return redirect('/warden')
+        return redirect('dashboard')
+
     if request.POST:
         username = request.POST.get('username')
         password = request.POST.get('password')
