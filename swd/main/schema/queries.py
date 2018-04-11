@@ -1,76 +1,9 @@
 import graphene
 from graphene_django.types import DjangoObjectType
 from django.contrib.auth.models import User
-from .models import *
-
-class UserType(DjangoObjectType):
-    class Meta:
-        model = User
-
-class WardenType(DjangoObjectType):
-    class Meta:
-        model = Warden
-
-class StaffType(DjangoObjectType):
-    class Meta:
-        model = Staff
-
-class StudentType(DjangoObjectType):
-    class Meta:
-        model = Student
-
-class DayScholarType(DjangoObjectType):
-    class Meta:
-        model = DayScholar
-
-class HostelPSType(DjangoObjectType):
-    class Meta:
-        model = HostelPS
-
-class CSAType(DjangoObjectType):
-    class Meta:
-        model = CSA
-
-class MessOptionType(DjangoObjectType):
-    class Meta:
-        model = MessOption
-
-class BonafideType(DjangoObjectType):
-    class Meta:
-        model = Bonafide
-
-class LeaveType(DjangoObjectType):
-    class Meta:
-        model = Leave
-
-class DayPassType(DjangoObjectType):
-    class Meta:
-        model = DayPass
-
-class LateComerType(DjangoObjectType):
-    class Meta:
-        model = LateComer
-
-class InOutType(DjangoObjectType):
-    class Meta:
-        model = InOut
-
-class DiscoType(DjangoObjectType):
-    class Meta:
-        model = Disco
-
-class MessOptionOpenType(DjangoObjectType):
-    class Meta:
-        model = MessOptionOpen
-
-class TransactionType(DjangoObjectType):
-    class Meta:
-        model = Transaction
-
-class MessBillType(DjangoObjectType):
-    class Meta:
-        model = MessBill
-
+from datetime import date, datetime
+from main.models import *
+from .types import *
 
 class Query(object):
     # used to get all data to the frontend
@@ -105,6 +38,12 @@ class Query(object):
         username = graphene.String(),
         name = graphene.String(),
         bitsId = graphene.String()
+    )
+    search_student = graphene.Field(
+        graphene.List(StudentType),
+        search=graphene.String(),
+        hostel=graphene.List(graphene.String),
+        branch=graphene.List(graphene.String)
     )
 
     all_day_scholars = graphene.List(DayScholarType)
@@ -271,6 +210,72 @@ class Query(object):
 
         return None
 
+    def resolve_search_student(self, args, **kwargs):
+        #Getting all the arguments
+        searches = kwargs.get('search')
+        hostel = kwargs.get('hostel')
+        branch = kwargs.get('branch')
+        #initializing final search results array
+        searchresults = []
+        flag=0
+        if hostel:
+            hostels=[]
+            for host in hostel:
+                hostels.extend(HostelPS.objects.all().filter(hostel=host))
+            for hostel in hostels:
+                searchresults.append(hostel.student)
+            if len(searchresults)==0:
+                flag=1
+        if branch:
+            if len(searchresults):
+                students = searchresults
+                searchresults = []
+            else:
+                students = Student.objects.all()
+            for student in students:
+                for bran in branch:
+                    if student.bitsId[4:6]==bran:
+                        searchresults.append(student)
+            if len(searchresults)==0:
+                flag=1
+
+        if searches:
+            #for multi word searches splitting the string into an array of words
+            searchArr=searches.split(' ')
+            for search in searchArr:
+                #for every word in the array of words.......
+                if search:
+                    if search[0].isalpha():
+                        if len(searchresults):
+                            students = searchresults
+                            searchresults = []
+                        elif flag==0:    
+                            students = Student.objects.all().filter(name__icontains=search)
+                        else:
+                            students=[]
+                        for student in students:
+                            names = student.name.split()
+                            for name in names:
+                                if name.startswith(search.upper()):
+                                    searchresults.append(student)
+                            if(len(searchresults)>9):
+                                break
+                    elif search[0].isdigit():
+                        if len(search)>2:
+                            if len(searchresults):
+                                students = searchresults
+                                searchresults = []
+                            elif flag==0:    
+                                students = Student.objects.all().filter(bitsId__icontains=search)
+                            else:
+                                students=[]
+                            for student in students:
+                                if student.bitsId.startswith(search.upper()):
+                                    searchresults.append(student)
+                        else:
+                            searchresults = searchresults
+        return searchresults
+
     def resolve_all_day_scholars(self, args, **kwargs):
         return DayScholar.objects.all()
 
@@ -319,7 +324,7 @@ class Query(object):
             return CSA.objects.get(student=student)
 
         return None
-
+    
     def resolve_all_mess_options(self, args, **kwargs):
         return MessOption.objects.all()
 
@@ -333,7 +338,22 @@ class Query(object):
         if username is not None:
             user = User.objects.get(username=username)
             student = Student.objects.get(user=user)
-            return MessOption.objects.filter(student=student)
+            try:
+                messoption = MessOption.objects.filter(student=student).latest('monthYear')
+            except:
+                messoption = None
+            try:
+                messoptionopen = MessOptionOpen.objects.filter(dateOpen__lte=date.today()).latest('monthYear')
+            except:
+                messoptionopen = None
+
+            if messoptionopen is not None:
+                if (datetime.today().date() < messoptionopen.dateClose) and messoption.monthYear != messoptionopen.monthYear:
+                    return None
+                else:
+                    return messoption
+
+                return messoption
 
         return None
 
@@ -421,23 +441,19 @@ class Query(object):
             return Disco.objects.filter(student=student)
 
         return None
-
+    
     def resolve_all_mess_option_opens(self, args, **kwargs):
         return MessOptionOpen.objects.all()
 
     def resolve_messoptionopen(self, args, **kwargs):
-        id = kwargs.get('id')
-        username = kwargs.get('username')
+        messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
+        messopen = messopen.exclude(dateOpen__gte=date.today())
 
-        if id is not None:
-           return MessOptionOpen.objects.get(id=id)
+        if messopen:
+            return messopen[0]
+        else:
+            return None
 
-        if username is not None:
-            user = User.objects.get(username=username)
-            student = Student.objects.get(user=user)
-            return MessOptionOpen.objects.filter(student=student)
-
-        return None
 
     def resolve_all_transactions(self, args, **kwargs):
         return Transaction.objects.all()

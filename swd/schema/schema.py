@@ -1,8 +1,12 @@
 import graphene
-import main.schema
+from main.schema.queries import Query 
+from main.schema.mutations import Mutation
 from django.contrib.auth.models import User
 
-class Query(main.schema.Query, graphene.ObjectType):
+class Query(Query, graphene.ObjectType):
     pass
 
-schema = graphene.Schema(query=Query)
+class Mutation(Mutation, graphene.ObjectType):
+    pass
+
+schema = graphene.Schema(query=Query,mutation=Mutation)

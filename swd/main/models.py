@@ -2,8 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 import os
 import hashlib
-
-SALT="9120273977"
+from tools.dev_info import SALT_IMG as SALT
 
 MESS_CHOICES = (
     ('A','Dining Hall A'),
@@ -90,27 +89,20 @@ class Staff(models.Model):
 
     def __str__(self):
         return self.staffType + ' ' + self.name
-
-
-def wrapper(instance, filename):
-    #print("filename is " + filename)
-    #print(instance.bitsId)
-    ext = filename.split('.')[-1]
-    tempname = (SALT+instance.bitsId).encode('utf-8') # creating temp filename
-    filename = '{}.{}'.format(hashlib.md5(tempname).hexdigest(), ext) # creating md5 of SALT+roll number of student as filename
-    # return the whole path to the file
-    return os.path.join(path, filename)
-
+      
 class Student(models.Model):    
-    def path_and_rename(path):
-        return wrapper
+    def hash_upload(instance, filename):
+        ext = filename.split('.')[-1]
+        tempname = (SALT+instance.bitsId).encode('utf-8')
+        filename = '{}.{}'.format(hashlib.md5(tempname).hexdigest(), ext)
+        return os.path.join('studentimg/', filename)
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
     bitsId = models.CharField(max_length=15)
     gender = models.CharField(max_length=1, blank=True)
     bDay = models.DateField(blank=True, null=True)
-    profile_picture=models.FileField(upload_to=path_and_rename('studentimg/'), blank=True, null=True)
+    profile_picture=models.FileField(upload_to=hash_upload, blank=True, null=True)
     phone = models.CharField(max_length=15, blank=True, null=True)
     email = models.EmailField(blank=True, null=True)
     address = models.TextField(blank=True, null=True)
@@ -173,7 +165,7 @@ class Bonafide(models.Model):
     text = models.TextField(default='', blank=True)
 
     def createText(self):
-        gender = "Mr." if self.student.gender.lower() == 'm' else "Ms."
+        gender = "Mr. " if self.student.gender.lower() == 'm' else "Ms. "
         pronoun = "He " if gender=="Mr." else "She "
         firstDeg=self.student.bitsId[4:6]
         secondDeg=self.student.bitsId[6:8]
@@ -187,7 +179,7 @@ class Bonafide(models.Model):
 
         reason = self.otherReason if self.reason.lower()=='other' else self.reason
 
-        return '''This is to certify that ''' + gender +self.student.name.title() + ''', ID No.''' + self.student.bitsId + ''' is a bonafide student of '''+ yearName + ''' year at Birla Institute of Technology and Science (BITS) Pilani University, K.K Birla Goa campus, pursuing ''' + branch + '''. This certificate is issued for the purpose of applying for ''' + reason + '''.'''
+        return '''This is to certify that <i>''' + gender + self.student.name.title() + '''</i>, ID No. <i>''' + self.student.bitsId + '''</i> is a bonafide student of '''+ yearName + ''' year at Birla Institute of Technology and Science (BITS) Pilani University, K.K Birla Goa campus, pursuing ''' + branch + '''. This certificate is issued for the purpose of applying for ''' + reason + '''.'''
 
     def save(self, *args, **kwargs):
         if self.text == '':

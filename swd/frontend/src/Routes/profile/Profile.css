@@ -1,0 +1,36 @@
+.container {
+    /* To ensure sidebar transition does not cause a restyling of internal components */
+    padding: 3%;
+    /* Fullscreen is occupied at this width */
+    width: 94vw;
+    height: 100vh;
+    background-repeat: no-repeat;
+    background-size: 100vw;
+    background-blend-mode: color-dodge;
+    overflow-x: hidden;
+}
+.profileImg{
+    display: flex;
+    justify-content: center;
+}
+.paperElement{
+    display: flex;
+}
+.infoPaper{
+    display: flex;
+    flex-direction: column;
+}
+.infoPaper p{
+    line-height: 0;
+    margin-left: 5vw;
+}
+.column1{
+
+    width: 30%;
+}
+.column2{
+    margin-left: 10vw;
+}
+.paperDiv{
+    margin-bottom: 2vh;
+}

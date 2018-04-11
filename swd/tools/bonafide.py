@@ -10,7 +10,7 @@ def index(request):
         try:
             user = User.objects.get(username=username)
             student = Student.objects.get(user=user)
-            rev_date= datetime.datetime.strptime(date, '%B %d, %Y').strftime('%Y-%m-%d')
+            rev_date= datetime.datetime.strptime(date, '%B %d, %Y').date()
             bonafide = Bonafide.objects.create(student=student, reason=reason, otherReason=other, reqDate=rev_date, printed=True if printed=='YES' else False)
             print('3')
             bonafide.save()
