@@ -81,6 +81,15 @@ class Warden(models.Model):
     def __str__(self):
         return self.hostel + ' ' + self.name + ' ' + self.email + ' ' + self.chamber
 
+class Hostel_Super_Intendent(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=50, null=True, blank=True)
+    email = models.EmailField(null=True, blank=True)
+    hostel = models.CharField(max_length=5, choices=HOSTELS, null=True, blank=True)
+
+    def __str__(self):
+        return self.hostel + ' ' + self.name + ' ' + self.email
+
 class Staff(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
@@ -209,8 +218,9 @@ class DayPass(models.Model):
     student = models.ForeignKey('Student', on_delete = models.CASCADE)
     reason = models.TextField()
     dateTime = models.DateTimeField(null=True)
-    consent = models.CharField(max_length=10, choices=CONSENT_CHOICES)
-    approvedBy = models.ForeignKey('Warden', blank=True, null=True, on_delete="PROTECT")
+    # consent = models.CharField(max_length=10, choices=CONSENT_CHOICES)
+    corrAddress = models.TextField()
+    approvedBy = models.ForeignKey('Hostel_Super_Intendent', blank=True, null=True, on_delete="PROTECT")
     approved = models.BooleanField(default=0, blank=True)
     disapproved = models.BooleanField(default=0, blank=True)
     inprocess = models.BooleanField(default=1, blank=True)

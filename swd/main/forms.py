@@ -75,7 +75,10 @@ class DayPassForm(forms.ModelForm):
                     'approved', 'comment', 'disapproved', 'inprocess', 'dateTime']
         widgets = {
             'reason': forms.Textarea(attrs={'class': 'materialize-textarea'}),
+            'corrAddress': forms.Textarea(attrs={'class': 'materialize-textarea validate'}),
         }
         labels = {
-            'consent': _('Parent Consent Type'),
+            'corrAddress': _(" Location you're visiting "),
+            
         }
+        
