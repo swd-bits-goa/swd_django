@@ -115,6 +115,7 @@ class Student(models.Model):
     parentEmail = models.CharField(max_length=50, blank=True, null=True)
 
     def nophd(self):
+        print("called")
         return re.match(r"^20\d{2}PHX[PF]\d{3,4}G$", self.bitsId, flags=re.IGNORECASE)
 
     def __str__(self):

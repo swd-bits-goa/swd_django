@@ -48,6 +48,11 @@ def studentimg(request):
             return HttpResponse(f.read(), content_type="image/jpg")
 
 @login_required
+def documents(request):
+    student = Student.objects.get(user=request.user)
+    return render(request, "documents.html", {'student': student})
+
+@login_required
 def dashboard(request):
     student = Student.objects.get(user=request.user)
     leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
