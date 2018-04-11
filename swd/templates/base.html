@@ -41,8 +41,8 @@
             <ul class="tabs tabs-transparent">
                 {% load main_extras %}
                 <li class="tab"><a href="/dashboard" class="{% active_page request 'dashboard' %}" target="_self">Dashboard</a></li>
-                <li class="tab"><a href="/messoption" class="{% active_page request 'messoption' %}" target="_self">Mess Option</a></li>
-                <li class="tab"><a href="/leave"  class="{% active_page request 'leave' %}" target="_self">Leave</a></li>
+                {% if not student.nophd %}<li class="tab"><a href="/messoption" class="{% active_page request 'messoption' %}" target="_self">Mess Option</a></li>{% endif %}
+                {% if not student.nophd %}<li class="tab"><a href="/leave"  class="{% active_page request 'leave' %}" target="_self">Leave</a></li>{% endif %}
                 <li class="tab"><a href="/certificates" class="{% active_page request 'certificates' %}" target="_self">Certificates</a></li>
                 <li class="tab"><a href="/daypass" class="{% active_page request 'daypass' %}" target="_self">Daypass</a></li>
                 <li class="tab"><a href="/store" class="{% active_page request 'store' %}" target="_self">Store</a></li>
@@ -82,8 +82,8 @@
         </li>
          {% load main_extras %}
         <li class="{% active_page request 'dashboard' %}"><a href="/dashboard"><i class="material-icons">dashboard</i>Dashboard</a></li>
-        <li class="{% active_page request 'messoption' %}"><a href="/messoption"><i class="material-icons">local_dining</i>Mess Option</a></li>
-        <li class="{% active_page request 'leave' %}"><a href="/leave"><i class="material-icons">flight_takeoff</i>Leave</a></li>
+        {% if not student.nophd %}<li class="{% active_page request 'messoption' %}"><a href="/messoption"><i class="material-icons">local_dining</i>Mess Option</a></li>{% endif %}
+        {% if not student.nophd %}<li class="{% active_page request 'leave' %}"><a href="/leave"><i class="material-icons">flight_takeoff</i>Leave</a></li>{% endif %}
         <li class="{% active_page request 'certificates' %}"><a href="/certificates"><i class="material-icons">assignment</i>Certificates</a></li>
         <li>
             <div class="divider"></div>

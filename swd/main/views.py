@@ -19,7 +19,14 @@ from calendar import monthrange
 
 from django.contrib import messages
 
-import re
+def noPhD(func):
+    def check(request, *args, **kwargs):
+        student = Student.objects.get(user=request.user)
+        if student.nophd():
+            return redirect("/dashboard/")
+        return func(request, *args, **kwargs)
+    return check
+
 def index(request):
     return render(request, 'home1.html',{})
 
@@ -135,6 +142,7 @@ def logoutform(request):
 
 
 @login_required
+@noPhD
 def messoption(request):
     messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
     messopen = messopen.exclude(dateOpen__gte=date.today())
@@ -169,6 +177,7 @@ def messoption(request):
 
 
 @login_required
+@noPhD
 def leave(request):
     student = Student.objects.get(user=request.user)
     form = LeaveForm()
