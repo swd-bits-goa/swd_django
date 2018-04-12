@@ -19,7 +19,14 @@ from calendar import monthrange
 
 from django.contrib import messages
 
-import re
+def noPhD(func):
+    def check(request, *args, **kwargs):
+        student = Student.objects.get(user=request.user)
+        if student.nophd():
+            return redirect("/dashboard/")
+        return func(request, *args, **kwargs)
+    return check
+
 def index(request):
     return render(request, 'home1.html',{})
 
@@ -41,17 +48,23 @@ def studentimg(request):
             return HttpResponse(f.read(), content_type="image/jpg")
 
 @login_required
+def documents(request):
+    student = Student.objects.get(user=request.user)
+    return render(request, "documents.html", {'student': student})
+
+@login_required
 def dashboard(request):
     student = Student.objects.get(user=request.user)
     leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
     daypasss = DayPass.objects.filter(student=student, dateTime__gte=date.today() - timedelta(days=7))
     bonafides = Bonafide.objects.filter(student=student, reqDate__gte=date.today() - timedelta(days=7))
-
+    address = student.address
     context = {
         'student': student,
         'leaves': leaves,
         'bonafides': bonafides,
         'daypasss': daypasss,
+        'address': address
     }
     #mess
     messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
@@ -67,6 +80,7 @@ def dashboard(request):
             'leaves': leaves,
             'bonafides': bonafides,
             'daypasss': daypasss,
+            'address': address
             }
     elif messopen and messoption:
         context = {
@@ -76,6 +90,7 @@ def dashboard(request):
             'leaves': leaves,
             'bonafides': bonafides,
             'daypasss': daypasss,
+            'address': address
             }
     else:
         context = {
@@ -84,8 +99,15 @@ def dashboard(request):
             'leaves': leaves,
             'bonafides': bonafides,
             'daypasss': daypasss,
+            'address': address
             }
 
+    if request.POST:
+        address = request.POST.get('address')
+        #print(address)
+        student.address = address
+        student.save()
+        return HttpResponse("{ status: 'ok' }")
 
     return render(request, "dashboard.html", context)
 
@@ -135,6 +157,7 @@ def logoutform(request):
 
 
 @login_required
+@noPhD
 def messoption(request):
     messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
     messopen = messopen.exclude(dateOpen__gte=date.today())
@@ -169,6 +192,7 @@ def messoption(request):
 
 
 @login_required
+@noPhD
 def leave(request):
     student = Student.objects.get(user=request.user)
     form = LeaveForm()
