@@ -22,6 +22,8 @@ from django.contrib import messages
 from django.db.models import Q
 from .models import BRANCH, HOSTELS
 
+import swd.config as config
+
 import re
 def index(request):
     return render(request, 'home1.html',{})
@@ -201,8 +203,10 @@ def leave(request):
             leaveform.student = student
             print(request.POST.get('consent'))
             leaveform.save()
-            #email_to=[Warden.objects.get(hostel=HostelPS.objects.get(student=student).hostel).email]             # For production
-            #email_to=["youremail@site.com"]                                                                      # For testing 
+            if config.EMAIL_PROD:
+                email_to=[Warden.objects.get(hostel=HostelPS.objects.get(student=student).hostel).email]
+            else:
+                email_to=["swdbitstest@gmail.com"]                                                                     # For testing 
             mailObj=Leave.objects.latest('id')
             mail_subject="New Leave ID: "+ str(mailObj.id)
             mail_message="Leave Application applied by "+ mailObj.student.name +" with leave id: " + str(mailObj.id) + ".\n"
@@ -314,8 +318,10 @@ def wardenleaveapprove(request, leave):
         print(approved)
         comment = request.POST.get('comment')
         mail_message={}
-        #email_to = [leave.student.email]                         # For production
-        #email_to = ["youremail@site.com"]                        # For testing
+        if config.EMAIL_PROD:
+            email_to = [leave.student.email]
+        else:
+            email_to = ["swdbitstest@gmail.com"]
         mail_subject="Leave Status - "
         mail_message=leave.student.name+",\n"
 
