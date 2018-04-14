@@ -23,11 +23,11 @@
             <a href="#" class="brand-logo">&nbsp;Student Welfare Division</a>
             <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
             <ul id="nav-mobile" class="right hide-on-med-and-down">
-                <li class=""><a href="/profile" class="valign-wrapper"><img class="circle profileImg" src="/studentimg/">&nbsp;{{ student.name|title }}</a></li>
+                <li class=""><a href="/profile" class="valign-wrapper"><img class="circle profileImg" src="/media/{{ student.profile_picture }}">&nbsp;{{ student.name|title }}</a></li>
                 <li><a href="/logout">Logout</a></li>
             </ul>
             <ul class="side-nav" id="mobile-demo">
-                <li><a href="/profile" class="valign-wrapper"><img class="circle profileImg" src="/studentimg/">&nbsp;{{ student.name|title }}</a></li>
+                <li><a href="/profile" class="valign-wrapper"><img class="circle profileImg" src="/media/{{ student.profile_picture }}">&nbsp;{{ student.name|title }}</a></li>
                 <li><a href="/logout">Logout</a></li>
             </ul>
             <style>
@@ -75,7 +75,7 @@
                 <div class="background">
                     <img src="{% static 'img/office.jpg' %}">
                 </div>
-                <a href="#!user"><img class="circle" src="/studentimg/"></a>
+                <a href="#!user"><img class="circle" src="/media/{{ student.profile_picture }}"></a>
                 <a href="#!name"><span class="white-text name">{{ student.name|title }}</span></a>
                 <a href="#!email"><span class="white-text email">{{ student.bitsId }}</span></a>
             </div>

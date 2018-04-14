@@ -94,8 +94,7 @@ class Student(models.Model):
     def hash_upload(instance, filename):
         ext = filename.split('.')[-1]
         tempname = (SALT+instance.bitsId).encode('utf-8')
-        filename = '{}.{}'.format(hashlib.md5(tempname).hexdigest(), ext)
-        return os.path.join('studentimg/', filename)
+        return '{}.{}'.format(hashlib.md5(tempname).hexdigest(), ext)
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)

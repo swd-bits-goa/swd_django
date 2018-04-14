@@ -32,18 +32,18 @@ def index(request):
 def login_success(request):
     return HttpResponse("Success!")
 
-@login_required
-def studentimg(request):
-    url = Student.objects.get(user=request.user).profile_picture
-    print(url)
-    ext = url.name.split('.')[-1]
+# @login_required
+# def studentimg(request):
+#     url = Student.objects.get(user=request.user).profile_picture
+#     print(url)
+#     ext = url.name.split('.')[-1]
     
-    try:
-        with open(url.name, "rb") as f:
-            return HttpResponse(f.read(), content_type="image/"+ext)
-    except IOError:
-        with open("assets/img/profile-swd.jpg", "rb") as f:
-            return HttpResponse(f.read(), content_type="image/jpg")
+#     try:
+#         with open(url.name, "rb") as f:
+#             return HttpResponse(f.read(), content_type="image/"+ext)
+#     except IOError:
+#         with open("assets/img/profile-swd.jpg", "rb") as f:
+#             return HttpResponse(f.read(), content_type="image/jpg")
 
 @login_required
 def dashboard(request):
@@ -289,8 +289,8 @@ def is_warden(user):
 @user_passes_test(is_warden)
 def warden(request):
     warden = Warden.objects.get(user=request.user)
-    leaves = Leave.objects.filter(student__hostelps__hostel__icontains=warden.hostel).order_by('approved', '-id')
-    daypasss = DayPass.objects.filter(student__hostelps__hostel__icontains=warden.hostel).order_by('approved', '-id')
+    leaves = Leave.objects.filter(student__hostelps__hostel__icontains=warden.hostel).order_by('-inprocess', '-id')[:50]
+    daypasss = DayPass.objects.filter(student__hostelps__hostel__icontains=warden.hostel).order_by('-inprocess', '-id')[:50]
     context = {
         'option':1,
         'warden': warden,
@@ -304,13 +304,16 @@ def warden(request):
 def wardenleaveapprove(request, leave):
     leave = Leave.objects.get(id=leave)
     warden = Warden.objects.get(user=request.user)
-    daypasss = DayPass.objects.filter(student__hostelps__hostel=warden.hostel).order_by('approved', '-id')
+    daypasss = DayPass.objects.filter(student__hostelps__hostel=warden.hostel).order_by('approved', '-id')[:50]
+    leaves = Leave.objects.filter(student=leave.student)
 
     context = {
         'option': 2,
         'warden': warden,
         'leave': leave,
         'daypasss' : daypasss,
+        'leaves': leaves,
+        'student': leave.student
     }
 
     if request.POST:
