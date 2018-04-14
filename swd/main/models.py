@@ -125,7 +125,7 @@ class DayScholar(models.Model):
         return self.student.bitsId + ' (' + self.student.name + ')'
 
 class HostelPS(models.Model):
-    student = models.OneToOneField('Student', on_delete = models.CASCADE)
+    student = models.OneToOneField('Student', on_delete = models.CASCADE, related_name='hostelps')
     acadstudent = models.BooleanField()
     status = models.CharField(max_length=10, choices=STUDENT_STATUS)
     psStation = models.CharField(max_length=20, null=True, blank=True)

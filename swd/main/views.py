@@ -19,6 +19,9 @@ from calendar import monthrange
 
 from django.contrib import messages
 
+from django.db.models import Q
+from .models import BRANCH, HOSTELS
+
 import re
 def index(request):
     return render(request, 'home1.html',{})
@@ -605,3 +608,38 @@ def dues(request):
     }
 
     return render(request, "dues.html", context)
+
+
+def search(request):
+    context = {
+        'hostels' : [i[0] for i in HOSTELS],
+        'branches' : BRANCH,
+    }
+    postContext = {}
+    if request.GET:
+        name = request.GET.get('name')
+        bitsId = request.GET.get('bitsId')
+        branch = request.GET.get('branch')
+        hostel = request.GET.get('hostel')
+        room = request.GET.get('room')
+
+        students = Student.objects.filter(Q(name__contains=name) & Q(bitsId__contains=bitsId) & Q(bitsId__contains=branch) & Q(hostelps__hostel__contains=hostel) & Q(hostelps__room__contains=room))[:50]
+
+        searchstr = {}
+
+        if name is not "":
+            searchstr['Name'] = name
+        if bitsId is not "":
+            searchstr['BITS ID'] = bitsId
+        if branch is not "":
+            searchstr['Branch'] = branch
+        if hostel is not "":
+            searchstr['Hostel'] = hostel
+        if room is not "":
+            searchstr['Room'] = room
+            
+        postContext = {
+            'students' : students,
+            'searchstr' : searchstr
+        }
+    return render(request, "search.html", dict(context, **postContext))

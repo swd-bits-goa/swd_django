@@ -31,6 +31,7 @@ urlpatterns = [
     url(r'^studentimg/', views.studentimg, name="studentimg"),
     url(r'^store/', views.store, name="store"),
     url(r'^dues/', views.dues, name="dues"),
+    url(r'^search/', views.search, name="search"),
 
     url(r'^messbill/', views.messbill, name='messbill'),
 
