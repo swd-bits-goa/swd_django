@@ -328,7 +328,7 @@ def wardenleaveapprove(request, leave):
 
         leave.comment = comment
         if(leave.comment != ''):
-        mail_message=mail_message+"\nComments: " + leave.comment
+            mail_message=mail_message+"\nComments: " + leave.comment
         send_mail(mail_subject,mail_message,settings.EMAIL_HOST_USER,email_to,fail_silently=False)
         leave.save()
         return redirect('warden')
