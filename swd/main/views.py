@@ -4,7 +4,7 @@ from django.urls import reverse
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .models import Student, MessOptionOpen, MessOption, Leave, Bonafide, Warden, DayPass, MessBill, HostelPS
+from .models import Student, MessOptionOpen, MessOption, Leave, Bonafide, Warden, DayPass, MessBill, HostelPS, TeeAdd, TeeBuy, ItemAdd, ItemBuy
 from django.views.decorators.csrf import csrf_protect
 from datetime import date, datetime, timedelta
 from .forms import MessForm, LeaveForm, BonafideForm, DayPassForm
@@ -19,6 +19,13 @@ from django.contrib.auth.models import User
 
 from calendar import monthrange
 
+from django.contrib import messages
+
+from django.db.models import Q
+from .models import BRANCH, HOSTELS
+
+import swd.config as config
+
 import re
 def index(request):
     return render(request, 'home1.html',{})
@@ -27,18 +34,18 @@ def index(request):
 def login_success(request):
     return HttpResponse("Success!")
 
-@login_required
-def studentimg(request):
-    url = Student.objects.get(user=request.user).profile_picture
-    print(url)
-    ext = url.name.split('.')[-1]
+# @login_required
+# def studentimg(request):
+#     url = Student.objects.get(user=request.user).profile_picture
+#     print(url)
+#     ext = url.name.split('.')[-1]
     
-    try:
-        with open(url.name, "rb") as f:
-            return HttpResponse(f.read(), content_type="image/"+ext)
-    except IOError:
-        with open("assets/img/profile-swd.jpg", "rb") as f:
-            return HttpResponse(f.read(), content_type="image/jpg")
+#     try:
+#         with open(url.name, "rb") as f:
+#             return HttpResponse(f.read(), content_type="image/"+ext)
+#     except IOError:
+#         with open("assets/img/profile-swd.jpg", "rb") as f:
+#             return HttpResponse(f.read(), content_type="image/jpg")
 
 @login_required
 def dashboard(request):
@@ -102,11 +109,18 @@ def profile(request):
 
 @csrf_protect
 def loginform(request):
+
+    if request.user.is_authenticated:
+        if request.user.is_staff:
+                return redirect('/admin')
+        if Warden.objects.filter(user=request.user):
+            return redirect('/warden')
+        return redirect('dashboard')
+
     if request.POST:
         username = request.POST.get('username')
         password = request.POST.get('password')
         user = authenticate(request, username=username, password=password)
-        print(username, password)
         if user is not None:
             login(request, user)
             if user.is_staff:
@@ -115,6 +129,7 @@ def loginform(request):
                 return redirect('/warden')
             return redirect('dashboard')
         else:
+            messages.add_message(request, messages.INFO,  "Incorrect username or password", extra_tags='red')
             print('Not able to authenticate')
 
     return render(request, "sign-in.html", {})
@@ -191,9 +206,11 @@ def leave(request):
             print(request.POST.get('consent'))
             leaveform.save()
             
-            #email_to=[Warden.objects.get(hostel=HostelPS.objects.get(student=student).hostel).email]             # For production
-            #email_to=["youremail@site.com"]                                                                      # For testing 
-            
+            if config.EMAIL_PROD:
+                email_to=[Warden.objects.get(hostel=HostelPS.objects.get(student=student).hostel).email]
+            else:
+                email_to=["swdbitstest@gmail.com"]                                                                     # For testing 
+                
             mailObj=Leave.objects.latest('id')
             mail_subject="New Leave ID: "+ str(mailObj.id)
             mail_message="Leave Application applied by "+ mailObj.student.name +" with leave id: " + str(mailObj.id) + ".\n"
@@ -272,8 +289,8 @@ def is_warden(user):
 @user_passes_test(is_warden)
 def warden(request):
     warden = Warden.objects.get(user=request.user)
-    leaves = Leave.objects.filter(student__hostelps__hostel__icontains=warden.hostel).order_by('approved', '-id')
-    daypasss = DayPass.objects.filter(student__hostelps__hostel__icontains=warden.hostel).order_by('approved', '-id')
+    leaves = Leave.objects.filter(student__hostelps__hostel__icontains=warden.hostel).order_by('-inprocess', '-id')[:50]
+    daypasss = DayPass.objects.filter(student__hostelps__hostel__icontains=warden.hostel).order_by('-inprocess', '-id')[:50]
     context = {
         'option':1,
         'warden': warden,
@@ -287,13 +304,16 @@ def warden(request):
 def wardenleaveapprove(request, leave):
     leave = Leave.objects.get(id=leave)
     warden = Warden.objects.get(user=request.user)
-    daypasss = DayPass.objects.filter(student__hostelps__hostel=warden.hostel).order_by('approved', '-id')
+    daypasss = DayPass.objects.filter(student__hostelps__hostel=warden.hostel).order_by('approved', '-id')[:50]
+    leaves = Leave.objects.filter(student=leave.student)
 
     context = {
         'option': 2,
         'warden': warden,
         'leave': leave,
         'daypasss' : daypasss,
+        'leaves': leaves,
+        'student': leave.student
     }
 
     if request.POST:
@@ -301,8 +321,10 @@ def wardenleaveapprove(request, leave):
         print(approved)
         comment = request.POST.get('comment')
         mail_message={}
-        #email_to = [leave.student.email]                         # For production
-        #email_to = ["youremail@site.com"]                        # For testing
+        if config.EMAIL_PROD:
+            email_to = [leave.student.email]
+        else:
+            email_to = ["swdbitstest@gmail.com"]
         mail_subject="Leave Status - "
         mail_message=leave.student.name+",\n"
 
@@ -528,3 +550,103 @@ def messbill(request):
         return response
 
     return render(request, "messbill.html", {})
+
+def store(request):
+    student = Student.objects.get(user=request.user)
+    tees = TeeAdd.objects.filter(available=True)
+    items = ItemAdd.objects.filter(available=True)
+    teesj = TeeAdd.objects.filter(available=True).values_list('title')
+    # tees_json = json.dumps(list(tees), cls=DjangoJSONEncoder)
+    context = {
+        'student': student,
+        'tees': tees,
+        'items': items,
+        # 'tees_json': tees_json,
+    }
+
+    if request.POST:
+        if request.POST.get('what') == 'item':
+            itemno = ItemAdd.objects.get(id=int(request.POST.get('info')))
+            if itemno.available == True:
+                itembuy = ItemBuy.objects.create(item = itemno, student=student)
+                messages.add_message(request, messages.INFO, itemno.title + ' item bought. Thank you for purchasing. Headover to DUES to check your purchases.', extra_tags='green')
+            messages.add_message(request, messages.INFO,  'Item not available', extra_tags='red')
+        if request.POST.get('what') == 'tee':
+            teeno = TeeAdd.objects.get(id=int(request.POST.get('info')))
+            try:
+                nick = request.POST.get('nick')
+                sizes = request.POST.get('sizes')
+                colors = request.POST.get('colors')
+                qty = request.POST.get('quantity')
+                # Validation
+                message_error = ""
+                if teeno.nick == True:
+                    if nick == "":
+                        message_error = "No nick provided. Please provide a nick."
+                if teeno.sizes and sizes not in teeno.sizes.split(','):
+                    message_error = "Size doesn't match the database."
+                if teeno.colors and colors not in teeno.colors.split(','):
+                    message_error = "Color doesn't match the database."
+                if qty is None:
+                    message_error = "Provide quantity of the tees you want."
+                print(message_error)
+                if message_error == "":
+                    teebuy = TeeBuy.objects.create(tee = teeno, student=student, nick=nick, size=sizes, color=colors, qty=qty)
+                    messages.add_message(request, messages.INFO, teeno.title + ' tee bought. Thank you for purchasing. Headover to DUES to check your purchases.', extra_tags='green')
+                else:
+                    messages.add_message(request, messages.INFO,  message_error, extra_tags='red')
+
+            except Exception as e:
+                print(e)
+                print("Failed")
+            # teebuy = TeeBuy.objects.create(tee = teeno, student=student, )
+    return render(request, "store.html", context)
+
+
+def dues(request):
+    student = Student.objects.get(user=request.user)
+    month = datetime.today().month
+    itemdues = ItemBuy.objects.filter(student=student, created__month=month)
+    teedues = TeeBuy.objects.filter(student=student, created__month=month)
+    context = {
+        'student' : student,
+        'itemdues' : itemdues,
+        'teedues' : teedues,
+    }
+
+    return render(request, "dues.html", context)
+
+
+def search(request):
+    context = {
+        'hostels' : [i[0] for i in HOSTELS],
+        'branches' : BRANCH,
+    }
+    postContext = {}
+    if request.GET:
+        name = request.GET.get('name')
+        bitsId = request.GET.get('bitsId')
+        branch = request.GET.get('branch')
+        hostel = request.GET.get('hostel')
+        room = request.GET.get('room')
+
+        students = Student.objects.filter(Q(name__contains=name) & Q(bitsId__contains=bitsId) & Q(bitsId__contains=branch) & Q(hostelps__hostel__contains=hostel) & Q(hostelps__room__contains=room))[:50]
+
+        searchstr = {}
+
+        if name is not "":
+            searchstr['Name'] = name
+        if bitsId is not "":
+            searchstr['BITS ID'] = bitsId
+        if branch is not "":
+            searchstr['Branch'] = branch
+        if hostel is not "":
+            searchstr['Hostel'] = hostel
+        if room is not "":
+            searchstr['Room'] = room
+            
+        postContext = {
+            'students' : students,
+            'searchstr' : searchstr
+        }
+    return render(request, "search.html", dict(context, **postContext))

@@ -94,8 +94,7 @@ class Student(models.Model):
     def hash_upload(instance, filename):
         ext = filename.split('.')[-1]
         tempname = (SALT+instance.bitsId).encode('utf-8')
-        filename = '{}.{}'.format(hashlib.md5(tempname).hexdigest(), ext)
-        return os.path.join('studentimg/', filename)
+        return '{}.{}'.format(hashlib.md5(tempname).hexdigest(), ext)
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
@@ -125,7 +124,7 @@ class DayScholar(models.Model):
         return self.student.bitsId + ' (' + self.student.name + ')'
 
 class HostelPS(models.Model):
-    student = models.OneToOneField('Student', on_delete = models.CASCADE)
+    student = models.OneToOneField('Student', on_delete = models.CASCADE, related_name='hostelps')
     acadstudent = models.BooleanField()
     status = models.CharField(max_length=10, choices=STUDENT_STATUS)
     psStation = models.CharField(max_length=20, null=True, blank=True)
@@ -272,3 +271,63 @@ class MessBill(models.Model):
 
     def __str__(self):
         return str(self.month) + ' ' + str(self.amount) + ' ' + str(self.rebate)
+
+# All store options are filled here
+
+class TeeAdd(models.Model):
+    title = models.CharField(max_length=30)
+    desc = models.TextField()
+    pic = models.ImageField(blank=True, null=True)
+    price = models.FloatField()
+    nick = models.BooleanField(blank=True)
+    colors = models.CharField(max_length=100, blank=True, null=True)
+    sizes = models.CharField(max_length=100, blank=True, null=True)
+    available = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.title + ' - Rs.' + str(self.price)
+
+class ItemAdd(models.Model):
+    title = models.CharField(max_length=30)
+    desc = models.TextField()
+    pic = models.ImageField(blank=True, null=True)
+    price = models.FloatField()
+    available = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.title + ' - Rs.' + str(self.price)
+
+class TeeBuy(models.Model):
+    student = models.ForeignKey('Student', on_delete = models.CASCADE)
+    tee = models.ForeignKey('TeeAdd', on_delete = models.CASCADE)
+    qty = models.IntegerField()
+    nick = models.CharField(max_length=100, blank=True, null=True)
+    color = models.CharField(max_length=10, blank=True, null=True)
+    size = models.CharField(max_length=10, blank=True, null=True)
+    created = models.DateTimeField(auto_now_add=True)
+    totamt = models.FloatField()
+
+    def __str__(self):
+        return self.student.bitsId + ' ' + self.tee.title
+
+    def save(self, *args, **kwargs):
+        self.totamt = float(self.qty) * float(self.tee.price)
+        super(TeeBuy, self).save(*args, **kwargs)
+  
+class ItemBuy(models.Model):
+    student = models.ForeignKey('Student', on_delete = models.CASCADE)
+    item = models.ForeignKey('ItemAdd', on_delete = models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.student.bitsId + ' ' + self.item.title
+
+class Dues(models.Model):
+    student = models.ForeignKey('Student', on_delete = models.CASCADE)
+    month = models.DateField(blank=True, null=True)
+    amount = models.FloatField()
+    desc = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.student.bitsId + ' ' + self.month
+

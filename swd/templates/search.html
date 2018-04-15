@@ -1,0 +1,161 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0" />
+  <title>SWD BITS Goa</title>
+
+  <!-- CSS  -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="{% static 'css/materialize.css' %}" type="text/css" rel="stylesheet" media="screen,projection" />
+  <link href="{% static 'css/style.css' %}" type="text/css" rel="stylesheet" media="screen,projection" />
+</head>
+
+<body>
+  <nav class="light-blue lighten-1" role="navigation">
+    <div class="nav-wrapper container"><a id="logo-container" href="#" class="brand-logo">Student Welfare Division</a>
+      <ul class="right hide-on-med-and-down">
+        <li><a href="/search">Search</a></li>
+        <li><a href="/login">Login</a></li>
+      </ul>
+
+      <ul id="nav-mobile" class="side-nav">
+        <li><a href="/search">Search</a></li>
+        <li><a href="/login">Login</a></li>
+      </ul>
+      <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
+    </div>
+  </nav>
+  
+
+
+  <div class="container">
+    <div class="section">
+
+      <!--   Icon Section   -->
+  <div class="row">
+    <div class="col s12 m12">
+        <div class="card">
+            <div class="card-content">
+                <div class="icon-block">
+                    <h2 class="center light-blue-text"><i class="material-icons">search</i></h2>
+                </div>
+                <h5 class="center">Search Students</h5>
+                <form method="GET">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="input-field col s6 offset-s3">
+                            <input name="name" id="name" type="text" class="validate">
+                            <label for="name">Name</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="input-field col s3 offset-s3">
+                            <input name="bitsId" id="bitsId" type="text" class="validate">
+                            <label for="bitsId">BITS ID</label>
+                        </div>
+                        <div class="input-field col s3">
+                            <select name="branch" id="branch">
+                                <option value="" selected>Not Selected</option>
+                                {% for key, value in branches.items %}
+                                <option value="{{ key }}">{{ value }}</option>
+                                {% endfor %}
+                            </select>
+                            <label>Branch</label>
+                        </div>
+                        <!-- <div class="input-field col s3">
+                            <input name="branch" id="branch" type="text" class="validate">
+                            <label for="branch">Branch</label>
+                        </div> -->
+                    </div>
+                    
+                    <div class="row">
+                        <div class="input-field col s3 offset-s3">
+                            <select name="hostel" id="hostel">
+                                <option value="" selected>Not Selected</option>
+                                {% for i in hostels %}
+                                    <option value="{{ i }}">{{ i }}</option>
+                                {% endfor %}
+                            </select>
+                            <label>Hostel</label>
+                        </div>
+                        <div class="input-field col s3">
+                            <input name="room" id="room" type="text" class="validate">
+                            <label for="room">Room</label>
+                        </div>
+                    </div>
+                    <div class="center">
+                        <input type="submit" value="Search" class="waves-effect waves-light btn" />
+                    </div>
+                </form>
+                <div class="row">
+
+                </div>
+                {% if searchstr %}
+                <div class="row">
+                    <div class="col s8 offset-s2" style="border: 1px solid #aaa; padding:8px;">
+                        {% for key, value in searchstr.items %}
+                            <div class="col s3">
+                                <b>{{ key }} : </b> {{ value }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                {% if students %}
+                <div class="row">
+                    <div class="col s8 offset-s2">
+                        <table class="centered striped">
+                            <thead>
+                                <tr>
+                                    <th>Student ID</th>
+                                    <th>Name</th>
+                                    <th>Hostel</th>
+                                    <th>Room</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {% for i in students %}
+                                <tr>
+                                    <td>{{ i.bitsId }}</td>
+                                    <td>{{ i.name }}</td>
+                                    <td>{{ i.hostelps.hostel }}</td>
+                                    <td>{{ i.hostelps.room }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        </div>
+                </div>
+                {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    </div>
+    <br><br>
+  </div>
+
+  <style>
+
+  </style>
+
+  <!--  Scripts-->
+  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="{% static 'js/materialize.js' %}"></script>
+  <script src="{% static 'js/init.js' %}"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('select').material_select();
+        });
+    </script>
+
+</body>
+
+</html>
