@@ -32,7 +32,7 @@ class UserCertificates extends React.Component{
                         <h2 style={styles.header}>Bonafide Applications</h2>
                         {bonafide.map((bon) => {
                             return (
-                                <div style={{display: 'flex', marginLeft: 20}}>
+                                <div key={bonafide.indexOf(bon)+1} style={{display: 'flex', marginLeft: 20}}>
                                     <div style={{flexGrow: 1}}><h4 style={styles.tableEntry}>{bonafide.indexOf(bon)+1}</h4></div>
                                     <div style={{flexGrow: 3}}><h4 style={styles.tableEntry}>{bon.reason=="OTHER"?bon.otherReason:bon.reason.replace('_',' ')}</h4></div>
                                     <div style={{flexGrow: 3}}><h4 style={styles.tableEntry}>{bon.printed? "Printed": "Not Printed"}</h4></div>

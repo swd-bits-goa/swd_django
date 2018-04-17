@@ -108,7 +108,7 @@ options : {
           className={s.container}
         >
 {
-this.context.loggedIn
+this.state.username
   ? <MessCardWithData/>
   : null
 }

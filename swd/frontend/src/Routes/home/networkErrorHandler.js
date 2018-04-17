@@ -21,13 +21,12 @@ function networkErrorHandler(LoadingComponent, FallbackComponent, Component) {
       for (var key in nextProps) {
         // Iterate through each query to check network state
         let query = nextProps[key]
-        console.log("Going through query " + key)
         // Need to also consider the case of '!query'
         if (query.error) {
           // Update state if error happens
           this.setState({hasError: true})
           console.log("Error while loading data!")
-          // We also have to differentiate between GraphQL and network errors
+          // TODO: We also have to differentiate between GraphQL and network errors
           console.log(query.error)
           break;
         } else if (query.loading) {
@@ -40,7 +39,7 @@ function networkErrorHandler(LoadingComponent, FallbackComponent, Component) {
         // }
         else {
           this.setState({isLoading: false})
-          console.log("Data has been succesfully loaded!")
+          console.log("There seem to no errors and data (empty or not) has loaded!")
         }
       }
 
