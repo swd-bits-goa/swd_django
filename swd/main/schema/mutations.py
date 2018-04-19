@@ -8,8 +8,7 @@ from .types import *
 class UpdateMessOption(graphene.Mutation):
     class Arguments:
         mess = graphene.String(required=True)
-        month = graphene.types.datetime.DateTime(required=True)
-    
+
     messoption = graphene.Field(MessOptionType)
 
     @staticmethod
@@ -17,8 +16,9 @@ class UpdateMessOption(graphene.Mutation):
         context = info.context
 
         if context.user.is_authenticated:
+            openmess = MessOptionOpen.objects.filter(dateClose__gte = date.today()).latest("monthYear")
             student = Student.objects.get(user=context.user)
-            messoption = MessOption(student=student, monthYear=month, mess=mess)
+            messoption = MessOption(student=student, messoptionopen=openmess, mess=mess)
             messoption.save()
             return UpdateMessOption(messoption=messoption)
         else:
