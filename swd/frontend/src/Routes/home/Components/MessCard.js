@@ -6,7 +6,7 @@ import {RadioButton, RadioButtonGroup} from 'material-ui/RadioButton';
 import gql from "graphql-tag";
 import {graphql, compose} from "react-apollo";
 import Snackbar from 'material-ui/Snackbar';
-import ExpandableCard from "../../Components/ExpandableCard";
+import ExpandableCard from "../../../Components/ExpandableCard/ExpandableCard";
 
 // TODO: Remove the need to provide date for mutation
 const messChoiceMutation = gql`

@@ -10,17 +10,18 @@ import {
   CardTitle,
   CardText
 } from "material-ui/Card";
-import MessCard from "./MessCard";
+import MessCard from "./Components/MessCard";
 import { Mobile } from "../../Components/Responsive";
 import {CardContentLoader} from "../../Components/Loaders";
 import InfoCard from "../../Components/InfoCard";
 import ExpandableCard from "../../Components/ExpandableCard";
-import background from "./Background.svg";
 import networkErrorHandler from "./networkErrorHandler";
 import bdome from "./BDome.svg";
 import s from "./Home.css";
 import gql from "graphql-tag";
 import { graphql, compose } from "react-apollo";
+import LeaveCard from "./Components/LeaveCard";
+import DuesCard from "./Components/DuesCard";
 
 // GraphQL queries
 const userInfoQuery = gql`
@@ -44,10 +45,10 @@ const messCardQuery = gql `
   `
 
 const fallback = props => (
-    <h1>Something Went Wrong</h1>
+    <p>Something Went Wrong</p>
 );
 const loading = props => (
-  <h1>Loading...</h1>
+  <p>Loading...</p>
 );
 
 let MessCardWithData;
@@ -56,7 +57,7 @@ class Home extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      // Home currently maintains username state until it is made as context to 
+      // Home currently maintains username state until it is made as context to
       // be provided to the whole app
       username: null,
     };
@@ -101,7 +102,7 @@ options : {
   }
 }
 }))(networkErrorHandler(CardContentLoader, fallback, MessCard));
-    
+
 
     return (
          <div
@@ -113,12 +114,22 @@ this.context.loggedIn
   : null
 }
 {
+    this.context.loggedIn
+    ? <LeaveCard leaveId={"1234"} leaveFrom={"27/01/18"} leaveTill={"29/01/18"} wardenApproval={"Yes"} leaveStatus={"Granted"}/>
+    : null
+}
+{
+    this.context.loggedIn
+    ?<DuesCard dues={"Rs. 124s"} />
+    : null
+}
+{
   !this.context.loggedIn
   ? (
             <div className={s.imgContainer}>
                  <img src={bdome} style={{ width: "100%"}} alt="BITS Pilani, KK Birla Goa Campus" />
                 <div className={s.bottomleft}>BITS Pilani, Goa Campus</div>
-            </div>
+             </div>
   )
   : null
 }
