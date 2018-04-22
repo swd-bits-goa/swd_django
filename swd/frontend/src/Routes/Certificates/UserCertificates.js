@@ -13,7 +13,7 @@ const styles = {
         padding: 20,
         paddingLeft: 30,
         marginBottom: 0,
-        paddingBottom: 0
+        paddingBottom: 10
     },
     tableEntry: {
         paddingLeft: 15,
@@ -30,7 +30,7 @@ class UserCertificates extends React.Component{
                 return <p>{error.message}</p>
             return (<Paper zDepth={1} style={styles.formContainer}>
                         <h2 style={styles.header}>Bonafide Applications</h2>
-                        {bonafide.map((bon) => {
+                        {bonafide?bonafide.map((bon) => {
                             return (
                                 <div key={bonafide.indexOf(bon)+1} style={{display: 'flex', marginLeft: 20}}>
                                     <div style={{flexGrow: 1}}><h4 style={styles.tableEntry}>{bonafide.indexOf(bon)+1}</h4></div>
@@ -38,7 +38,7 @@ class UserCertificates extends React.Component{
                                     <div style={{flexGrow: 3}}><h4 style={styles.tableEntry}>{bon.printed? "Printed": "Not Printed"}</h4></div>
                                 </div>
                             )
-                        })}
+                        }):<p>Nothing to show here!</p>}
                     </Paper>
                 )
     }
@@ -55,5 +55,5 @@ const bonafide = gql`
     }
 `;
 
-
+export { bonafide };
 export default graphql(bonafide, {options: (props) => ({variables: {username: props.username}})})(UserCertificates);
