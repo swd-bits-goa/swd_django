@@ -26,6 +26,34 @@ class UpdateMessOption(graphene.Mutation):
         else:
             return None
 
+class ApplyLeave(graphene.Mutation):
+    class Arguments:
+        dateTimeStart = graphene.types.datetime.DateTime(required=True)
+        dateTimeEnd = graphene.types.datetime.DateTime(required=True)
+        reason = graphene.String(required=True)
+        corrAddress = graphene.String(required=True)
+        corrPhone = graphene.String(required=True)
+        consent = graphene.String(required=True)
+
+# CONSENT_CHOICES
+# Letter
+# Fax
+# Email
+
+    leave = graphene.Field(LeaveType)
+
+    @staticmethod
+    def mutate(root, info,  dateTimeStart=None, dateTimeEnd=None, reason=None, corrAddress=None, corrPhone=None, consent=None):
+        context = info.context
+
+        if context.user.is_authenticated:
+            student = Student.objects.get(user=context.user)
+            leave = Leave(student=student, dateTimeStart=dateTimeStart, dateTimeEnd=dateTimeEnd, reason=reason, corrAddress=corrAddress, corrPhone=corrPhone)
+            leave.save()
+            return ApplyLeave(leave=leave)
+        else:
+            return None            
+
 class SubmitBonafideApplication(graphene.Mutation):
     class Arguments:
         reason = graphene.String()
@@ -52,6 +80,8 @@ class SubmitBonafideApplication(graphene.Mutation):
             return SubmitBonafideApplication(bonafide=bonafide)
         else:
             return None
+          
 class Mutation(graphene.ObjectType):
     update_mess_option = UpdateMessOption.Field()
     submit_bonafide_application = SubmitBonafideApplication.Field()
+    apply_leave = ApplyLeave.Field()
