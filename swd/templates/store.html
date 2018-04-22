@@ -86,9 +86,9 @@
         $('select').material_select();
     });
 
-    function openItemModal(info) {
+    openItemModal = function(info) {
         info = parseInt(info)
-        var items = { {% for i in items %} "{{ i.id }}" : ["{{ i.title|safe }}", "{{ i.desc|safe }}", "{{ i.pic|safe }}", "{{ i.price }}", "{{ i.nick|safe }}", "{{ i.colors|safe }}", "{{ i.sizes|safe }}", "{{ i.available }}"], {% endfor %} }
+        var items = { {% for i in items %} "{{ i.id }}" : ["{{ i.title|safe }}", `{{ i.desc|safe }}`, "{{ i.pic|safe }}", "{{ i.price }}", "{{ i.nick|safe }}", "{{ i.colors|safe }}", "{{ i.sizes|safe }}", "{{ i.available }}"], {% endfor %} }
         $("#modalheader").html(items[info][0])
         $("#modalinfo").html(`
         <div class="row">
@@ -124,9 +124,9 @@
         });
     }
 
-    function openTeeModal(info) {
+    openTeeModal = function(info) {
         info = parseInt(info)
-        var tees = { {% for i in tees %} "{{ i.id }}" : ["{{ i.title|safe }}", "{{ i.desc|safe }}", "{{ i.pic|safe }}", "{{ i.price }}", "{{ i.nick|safe }}", "{{ i.colors|safe }}", "{{ i.sizes|safe }}", "{{ i.available }}"], {% endfor %} }
+        var tees = { {% for i in tees %} "{{ i.id }}" : ["{{ i.title|safe }}", `{{ i.desc|safe }}`, "{{ i.pic|safe }}", "{{ i.price }}", "{{ i.nick|safe }}", "{{ i.colors|safe }}", "{{ i.sizes|safe }}", "{{ i.available }}"], {% endfor %} }
         console.log(tees)
         $("#modalheader").html(tees[info][0])
         var nick = "";
