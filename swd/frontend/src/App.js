@@ -17,6 +17,7 @@ import Search from './Components/Search/Search.js';
 import Profile from "./Routes/profile/Profile";
 import Login from "./Routes/login/Login";
 import Certificates from './Routes/Certificates/Certificates';
+import Leave from "./Routes/Leave/Leave";
 
 // react-tap-event-plugin provides onTouchTap() to all React Components.
 // It's a mobile-friendly onClick() alternative for components in Material-UI,
@@ -133,6 +134,14 @@ class App extends React.Component {
                 </Layout>
               )}
             />
+              <Route
+                  path="/leave"
+                  render={() => (
+                      <Layout isLoggedIn={this.state.loggedIn} logout={this.logout} searchMode={false}>
+                          <Leave/>
+                      </Layout>
+                  )}
+              />
             <PrivateRoute
               path="/certificates"
               loggedIn={this.state.loggedIn}
