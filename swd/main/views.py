@@ -1,5 +1,7 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.contrib import messages
+from django.urls import reverse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import Student, MessOptionOpen, MessOption, Leave, Bonafide, Warden, DayPass, MessBill, HostelPS, TeeAdd, TeeBuy, ItemAdd, ItemBuy
@@ -203,24 +205,22 @@ def leave(request):
             leaveform.student = student
             print(request.POST.get('consent'))
             leaveform.save()
+            
             if config.EMAIL_PROD:
                 email_to=[Warden.objects.get(hostel=HostelPS.objects.get(student=student).hostel).email]
             else:
                 email_to=["swdbitstest@gmail.com"]                                                                     # For testing 
+                
             mailObj=Leave.objects.latest('id')
             mail_subject="New Leave ID: "+ str(mailObj.id)
             mail_message="Leave Application applied by "+ mailObj.student.name +" with leave id: " + str(mailObj.id) + ".\n"
             mail_message=mail_message + "Parent name: " + mailObj.student.parentName + "\nParent Email: "+ mailObj.student.parentEmail + "\nParent Phone: " + mailObj.student.parentPhone
             mail_message=mail_message + "\nConsent type: " + mailObj.consent
             send_mail(mail_subject,mail_message,settings.EMAIL_HOST_USER,email_to,fail_silently=False)
-
-            context = {
-                'option': 1,
-                'dateStart': request.POST.get('dateStart'),
-                'dateEnd': request.POST.get('dateEnd'),
-                'timeStart': request.POST.get('timeStart'),
-                'timeEnd': request.POST.get('timeEnd'),
-            }
+            
+            messages.success(request, "Leave Successfully applied. Please wait for approval.")
+            messages.success(request, "Leave applied from " + dateTimeStart.strftime("%d/%m/%Y (%H:%M:%S)") + " to " + dateTimeEnd.strftime("%d/%m/%Y (%H:%M:%S)"))
+            return HttpResponseRedirect(reverse('leave'))
         else:
             context = {
                 'option': 2,
@@ -255,18 +255,18 @@ def certificates(request):
                 bonafideform.reqDate = date.today()
                 bonafideform.student = student
                 bonafideform.save()
-
-                context = {
-                    'option': 1,
-                }
+                messages.success(request, "Applied for Bonafide Certificate. Please check SWD office in 3 days.")
+                return HttpResponseRedirect(reverse('certificates'))
             else:
                 context = {
                     'option': 2,
                 }
+                messages.error(request, "Sorry, there was some problem with form submission. Please fill all the fields correctly.")
     else:
         context = {
               'option': 3,
             }
+        messages.error(request, "Sorry, there can be a maximum application of 3 for Bonafides.")
 
     return render(request, "certificates.html", dict(context, **bonafideContext))
 
@@ -423,11 +423,9 @@ def daypass(request):
             daypassform.student = student
             daypassform.save()
 
-            context = {
-                'option': 1,
-                'date': request.POST.get('date'),
-
-            }
+            messages.success(request, "DayPass Successfully applied. Please wait for approval.")
+            messages.success(request, "DayPass applied for " + date.strftime("%d/%m/%Y"))
+            return HttpResponseRedirect(reverse('daypass'))
         else:
             context = {
                 'option': 2,
