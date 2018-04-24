@@ -109,13 +109,6 @@ def dashboard(request):
             'address': address
             }
 
-    if request.POST:
-        address = request.POST.get('address')
-        #print(address)
-        student.address = address
-        student.save()
-        return HttpResponse("{ status: 'ok' }")
-
     return render(request, "dashboard.html", context)
 
 
@@ -126,6 +119,14 @@ def profile(request):
         'student': student,
     }
     print(student.name)
+
+    if request.POST:
+        address = request.POST.get('address')
+        #print(address)
+        student.address = address
+        student.save()
+        return HttpResponse("{ status: 'ok' }")
+        
     return render(request, "profile.html", context)
 
 
