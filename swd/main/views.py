@@ -58,7 +58,7 @@ def login_success(request):
 def documents(request):
     student = Student.objects.get(user=request.user)
     return render(request, "documents.html", {'student': student})
-
+  
 @login_required
 def dashboard(request):
     student = Student.objects.get(user=request.user)
