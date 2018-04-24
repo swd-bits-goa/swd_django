@@ -1,25 +1,48 @@
 
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from "prop-types";
 import { BottomNavigation, BottomNavigationItem } from 'material-ui/BottomNavigation';
 import Paper from 'material-ui/Paper';
-import IconLocationOn from 'material-ui/svg-icons/communication/location-on';
+import {withRouter} from 'react-router-dom';
+import ActionHome from 'material-ui/svg-icons/action/home';
+import ActionEvent from 'material-ui/svg-icons/action/event';
+import ActionProfile from 'material-ui/svg-icons/action/perm-identity';
 import {Mobile, Tablet} from '../Responsive';
 // Import custom footer styles
 import s from './Footer.css';
 
 
-const nearbyIcon = <IconLocationOn />;
+const options = [
+  {
+    name: 'Home',
+    icon: <ActionHome/>,
+    link: '/'
+  },
+  {
+    name: 'Profile',
+    icon: <ActionProfile/>,
+    link: '/profile'
+  },  {
+    name: 'Events',
+    icon: <ActionEvent/>,
+    link: '/events'
+  }
+];
 
 class Footer extends React.Component {
-  // static propTypes = {
-  //   isLoggedIn: PropTypes.bool.isRequired,
-  // };
 
-  state = {
-    selectedIndex: 0,
+  static contextTypes = {
+    loggedIn: PropTypes.bool,
   };
 
-  select = index => this.setState({ selectedIndex: index });
+  state = {
+    selectedBottomNavIndex: options.findIndex(option => option.link === this.props.location.pathname)
+  };
+
+  handleBottomNavClick = (index, link) => {
+    this.setState({ selectedBottomNavIndex: index })
+    this.props.history.push(link);   
+  }
 
   render() {
       return (
@@ -59,30 +82,31 @@ class Footer extends React.Component {
           </div>
         </footer>
         </Tablet>
-      <Mobile>
+
+        { this.context.loggedIn ?
+      <Mobile>       
       <Paper zDepth={1} style={{ bottom: 0, position: 'fixed', width: '100%' }}>
-        <BottomNavigation selectedIndex={this.state.selectedIndex}>
-          <BottomNavigationItem
-            label="Location"
-            icon={nearbyIcon}
-            onTouchTap={() => this.select(0)}
+        <BottomNavigation selectedIndex={this.state.selectedBottomNavIndex}>
+        {
+          options.map( (option, index) =>
+          
+            <BottomNavigationItem
+            label={option.name}
+            icon={option.icon}
+            onTouchTap={() => this.handleBottomNavClick(index, option.link)}
+            key={index}
           />
-          <BottomNavigationItem
-            label="Location"
-            icon={nearbyIcon}
-            onTouchTap={() => this.select(1)}
-          />
-          <BottomNavigationItem
-            label="Location"
-            icon={nearbyIcon}
-            onTouchTap={() => this.select(2)}
-          />
+          )
+        }
         </BottomNavigation>
       </Paper>
     </Mobile>
+    : null
+        }
     </div>
       )
 }
 }
 
-export default (Footer);
+
+export default withRouter(Footer);

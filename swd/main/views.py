@@ -19,6 +19,13 @@ from calendar import monthrange
 
 from django.contrib import messages
 
+from django.db.models import Q
+from .models import BRANCH, HOSTELS
+
+import swd.config as config
+
+import re
+
 def noPhD(func):
     def check(request, *args, **kwargs):
         student = Student.objects.get(user=request.user)
@@ -34,18 +41,18 @@ def index(request):
 def login_success(request):
     return HttpResponse("Success!")
 
-@login_required
-def studentimg(request):
-    url = Student.objects.get(user=request.user).profile_picture
-    print(url)
-    ext = url.name.split('.')[-1]
+# @login_required
+# def studentimg(request):
+#     url = Student.objects.get(user=request.user).profile_picture
+#     print(url)
+#     ext = url.name.split('.')[-1]
     
-    try:
-        with open(url.name, "rb") as f:
-            return HttpResponse(f.read(), content_type="image/"+ext)
-    except IOError:
-        with open("assets/img/profile-swd.jpg", "rb") as f:
-            return HttpResponse(f.read(), content_type="image/jpg")
+#     try:
+#         with open(url.name, "rb") as f:
+#             return HttpResponse(f.read(), content_type="image/"+ext)
+#     except IOError:
+#         with open("assets/img/profile-swd.jpg", "rb") as f:
+#             return HttpResponse(f.read(), content_type="image/jpg")
 
 @login_required
 def documents(request):
@@ -222,8 +229,10 @@ def leave(request):
             leaveform.student = student
             print(request.POST.get('consent'))
             leaveform.save()
-            #email_to=[Warden.objects.get(hostel=HostelPS.objects.get(student=student).hostel).email]             # For production
-            #email_to=["youremail@site.com"]                                                                      # For testing 
+            if config.EMAIL_PROD:
+                email_to=[Warden.objects.get(hostel=HostelPS.objects.get(student=student).hostel).email]
+            else:
+                email_to=["swdbitstest@gmail.com"]                                                                     # For testing 
             mailObj=Leave.objects.latest('id')
             mail_subject="New Leave ID: "+ str(mailObj.id)
             mail_message="Leave Application applied by "+ mailObj.student.name +" with leave id: " + str(mailObj.id) + ".\n"
@@ -306,8 +315,8 @@ def is_warden(user):
 @user_passes_test(is_warden)
 def warden(request):
     warden = Warden.objects.get(user=request.user)
-    leaves = Leave.objects.filter(student__hostelps__hostel__icontains=warden.hostel).order_by('approved', '-id')
-    daypasss = DayPass.objects.filter(student__hostelps__hostel__icontains=warden.hostel).order_by('approved', '-id')
+    leaves = Leave.objects.filter(student__hostelps__hostel__icontains=warden.hostel).order_by('-inprocess', '-id')[:50]
+    daypasss = DayPass.objects.filter(student__hostelps__hostel__icontains=warden.hostel).order_by('-inprocess', '-id')[:50]
     context = {
         'option':1,
         'warden': warden,
@@ -321,13 +330,16 @@ def warden(request):
 def wardenleaveapprove(request, leave):
     leave = Leave.objects.get(id=leave)
     warden = Warden.objects.get(user=request.user)
-    daypasss = DayPass.objects.filter(student__hostelps__hostel=warden.hostel).order_by('approved', '-id')
+    daypasss = DayPass.objects.filter(student__hostelps__hostel=warden.hostel).order_by('approved', '-id')[:50]
+    leaves = Leave.objects.filter(student=leave.student)
 
     context = {
         'option': 2,
         'warden': warden,
         'leave': leave,
         'daypasss' : daypasss,
+        'leaves': leaves,
+        'student': leave.student
     }
 
     if request.POST:
@@ -335,8 +347,10 @@ def wardenleaveapprove(request, leave):
         print(approved)
         comment = request.POST.get('comment')
         mail_message={}
-        #email_to = [leave.student.email]                         # For production
-        #email_to = ["youremail@site.com"]                        # For testing
+        if config.EMAIL_PROD:
+            email_to = [leave.student.email]
+        else:
+            email_to = ["swdbitstest@gmail.com"]
         mail_subject="Leave Status - "
         mail_message=leave.student.name+",\n"
 
@@ -629,3 +643,38 @@ def dues(request):
     }
 
     return render(request, "dues.html", context)
+
+
+def search(request):
+    context = {
+        'hostels' : [i[0] for i in HOSTELS],
+        'branches' : BRANCH,
+    }
+    postContext = {}
+    if request.GET:
+        name = request.GET.get('name')
+        bitsId = request.GET.get('bitsId')
+        branch = request.GET.get('branch')
+        hostel = request.GET.get('hostel')
+        room = request.GET.get('room')
+
+        students = Student.objects.filter(Q(name__contains=name) & Q(bitsId__contains=bitsId) & Q(bitsId__contains=branch) & Q(hostelps__hostel__contains=hostel) & Q(hostelps__room__contains=room))[:50]
+
+        searchstr = {}
+
+        if name is not "":
+            searchstr['Name'] = name
+        if bitsId is not "":
+            searchstr['BITS ID'] = bitsId
+        if branch is not "":
+            searchstr['Branch'] = branch
+        if hostel is not "":
+            searchstr['Hostel'] = hostel
+        if room is not "":
+            searchstr['Room'] = room
+            
+        postContext = {
+            'students' : students,
+            'searchstr' : searchstr
+        }
+    return render(request, "search.html", dict(context, **postContext))
