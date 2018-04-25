@@ -347,11 +347,23 @@ class Dues(models.Model):
 
 class Notice(models.Model):
     
-    date=models.DateField(editable=False) 
-    desc=models.CharField(max_length=100)
-    file=models.FileField()
+    date = models.DateField(editable=False) 
+    title = models.CharField(max_length=100)
+    desc = models.TextField()
     def __str__(self):
         return self.desc
     def save(self, *args, **kwargs):
         self.date = timezone.now()
         super().save(*args, **kwargs)
+
+class FileAdd(models.Model):
+
+    file = models.FileField()
+    link = models.CharField(max_length=200,blank=True,null=True)
+
+    def __str__(self):
+        return self.file.name
+    def save(self, *args, **kwargs):
+        self.link = '/media/' + self.file.name 
+        super().save(*args, **kwargs)
+    

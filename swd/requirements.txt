@@ -17,4 +17,4 @@ Rx==1.6.1
 singledispatch==3.4.0.3
 six==1.11.0
 typing==3.6.4
-
+django-import-export==1.0.0
