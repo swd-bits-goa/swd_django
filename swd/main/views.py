@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .models import Student, MessOptionOpen, MessOption, Leave, Bonafide, Warden, DayPass, MessBill, HostelPS, TeeAdd, TeeBuy, ItemAdd, ItemBuy
+from .models import Student, MessOptionOpen, MessOption, Leave, Bonafide, Warden, DayPass, MessBill, HostelPS, TeeAdd, TeeBuy, ItemAdd, ItemBuy, HostelSuperintendent
 from django.views.decorators.csrf import csrf_protect
 from datetime import date, datetime, timedelta
 from .forms import MessForm, LeaveForm, BonafideForm, DayPassForm
@@ -125,6 +125,8 @@ def loginform(request):
                 return redirect('/admin')
             if Warden.objects.filter(user=request.user):
                 return redirect('/warden')
+            if HostelSuperintendent.objects.filter(user=request.user):
+                return redirect('/hostelsuperintendent')
             return redirect('dashboard')
         else:
             messages.add_message(request, messages.INFO,  "Incorrect username or password", extra_tags='red')
@@ -285,19 +287,34 @@ def printBonafide(request,id=None):
 def is_warden(user):
     return False if not Warden.objects.filter(user=user) else True
 
+def is_hostelsuperintendent(user):
+     return False if not HostelSuperintendent.objects.filter(user=user) else True
+
 @login_required
 @user_passes_test(is_warden)
 def warden(request):
     warden = Warden.objects.get(user=request.user)
-    leaves = Leave.objects.filter(student__hostelps__hostel__icontains=warden.hostel).order_by('-inprocess', '-id')[:50]
-    daypasss = DayPass.objects.filter(student__hostelps__hostel__icontains=warden.hostel).order_by('-inprocess', '-id')[:50]
+    leaves = Leave.objects.filter(student__hostelps__hostel__icontains=warden.hostel).order_by('approved', '-id')
     context = {
         'option':1,
         'warden': warden,
         'leaves': leaves,
-        'daypasss': daypasss
     }
     return render(request, "warden.html", context)
+
+@login_required
+@user_passes_test(is_hostelsuperintendent)
+def hostelsuperintendent(request):
+    hostelsuperintendents = HostelSuperintendent.objects.filter(user=request.user)
+    daypass = []
+    for hostelsuperintendent in hostelsuperintendents:
+        daypass += DayPass.objects.filter(student__hostelps__hostel__icontains=hostelsuperintendent.hostel).order_by('approved', '-id')
+    context = {
+        'option':1,
+        'hostelsuperintendent': hostelsuperintendent,
+        'daypasss': daypass
+    }
+    return render(request, "hostelsuperintendent.html", context)
 
 @login_required
 @user_passes_test(is_warden)
@@ -358,33 +375,43 @@ def wardenleaveapprove(request, leave):
     return render(request, "warden.html", context)
 
 @login_required
-@user_passes_test(is_warden)
-def wardendaypassapprove(request, daypass):
+@user_passes_test(is_hostelsuperintendent)
+def hostelsuperintendentdaypassapprove(request, daypass):
     daypass = DayPass.objects.get(id=daypass)
-    warden = Warden.objects.get(user=request.user)
-    leaves = Leave.objects.filter(student__hostelps__hostel__icontains=warden.hostel).order_by('approved', '-id')
+    hostelsuperintendent = HostelSuperintendent.objects.filter(hostel=daypass.student.hostelps.hostel)
+    hostelsuperintendent = hostelsuperintendent[0]
     context = {
-        'option': 3,
-        'warden': warden,
-        'daypass': daypass,
-        'leaves' : leaves,
+        'option': 2,
+        'hostelsuperintendent': hostelsuperintendent,
+        'daypasss': daypass,
     }
-
     if request.POST:
         approved = request.POST.getlist('group1')
         print(approved)
         comment = request.POST.get('comment')
 
+        mail_message={}
+        if config.EMAIL_PROD:
+            email_to = [daypass.student.email]
+        else:
+            email_to = ["swdbitstest@gmail.com"]
+        mail_subject="Daypass Status - "
+        mail_message=daypass.student.name+",\n"
+
         if '1' in approved:
             daypass.approved=True
             daypass.disapproved = False
             daypass.inprocess = False
-            daypass.approvedBy = warden
+            daypass.approvedBy = hostelsuperintendent
+            mail_subject=mail_subject + "Successful!"
+            mail_message=mail_message+ "Success! Your Daypass application with id: " + str(daypass.id) + " on " + daypass.dateTime.strftime('%d/%m/%Y') + " has been approved."
         elif '2' in approved:
             daypass.disapproved=True
             daypass.approved = False
             daypass.inprocess = False
-            daypass.approvedBy = warden
+            daypass.approvedBy = hostelsuperintendent
+            mail_subject=mail_subject + "Unsuccessful!"
+            mail_message=mail_message+ "Unsuccessful! Your Daypass application with id: " + str(daypass.id) + " on " + daypass.dateTime.strftime('%d/%m/%Y') + " has been disapproved."
         else:
             daypass.inprocess = True
             daypass.approved = False
@@ -392,10 +419,14 @@ def wardendaypassapprove(request, daypass):
             daypass.approvedBy = None
 
         daypass.comment = comment
+        if(daypass.comment != ''):
+            mail_message=mail_message+"\nComments: " + daypass.comment
+        send_mail(mail_subject,mail_message,settings.EMAIL_HOST_USER,email_to,fail_silently=False)
         daypass.save()
-        return redirect('warden')
+        return redirect('hostelsuperintendent')
+    
 
-    return render(request, "warden.html", context)
+    return render(request, "hostelsuperintendent.html", context)
 
 
 @login_required
@@ -422,6 +453,16 @@ def daypass(request):
             daypassform.dateTime = make_aware(dateTime)
             daypassform.student = student
             daypassform.save()
+
+            if config.EMAIL_PROD:
+                email_to=[HostelSuperintendent.objects.get(hostel=HostelPS.objects.get(student=student).hostel).email]
+            else:
+                email_to=["swdbitstest@gmail.com"]
+                                                                                   # For testing 
+            mailObj=DayPass.objects.latest('id')
+            mail_subject="New Daypass ID: "+ str(mailObj.id)
+            mail_message="Daypass Application applied by "+ mailObj.student.name +" with id: " + str(mailObj.id) + ".\n"
+            send_mail(mail_subject,mail_message,settings.EMAIL_HOST_USER,email_to,fail_silently=False)
 
             context = {
                 'option': 1,
@@ -503,7 +544,7 @@ def messbill(request):
                     mess = MessOption.objects.create(
                         student=obj, monthYear=start_date.replace(day=1), mess='N')
 
-            leaves = Leave.objects.filter(student=obj)
+            leaves = Daypass.objects.filter(student=obj)
 
             noofdays = 0
 
