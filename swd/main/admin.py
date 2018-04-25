@@ -6,6 +6,9 @@ from django.http import HttpResponseRedirect, HttpResponse
 import datetime
 from .models import MessBill, Leave
 from calendar import monthrange
+from import_export.admin import ExportActionModelAdmin
+from .resources import *
+
 # import django.models.queryset as QuerySet
 
 class HostelPSAdmin(admin.ModelAdmin):
@@ -45,6 +48,20 @@ export_xls.short_description = u"Export Mess Bill"
 class StudentAdmin(admin.ModelAdmin):
     search_fields = ['name', 'bitsId']
     actions = [export_xls, ]
+
+
+@admin.register(TeeBuy)
+class TeeBuyAdmin(ExportActionModelAdmin,admin.ModelAdmin):
+    resource_class = TeeBuyResource
+    search_fields = ['tee__title']
+    
+
+
+@admin.register(ItemBuy)
+class ItemBuyAdmin(ExportActionModelAdmin,admin.ModelAdmin):
+    resource_class = ItemBuyResource  
+    search_fields = ['item__title']
+
 
 admin.site.register(Student, StudentAdmin)
 admin.site.register(HostelPS, HostelPSAdmin)
