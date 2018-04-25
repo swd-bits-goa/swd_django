@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .models import Student, MessOptionOpen, MessOption, Leave, Bonafide, Warden, DayPass, MessBill, HostelPS, TeeAdd, TeeBuy, ItemAdd, ItemBuy, Hostel_Super_Intendent
+from .models import Student, MessOptionOpen, MessOption, Leave, Bonafide, Warden, DayPass, MessBill, HostelPS, TeeAdd, TeeBuy, ItemAdd, ItemBuy, HostelSuperintendent
 from django.views.decorators.csrf import csrf_protect
 from datetime import date, datetime, timedelta
 from .forms import MessForm, LeaveForm, BonafideForm, DayPassForm
@@ -125,7 +125,7 @@ def loginform(request):
                 return redirect('/admin')
             if Warden.objects.filter(user=request.user):
                 return redirect('/warden')
-            if Hostel_Super_Intendent.objects.filter(user=request.user):
+            if HostelSuperintendent.objects.filter(user=request.user):
                 return redirect('/hostelsuperintendent')
             return redirect('dashboard')
         else:
@@ -288,7 +288,7 @@ def is_warden(user):
     return False if not Warden.objects.filter(user=user) else True
 
 def is_hostelsuperintendent(user):
-     return False if not Hostel_Super_Intendent.objects.filter(user=user) else True
+     return False if not HostelSuperintendent.objects.filter(user=user) else True
 
 @login_required
 @user_passes_test(is_warden)
@@ -305,7 +305,7 @@ def warden(request):
 @login_required
 @user_passes_test(is_hostelsuperintendent)
 def hostelsuperintendent(request):
-    hostelsuperintendents = Hostel_Super_Intendent.objects.filter(user=request.user)
+    hostelsuperintendents = HostelSuperintendent.objects.filter(user=request.user)
     daypass = []
     for hostelsuperintendent in hostelsuperintendents:
         daypass += DayPass.objects.filter(student__hostelps__hostel__icontains=hostelsuperintendent.hostel).order_by('approved', '-id')
@@ -378,7 +378,7 @@ def wardenleaveapprove(request, leave):
 @user_passes_test(is_hostelsuperintendent)
 def hostelsuperintendentdaypassapprove(request, daypass):
     daypass = DayPass.objects.get(id=daypass)
-    hostelsuperintendent = Hostel_Super_Intendent.objects.filter(hostel=daypass.student.hostelps.hostel)
+    hostelsuperintendent = HostelSuperintendent.objects.filter(hostel=daypass.student.hostelps.hostel)
     hostelsuperintendent = hostelsuperintendent[0]
     context = {
         'option': 2,
@@ -455,7 +455,7 @@ def daypass(request):
             daypassform.save()
 
             if config.EMAIL_PROD:
-                email_to=[Hostel_Super_Intendent.objects.get(hostel=HostelPS.objects.get(student=student).hostel).email]
+                email_to=[HostelSuperintendent.objects.get(hostel=HostelPS.objects.get(student=student).hostel).email]
             else:
                 email_to=["swdbitstest@gmail.com"]
                                                                                    # For testing 
