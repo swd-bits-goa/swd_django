@@ -723,6 +723,6 @@ def search(request):
 
 def notice(request):
     context = {
-        'queryset' : Notice.objects.all()
+        'queryset' : Notice.objects.all().order_by('-id')
     }
     return render(request,"notice.html",context)
