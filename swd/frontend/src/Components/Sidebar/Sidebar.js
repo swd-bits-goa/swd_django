@@ -23,9 +23,9 @@ const options = [
       link: '/certificates'
     },
     {
-      name: 'Counselor',
+      name: 'Leave',
       icon: counselorIcon,
-      link: ''
+      link: '/leave'
     },
     {
       name: 'CSA',
