@@ -359,10 +359,11 @@ class Notice(models.Model):
 class FileAdd(models.Model):
 
     file = models.FileField()
-    link = models.CharField(max_length=200,blank=True,null=True)
+    link = models.CharField(max_length=200,blank=True,null=True, editable = False)
 
     def __str__(self):
-        return self.file.name
+        return self.link
+
     def save(self, *args, **kwargs):
         self.link = '/media/' + self.file.name 
         super().save(*args, **kwargs)

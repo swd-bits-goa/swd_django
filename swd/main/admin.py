@@ -14,7 +14,7 @@ from .resources import *
 class HostelPSAdmin(admin.ModelAdmin):
     search_fields = ['student__name', 'student__bitsId']
 
-models = [Warden, Staff, DayScholar, CSA, MessOption, Leave, DayPass, LateComer, InOut, Disco, MessOptionOpen, Transaction, MessBill, TeeAdd, TeeBuy, ItemAdd, ItemBuy, HostelSuperintendent, Notice, FileAdd]
+models = [Warden, Staff, DayScholar, CSA, MessOption, Leave, DayPass, LateComer, InOut, Disco, MessOptionOpen, Transaction, MessBill, TeeAdd, ItemAdd, HostelSuperintendent, Notice, FileAdd]
 
 
 @admin.register(Bonafide)
@@ -61,7 +61,6 @@ class TeeBuyAdmin(ExportActionModelAdmin,admin.ModelAdmin):
 class ItemBuyAdmin(ExportActionModelAdmin,admin.ModelAdmin):
     resource_class = ItemBuyResource  
     search_fields = ['item__title']
-
 
 admin.site.register(Student, StudentAdmin)
 admin.site.register(HostelPS, HostelPSAdmin)
