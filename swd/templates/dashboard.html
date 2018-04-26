@@ -2,35 +2,6 @@
 {% load staticfiles %}
 {% block content %}
 <div class="container">
-
-    <div class="card grey lighten-4">
-      <div class="card-content">
-        <div class="row">
-          <div class="col s6 l12">
-            <table class="bordered striped details">
-              <thead>
-                <tr>
-                  <th>Detail</th>
-                  <th>Value</th>
-                </tr>
-                <tr>
-                  <td> Name </td>
-                  <td> {{ student.name }} </td>
-                </tr>
-                <tr>
-                  <td> ID </td>
-                  <td> {{ student.bitsId }} </td>
-                </tr>
-                <tr>
-                  <td> Address </td>
-                  <td> <span class="left addressval">{{ student.address }} </span> <span class="new badge red comm left editAddr" data-badge-caption="">Edit</span> </td>
-                </tr>
-              </thead>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
     <div class="card grey lighten-4">
       <div class="card-content">
         <div class="row">
@@ -101,35 +72,5 @@
   .comm {
     width:100px;
   }
-  .editAddr, .saveAddr {
-    cursor: pointer;
-  }
-  .details th:nth-child(1), .details td:nth-child(1) {
-    width: 35%;
-  }
-  .details th:nth-child(2), .details td:nth-child(2) {
-    width: 65%;
-  }
 </style>
-{% csrf_token %}
-<script>
-  $(document).on('click', '.editAddr', (e) => {
-    $('.editAddr').addClass('saveAddr').removeClass('editAddr').text('Save').removeClass('red').addClass('green')
-    $('.addressval').attr('contenteditable', true)
-    $('.addressval').focus()
-  })
-
-  $(document).on('click', '.saveAddr', (e) => {
-    $('.saveAddr').addClass('editAddr').removeClass('saveAddr').text('Edit').removeClass('green').addClass('red')
-    $('.addressval').removeAttr('contenteditable')
-    $('.addressval').blur()
-
-    const newAddr = $('.addressval').text()
-
-    $.post('/dashboard/', {
-      address: newAddr,
-      csrfmiddlewaretoken: $('[name="csrfmiddlewaretoken"]').val()
-    })
-  })
-</script>
 {% endblock %}
