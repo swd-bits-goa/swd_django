@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 import os
 import hashlib
 from tools.dev_info import SALT_IMG as SALT
+import re
 
 MESS_CHOICES = (
     ('A','Dining Hall A'),
@@ -121,7 +122,9 @@ class Student(models.Model):
     parentPhone = models.CharField(max_length=20, blank=True, null=True)
     parentEmail = models.CharField(max_length=50, blank=True, null=True)
 
-    
+    def nophd(self):
+        print("called")
+        return re.match(r"^20\d{2}PHX[PF]\d{3,4}G$", self.bitsId, flags=re.IGNORECASE)
 
     def __str__(self):
         return self.bitsId + ' (' + self.name + ')'
