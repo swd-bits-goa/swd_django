@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .models import Student, MessOptionOpen, MessOption, Leave, Bonafide, Warden, DayPass, MessBill, HostelPS, TeeAdd, TeeBuy, ItemAdd, ItemBuy, HostelSuperintendent
+from .models import Student, MessOptionOpen, MessOption, Leave, Bonafide, Warden, DayPass, MessBill, HostelPS, TeeAdd, TeeBuy, ItemAdd, ItemBuy, HostelSuperintendent, Notice
 from django.views.decorators.csrf import csrf_protect
 from datetime import date, datetime, timedelta
 from .forms import MessForm, LeaveForm, BonafideForm, DayPassForm
@@ -720,3 +720,9 @@ def search(request):
             'searchstr' : searchstr
         }
     return render(request, "search.html", dict(context, **postContext))
+
+def notice(request):
+    context = {
+        'queryset' : Notice.objects.all().order_by('-id')
+    }
+    return render(request,"notice.html",context)

@@ -36,6 +36,7 @@ urlpatterns = [
     url(r'^search/', views.search, name="search"),
 
     url(r'^messbill/', views.messbill, name='messbill'),
+    url(r'^notice/',views.notice, name='notice'),
 
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

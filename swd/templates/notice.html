@@ -1,0 +1,77 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0" />
+  <title>SWD BITS Goa</title>
+
+  <!-- CSS  -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="{% static 'css/materialize.css' %}" type="text/css" rel="stylesheet" media="screen,projection" />
+  <link href="{% static 'css/style.css' %}" type="text/css" rel="stylesheet" media="screen,projection" />
+</head>
+
+<body>
+  <nav class="light-blue lighten-1" role="navigation">
+    <div class="nav-wrapper container"><a id="logo-container" href="/#" class="brand-logo">Student Welfare Division</a>
+      <ul class="right hide-on-med-and-down">
+      	<li><a href="/notice">Notice</a></li>
+        <li><a href="/search">Search</a></li>
+        <li><a href="/login">Login</a></li>
+      </ul>
+
+      <ul id="nav-mobile" class="side-nav">
+      	<li><a href="/notice">Notice</a></li>
+        <li><a href="/search">Search</a></li>
+        <li><a href="/login">Login</a></li>
+      </ul>
+      <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
+    </div>
+  </nav>
+  
+
+
+  <div class="container">
+    <div class="section">
+
+  <div class="row">
+    <div class="col s12 m12">
+        <div class="card">
+        			{% for notice in queryset %}
+        			<p>
+              <div class="card" >
+              <span class="card-title">{{ notice.date }}</span>
+                <div class="card-content">
+                <b>{{ notice.title|safe }} </b>
+                {{ notice.desc|safe|linebreaks}}
+                </div>
+              </div>
+            	{% endfor %}  
+            </p>
+        </div>
+    </div>
+
+    </div>
+    <br><br>
+  </div>
+
+  <style>
+
+  </style>
+
+  <!--  Scripts-->
+  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="{% static 'js/materialize.js' %}"></script>
+  <script src="{% static 'js/init.js' %}"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('select').material_select();
+        });
+    </script>
+
+</body>
+
+</html>

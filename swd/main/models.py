@@ -4,6 +4,7 @@ import os
 import hashlib
 from tools.dev_info import SALT_IMG as SALT
 import re
+from django.utils import timezone
 
 MESS_CHOICES = (
     ('A','Dining Hall A'),
@@ -344,3 +345,26 @@ class Dues(models.Model):
     def __str__(self):
         return self.student.bitsId + ' ' + self.month
 
+class Notice(models.Model):
+    
+    date = models.DateField(editable=False) 
+    title = models.CharField(max_length=100)
+    desc = models.TextField()
+    def __str__(self):
+        return self.desc
+    def save(self, *args, **kwargs):
+        self.date = timezone.now()
+        super().save(*args, **kwargs)
+
+class FileAdd(models.Model):
+
+    file = models.FileField()
+    link = models.CharField(max_length=200,blank=True,null=True, editable = False)
+
+    def __str__(self):
+        return self.link
+
+    def save(self, *args, **kwargs):
+        self.link = '/media/' + self.file.name 
+        super().save(*args, **kwargs)
+    

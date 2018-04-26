@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'braces',
+    'import_export',
 ]
 
 REST_FRAMEWORK = {
