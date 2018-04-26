@@ -81,7 +81,7 @@ class Query(object):
     )
 
     all_leaves = graphene.List(LeaveType)
-    leave = graphene.Field(
+    leave = graphene.List(
         LeaveType,
         id=graphene.Int(),
         username = graphene.String()

@@ -47,8 +47,9 @@ class ApplyLeave(graphene.Mutation):
         context = info.context
 
         if context.user.is_authenticated:
+            print(dateTimeStart)
             student = Student.objects.get(user=context.user)
-            leave = Leave(student=student, dateTimeStart=dateTimeStart, dateTimeEnd=dateTimeEnd, reason=reason, corrAddress=corrAddress, corrPhone=corrPhone)
+            leave = Leave(student=student, dateTimeStart=dateTimeStart, dateTimeEnd=dateTimeEnd, reason=reason, consent=consent, corrAddress=corrAddress, corrPhone=corrPhone)
             leave.save()
             return ApplyLeave(leave=leave)
         else:

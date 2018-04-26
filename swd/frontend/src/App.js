@@ -18,6 +18,7 @@ import Profile from "./Routes/profile/Profile";
 import Login from "./Routes/login/Login";
 import Certificates from './Routes/Certificates/Certificates';
 import Leave from "./Routes/Leave/Leave";
+import { onError } from "apollo-link-error";
 
 // react-tap-event-plugin provides onTouchTap() to all React Components.
 // It's a mobile-friendly onClick() alternative for components in Material-UI,
@@ -32,6 +33,18 @@ const link = new HttpLink({
   credentials: "same-origin"
 });
 
+
+const errorLink = onError(({ graphQLErrors, networkError }) => {
+  if (graphQLErrors)
+    graphQLErrors.map(({ message, locations, path }) =>
+      console.log(
+        `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`,
+      ),
+    );
+
+  if (networkError) console.log(`[Network error]: ${networkError}`);
+});
+
 const authMiddleware = new ApolloLink((operation, next) => {
   operation.setContext(({ headers = {} }) => ({
     headers: {
@@ -44,8 +57,9 @@ const authMiddleware = new ApolloLink((operation, next) => {
 });
 
 const client = new ApolloClient({
-  link: concat(authMiddleware, link),
-  cache: new InMemoryCache()
+  link: concat(authMiddleware, link, errorLink),
+  cache: new InMemoryCache(),
+  onError: (e) => { console.log('GraphQl errors: '+e.graphQLErrors+" Network Errors: "+e.networkError) }
 });
 
 const PrivateRoute = ({ render, loggedIn, ...rest}) => (
@@ -134,8 +148,9 @@ class App extends React.Component {
                 </Layout>
               )}
             />
-              <Route
+              <PrivateRoute
                   path="/leave"
+                  loggedIn={this.state.loggedIn}
                   render={() => (
                       <Layout isLoggedIn={this.state.loggedIn} logout={this.logout} searchMode={false}>
                           <Leave/>
