@@ -44,13 +44,18 @@ div.container3 p {
 <body bgcolor="white">
 <div id="content" >
     <div class="top">
-        <h3 class="ref" align="left">SWD/CERT/{{ id }}</h3>
-        <h3 class="date" align="right">{{ date|date:"d/F/Y"  }}</h3>
+        <h3 class="ref" align="left">SWD/CERT/{{ id }}<span style="float:right;">Date:{{ date|date:"d-F-Y"  }}</span></h3>
+        
     </div>
     <h1 align="center">CERTIFICATE</h1>
+    <font size="5">
     <p>
       {{ text | safe | linebreaks}}
-    </p> 
+    </p>
+    <br><br><br>
+    <p>
+    <span style="float:right;">(Dr. C.K Ramesha)</span>
+    </font>
 </div>
 <div id="footer">
   <img src="{% static 'img/bonafide_footer.png' %}"  width=595px >
