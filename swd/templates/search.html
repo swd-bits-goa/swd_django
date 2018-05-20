@@ -50,7 +50,7 @@
                     <div class="row">
                         <div class="input-field col s6 offset-s3">
                             <input name="name" id="name" type="text" class="validate">
-                            <label for="name">Name</label>
+                            <label for="name">Name</label>  
                         </div>
                     </div>
                     <div class="row">
@@ -123,7 +123,11 @@
                                 {% for i in students %}
                                 <tr>
                                     <td>{{ i.bitsId }}</td>
+                                    {% if permission == 1 %}
+                                    <td><a href="/student/{{ i.id }}/">{{ i.name }}</a></td>
+                                    {% else %}
                                     <td>{{ i.name }}</td>
+                                    {% endif %}
                                     <td>{{ i.hostelps.hostel }}</td>
                                     <td>{{ i.hostelps.room }}</td>
                                 </tr>

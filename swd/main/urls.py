@@ -34,7 +34,7 @@ urlpatterns = [
     url(r'^dues/', views.dues, name="dues"),
     url(r'^documents/', views.documents, name="documents"),
     url(r'^search/', views.search, name="search"),
-
+    url(r'^student/(?P<id>\d+)/$',views.studentDetails, name="studentDetails"),
     url(r'^messbill/', views.messbill, name='messbill'),
     url(r'^notice/',views.notice, name='notice'),
 
