@@ -688,10 +688,10 @@ def dues(request):
 
 
 def search(request):
-    perm=int(0);
+    perm=0;
     if request.user.is_authenticated:
         if is_warden(request.user) or is_hostelsuperintendent(request.user):
-            perm=int(1) 
+            perm=1
     context = {
         'hostels' : [i[0] for i in HOSTELS],
         'branches' : BRANCH,
@@ -732,14 +732,17 @@ def notice(request):
     }
     return render(request,"notice.html",context)
 
-
-@user_passes_test(is_warden)
-@user_passes_test(is_hostelsuperintendent)
 def studentDetails(request,id=None):
-    student = Student.objects.get(id=id)
-    res=HostelPS.objects.get(student__id=id) 
-    context = { 
-             'student'  :student,
-             'residence' :res
-    }
-    return render(request,"studentdetails.html",context)
+    if request.user.is_authenticated:
+        if is_warden(request.user) or is_hostelsuperintendent(request.user):
+            student = Student.objects.get(id=id)
+            res=HostelPS.objects.get(student__id=id) 
+            context = { 
+                     'student'  :student,
+                     'residence' :res
+            }
+            return render(request,"studentdetails.html",context)
+    else:
+        return render(request, 'home1.html',{})
+        
+
