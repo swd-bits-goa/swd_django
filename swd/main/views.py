@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .models import Student, MessOptionOpen, MessOption, Leave, Bonafide, Warden, DayPass, MessBill, HostelPS, TeeAdd, TeeBuy, ItemAdd, ItemBuy, HostelSuperintendent, Notice
+from .models import Student, MessOptionOpen, MessOption, Leave, Bonafide, Warden, DayPass, MessBill, HostelPS, TeeAdd, TeeBuy, ItemAdd, ItemBuy, HostelSuperintendent, Notice, Document
 from django.views.decorators.csrf import csrf_protect
 from datetime import date, datetime, timedelta
 from .forms import MessForm, LeaveForm, BonafideForm, DayPassForm
@@ -744,5 +744,15 @@ def studentDetails(request,id=None):
             return render(request,"studentdetails.html",context)
     else:
         return render(request, 'home1.html',{})
+
+def documents(request):
+    context = {
+                    'queryset' : Document.objects.all()
+    }
+    return render(request,"documents.html",context)
+
+
+
+
         
 

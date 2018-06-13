@@ -368,4 +368,10 @@ class FileAdd(models.Model):
     def save(self, *args, **kwargs):
         self.link = '/media/' + self.file.name 
         super().save(*args, **kwargs)
-    
+
+class Document(models.Model):
+    title = models.CharField(max_length=100)
+    link = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.title    

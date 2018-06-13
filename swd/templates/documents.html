@@ -3,9 +3,10 @@
 
 <div class="container">
     <div class="section">
-        <div><a class="waves-effect waves-light btn" href="javascript:alert('place link here')">BITS Constitution</a></div><br>
-        <div><a class="waves-effect waves-light btn" href="javascript:alert('place link here')">Counsellor Notice</a></div><br>
-        <div><a class="waves-effect waves-light btn" href="javascript:alert('place link here')">Information Booklet</a></div>
+    	{% for document in queryset %}
+        <div><a class="waves-effect waves-light btn" href="{{ document.link }}">{{ document.title }}</a></div><br>
+    	{% endfor %}
+        
     </div>
     <br><br>
 </div>
