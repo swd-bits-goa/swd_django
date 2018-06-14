@@ -673,9 +673,8 @@ def store(request):
                     message_error = "Color doesn't match the database."
                 if qty is None:
                     message_error = "Provide quantity of the tees you want."
-                if int(qty) > 9:
-                    messages.add_message(request,messages.INFO,"Provide a quantity less than 9",extra_tags='orange')
-                elif bought == True:
+    
+                if bought == True:
                     messages.add_message(request,messages.INFO,"You have already paid for "+ teeno.title,extra_tags='orange')
                 elif message_error == "":
                     teebuy = TeeBuy.objects.create(tee = teeno, student=student, nick=nick, size=sizes, color=colors, qty=qty)
