@@ -748,6 +748,18 @@ def notice(request):
     }
     return render(request,"notice.html",context)
 
+def antiragging(request):
+    return render(request,"antiragging.html",{})
+
+def swd(request):
+    return render(request,"swd.html",{})
+
+def csa(request):
+    return render(request,"csa.html",{})
+
+def sac(request):
+    return render(request,"sac.html",{})
+
 def studentDetails(request,id=None):
     if request.user.is_authenticated:
         if is_warden(request.user) or is_hostelsuperintendent(request.user):
