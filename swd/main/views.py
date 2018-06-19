@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .models import Student, MessOptionOpen, MessOption, Leave, Bonafide, Warden, DayPass, MessBill, HostelPS, TeeAdd, TeeBuy, ItemAdd, ItemBuy, HostelSuperintendent, Notice
+from .models import Student, MessOptionOpen, MessOption, Leave, Bonafide, Warden, DayPass, MessBill, HostelPS, TeeAdd, TeeBuy, ItemAdd, ItemBuy, HostelSuperintendent, Notice, Document
 from django.views.decorators.csrf import csrf_protect
 from datetime import date, datetime, timedelta
 from .forms import MessForm, LeaveForm, BonafideForm, DayPassForm
@@ -626,6 +626,7 @@ def store(request):
     tees = TeeAdd.objects.filter(available=True)
     items = ItemAdd.objects.filter(available=True)
     teesj = TeeAdd.objects.filter(available=True).values_list('title')
+
     # tees_json = json.dumps(list(tees), cls=DjangoJSONEncoder)
     context = {
         'student': student,
@@ -637,12 +638,25 @@ def store(request):
     if request.POST:
         if request.POST.get('what') == 'item':
             itemno = ItemAdd.objects.get(id=int(request.POST.get('info')))
-            if itemno.available == True:
+            bought = False;
+            if ItemBuy.objects.filter(student=student,item=itemno).exists():
+                bought = True
+            else: 
+                bought = False
+            if bought == True:
+                messages.add_message(request, messages.INFO,"You have already paid for "+ itemno.title,extra_tags='orange')
+            elif itemno.available == True:
                 itembuy = ItemBuy.objects.create(item = itemno, student=student)
                 messages.add_message(request, messages.INFO, itemno.title + ' item bought. Thank you for purchasing. Headover to DUES to check your purchases.', extra_tags='green')
-            messages.add_message(request, messages.INFO,  'Item not available', extra_tags='red')
+            else:
+                messages.add_message(request, messages.INFO,  'Item not available', extra_tags='red')
         if request.POST.get('what') == 'tee':
             teeno = TeeAdd.objects.get(id=int(request.POST.get('info')))
+            bought = False;
+            if TeeBuy.objects.filter(student=student,tee=teeno).exists():
+                bought = True
+            else: 
+                bought = False
             try:
                 nick = request.POST.get('nick')
                 sizes = request.POST.get('sizes')
@@ -659,8 +673,10 @@ def store(request):
                     message_error = "Color doesn't match the database."
                 if qty is None:
                     message_error = "Provide quantity of the tees you want."
-                print(message_error)
-                if message_error == "":
+    
+                if bought == True:
+                    messages.add_message(request,messages.INFO,"You have already paid for "+ teeno.title,extra_tags='orange')
+                elif message_error == "":
                     teebuy = TeeBuy.objects.create(tee = teeno, student=student, nick=nick, size=sizes, color=colors, qty=qty)
                     messages.add_message(request, messages.INFO, teeno.title + ' tee bought. Thank you for purchasing. Headover to DUES to check your purchases.', extra_tags='green')
                 else:
@@ -688,9 +704,14 @@ def dues(request):
 
 
 def search(request):
+    perm=0;
+    if request.user.is_authenticated:
+        if is_warden(request.user) or is_hostelsuperintendent(request.user):
+            perm=1
     context = {
         'hostels' : [i[0] for i in HOSTELS],
         'branches' : BRANCH,
+        'permission': perm
     }
     postContext = {}
     if request.GET:
@@ -726,3 +747,40 @@ def notice(request):
         'queryset' : Notice.objects.all().order_by('-id')
     }
     return render(request,"notice.html",context)
+
+def antiragging(request):
+    return render(request,"antiragging.html",{})
+
+def swd(request):
+    return render(request,"swd.html",{})
+
+def csa(request):
+    return render(request,"csa.html",{})
+
+def sac(request):
+    return render(request,"sac.html",{})
+
+def studentDetails(request,id=None):
+    if request.user.is_authenticated:
+        if is_warden(request.user) or is_hostelsuperintendent(request.user):
+            student = Student.objects.get(id=id)
+            res=HostelPS.objects.get(student__id=id) 
+            context = { 
+                     'student'  :student,
+                     'residence' :res
+            }
+            return render(request,"studentdetails.html",context)
+    else:
+        return render(request, 'home1.html',{})
+
+def documents(request):
+    context = {
+                    'queryset' : Document.objects.all()
+    }
+    return render(request,"documents.html",context)
+
+
+
+
+        
+

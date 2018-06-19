@@ -34,9 +34,14 @@ urlpatterns = [
     url(r'^dues/', views.dues, name="dues"),
     url(r'^documents/', views.documents, name="documents"),
     url(r'^search/', views.search, name="search"),
-
+    url(r'^student/(?P<id>\d+)/$',views.studentDetails, name="studentDetails"),
     url(r'^messbill/', views.messbill, name='messbill'),
     url(r'^notice/',views.notice, name='notice'),
+    url(r'^antiragging/',views.antiragging, name='antiragging'),
+    url(r'^swd/',views.swd, name='swd'),
+    url(r'^csa/',views.csa, name='csa'),
+    url(r'^sac/',views.sac, name='sac'),
+
 
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
