@@ -1,39 +1,6 @@
+{% extends 'wardenbase.html' %}
 {% load staticfiles %}
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0" />
-    <title>SWD BITS Goa</title>
-
-    <!-- CSS  -->
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link href="{% static 'css/materialize.css' %}" type="text/css" rel="stylesheet" media="screen,projection" />
-    <link href="{% static 'css/style.css' %}" type="text/css" rel="stylesheet" media="screen,projection" />
-</head>
-
-<body>
-    <nav class="nav-extended">
-        <div class="nav-wrapper">
-            <a href="#" class="brand-logo">&nbsp;Student Welfare Division</a>
-            <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
-            <ul id="nav-mobile" class="right hide-on-med-and-down">
-                <li class=""><a href="/profile" class="valign-wrapper"><img class="circle profileImg" src="{% static 'img/profile-swd.jpg' %}">&nbsp;{{ warden.name|title }}</a></li>
-                <li><a href="/logout">Logout</a></li>
-            </ul>
-            <ul class="side-nav" id="mobile-demo">
-                <li><a href="/profile" class="valign-wrapper"><img class="circle profileImg" src="{% static 'img/profile-swd.jpg' %}">&nbsp;{{ warden.name|title }}</a></li>
-                <li><a href="/logout">Logout</a></li>
-            </ul>
-            <style>
-                .profileImg {
-                    max-width: 35px;
-                    height: auto
-                }
-            </style>
-        </div>
-    </nav>
+{% block content %}
     <div class="section no-pad-bot" id="index-banner">
     </div>
 
@@ -241,23 +208,5 @@
         <br><br>
     </div>
 
+{% endblock %}
 
-
-    <!--  Scripts-->
-    <script src="{% static 'js/jquery.js' %}"></script>
-    <script src="{% static 'js/materialize.js' %}"></script>
-    <script src="{% static 'js/init.js' %}"></script>
-    <style>
-        .clickable {
-            cursor: pointer;
-        }
-    </style>
-    <script>
-       function leaveclick(d) {
-           window.location.href = '/warden/' + $(d).data('id') +'/';
-       }
-    </script>
-
-</body>
-
-</html>
