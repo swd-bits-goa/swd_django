@@ -42,6 +42,10 @@
                     <td>{{ student.name }}</td>
                 </tr>
                 <tr>
+                    <td>Photo</td>
+                    <td><img src="/media/{{ student.profile_picture }}" height=200 width=140></img></td>
+                </tr>
+                <tr>
                     <td>ID</td>
                     <td>{{ student.bitsId }}</td>
                 </tr>
@@ -94,6 +98,12 @@
                     <td>Parent's email</td>
                     <td>{{ student.parentEmail }}</td>
                 </tr>
+                {% for d in disco %}
+                <tr>
+                    <td>DISCO({{ d.dateOfViolation }})</td>
+                    <td>{{ d.subject }}</td>
+                </tr>
+                {% endfor %}
             </tbody>
         </table>
    

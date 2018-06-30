@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .models import Student, MessOptionOpen, MessOption, Leave, Bonafide, Warden, DayPass, MessBill, HostelPS, TeeAdd, TeeBuy, ItemAdd, ItemBuy, HostelSuperintendent, Notice, Document, LateComer
+from .models import Student, MessOptionOpen, MessOption, Leave, Bonafide, Warden, DayPass, MessBill, HostelPS, TeeAdd, TeeBuy, ItemAdd, ItemBuy, HostelSuperintendent, Notice, Document, LateComer, Disco
 from django.views.decorators.csrf import csrf_protect
 from datetime import date, datetime, timedelta
 from .forms import MessForm, LeaveForm, BonafideForm, DayPassForm
@@ -765,9 +765,11 @@ def studentDetails(request,id=None):
         if is_warden(request.user) or is_hostelsuperintendent(request.user):
             student = Student.objects.get(id=id)
             res=HostelPS.objects.get(student__id=id) 
+            disco=Disco.objects.filter(student__id=id)
             context = { 
                      'student'  :student,
-                     'residence' :res
+                     'residence' :res,
+                     'disco' : disco,
             }
             return render(request,"studentdetails.html",context)
     else:
