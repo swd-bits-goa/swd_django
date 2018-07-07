@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .models import Student, MessOptionOpen, MessOption, Leave, Bonafide, Warden, DayPass, MessBill, HostelPS, TeeAdd, TeeBuy, ItemAdd, ItemBuy, HostelSuperintendent, Notice, Document, LateComer, Disco
+from .models import Student, MessOptionOpen, MessOption, Leave, Bonafide, Warden, DayPass, MessBill, HostelPS, TeeAdd, TeeBuy, ItemAdd, ItemBuy, HostelSuperintendent, Notice, Document, LateComer, Disco, AntiRagging
 from django.views.decorators.csrf import csrf_protect
 from datetime import date, datetime, timedelta
 from .forms import MessForm, LeaveForm, BonafideForm, DayPassForm
@@ -653,10 +653,7 @@ def store(request):
         if request.POST.get('what') == 'tee':
             teeno = TeeAdd.objects.get(id=int(request.POST.get('info')))
             bought = False;
-            if TeeBuy.objects.filter(student=student,tee=teeno).exists():
-                bought = True
-            else: 
-                bought = False
+            query=TeeBuy.objects.filter(student=student,tee=teeno)
             try:
                 nick = request.POST.get('nick')
                 sizes = request.POST.get('sizes')
@@ -673,7 +670,9 @@ def store(request):
                     message_error = "Color doesn't match the database."
                 if qty is None:
                     message_error = "Provide quantity of the tees you want."
-    
+                for i in range(0,query.count()):
+                    if query[i].size==sizes:
+                        bought = True
                 if bought == True:
                     messages.add_message(request,messages.INFO,"You have already paid for "+ teeno.title,extra_tags='orange')
                 elif message_error == "":
@@ -802,6 +801,8 @@ def latecomer(request):
     }
     return render(request,"latecomer.html",context)
 
-
-        
-
+def antiragging(request):
+    context = {
+                    'queryset' : AntiRagging.objects.all()
+    }
+    return render(request,"antiragging.html",context)
