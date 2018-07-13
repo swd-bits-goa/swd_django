@@ -776,27 +776,36 @@ def studentDetails(request,id=None):
 
 def documents(request):
     if request.user.is_authenticated:
-        if is_warden(request.user) or is_hostelsuperintendent(request.user):
+        if is_warden(request.user):
             option = 'wardenbase.html'
+        elif is_hostelsuperintendent(request.user):
+            option = 'superintendentbase.html'
         else:
             option = 'base.html'
     context = {
                     'option' : option,
-                    'queryset' : Document.objects.all()
+                    'queryset' : Document.objects.all(),
     }
     return render(request,"documents.html",context)
 
-@user_passes_test(is_warden)
 def latecomer(request):
-    late = LateComer.objects.all() 
-    warden = Warden.objects.get(user=request.user)
-    queryset = HostelPS.objects.filter(hostel__icontains=warden.hostel)
     finallist=[]
-    for q in queryset:
-        for instance in late:
-            if q.student == instance.student:
-                finallist.append(instance)
+    late = LateComer.objects.all() 
+    if request.user.is_authenticated:
+        if is_warden(request.user):
+            option = 'wardenbase.html'
+            warden = Warden.objects.get(user=request.user)
+            queryset = HostelPS.objects.filter(hostel__icontains=warden.hostel)
+            for q in queryset:
+                for instance in late:
+                    if q.student == instance.student:
+                        finallist.append(instance)
+        elif is_hostelsuperintendent(request.user):
+            finallist=late.order_by('-dateTime')
+            option = 'superintendentbase.html'
+
     context={
+            'option' : option,
             'list' : finallist,
     }
     return render(request,"latecomer.html",context)
