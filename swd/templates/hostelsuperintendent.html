@@ -16,6 +16,7 @@
                                         <th>DayPass No.</th>
                                         <th>Name (ID)</th>
                                         <th>Date Applied</th>
+                                        <th>Out time</th>
                                         <th>Approval Status</th>
                                     </tr>
                                 </thead>
@@ -25,6 +26,7 @@
                                         <td>{{ daypass.id }}</td>
                                         <td>{{ daypass.student.name }} | {{ daypass.student.bitsId }}</td>
                                         <td>{{ daypass.dateTime|date:"d/M/y" }}</td>
+                                        <td>{{ daypass.dateTime|time}}</td>                                     
                                         <td>{% if daypass.approved == 1 %}Approved{% elif daypass.disapproved == 1 %}Disapproved{% else %}In Process{% endif %}</td>
                                     </tr>
                                     {% endfor %}

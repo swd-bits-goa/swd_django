@@ -405,7 +405,7 @@ def wardenleaveapprove(request, leave):
 @user_passes_test(is_hostelsuperintendent)
 def hostelsuperintendentdaypassapprove(request, daypass):
     daypass = DayPass.objects.get(id=daypass)
-    hostelsuperintendent = HostelSuperintendent.objects.filter(hostel=daypass.student.hostelps.hostel)
+    hostelsuperintendent = HostelSuperintendent.objects.filter(hostel__icontains=daypass.student.hostelps.hostel)
     hostelsuperintendent = hostelsuperintendent[0]
     context = {
         'option': 2,
