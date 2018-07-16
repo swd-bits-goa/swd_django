@@ -8,6 +8,23 @@
         <div class="section">
 
             <!--   Icon Section   -->
+            <form method="GET">
+            <div class="row">
+                        <div class="input-field col s3 offset-s2">
+                            <input name="name" id="name" type="text">
+                            <label for="name">Name</label>  
+                        </div>
+                        <div class="input-field col s3 ">
+                            <input name="date" id="date" type="date">
+                            <label for="date">Date</label>
+                        </div>
+                        <div>
+                        <input type="submit" value="Search" class="waves-effect waves-light btn" />
+                        </div>
+                    </div>
+                </form>
+
+                        
             <div class="row">
                 {% if option == 1 %}
                 <div class="col s6 l12">

@@ -327,7 +327,20 @@ def warden(request):
         'warden': warden,
         'leaves': leaves,
     }
-    return render(request, "warden.html", context)
+    postContext = {}
+    if request.GET:
+        name = request.GET.get('name')
+        date = request.GET.get('date')
+        leavesearch=[]
+        for leave in leaves:
+            if name.lower() in leave.student.name.lower():
+                dt=str(leave.dateTimeStart.year)+'-'+str(leave.dateTimeStart.month).zfill(2)+'-'+str(leave.dateTimeStart.day).zfill(2)
+                if date == "" or date in dt:
+                    leavesearch.append(leave)
+        postContext = {
+            'leaves':leavesearch
+        }
+    return render(request, "warden.html", dict(context, **postContext))
 
 @login_required
 @user_passes_test(is_hostelsuperintendent)
