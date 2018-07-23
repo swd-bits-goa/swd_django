@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .models import Student, MessOptionOpen, MessOption, Leave, Bonafide, Warden, DayPass, MessBill, HostelPS, TeeAdd, TeeBuy, ItemAdd, ItemBuy, HostelSuperintendent, Notice, Document
+from .models import Student, MessOptionOpen, MessOption, Leave, Bonafide, Warden, DayPass, MessBill, HostelPS, TeeAdd, TeeBuy, ItemAdd, ItemBuy, HostelSuperintendent, Notice, Document, LateComer, Disco, AntiRagging
 from django.views.decorators.csrf import csrf_protect
 from datetime import date, datetime, timedelta
 from .forms import MessForm, LeaveForm, BonafideForm, DayPassForm
@@ -327,7 +327,20 @@ def warden(request):
         'warden': warden,
         'leaves': leaves,
     }
-    return render(request, "warden.html", context)
+    postContext = {}
+    if request.GET:
+        name = request.GET.get('name')
+        date = request.GET.get('date')
+        leavesearch=[]
+        for leave in leaves:
+            if name.lower() in leave.student.name.lower():
+                dt=str(leave.dateTimeStart.year)+'-'+str(leave.dateTimeStart.month).zfill(2)+'-'+str(leave.dateTimeStart.day).zfill(2)
+                if date == "" or date in dt:
+                    leavesearch.append(leave)
+        postContext = {
+            'leaves':leavesearch
+        }
+    return render(request, "warden.html", dict(context, **postContext))
 
 @login_required
 @user_passes_test(is_hostelsuperintendent)
@@ -405,7 +418,7 @@ def wardenleaveapprove(request, leave):
 @user_passes_test(is_hostelsuperintendent)
 def hostelsuperintendentdaypassapprove(request, daypass):
     daypass = DayPass.objects.get(id=daypass)
-    hostelsuperintendent = HostelSuperintendent.objects.filter(hostel=daypass.student.hostelps.hostel)
+    hostelsuperintendent = HostelSuperintendent.objects.filter(hostel__icontains=daypass.student.hostelps.hostel)
     hostelsuperintendent = hostelsuperintendent[0]
     context = {
         'option': 2,
@@ -653,10 +666,7 @@ def store(request):
         if request.POST.get('what') == 'tee':
             teeno = TeeAdd.objects.get(id=int(request.POST.get('info')))
             bought = False;
-            if TeeBuy.objects.filter(student=student,tee=teeno).exists():
-                bought = True
-            else: 
-                bought = False
+            query=TeeBuy.objects.filter(student=student,tee=teeno)
             try:
                 nick = request.POST.get('nick')
                 sizes = request.POST.get('sizes')
@@ -673,7 +683,9 @@ def store(request):
                     message_error = "Color doesn't match the database."
                 if qty is None:
                     message_error = "Provide quantity of the tees you want."
-    
+                for i in range(0,query.count()):
+                    if query[i].size==sizes:
+                        bought = True
                 if bought == True:
                     messages.add_message(request,messages.INFO,"You have already paid for "+ teeno.title,extra_tags='orange')
                 elif message_error == "":
@@ -765,22 +777,54 @@ def studentDetails(request,id=None):
         if is_warden(request.user) or is_hostelsuperintendent(request.user):
             student = Student.objects.get(id=id)
             res=HostelPS.objects.get(student__id=id) 
+            disco=Disco.objects.filter(student__id=id)
             context = { 
                      'student'  :student,
-                     'residence' :res
+                     'residence' :res,
+                     'disco' : disco,
             }
             return render(request,"studentdetails.html",context)
     else:
         return render(request, 'home1.html',{})
 
 def documents(request):
+    if request.user.is_authenticated:
+        if is_warden(request.user):
+            option = 'wardenbase.html'
+        elif is_hostelsuperintendent(request.user):
+            option = 'superintendentbase.html'
+        else:
+            option = 'base.html'
     context = {
-                    'queryset' : Document.objects.all()
+                    'option' : option,
+                    'queryset' : Document.objects.all(),
     }
     return render(request,"documents.html",context)
 
+def latecomer(request):
+    finallist=[]
+    late = LateComer.objects.all() 
+    if request.user.is_authenticated:
+        if is_warden(request.user):
+            option = 'wardenbase.html'
+            warden = Warden.objects.get(user=request.user)
+            queryset = HostelPS.objects.filter(hostel__icontains=warden.hostel)
+            for q in queryset:
+                for instance in late:
+                    if q.student == instance.student:
+                        finallist.append(instance)
+        elif is_hostelsuperintendent(request.user):
+            finallist=late.order_by('-dateTime')
+            option = 'superintendentbase.html'
 
+    context={
+            'option' : option,
+            'list' : finallist,
+    }
+    return render(request,"latecomer.html",context)
 
-
-        
-
+def antiragging(request):
+    context = {
+                    'queryset' : AntiRagging.objects.all()
+    }
+    return render(request,"antiragging.html",context)

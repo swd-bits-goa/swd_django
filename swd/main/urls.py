@@ -41,6 +41,8 @@ urlpatterns = [
     url(r'^swd/',views.swd, name='swd'),
     url(r'^csa/',views.csa, name='csa'),
     url(r'^sac/',views.sac, name='sac'),
+    url(r'^latecomer/', views.latecomer, name="latecomer"),
+
 
 
 

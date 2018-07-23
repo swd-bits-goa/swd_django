@@ -30,3 +30,8 @@ class TeeBuyResource(resources.ModelResource):
 
     def dehydrate_room(self, TeeBuy):
         return HostelPS.objects.get(student=TeeBuy.student).room
+
+class MessOptionResource(resources.ModelResource):
+    class Meta:
+        model = MessOption
+        fields = ('monthYear','student__name','student__bitsId','mess',)

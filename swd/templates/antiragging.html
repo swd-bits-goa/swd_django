@@ -2,13 +2,9 @@
 
 <div class="container">
     <div class="section">
-        <div><a class="waves-effect waves-light btn" href="javascript:alert('place link here')">Supreme Court's Orders</a></div><br>
-        <div><a class="waves-effect waves-light btn" href="javascript:alert('place link here')">Raghavan's Report</a></div><br>
-        <div><a class="waves-effect waves-light btn" href="javascript:alert('place link here')">BIT's Office orders</a></div><br>
-        <div><a class="waves-effect waves-light btn" href="javascript:alert('place link here')">UGC Regulations 2009</a></div><br>
-        <div><a class="waves-effect waves-light btn" href="javascript:alert('place link here')">Anti Ragging Affidavit</a></div><br>
-        <div><a class="waves-effect waves-light btn" href="javascript:alert('place link here')">Videos on Anti Ragging</a></div><br>
-        
+    	{% for document in queryset %}
+        <div><a class="waves-effect waves-light btn" href="{{ document.link }}">{{ document.title }}</a></div><br>
+    	{% endfor %}
     </div>
     <br><br>
 </div>
