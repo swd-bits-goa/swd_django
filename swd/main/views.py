@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .models import Student, MessOptionOpen, MessOption, Leave, Bonafide, Warden, DayPass, MessBill, HostelPS, TeeAdd, TeeBuy, ItemAdd, ItemBuy, HostelSuperintendent, Notice, Document, LateComer, Disco, AntiRagging
+from .models import Student, MessOptionOpen, MessOption, Leave, Bonafide, Warden, DayPass, MessBill, HostelPS, TeeAdd, TeeBuy, ItemAdd, ItemBuy, HostelSuperintendent, Notice, Document, LateComer, Disco, AntiRagging, CSA
 from django.views.decorators.csrf import csrf_protect
 from datetime import date, datetime, timedelta
 from .forms import MessForm, LeaveForm, BonafideForm, DayPassForm
@@ -733,7 +733,7 @@ def search(request):
         hostel = request.GET.get('hostel')
         room = request.GET.get('room')
 
-        students = Student.objects.filter(Q(name__contains=name) & Q(bitsId__contains=bitsId) & Q(bitsId__contains=branch) & Q(hostelps__hostel__contains=hostel) & Q(hostelps__room__contains=room))[:50]
+        students = Student.objects.filter(Q(name__icontains=name) & Q(bitsId__icontains=bitsId) & Q(bitsId__contains=branch) & Q(hostelps__hostel__contains=hostel) & Q(hostelps__room__contains=room))[:50]
 
         searchstr = {}
 
@@ -767,7 +767,10 @@ def swd(request):
     return render(request,"swd.html",{})
 
 def csa(request):
-    return render(request,"csa.html",{})
+    context = {
+        'csa' : CSA.objects.all().order_by('priority')
+    }
+    return render(request,"csa.html",context)
 
 def sac(request):
     return render(request,"sac.html",{})

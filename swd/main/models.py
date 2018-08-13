@@ -69,6 +69,8 @@ HOSTELS = (
     ('CH5', 'CH5'),
     ('CH6', 'CH6'),
     ('CH7', 'CH7'),
+    ('DH1', 'DH1'),
+    ('DH2', 'DH2')
 )
 
 class Warden(models.Model):
@@ -156,9 +158,11 @@ class CSA(models.Model):
     student = models.OneToOneField('Student', on_delete = models.CASCADE)
     title = models.CharField(max_length=20)
     email = models.EmailField()
+    pic = models.ImageField(blank=True, null=True)
+    priority=models.IntegerField(blank=True, null=True)
 
     def __str__(self):
-        return self.title + ' ' + self.student.name + self.email
+        return self.title + ' ' + self.student.name + ' ' + self.email
 
 class MessOption(models.Model):
     student = models.ForeignKey('Student', on_delete = models.CASCADE)
@@ -381,3 +385,4 @@ class AntiRagging(models.Model):
 
     def __str__(self):
         return self.title  
+
