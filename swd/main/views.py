@@ -75,7 +75,7 @@ def dashboard(request):
     }
     #mess
     messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
-    messopen = messopen.exclude(dateOpen__gte=date.today())
+    messopen = messopen.exclude(dateOpen__gt=date.today())
     if messopen:
         messoption = MessOption.objects.filter(monthYear=messopen[0].monthYear, student=student)
 
@@ -115,8 +115,10 @@ def dashboard(request):
 @login_required
 def profile(request):
     student = Student.objects.get(user=request.user)
+    hostelps = HostelPS.objects.get(student=student)
     context = {
         'student': student,
+        'hostelps':hostelps,
     }
     print(student.name)
 
@@ -170,7 +172,7 @@ def logoutform(request):
 @noPhD
 def messoption(request):
     messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
-    messopen = messopen.exclude(dateOpen__gte=date.today())
+    messopen = messopen.exclude(dateOpen__gt=date.today())
     student = Student.objects.get(user=request.user)
 
     if messopen:
@@ -489,9 +491,12 @@ def daypass(request):
             daypassform = form.save(commit=False)
             date = datetime.strptime(request.POST.get('date'), '%d %B, %Y').date()
             time = datetime.strptime(request.POST.get('time'), '%H:%M').time()
+            intime = datetime.strptime(request.POST.get('intime'), '%H:%M').time()
             dateTime = datetime.combine(date, time)
+            inTime = datetime.combine(date,intime)
             daypassform.dateTime = make_aware(dateTime)
             daypassform.student = student
+            daypassform.inTime = make_aware(inTime)
             daypassform.save()
 
             if config.EMAIL_PROD:
@@ -718,12 +723,19 @@ def dues(request):
 def search(request):
     perm=0;
     if request.user.is_authenticated:
-        if is_warden(request.user) or is_hostelsuperintendent(request.user):
+        if is_warden(request.user):
+            option = 'wardenbase.html'
             perm=1
+        elif is_hostelsuperintendent(request.user):
+            option = 'superintendentbase.html'
+            perm=1
+        else:
+            option = 'indexbase.html'
     context = {
         'hostels' : [i[0] for i in HOSTELS],
         'branches' : BRANCH,
-        'permission': perm
+        'permission': perm,
+        'option' :option
     }
     postContext = {}
     if request.GET:

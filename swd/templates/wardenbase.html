@@ -46,6 +46,7 @@
 {% block content %}
 {% endblock %} 
 <!--  Scripts-->
+
     <script src="{% static 'js/jquery.js' %}"></script>
     <script src="{% static 'js/materialize.js' %}"></script>
     <script src="{% static 'js/init.js' %}"></script>
@@ -58,6 +59,9 @@
        function leaveclick(d) {
            window.location.href = '/warden/' + $(d).data('id') +'/';
        }
+        $(document).ready(function () {
+            $('select').material_select();
+        });
     </script>
 
 </body>
