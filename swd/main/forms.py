@@ -58,12 +58,13 @@ class printBonafideForm(forms.Form):
 
 class DayPassForm(forms.ModelForm):
     date = forms.CharField(label='Date', widget=forms.TextInput(attrs={'class': 'datepicker'}))
-    time = forms.CharField(label='Time', widget=forms.TextInput(attrs={'class': 'timepicker'}))
-
+    time = forms.CharField(label='Out Time', widget=forms.TextInput(attrs={'class': 'timepicker'}))
+    intime = forms.CharField(label='In Time', widget=forms.TextInput(attrs={'class': 'timepicker'}))
     def clean(self):
         cleaned_data = super(DayPassForm, self).clean()
         date = datetime.strptime(cleaned_data['date'], '%d %B, %Y').date()
         time = datetime.strptime(cleaned_data['time'], '%H:%M').time()
+        intime = datetime.strptime(cleaned_data['intime'], '%H:%M').time()
         date_time_start = datetime.combine(date, time)
         if datetime.now() >= date_time_start:
             self.add_error('date', "Daypass cannot be issued before the present date and time")
@@ -72,7 +73,7 @@ class DayPassForm(forms.ModelForm):
     class Meta:
         model = DayPass
         exclude = ['student', 'approvedBy',
-                    'approved', 'comment', 'disapproved', 'inprocess', 'dateTime']
+                    'approved', 'comment', 'disapproved', 'inprocess', 'dateTime','inTime']
         widgets = {
             'reason': forms.Textarea(attrs={'class': 'materialize-textarea'}),
             'corrAddress': forms.Textarea(attrs={'class': 'materialize-textarea validate'}),

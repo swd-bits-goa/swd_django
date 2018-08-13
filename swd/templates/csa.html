@@ -1,7 +1,54 @@
 {% extends 'indexbase.html' %} {% block content %}
 
-<h1><div align="center">Council for Student Affairs 2017-18</h1>
-<div class="card">
+<h1><div align="center">Council for Student Affairs 2017-18</h1></div>
+<div class="row">
+  {% for person in csa %}
+  <div class="column">
+    <div class="card">
+    <p class ="img">
+      <img src="/media/{{ person.pic }}" style="width:30%">
+     </p>
+      <div class="container">
+        <h4>{{ person.title }}</h4>
+        <p class="title">{{ person.student.name }} - {{ person.student.bitsId }}</p>
+        <p>{{ person.student.phone }}</p>
+        <p><a href="mailto:{{ person.email }}">{{ person.email }}</a></p>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
 </div>
+<style>
+.column {
+    float: left;
+    width: 50%;
+    margin-bottom: 16px;
+    padding: 0 8px;
+}
 
+@media screen and (max-width: 650px) {
+.column {
+        width: 100%;
+        display: block;
+    }
+}
+.container {
+    padding: 0 16px;
+}
+.container::after, .row::after {
+    content: "";
+    clear: both;
+    display: table;
+}
+.title {
+    color: grey;
+}
+.img{
+	float: left;
+	padding: 0 16px;
+
+}
+
+
+</style>
 {% endblock %}

@@ -9,8 +9,8 @@
                 <div class="card">
                     <div class="card-content">
                         <span class="card-title">Apply for Daypass</span>
-                        Students should apply for day pass 1 day prior/that day itself.
                         {% if option == 0 %}
+                        Students should apply for day pass 1 day prior.
                         <form method="POST">
                             {% csrf_token %}
                             <div class="col-md-12">
@@ -25,8 +25,7 @@
                             </div>
                         </form>
                         {% elif option == 1 %}
-                            <p>Daypass Successfully applied. Please wait for approval</p>
-                            <p>Daypass applied for {{ date }}</p>
+                            <p>Daypass Successfully applied for {{ date }}. Please wait for approval.</p>
                         {% else %}
                             {% if form.errors %}
                                 {% for error in form.non_field_errors %}

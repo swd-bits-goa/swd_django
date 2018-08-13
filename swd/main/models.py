@@ -69,6 +69,8 @@ HOSTELS = (
     ('CH5', 'CH5'),
     ('CH6', 'CH6'),
     ('CH7', 'CH7'),
+    ('DH1', 'DH1'),
+    ('DH2', 'DH2')
 )
 
 class Warden(models.Model):
@@ -156,9 +158,11 @@ class CSA(models.Model):
     student = models.OneToOneField('Student', on_delete = models.CASCADE)
     title = models.CharField(max_length=20)
     email = models.EmailField()
+    pic = models.ImageField(blank=True, null=True)
+    priority=models.IntegerField(blank=True, null=True)
 
     def __str__(self):
-        return self.title + ' ' + self.student.name + self.email
+        return self.title + ' ' + self.student.name + ' ' + self.email
 
 class MessOption(models.Model):
     student = models.ForeignKey('Student', on_delete = models.CASCADE)
@@ -191,8 +195,10 @@ class Bonafide(models.Model):
         yearName=YEARNAMES[yearNum]
 
         reason = self.otherReason if self.reason.lower()=='other' else self.reason
-
-        return '''This is to certify that <i>''' + gender + self.student.name.title() + '''</i>, ID No. <i>''' + self.student.bitsId + '''</i> is a bonafide student of '''+ yearName + ''' year at Birla Institute of Technology and Science (BITS) Pilani University, K.K Birla Goa campus, pursuing ''' + branch + '''. '''+pronoun+''' is residing in the Hostel <i>'''+res.hostel+'''-'''+res.room+'''</i> of this institute.''' +'''<br>This certificate is issued for the purpose of applying for ''' + reason + '''.'''
+        if(res.status == "Student"):
+            return '''&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This is to certify that <i>''' + gender + self.student.name.title() + '''</i>, ID No. <i>''' + self.student.bitsId + '''</i> is a bonafide student of '''+ yearName + ''' year at Birla Institute of Technology and Science (BITS) Pilani University, K.K Birla Goa campus, pursuing ''' + branch + '''. '''+pronoun+''' is residing in the Hostel <i>'''+res.hostel+'''-'''+res.room+'''</i> of this institute.''' +'''<br>This certificate is issued for the purpose of applying for ''' + reason + '''.'''
+        elif(res.status == "Thesis" or res.status == "PS2"):
+            return '''&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This is to certify that <i>''' + gender + self.student.name.title() + '''</i>, ID No. <i>''' + self.student.bitsId + '''</i> is a bonafide student of '''+ yearName + ''' year class. ''' + pronoun +''' was admitted to the Institute on <i>30/07/2014</i>, for pursuing the <i>'''+ branch +'''</i> programme of studies. '''+ pronoun+ ''' is pursuing <i>''' + res.status + '''</i> at <i>'''+ res.psStation +'''</i> as a part of the academic requirement of BITS-Pilani, Deemed University.<br>This certificate is issued for the purpose of applying for ''' + reason + '''.'''
 
     def save(self, *args, **kwargs):
         if self.text == '':
@@ -223,7 +229,7 @@ class DayPass(models.Model):
     student = models.ForeignKey('Student', on_delete = models.CASCADE)
     reason = models.TextField()
     dateTime = models.DateTimeField(null=True)
-    # consent = models.CharField(max_length=10, choices=CONSENT_CHOICES)
+    inTime = models.DateTimeField(null=True)
     corrAddress = models.TextField()
     approvedBy = models.ForeignKey('HostelSuperintendent', blank=True, null=True, on_delete="PROTECT")
     approved = models.BooleanField(default=0, blank=True)
@@ -381,3 +387,4 @@ class AntiRagging(models.Model):
 
     def __str__(self):
         return self.title  
+

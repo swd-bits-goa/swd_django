@@ -15,7 +15,6 @@
                                 <tr>
                                     <td>Name</td>
                                     <td>{{ student.name }}</td>
-
                                 </tr>
                                 <tr>
                                     <td>BITS ID:</td>
@@ -28,8 +27,37 @@
                                 </tr>
                                 <tr>
                                     <td>Address</td>
-                                    <td> <span class="left addressval">{{ student.address }} </span> <span class="new badge red comm left editAddr" data-badge-caption="">Edit</span> </td>
+                                    <td> 
+                                    <span class="left initialAdress">{{ student.address }}</span>
+                                    <input type="text" placeholder="House no." class="left addressval"> </input>
+                                    <input type="text" placeholder="Premise" class="left addressval"></input> 
+                                    <input type="text" placeholder="Area" class="left addressval"></input> 
+                                    <input type="text" placeholder="Town" class="left addressval"></input> 
+                                    <input type="text" placeholder="State" class="left addressval"></input> 
+                                    <input type="text" placeholder="PIN" class="left addressval"></input>
+                                    <span class="new badge red comm left editAddr" data-badge-caption="">Edit</span>
+                                    <br>
+                                    <span class="showError">Enter all the fields</span> </td>
                                 </tr>
+                                {% if hostelps.status == "Student" %}
+                                <tr>
+                                    <td>Hostel</td>
+                                    <td>{{ hostelps.hostel }}</td>
+                                </tr><tr>
+                                    <td>Room</td>
+                                    <td>{{ hostelps.room }}</td>
+                                </tr>
+                                {% elif hostelps.status == "Graduate" %}
+                                <tr>
+                                    <td>Status</td>
+                                    <td>Graduated</td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td>{{hostelps.status }}</td>
+                                    <td>{{ hostelps.psStation }}</td>
+                                </tr>
+                                {% endif %}
                                 <tr>
                                     <td>CGPA</td>
                                     <td>{{ student.cgpa }}</td>
@@ -66,26 +94,58 @@
   .details th:nth-child(2), .details td:nth-child(2) {
     width: 65%;
   }
+  .initialAdress{
+    display: block;
+  }
+  .addressval{
+    display: none
+  }
+  .showError{
+    color: red;
+    display: none;
+    padding: 10px;
+  }
 </style>
 {% csrf_token %}
 <script>
   $(document).on('click', '.editAddr', (e) => {
     $('.editAddr').addClass('saveAddr').removeClass('editAddr').text('Save').removeClass('red').addClass('green')
-    $('.addressval').attr('contenteditable', true)
-    $('.addressval').focus()
+    $(".initialAdress").hide();
+    console.log('Show')
+    $('.addressval').show()
+    $('.addressval')[0].focus()
   })
 
   $(document).on('click', '.saveAddr', (e) => {
-    $('.saveAddr').addClass('editAddr').removeClass('saveAddr').text('Edit').removeClass('green').addClass('red')
-    $('.addressval').removeAttr('contenteditable')
-    $('.addressval').blur()
-
-    const newAddr = $('.addressval').text()
-
-    $.post('/profile/', {
-      address: newAddr,
-      csrfmiddlewaretoken: $('[name="csrfmiddlewaretoken"]').val()
-    })
+    var flag=1;
+    for(var i=0;i<6;i++){
+        if(!$('.addressval')[i].value){
+            flag=0;
+        }
+    }
+    console.log(flag)
+    if(flag){
+        $('.saveAddr').addClass('editAddr').removeClass('saveAddr').text('Edit').removeClass('green').addClass('red')
+        $(".initialAdress").show();
+        $('.addressval').removeAttr('contenteditable')
+        $('.addressval').hide()
+        $('.addressval').blur()
+        $('.showError').hide();
+        location.reload()
+        var newAddr = "";
+        for(var i=0;i<6;i++){
+            newAddr = $('.addressval')[i].value+', '+newAddr
+        }
+        $.post('/profile/', {
+          address: newAddr.substr(0, newAddr.length-1),
+          csrfmiddlewaretoken: $('[name="csrfmiddlewaretoken"]').val()
+        })
+    }
+    else{
+        console.log('Show all the fields')
+        $('.showError').show();
+    }
+    
   })
 </script>
 
