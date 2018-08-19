@@ -69,7 +69,7 @@ class MessOptionAdmin(ExportActionModelAdmin,admin.ModelAdmin):
 
 @admin.register(Leave)
 class LeaveAdmin(admin.ModelAdmin):
-    search_fields = ['student__name', 'student__bitsId','dateTimeStart']
+    search_fields = ['student__name', 'student__bitsId','dateTimeStart','id']
     actions = [export_xls, ]
 
 admin.site.register(Student, StudentAdmin)

@@ -28,6 +28,8 @@ class LeaveForm(forms.ModelForm):
             self.add_error('dateEnd', "Arrival cannot be before Departure")
         if (datetime.now() >= date_time_start):
             self.add_error('dateStart', "Departure cannot be before the present date and time")
+        if((date_time_start-datetime.now()).days>30):
+            self.add_error('dateStart', "Can apply for leaves within a month only.")
         return cleaned_data
 
     class Meta:
@@ -68,6 +70,8 @@ class DayPassForm(forms.ModelForm):
         date_time_start = datetime.combine(date, time)
         if datetime.now() >= date_time_start:
             self.add_error('date', "Daypass cannot be issued before the present date and time")
+        if (date_time_start-datetime.now()).days>2:
+            self.add_error('date', "Can apply for daypass within 2 days")
         return cleaned_data
 
     class Meta:

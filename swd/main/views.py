@@ -779,13 +779,18 @@ def swd(request):
     return render(request,"swd.html",{})
 
 def csa(request):
+    y=1-(datetime.now().month-1)//6
+
     context = {
-        'csa' : CSA.objects.all().order_by('priority')
+        'csa' : CSA.objects.all().order_by('priority'),
+        'year' : datetime.now().year - y
     }
     return render(request,"csa.html",context)
 
 def sac(request):
     return render(request,"sac.html",{})
+def contact(request):
+    return render(request,"contact.html",{})
 
 def studentDetails(request,id=None):
     if request.user.is_authenticated:
