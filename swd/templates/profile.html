@@ -133,7 +133,7 @@
         $('.showError').hide();
         location.reload()
         var newAddr = "";
-        for(var i=0;i<6;i++){
+        for(var i=5;i>=0;i--){
             newAddr = $('.addressval')[i].value+', '+newAddr
         }
         $.post('/profile/', {

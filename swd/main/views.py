@@ -54,10 +54,10 @@ def login_success(request):
 #         with open("assets/img/profile-swd.jpg", "rb") as f:
 #             return HttpResponse(f.read(), content_type="image/jpg")
 
-@login_required
-def documents(request):
-    student = Student.objects.get(user=request.user)
-    return render(request, "documents.html", {'student': student})
+# @login_required
+# def documents(request):
+#     student = Student.objects.get(user=request.user)
+#     return render(request, "documents.html", {'student': student})
   
 @login_required
 def dashboard(request):
@@ -722,6 +722,7 @@ def dues(request):
 
 def search(request):
     perm=0;
+    option='indexbase.html';
     if request.user.is_authenticated:
         if is_warden(request.user):
             option = 'wardenbase.html'
@@ -729,8 +730,8 @@ def search(request):
         elif is_hostelsuperintendent(request.user):
             option = 'superintendentbase.html'
             perm=1
-        else:
-            option = 'indexbase.html'
+        elif request.user.is_superuser:
+            perm=1
     context = {
         'hostels' : [i[0] for i in HOSTELS],
         'branches' : BRANCH,
@@ -779,17 +780,22 @@ def swd(request):
     return render(request,"swd.html",{})
 
 def csa(request):
+    y=1-(datetime.now().month-1)//6
+
     context = {
-        'csa' : CSA.objects.all().order_by('priority')
+        'csa' : CSA.objects.all().order_by('priority'),
+        'year' : datetime.now().year - y
     }
     return render(request,"csa.html",context)
 
 def sac(request):
     return render(request,"sac.html",{})
+def contact(request):
+    return render(request,"contact.html",{})
 
 def studentDetails(request,id=None):
     if request.user.is_authenticated:
-        if is_warden(request.user) or is_hostelsuperintendent(request.user):
+        if is_warden(request.user) or is_hostelsuperintendent(request.user) or request.user.is_superuser:
             student = Student.objects.get(id=id)
             res=HostelPS.objects.get(student__id=id) 
             disco=Disco.objects.filter(student__id=id)
@@ -802,18 +808,30 @@ def studentDetails(request,id=None):
     else:
         return render(request, 'home1.html',{})
 
+@login_required
 def documents(request):
     if request.user.is_authenticated:
         if is_warden(request.user):
-            option = 'wardenbase.html'
+            warden = Warden.objects.get(user=request.user)
+            context = {
+                            'option' : 'wardenbase.html',
+                            'warden' : warden,
+                            'queryset' : Document.objects.all(),
+            }
         elif is_hostelsuperintendent(request.user):
-            option = 'superintendentbase.html'
+            hostelsuperintendent = HostelSuperintendent.objects.get(user=request.user)
+            context = {
+                            'option' : 'superintendentbase.html',
+                            'hostelsuperintendent' : hostelsuperintendent,
+                            'queryset' : Document.objects.all(),
+            }
         else:
-            option = 'base.html'
-    context = {
-                    'option' : option,
-                    'queryset' : Document.objects.all(),
-    }
+            student = Student.objects.get(user=request.user)
+            context = {
+                            'option' : 'base.html',
+                            'student' : student,
+                            'queryset' : Document.objects.all(),
+            }
     return render(request,"documents.html",context)
 
 def latecomer(request):
@@ -828,15 +846,24 @@ def latecomer(request):
                 for instance in late:
                     if q.student == instance.student:
                         finallist.append(instance)
+            context={
+                        'warden' : warden,
+                        'option' : option,
+                        'list' : finallist,
+            }
         elif is_hostelsuperintendent(request.user):
             finallist=late.order_by('-dateTime')
             option = 'superintendentbase.html'
+            hostelsuperintendent = HostelSuperintendent.objects.get(user=request.user)
+            context={
+                        'hostelsuperintendent' : hostelsuperintendent,
+                        'option' : option,
+                        'list' : finallist,
+            }
 
-    context={
-            'option' : option,
-            'list' : finallist,
-    }
-    return render(request,"latecomer.html",context)
+        return render(request,"latecomer.html",context)
+    else:
+        return render(request, 'home1.html',{})
 
 def antiragging(request):
     context = {

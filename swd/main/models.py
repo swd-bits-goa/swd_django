@@ -223,7 +223,7 @@ class Leave(models.Model):
     comment = models.TextField(default='', blank=True)
 
     def __str__(self):
-        return self.student.bitsId + ' '+ self.student.name
+        return self.student.bitsId + ' '+ self.student.name + ' ' + str(self.id)
 
 class DayPass(models.Model):
     student = models.ForeignKey('Student', on_delete = models.CASCADE)
