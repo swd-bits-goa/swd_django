@@ -109,22 +109,35 @@ def dashboard(request):
 
 @login_required
 def profile(request):
-    student = Student.objects.get(user=request.user)
-    hostelps = HostelPS.objects.get(student=student)
-    context = {
-        'student': student,
-        'hostelps':hostelps,
-    }
-    print(student.name)
-
-    if request.POST:
-        address = request.POST.get('address')
-        #print(address)
-        student.address = address
-        student.save()
-        return HttpResponse("{ status: 'ok' }")
-        
+    if is_warden(request.user):
+        warden = Warden.objects.get(user=request.user)
+        context = {
+            'option' : 'wardenbase.html',
+            'warden' : warden,
+        }
+    elif is_hostelsuperintendent(request.user):
+        hostelsuperintendent = HostelSuperintendent.objects.get(user=request.user)
+        context = {
+            'option' : 'superintendentbase.html',
+            'hostelsuperintendent' : hostelsuperintendent
+        }
+    else:
+        student = Student.objects.get(user=request.user)
+        hostelps = HostelPS.objects.get(student=student)
+        context = {
+            'option' : 'base.html',
+            'student': student,
+            'hostelps':hostelps,
+        }
+        if request.POST:
+            address = request.POST.get('address')
+            #print(address)
+            student.address = address
+            student.save()
+            return HttpResponse("{ status: 'ok' }")
+            
     return render(request, "profile.html", context)
+
 
 
 @csrf_protect
@@ -135,6 +148,8 @@ def loginform(request):
                 return redirect('/admin')
         if Warden.objects.filter(user=request.user):
             return redirect('/warden')
+        if HostelSuperintendent.objects.filter(user=request.user):
+            return redirect('/hostelsuperintendent')
         return redirect('dashboard')
 
     if request.POST:
