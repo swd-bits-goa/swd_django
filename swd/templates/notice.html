@@ -9,7 +9,7 @@
         			{% for notice in queryset %}
         			<p>
               <div class="card" >
-              <span class="card-title">{{ notice.date }}</span>
+              <div class="card-title" >{{ notice.date }}</div>
                 <div class="card-content">
                 <b>{{ notice.title|safe }} </b>
                 {{ notice.desc|safe|linebreaks}}
