@@ -53,11 +53,6 @@ def login_success(request):
 #     except IOError:
 #         with open("assets/img/profile-swd.jpg", "rb") as f:
 #             return HttpResponse(f.read(), content_type="image/jpg")
-
-# @login_required
-# def documents(request):
-#     student = Student.objects.get(user=request.user)
-#     return render(request, "documents.html", {'student': student})
   
 @login_required
 def dashboard(request):
@@ -114,22 +109,35 @@ def dashboard(request):
 
 @login_required
 def profile(request):
-    student = Student.objects.get(user=request.user)
-    hostelps = HostelPS.objects.get(student=student)
-    context = {
-        'student': student,
-        'hostelps':hostelps,
-    }
-    print(student.name)
-
-    if request.POST:
-        address = request.POST.get('address')
-        #print(address)
-        student.address = address
-        student.save()
-        return HttpResponse("{ status: 'ok' }")
-        
+    if is_warden(request.user):
+        warden = Warden.objects.get(user=request.user)
+        context = {
+            'option' : 'wardenbase.html',
+            'warden' : warden,
+        }
+    elif is_hostelsuperintendent(request.user):
+        hostelsuperintendent = HostelSuperintendent.objects.get(user=request.user)
+        context = {
+            'option' : 'superintendentbase.html',
+            'hostelsuperintendent' : hostelsuperintendent
+        }
+    else:
+        student = Student.objects.get(user=request.user)
+        hostelps = HostelPS.objects.get(student=student)
+        context = {
+            'option' : 'base.html',
+            'student': student,
+            'hostelps':hostelps,
+        }
+        if request.POST:
+            address = request.POST.get('address')
+            #print(address)
+            student.address = address
+            student.save()
+            return HttpResponse("{ status: 'ok' }")
+            
     return render(request, "profile.html", context)
+
 
 
 @csrf_protect
@@ -140,6 +148,8 @@ def loginform(request):
                 return redirect('/admin')
         if Warden.objects.filter(user=request.user):
             return redirect('/warden')
+        if HostelSuperintendent.objects.filter(user=request.user):
+            return redirect('/hostelsuperintendent')
         return redirect('dashboard')
 
     if request.POST:
@@ -723,21 +733,43 @@ def dues(request):
 def search(request):
     perm=0;
     option='indexbase.html';
-    if request.user.is_authenticated:
-        if is_warden(request.user):
-            option = 'wardenbase.html'
-            perm=1
-        elif is_hostelsuperintendent(request.user):
-            option = 'superintendentbase.html'
-            perm=1
-        elif request.user.is_superuser:
-            perm=1
     context = {
         'hostels' : [i[0] for i in HOSTELS],
         'branches' : BRANCH,
         'permission': perm,
         'option' :option
     }
+    if request.user.is_authenticated:
+        if is_warden(request.user):
+            warden = Warden.objects.get(user=request.user)
+            option = 'wardenbase.html'
+            perm=1
+            context = {
+                'hostels' : [i[0] for i in HOSTELS],
+                'branches' : BRANCH,
+                'permission': perm,
+                'option' :option,
+                'warden' : warden,
+            }
+        elif is_hostelsuperintendent(request.user):
+            option = 'superintendentbase.html'
+            perm=1
+            hostelsuperintendent = HostelSuperintendent.objects.get(user=request.user)
+            context = {
+                'hostels' : [i[0] for i in HOSTELS],
+                'branches' : BRANCH,
+                'permission': perm,
+                'option' :option,
+                'hostelsuperintendent':hostelsuperintendent,
+            }
+        elif request.user.is_superuser:
+            perm=1
+            context = {
+                'hostels' : [i[0] for i in HOSTELS],
+                'branches' : BRANCH,
+                'permission': perm,
+                'option' :option,
+            }
     postContext = {}
     if request.GET:
         name = request.GET.get('name')
