@@ -12,7 +12,7 @@ The main repository for the development of SWD web application of BITS Goa.
 $ virtualenv swd
 $ cd swd
 $ source bin/activate
-$ git clone https://github.com/SebastinSanty/swd_django src
+$ git clone https://github.com/swd-bits-goa/swd_django src
 $ cd src/swd
 $ pip install -r requirements.txt
 ```
