@@ -36,6 +36,7 @@ urlpatterns = [
     url(r'^search/', views.search, name="search"),
     url(r'^student/(?P<id>\d+)/$',views.studentDetails, name="studentDetails"),
     url(r'^messbill/', views.messbill, name='messbill'),
+    url(r'^import_mess_bill/', views.import_mess_bill, name='import_mess_bill'),
     url(r'^notice/',views.notice, name='notice'),
     url(r'^antiragging/',views.antiragging, name='antiragging'),
     url(r'^swd/',views.swd, name='swd'),

@@ -8,7 +8,8 @@ from django.utils import timezone
 
 MESS_CHOICES = (
     ('A','Dining Hall A'),
-    ('C','Dining Hall C'))
+    ('C','Dining Hall C'),
+    ('D','Dining Hall D'))
 
 CONSENT_CHOICES = (
     ('Letter', 'Letter'),
@@ -290,6 +291,9 @@ class MessBill(models.Model):
     amount = models.FloatField()
     rebate = models.FloatField()
 
+    class Meta:
+        get_latest_by = "month"
+
     def __str__(self):
         return str(self.month) + ' ' + str(self.amount) + ' ' + str(self.rebate)
 
@@ -357,7 +361,11 @@ class Due(models.Model):
     description = models.CharField(max_length=500)
     date_added = models.DateField()
 
+    class Meta:
+        verbose_name_plural = "Dues"
+
     def __str__(self):
+<<<<<<< HEAD
         return self.student.bitsId + "'s due entry with amount " + str(self.amount)
 
 class DuesPublished(models.Model):
@@ -367,7 +375,6 @@ class DuesPublished(models.Model):
 
     def __str__(self):
         return str(self.date_published)
-
 
 class Notice(models.Model):
     

@@ -1,3 +1,5 @@
+from django.http import HttpResponse
+
 from .dev_info import address
 
 def index(request):
@@ -11,3 +13,5 @@ def index(request):
             print('pass')
         except:
             print('fail')
+
+    return HttpResponse("Done")

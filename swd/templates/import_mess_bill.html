@@ -1,0 +1,162 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=1024">
+    <title>SWD BITS Goa</title>
+
+    <!-- CSS  -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="{% static 'css/materialize.css' %}" type="text/css" rel="stylesheet" media="screen,projection" />
+    <link href="{% static 'css/style.css' %}" type="text/css" rel="stylesheet" media="screen,projection" />
+
+</head>
+
+<body>
+    <nav class="nav-extended">
+        <div class="nav-wrapper">
+            <a href="#" class="brand-logo">&nbsp;Student Welfare Division</a>
+            <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
+            <ul id="nav-mobile" class="right hide-on-med-and-down">
+                <li class=""><a href="/profile" class="valign-wrapper"><img class="circle profileImg" src="{% static 'img/profile-swd.jpg' %}">&nbsp;{{ warden.name|title }}</a></li>
+                <li><a href="/logout">Logout</a></li>
+            </ul>
+            <ul class="side-nav" id="mobile-demo">
+                <li><a href="/profile" class="valign-wrapper"><img class="circle profileImg" src="{% static 'img/profile-swd.jpg' %}">&nbsp;{{ warden.name|title }}</a></li>
+                <li><a href="/logout">Logout</a></li>
+            </ul>
+            <style>
+                .profileImg {
+                    max-width: 35px;
+                    height: auto
+                }
+            </style>
+        </div>
+    </nav>
+    <div class="section no-pad-bot" id="index-banner">
+    </div>
+
+    <div>
+        <div class="container">
+            <div class="section">
+                <div class="col s6 l6">
+                    <div class="card">
+                        <div class="card-content">
+                            <span class="card-title">Import Mess Bill</span>
+                            <form method="POST" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <div class="row">
+                                    <fieldset id="month-choice" class="form-group clickable">
+                                    <p>
+                                        <input name="month" type="radio" id="jan" value="January" checked/>
+                                        <label for="Jan">January</label>
+                                    </p>
+                                    <p>
+                                        <input name="month" type="radio" id="feb" value="February" />
+                                        <label for="Feb">February</label>
+                                    </p>
+                                    <p>
+                                        <input name="month" type="radio" id="mar" value="March" />
+                                        <label for="mar">March</label>
+                                    </p>
+                                    <p>
+                                        <input name="month" type="radio" id="apr" value="April" />
+                                        <label for="apr">April</label>
+                                    </p>
+                                    <p>
+                                        <input name="month" type="radio" id="may" value="May" />
+                                        <label for="Jan">May</label>
+                                    </p>
+                                    <p>
+                                        <input name="month" type="radio" id="jun" value="June" />
+                                        <label for="Feb">June</label>
+                                    </p>
+                                    <p>
+                                        <input name="month" type="radio" id="jul" value="July" />
+                                        <label for="Jan">July</label>
+                                    </p>
+                                    <p>
+                                        <input name="month" type="radio" id="aug" value="August" />
+                                        <label for="Feb">August</label>
+                                    </p>
+                                    <p>
+                                        <input name="month" type="radio" id="sept" value="September" />
+                                        <label for="Jan">September</label>
+                                    </p>
+                                    <p>
+                                        <input name="month" type="radio" id="oct" value="October" />
+                                        <label for="Feb">October</label>
+                                    </p>
+                                    <p>
+                                        <input name="month" type="radio" id="nov" value="November" />
+                                        <label for="Jan">November</label>
+                                    </p>
+                                    <p>
+                                        <input name="month" type="radio" id="dec" value="December" />
+                                        <label for="dec">December</label>
+                                    </p>
+                                    </fieldset>
+                                </div>
+                                <div class="row">
+                                    <p>
+                                        <select class="year-choice" name="year" style="display:block;">
+                                            <option value="" disabled>Choose Year</option>
+                                        </select>
+                                    </p>
+                                </div>
+                                <div class="row">
+                                    <div class="input-field col s6">
+                                        <input id="newrebate" name="newrebate" type="file">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col s6 red-text">
+                                        * Please upload an excel file with the headers in order:<br>
+                                        (Name | ID | Amount | Rebate | Final Amount)
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col s6 left-align">
+                                        <button class="btn btn-block bg-green waves-effect" type="submit">UPDATE (This can NOT be undone)</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!--  Scripts-->
+    <script src="{% static 'js/jquery.js' %}"></script>
+    <script src="{% static 'js/materialize.js' %}"></script>
+    <script src="{% static 'js/init.js' %}"></script>
+    <script>
+        var d = new Date();
+        $('#year').attr('value', d.getFullYear());
+        $(document).ready(function(){
+            var i;
+            for(i=2018; i<d.getFullYear();i++){
+                $('.year-choice').append(
+                    '<option value="' + i + '">'+ i + '</option>'
+                );
+            }
+            $('.year-choice').append(
+                    '<option value="' + i + '" selected>'+ i + '</option>'
+                );
+        });
+    </script>
+    <style>
+        .clickable {
+            cursor: pointer;
+        }
+    </style>
+
+</body>
+
+</html>

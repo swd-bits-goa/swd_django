@@ -1,3 +1,5 @@
+from django.http import HttpResponse
+
 from .dev_info import messes
 
 def index(request):

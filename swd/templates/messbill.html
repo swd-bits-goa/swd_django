@@ -43,7 +43,7 @@
                 <div class="col s6 l6">
                     <div class="card">
                         <div class="card-content">
-                            <span class="card-title">Mess Bill</span>
+                            <span class="card-title">Export Student Mess Bills</span>
                             <form method="POST">
                                 {% csrf_token %}
                                 <div class="row">
@@ -57,8 +57,21 @@
                                     </div>
                                 </div>
                                 <div class="row">
+                                    <fieldset id="export_type" class="form-group">
                                     <p>
-                                        <input name="mess" type="radio" id="test1" value="A" />
+                                        <input name="extype" type="radio" id="typeraw" value="R" checked/>
+                                        <label for="typeraw">Raw Data (Includes rebate on leaves only)</label>
+                                    </p>
+                                    <p>
+                                        <input name="extype" type="radio" id="typefinal" value="F" />
+                                        <label for="typefinal">Final Data (if exists, data imported imported manually)</label>
+                                    </p>
+                                    </fieldset>
+                                </div>
+                                <div class="row">
+                                    <fieldset id="mess_option" class="form-group">
+                                    <p>
+                                        <input name="mess" type="radio" id="test1" value="A" checked/>
                                         <label for="test1">Complete A Mess</label>
                                     </p>
                                     <p>
@@ -66,9 +79,10 @@
                                         <label for="test2">Complete C Mess</label>
                                     </p>
                                     <p>
-                                        <input name="mess" type="radio" id="test3" checked value="N" />
-                                        <label for="test3">None</label>
+                                        <input name="mess" type="radio" id="test4" value="D" />
+                                        <label for="test4">Complete D Mess</label>
                                     </p>
+                                    </fieldset>
                                 </div>
                                 <div class="row">
                                     <div class="col s6 left-align">
