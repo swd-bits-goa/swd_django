@@ -136,6 +136,13 @@ class Query(object):
         username = graphene.String()
     )
 
+    all_dues = graphene.List(DueType)
+    dues = graphene.List(
+        DueType,
+        id=graphene.Int(),
+        username=graphene.String()
+    )
+
     def resolve_current_user(self, args, **kwargs):
         context = args.context
         if not context.user.is_authenticated:
@@ -484,3 +491,20 @@ class Query(object):
             return MessBill.objects.filter(student=student)
 
         return None
+
+    def resolve_all_dues(self, args, **kwargs):
+        return Due.objects.all()
+
+    def resolve_dues(self, args, **kwargs):
+        id_ = kwargs.get('id')
+        username = kwargs.get('username')
+
+        if id_ is not None:
+            return [Due.objects.get(id=id_)]
+
+        if username is not None:
+            user = User.objects.get(username=username)
+            student = Student.objects.get(user=user)
+            return Due.objects.filter(student=student)
+
+        return []

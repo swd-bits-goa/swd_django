@@ -343,14 +343,23 @@ class ItemBuy(models.Model):
     def __str__(self):
         return self.student.bitsId + ' ' + self.item.title
 
-class Dues(models.Model):
-    student = models.ForeignKey('Student', on_delete = models.CASCADE)
-    month = models.DateField(blank=True, null=True)
-    amount = models.FloatField()
-    desc = models.CharField(max_length=100)
+class DueCategory(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.CharField(max_length=500)
 
     def __str__(self):
-        return self.student.bitsId + ' ' + self.month
+        return "Due category with name {} and description '{}'".format(self.name, self.description)
+
+class Due(models.Model):
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    amount = models.FloatField()
+    due_category = models.ForeignKey(DueCategory, on_delete=models.CASCADE)
+    description = models.CharField(max_length=500)
+    date_added = models.DateField()
+
+    def __str__(self):
+        return self.student.bitsId + "'s due entry with amount " + str(self.amount)
+
 
 class Notice(models.Model):
     
