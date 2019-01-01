@@ -53,7 +53,7 @@ class Sidebar extends React.Component {
     push: PropTypes.func.isRequired,
   }).isRequired,
   };
-  
+
 
   handleMenuItemClick = (link) => {
     this.props.history.push(link);
@@ -64,9 +64,9 @@ class Sidebar extends React.Component {
   render() {
     return (
       <div>
-        <Drawer open={this.props.open} docked={false} onRequestChange={this.props.toggleOpen} containerStyle={{marginTop: 55, backgroundColor: "#EDF1F2", width: "50%"}}>
+        <Drawer open={this.props.open} docked={false} onRequestChange={this.props.toggleOpen} containerStyle={{marginTop: 55, backgroundColor: "#EDF1F2", width: "200px"}}>
           {
-            options.map(option => 
+            options.map(option =>
     <MenuItem style={{paddingTop: 10}} onTouchTap={() => this.handleMenuItemClick(option.link)} key={option.name} ><img src={option.icon} style={{padding: 5, paddingRight: 10}}/> {option.name}</MenuItem>
   )
           }
@@ -77,4 +77,3 @@ class Sidebar extends React.Component {
 }
 
 export default withRouter(Sidebar);
-

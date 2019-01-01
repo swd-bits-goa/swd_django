@@ -7,6 +7,19 @@ import { List, ListItem } from 'material-ui/List';
 import Divider from 'material-ui/Divider';
 import s from './InfoCard.css';
 
+const styles = {
+  listStyle: {
+    backgroundColor: 'white',
+    height:'72px',
+    fontSize:12,
+    fontFamily:'Montserrat',
+    borderStyle: 'solid',
+    borderColor: '#074F57',
+    borderWidth: 2,
+    marginBottom: 15,
+    marginTop:15
+  }
+}
 
 const InfoCard = (props) => {
   const { title, list } = props;
@@ -16,7 +29,7 @@ const InfoCard = (props) => {
 
   const listItems = list.map(element =>
     <div key={element.title}>
-      <ListItem primaryText={element.title} onClick={navigateToLink.bind(null, element.link)} />
+      <ListItem primaryText={element.title} onClick={navigateToLink.bind(null, element.link)} style={styles.listStyle} />
       <Divider />
     </div>,
 

@@ -12,15 +12,17 @@ import {
 } from "material-ui/Card";
 import MessCard from "./MessCard";
 import { Mobile } from "../../Components/Responsive";
+import { Tablet } from "../../Components/Responsive";
 import {CardContentLoader} from "../../Components/Loaders";
 import InfoCard from "../../Components/InfoCard";
 import ExpandableCard from "../../Components/ExpandableCard";
-import background from "./Background.svg";
+import background from "./Image6.png";
 import networkErrorHandler from "./networkErrorHandler";
-import bdome from "./BDome.svg";
+import bdome from "./Image6.png";
 import s from "./Home.css";
 import gql from "graphql-tag";
 import { graphql, compose } from "react-apollo";
+import Login from "../login/Loginbox";
 
 // GraphQL queries
 const userInfoQuery = gql`
@@ -32,7 +34,7 @@ const userInfoQuery = gql`
   }
 `;
 const messCardQuery = gql `
-  query messCard($username: String) { 
+  query messCard($username: String) {
     messoptionopen{
     openNow,
     month
@@ -56,7 +58,7 @@ class Home extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      // Home currently maintains username state until it is made as context to 
+      // Home currently maintains username state until it is made as context to
       // be provided to the whole app
       username: null,
     };
@@ -101,7 +103,7 @@ options : {
   }
 }
 }))(networkErrorHandler(CardContentLoader, fallback, MessCard));
-    
+
 
     return (
          <div
@@ -115,15 +117,17 @@ this.state.username
 {
   !this.context.loggedIn
   ? (
+            <Tablet>
             <div className={s.imgContainer}>
-                 <img src={bdome} style={{ width: "100%"}} alt="BITS Pilani, KK Birla Goa Campus" />
-                <div className={s.bottomleft}>BITS Pilani, Goa Campus</div>
+                 <img src={bdome} style={{ width: "1920px",backgroundPosition:"center"}} alt="BITS Pilani, KK Birla Goa Campus" />
+                 <Login/>
             </div>
+            </Tablet>
   )
   : null
-}
+}           <Mobile>
             <div className={s.container2}>
-              <InfoCard title="Latest News" list={this.props.news} />
+              <InfoCard title="General Notices" list={this.props.news} />
               {/* TODO: Handle apollo errors */}
               {this.props.userInfoQuery && this.props.userInfoQuery.networkStatus === 7 ? (
                 <div>
@@ -131,9 +135,10 @@ this.state.username
                     this.props.userInfoQuery.currentUser.username}
                 </div>
               ) : (
-                <div>loading</div>
+                <div></div>
               )}
             </div>
+            </Mobile>
         </div>
     );
   }
@@ -146,5 +151,3 @@ Home.contextTypes = {
 export default graphql(userInfoQuery, {
   name: "userInfoQuery"
 }) (Home);
-
-

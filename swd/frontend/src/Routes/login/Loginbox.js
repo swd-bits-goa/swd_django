@@ -18,9 +18,9 @@ const styles = {
     // overflowX: 'hidden',
     // overflowY: 'hidden',
     top: '10%',
-    right: '5%',
+    right: 50,
     backgroundColor: 'white',
-    width: '90%',
+    width: '460px',
     height:'334px'
   },
   headerDiv: {
@@ -222,7 +222,7 @@ class Login extends React.Component {
 
       : null
         }
-          <Paper zDepth={0} style={styles.headerDiv}>
+          <Paper zDepth={1} style={styles.headerDiv}>
             <div style={{
               marginBottom: 'auto'
             }}>

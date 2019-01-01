@@ -1,7 +1,10 @@
 
 .title {
-  color: #faefe2;
-  font-size: 1.5rem;
+  color: #F46036;
+  font-size: 18px;
+  font-weight: bold;
+  font-family: 'Montserrat';
+  margin-bottom: 30px;
 }
 
 .container {
