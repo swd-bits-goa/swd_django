@@ -10,6 +10,7 @@ from django.contrib import messages
 from django.utils.timezone import make_aware
 from django.core.mail import send_mail
 from django.conf import settings
+import csv, io
 
 from braces import views
 
@@ -902,3 +903,24 @@ def antiragging(request):
                     'queryset' : AntiRagging.objects.all()
     }
     return render(request,"antiragging.html",context)
+
+
+def late_comer_upload(request):
+    template = "late_comer_upload.html"
+
+    if request.method == "GET":
+        return render(request, template)
+
+    latecomer_csv = request.FILES['file']
+    data_set = latecomer_csv.read().decode('UTF-8')
+    io_string = io.StringIO(data_set)
+    next(io_string) # to skip the header
+
+    for col in csv.reader(io_string, delimiter=','):
+        student_obj = Student.objects.get(bitsId=col[1])
+        late_comer_obj = LateComer.objects.create(
+                student = student_obj,
+                dateTime = col[2]
+            )
+        
+    return render(request, template)
