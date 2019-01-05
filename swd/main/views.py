@@ -10,7 +10,7 @@ from django.contrib import messages
 from django.utils.timezone import make_aware
 from django.core.mail import send_mail
 from django.conf import settings
-import csv, io
+import xlrd, io
 
 from braces import views
 
@@ -904,23 +904,36 @@ def antiragging(request):
     }
     return render(request,"antiragging.html",context)
 
-
 def late_comer_upload(request):
     template = "late_comer_upload.html"
 
     if request.method == "GET":
         return render(request, template)
 
-    latecomer_csv = request.FILES['file']
-    data_set = latecomer_csv.read().decode('UTF-8')
-    io_string = io.StringIO(data_set)
-    next(io_string) # to skip the header
+    latecomer = request.FILES['file']
+    
+    import tempfile, os
+    fd, tmp = tempfile.mkstemp()
+    with os.fdopen(fd, 'wb') as out:
+        out.write(latecomer.read())
+    workbook = xlrd.open_workbook(tmp)
 
-    for col in csv.reader(io_string, delimiter=','):
-        student_obj = Student.objects.get(bitsId=col[1])
-        late_comer_obj = LateComer.objects.create(
-                student = student_obj,
-                dateTime = col[2]
-            )
-        
+    #wb = xlrd.open_workbook(latecomer)
+    idx = 0
+
+    for sheet in workbook.sheets():
+        for col in sheet.get_rows():
+            idx += 1
+            try:
+                bid = col[1].value
+                date = datetime(*xlrd.xldate.xldate_as_tuple(col[2].value, workbook.datemode))
+                #return HttpResponse(date)
+                student_obj = Student.objects.get(bitsId=bid)
+                late_comer_obj = LateComer.objects.create(
+                        student = student_obj,
+                        dateTime = date
+                    )
+            except Student.DoesNotExist:
+                return HttpResponse("Student does not exist")
+
     return render(request, template)
