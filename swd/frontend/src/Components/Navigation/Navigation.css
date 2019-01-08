@@ -16,3 +16,14 @@
   cursor: pointer;
   color: #0b2326;
 }
+
+.qverticalBar {
+  /* position: absolute;
+  left: 60.09%;
+  right: 20.18%;
+  top: 0%;
+  bottom: 100%; */
+
+  border: 1px solid #074f57;
+  transform: rotate(90deg);
+}
