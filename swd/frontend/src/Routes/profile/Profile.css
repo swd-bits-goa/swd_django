@@ -11,7 +11,7 @@
 }
 .profileImg{
     display: flex;
-    justify-content: center;
+    justify-content: left;
 }
 .paperElement{
     display: flex;
@@ -34,3 +34,4 @@
 .paperDiv{
     margin-bottom: 2vh;
 }
+
