@@ -2,6 +2,7 @@
 
 import React from "react";
 import {Mobile} from "../../Components/Responsive";
+import { Tablet } from '../Components/Responsive';
 import s from "./Profile.css";
 import {Card, CardMedia, Paper} from "material-ui";
 import pic from "./DefaultPic.svg";
@@ -25,15 +26,17 @@ class Profile extends React.Component {
                 <h2>Profile</h2>
                     <div className={s.profileImg}>
                         <CardMedia>
-                            <img src={pic} style={{width: "100%", minWidth: "20%"}} alt="profile_pic"/>
+                            <img src={pic} style={{width: "100%", minWidth: "20%" , box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25)}} alt="profile_pic"/>
                         </CardMedia>
                     </div>
                     <div className={s.paperDiv}>
-                        <Paper zDepth={1} style={{borderRadius: 4, margin: 4, padding: 3}}>
+                        <Paper zDepth={1} style={{borderRadius: 4, margin: 4, padding: 3, font-family: 'Montserrat',
+  fontWeight: 'semibold'}}>
 
                             <div className={s.infoPaper}>
                                 <div className={s.paperElement}>
-                                    <div className={s.column1}>
+                                    <div className={s.column1} style={color: '#F46036', line-height: 'normal';
+font-size: '32px'; }>
                                         <p><b>Name</b></p>
                                     </div>
                                     <div className={s.column2}>
@@ -48,17 +51,10 @@ class Profile extends React.Component {
                                         <p>{currentUser.student.bitsId}</p>
                                     </div>
                                 </div>
+                                
                                 <div className={s.paperElement}>
                                     <div className={s.column1}>
-                                        <p><b>DOB</b></p>
-                                    </div>
-                                    <div className={s.column2}>
-                                        <p>{currentUser.student.bDay}</p>
-                                    </div>
-                                </div>
-                                <div className={s.paperElement}>
-                                    <div className={s.column1}>
-                                        {currentUser.student.hostelps.acadstudent?<p><b>Hostel No.</b></p>:<p><b>PS Station</b></p>}
+                                        {currentUser.student.hostelps.acadstudent?<p><b>Hostel </b></p>:<p><b>PS Station</b></p>}
                                     </div>
                                     <div className={s.column2}>
                                         {currentUser.student.hostelps.acadstudent?<p>{currentUser.student.hostelps.hostel}</p>:<p>{currentUser.student.hostelps.psStation}</p>}
@@ -67,8 +63,16 @@ class Profile extends React.Component {
                                 {currentUser.student.hostelps.acadstudent?
                                     <div className={s.paperElement}>
                                         <div className={s.column1}>
-                                            <p><b>Room No.</b></p>
+                                            <p><b>Hostel Room </b></p>
                                         </div>
+                                        <div className={s.paperElement}>
+                                    <div className={s.column1}>
+                                        <p><b>DOB</b></p>
+                                    </div>
+                                    <div className={s.column2}>
+                                        <p>{currentUser.student.bDay}</p>
+                                    </div>
+                                </div>
                                         <div className={s.column2}>
                                             <p>{currentUser.student.hostelps.room}</p>
                                         </div>
@@ -92,19 +96,21 @@ class Profile extends React.Component {
                             </div>
                         </Paper>
                     </div>
-                    <div className={s.paperDiv}>
-                        <Paper zDepth={1} style={{borderRadius: 4, margin: 4, padding: 3}}>
-                            <div className={s.infoPaper}>
-                                <p><b>Contact Details</b></p>
-                                <p>{currentUser.student.phone}</p>
-                            </div>
+                    
 
                         </Paper>
+
                     </div>
                 </div>
+                <ButtonToolbar>
+  <Button href="home.html" style={{font-family: 'Montserrat',font-style: 'normal',font-weight: 600, line-height: 'normal',font-size: 22px,
+text-align: 'center',color: ' #074F57',background: '#FFBE57'}}>GO Back</Button>
+  <Button style={{padding-top: '12px',padding-bottom: '12px'}}>GO Back</Button>
+</ButtonToolbar>;
             </Mobile>
 
         );
+
     }
 }
 

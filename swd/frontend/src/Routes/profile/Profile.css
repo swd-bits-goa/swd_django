@@ -12,6 +12,8 @@
 .profileImg{
     display: flex;
     justify-content: left;
+     border-radius: 50%;
+	
 }
 .paperElement{
     display: flex;
