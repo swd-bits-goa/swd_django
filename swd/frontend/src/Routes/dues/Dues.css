@@ -1,0 +1,217 @@
+.screen {
+  height: 1000px;
+  width: 100%;
+}
+
+.dues {
+  margin-top: 160px;;
+  margin-left: 50px;
+  width: 33%;
+}
+
+.dues_text{
+  font-family: Montserrat;
+  font-size: 24px;
+  padding-top: 3px;
+  color: #F46036;
+}
+
+.details {
+  padding-top: 16px;
+  width: 100%;
+  display: flex;
+  height: 30px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.fees {
+  padding-top: 16px;
+  width: 100%;
+  display: flex;
+  height: 30px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.note{
+  width: 100%;
+  display: flex;
+  padding-top: 24px;
+}
+
+.details_page{
+  position: absolute;
+  top: 160px;
+  left: 50px;
+  width: 100%;
+  height: 1000px;
+  background: white;
+}
+
+.fees_page{
+  position: absolute;
+  top: 160px;
+  left: 50px;
+  width: 100%;
+  height: 1000px;
+  background: white;
+}
+
+.imgDiv{
+  width: 30px;
+  height: 100%;
+  background:#FFBE57;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.img{
+  width: 16px;
+  height: 16px;
+}
+
+.dues_head{
+}
+
+.table{
+  display: flex;
+  flex-direction: column;
+  font-size: 12px;
+  padding-top: 16px;
+  width: 40%;
+}
+
+.row{
+  display: flex;
+  height: 24px;
+  align-items: center;
+  width: 100%;
+}
+
+.first_colHead{
+  flex-basis: 50%;
+  font-weight: 600;
+  font-family: Montserrat;
+}
+
+.first_col{
+  flex-basis: 50%;
+}
+
+.second_colHead{
+  flex-basis: 35%;
+  font-weight: 600;
+  font-family: Montserrat;
+}
+
+.second_col{
+  flex-basis: 35%;
+}
+
+.third_colHead{
+  flex-basis: 15%;
+  font-weight: 600;
+  font-family: Montserrat;
+}
+
+.third_col{
+  flex-basis: 15%;
+}
+
+.total{
+  height: 48px;
+  width: 40%;
+  padding-top: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  font-size: 12px;
+}
+
+.total_row{
+  display: flex;
+  flex-direction: crow;
+}
+
+.total_col1{
+  flex-basis: 85%;
+  font-family: Montserrat;
+  font-weight: 600;
+}
+
+.total_col2{
+  flex-basis: 15%;
+}
+
+.total_col{
+  border-color: blue;
+  border-top: 2px;
+  border-width: 2px;
+  flex-basis: 15%;
+}
+
+.table_fees{
+  display: flex;
+  flex-direction: column;
+  font-weight: normal;
+  font-size: 12px;
+  padding-top: 16px;
+  width: 33%;
+}
+
+.fees_row{
+  display: flex;
+  height: 36px;
+  align-items: center;
+  width: 100%;
+}
+
+.fees_colHead1{
+  flex-basis: 80%;
+  font-weight: 600;
+  font-family: Montserrat;
+}
+
+.fees_colHead2{
+  flex-basis: 20%;
+  font-weight: 600;
+  font-family: Montserrat;
+}
+
+.fees_col1{
+  flex-basis: 50%;
+  font-family: Montserrat;
+  padding-right: 30%;
+}
+
+.fees_col2{
+  flex-basis: 20%;
+  font-family: Montserrat;
+}
+
+.fees_row_last{
+  padding-top: 8px;
+  display: flex;
+  height: 36px;
+  align-items: center;
+  width: 100%;
+}
+
+.back{
+  padding-top: 40px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.button{
+  font-family: Montserrat;
+  font-weight: 600;
+  border: none;
+  height: 100%;
+  color: #074F57;
+  background: #FFBE57;
+}
