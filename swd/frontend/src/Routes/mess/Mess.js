@@ -35,12 +35,6 @@ class Mess extends React.Component{
   }
 
   render(){
-        if(this.state.sumbitButton){
-          return (
-            <div className={s.container3}>"You've already chosen your mess option"</div>
-          )
-        }
-        else{
           return (
             <div className={s.main}>
               {(this.state.radioButton!=0)&&this.state.submitButton?<div className={s.container2}>Congrats! You chose {messArr[this.state.radioButton]} for {thisMonth}</div>:
@@ -74,8 +68,10 @@ class Mess extends React.Component{
               </div>
               }
             </div>)
-          }
   }
 }
 
 export default withRouter(withApollo(Mess));
+
+
+/*<div className={s.container3}>"You've already chosen your mess option"</div>*/
