@@ -1,0 +1,106 @@
+.main{
+  height: 1080px;
+  width: 1920px;
+  background-color: white;
+}
+
+.allItemsHolder{
+  display: flex;
+  width: 494px;
+  height: 423px;
+  margin-left: 713px;
+  margin-top: 362px;
+}
+.container1{
+  display: flex;
+  height: 258px;
+  width: 279px;
+  margin-left: 0px;
+  margin-top: 0px;
+}
+
+.headerDiv{
+  width: 279px;
+  height: 40px;
+  margin-left: 0px;
+  margin-top: 0px;
+  font-family: Montserrat;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+  font-size: 37px;
+  color: #F46036;
+}
+
+.radioDiv{
+  display: flex;
+  width: 279px;
+  height: 175px;
+  margin-top: 43px;
+  margin-left: 0;
+  flex-direction: column;
+  justify-content: space-around;
+  font-family: Montserrat;
+  font-style: normal;
+  font-weight: normal;
+  line-height: normal;
+  font-size: 25px;
+  text-align: justify;
+}
+
+.radio1{
+  width: 100%;
+}
+.radio2{
+  width: 100%;
+}
+.radio3{
+  width: 100%;
+}
+
+.submitButton{
+  height: 55px;
+  width: 132px;
+  margin-left: 83px;
+  margin-top: 368px;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: normal;
+  font-style: normal;
+  color: #074F57;
+  background: #FFBE57;
+  border: none;
+}
+
+.container2{
+  position: absolute;
+  width: 584px;
+  height: 161px;
+  margin-left: 680px;
+  margin-top: 488px;
+  font-family: Montserrat;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+  font-size: 54px;
+  color: #F46036;
+}
+
+.container3{
+  position: absolute;
+  width: 1155px;
+  height: 79px;
+  margin-left: 405px;
+  margin-top: 540px;
+  font-family: Montserrat;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+  font-size: 54px;
+  color: #F46036;
+}
+
+input[type="radio"] {
+  margin-right: 25px;
+  background-color: #FFBE57;
+}

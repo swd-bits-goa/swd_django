@@ -17,6 +17,7 @@ import Search from './Components/Search/Search.js';
 import Profile from "./Routes/profile/Profile";
 import Login from "./Routes/login/Login";
 import Certificates from './Routes/Certificates/Certificates';
+import Mess from "./Routes/mess/Mess";
 
 // react-tap-event-plugin provides onTouchTap() to all React Components.
 // It's a mobile-friendly onClick() alternative for components in Material-UI,
@@ -51,10 +52,10 @@ const PrivateRoute = ({ render, loggedIn, ...rest}) => (
   <Route {...rest} render={props => (
 loggedIn ?
     render()
-    : <Redirect to={{ 
+    : <Redirect to={{
       pathname:"/login",
       state: {from: props.location}
-    }}/> 
+    }}/>
 
   )} />
 );
@@ -65,7 +66,7 @@ class App extends React.Component {
     this.state = {
       //Check if we're already logged in when starting the app.
       // However this is an offline method
-      loggedIn: localStorage.getItem('token') ? true : false , 
+      loggedIn: localStorage.getItem('token') ? true : false ,
 
       latestNews: [
         {
@@ -133,6 +134,14 @@ class App extends React.Component {
                 </Layout>
               )}
             />
+            <Route
+              path="/mess"
+              render={() => (
+                <Layout isLoggedIn={this.state.loggedIn} logout={this.logout} searchMode={false}>
+                <Mess/>
+                </Layout>
+              )}
+            />
             <PrivateRoute
               path="/certificates"
               loggedIn={this.state.loggedIn}
@@ -149,12 +158,12 @@ class App extends React.Component {
                   <Home news={this.state.latestNews} />
                 </Layout>
               )}
-            /> 
+            />
           </Switch>
         </Router>
         </MuiThemeProvider>
       </ApolloProvider>
-            
+
     );
   }
 }
