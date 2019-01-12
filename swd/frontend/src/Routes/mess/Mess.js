@@ -74,4 +74,6 @@ class Mess extends React.Component{
 export default withRouter(withApollo(Mess));
 
 
-/*<div className={s.container3}>"You've already chosen your mess option"</div>*/
+/*<div className={s.container3}>"You've already chosen your mess option"</div>
+<div className={s.container4}>"Oops! The mess option is closed"</div>
+*/
