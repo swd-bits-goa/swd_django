@@ -108,7 +108,7 @@ class Dues extends React.Component{
       <div className={s.fees_col2}>Rs 191700</div>
       </div>
       <div className={s.back}>
-      <button className={s.button} type="submit">Go Back</button>
+      <button className={s.button} type="submit" onClick={()=>this.handlefeesClick()}>Go Back</button>
       </div>
       </div>
       </div>
