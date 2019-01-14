@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .models import Student, MessOptionOpen, MessOption, Leave, Bonafide, Warden, DayPass, MessBill, HostelPS, TeeAdd, TeeBuy, ItemAdd, ItemBuy, HostelSuperintendent, Notice, Document, LateComer, Disco, AntiRagging, CSA
+from .models import *
 from django.views.decorators.csrf import csrf_protect
 from datetime import date, datetime, timedelta
 from .forms import MessForm, LeaveForm, BonafideForm, DayPassForm
@@ -16,8 +16,6 @@ from braces import views
 from django.contrib.auth.models import User
 
 from calendar import monthrange
-
-from django.contrib import messages
 
 from django.db.models import Q
 from .models import BRANCH, HOSTELS
@@ -902,3 +900,127 @@ def antiragging(request):
                     'queryset' : AntiRagging.objects.all()
     }
     return render(request,"antiragging.html",context)
+
+@user_passes_test(lambda a: a.is_superuser)
+def dues_dashboard(request):
+    return render(request, "dues_dashboard.html")
+
+def retrieve_or_create_due_category(name, desc=""):
+    query = DueCategory.objects.filter(name__exact=name)
+    if len(query) == 0:
+        obj = DueCategory(name=name, description=desc)
+        obj.save()
+    else:
+        obj = query[0]
+
+    return obj
+
+@user_passes_test(lambda a: a.is_superuser)
+def import_dues_from_sheet(request):
+    if request.POST:
+        if request.FILES:
+            print ('files')
+            xlfile_uploaded = request.FILES['dues_sheet']
+            extension = xlfile_uploaded.name.rsplit('.', 1)[1]
+            if ('xls' != extension):
+                if ('xlsx' != extension):
+                    messages.error(request, "Please upload .xls or .xlsx file only")
+                    return redirect('dues_dashboard')
+
+            import xlrd
+            import os
+            import tempfile
+            fd, tmp = tempfile.mkstemp()
+            with os.fdopen(fd, 'wb') as out:
+                out.write(xlfile_uploaded.read())
+            workbook = xlrd.open_workbook(tmp)
+
+            for sheet in workbook.sheets():
+                first_iter = True
+                categories = []
+                for row in sheet.get_rows():
+                    # ID No | Name | Expense 1 | Expense 2 | ... | Expense N
+                    #              [ DueCategory(expense 1), DueCategory(expense 2), ...]
+                    if first_iter:
+                        for i in range(2, len(row)):
+                            categories.append(retrieve_or_create_due_category(name=row[i].value))
+
+                        first_iter = False
+                        continue
+
+                    try:
+                        student = Student.objects.get(bitsId=row[0].value)
+                    except Student.DoesNotExist:
+                        messages.error(request,
+                                "Student " + str(row[1].value) + " was not found in the database! SKIPPING HIS DUE ROW!")
+                        continue
+
+                    for i, category in enumerate(categories):
+                        amount = row[i+2].value
+                        Due.objects.create(student=student,
+                                           amount=amount,
+                                           due_category=category,
+                                           description=category.name,
+                                           date_added=datetime.now())
+
+                    print (row)
+
+            os.remove(tmp)
+
+            messages.success(request, "Dues have been imported")
+        else:
+            messages.error(request, "Please select a file to upload")
+    else:
+        messages.error(request, "Only POST requests are allowed")
+
+    return redirect('dues_dashboard')
+
+@user_passes_test(lambda a: a.is_superuser)
+def publish_dues(request):
+    if request.POST:
+        """
+            Import entries from
+            TeeBuy -> totamt, datetime added = created
+            ItemBuy -> has foreign key to ItemAdd called item; use item.price,
+                       datetime added = created
+            LateComer -> amount = ???, datetime added = dateTime
+
+            Import only if the due above has creation datetime > 
+            last DuePublished timing
+        """
+
+        try:
+            lasted = DuesPublished.objects.latest('date_published').date_published
+        except:
+            lasted = datetime(year=2004, month=1, day=1) # Before college was founded
+
+        # Create/retrieve categories for
+        # Tees, ItemBuy, LateComer
+        tee_category = retrieve_or_create_due_category('TeeBuy', 'TShirt was bought')
+        itembuy_category = retrieve_or_create_due_category('ItemBuy', 'An Item was bought')
+        latecomer_category = retrieve_or_create_due_category('LateComer', 'Latecomer\'s fine')
+
+        tees = TeeBuy.objects.filter(created__gte=lasted)
+        for tee_buy in tees:
+            due = Due(student=tee_buy.student,
+                      amount=tee_buy.totamt,
+                      due_category=tee_category,
+                      description=tee_buy.tee.title,
+                      date_added=tee_buy.created)
+            due.save()
+
+        itembuys = ItemBuy.objects.filter(created__gte=lasted)
+        for itembuy in itembuys:
+            due = Due(student=itembuy.student,
+                      amount=itembuy.item.price,
+                      due_category=itembuy_category,
+                      description=itembuy.item.title,
+                      date_added=itembuy.created)
+            due.save()
+
+        messages.success(request, "Dues have been published")
+        DuesPublished.objects.create()
+    else:
+        messages.error(request, "Only POST requests are allowed")
+
+    return redirect('dues_dashboard')

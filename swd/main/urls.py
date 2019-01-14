@@ -43,6 +43,9 @@ urlpatterns = [
     url(r'^sac/',views.sac, name='sac'),
     url(r'^latecomer/', views.latecomer, name="latecomer"),
     url(r'^contact/',views.contact, name='contact'),
+    url(r'^dues_dashboard/', views.dues_dashboard, name='dues_dashboard'),
+    url(r'^import_dues_from_sheet/', views.import_dues_from_sheet, name='import_dues_from_sheet'),
+    url(r'^publish_dues/', views.publish_dues, name='publish_dues'),
 
 
 

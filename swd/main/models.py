@@ -360,6 +360,14 @@ class Due(models.Model):
     def __str__(self):
         return self.student.bitsId + "'s due entry with amount " + str(self.amount)
 
+class DuesPublished(models.Model):
+    # This model keeps track of when dues was completely up to date
+    # last time.
+    date_published = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return str(self.date_published)
+
 
 class Notice(models.Model):
     

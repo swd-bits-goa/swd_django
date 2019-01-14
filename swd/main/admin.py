@@ -14,7 +14,7 @@ from .resources import *
 class HostelPSAdmin(admin.ModelAdmin):
     search_fields = ['student__name', 'student__bitsId']
 
-models = [Warden, Staff, DayScholar, CSA, DayPass, LateComer, InOut, Disco, MessOptionOpen, Transaction, MessBill, TeeAdd, ItemAdd, HostelSuperintendent, Notice, FileAdd, Document, AntiRagging, DueCategory, Due]
+models = [Warden, Staff, DayScholar, CSA, DayPass, LateComer, InOut, Disco, MessOptionOpen, Transaction, MessBill, TeeAdd, ItemAdd, HostelSuperintendent, Notice, FileAdd, Document, AntiRagging, DueCategory, Due, DuesPublished]
 
 
 @admin.register(Bonafide)
