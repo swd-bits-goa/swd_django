@@ -23,6 +23,9 @@ from .models import BRANCH, HOSTELS
 import swd.config as config
 
 import re
+import xlrd
+import os
+import tempfile
 
 def noPhD(func):
     def check(request, *args, **kwargs):
@@ -923,9 +926,6 @@ def import_dues_from_sheet(request):
                     messages.error(request, "Please upload .xls or .xlsx file only")
                     return redirect('dues_dashboard')
 
-            import xlrd
-            import os
-            import tempfile
             fd, tmp = tempfile.mkstemp()
             with os.fdopen(fd, 'wb') as out:
                 out.write(xlfile_uploaded.read())
