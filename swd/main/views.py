@@ -906,14 +906,10 @@ def dues_dashboard(request):
     return render(request, "dues_dashboard.html")
 
 def retrieve_or_create_due_category(name, desc=""):
-    query = DueCategory.objects.filter(name__exact=name)
-    if len(query) == 0:
-        obj = DueCategory(name=name, description=desc)
-        obj.save()
-    else:
-        obj = query[0]
+    query, created = DueCategory.objects.get_or_create(name=name,
+                                                       description=desc)
 
-    return obj
+    return query
 
 @user_passes_test(lambda a: a.is_superuser)
 def import_dues_from_sheet(request):
@@ -983,7 +979,6 @@ def publish_dues(request):
             TeeBuy -> totamt, datetime added = created
             ItemBuy -> has foreign key to ItemAdd called item; use item.price,
                        datetime added = created
-            LateComer -> amount = ???, datetime added = dateTime
 
             Import only if the due above has creation datetime > 
             last DuePublished timing
@@ -998,7 +993,6 @@ def publish_dues(request):
         # Tees, ItemBuy, LateComer
         tee_category = retrieve_or_create_due_category('TeeBuy', 'TShirt was bought')
         itembuy_category = retrieve_or_create_due_category('ItemBuy', 'An Item was bought')
-        latecomer_category = retrieve_or_create_due_category('LateComer', 'Latecomer\'s fine')
 
         tees = TeeBuy.objects.filter(created__gte=lasted)
         for tee_buy in tees:
