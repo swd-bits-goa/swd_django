@@ -16,6 +16,7 @@ from braces import views
 from django.contrib.auth.models import User
 
 from calendar import monthrange
+from dateutil import rrule
 
 from django.db.models import Q
 from .models import BRANCH, HOSTELS
@@ -24,6 +25,7 @@ import swd.config as config
 
 import re
 import xlrd
+import xlwt
 import os
 import tempfile
 
@@ -542,9 +544,7 @@ def messbill(request):
         selected = request.GET['ids']
         values = [x for x in selected.split(',')]
     if request.POST:
-        # If the admin requests raw data
         messOpt = request.POST.get('mess')
-        import xlwt
         response = HttpResponse(content_type='application/ms-excel')
         response['Content-Disposition'] = 'attachment; filename='+ str(messOpt) +'-MessBill.xls'
         wb = xlwt.Workbook(encoding='utf-8')
@@ -581,11 +581,7 @@ def messbill(request):
 
         for col_num in range(len(columns)):
             ws.write(row_num, col_num, columns[col_num][0], h2_font_style)
-            # set column width
             ws.col(col_num).width = columns[col_num][1]
-
-        # font_style = xlwt.XFStyle()
-        # font_style.alignment.wrap = 1
 
         messbill = MessBill.objects.latest()
         amount = messbill.amount
@@ -633,13 +629,12 @@ def messbill(request):
                     ws.write(row_num, col_num, row[col_num], font_style)
 
             elif request.POST.get('extype') is 'F':
-                from dateutil import rrule
                 month_list = list(rrule.rrule(rrule.MONTHLY, dtstart=start_date, until=end_date))
                 for month in month_list:
                     # The desc has to match with the desc in created Dues object
                     #       exactly same as desc created in import_mess_bill view
                     desc = "Mess Due " + month.strftime("%B %y")
-                    dues = Dues.objects.filter(student=obj, desc=desc).first()
+                    dues = Due.objects.filter(student=obj, description=desc).first()
                     if dues is not None:
                         finalamt = dues.amount
                     else:
@@ -658,10 +653,11 @@ def messbill(request):
                     for col_num in range(len(row)):
                         ws.write(row_num, col_num, row[col_num], font_style)
             else:
-                finalamt = 'extype is {}'.format(request.POST.get('extype'))
+                messages.error(request, 'Invalid: extype={} found'.format(request.POST.get('extype')))
 
 
         wb.save(response)
+        messages.success(request, "Export done. Download will automatically start.")
         return response
 
     return render(request, "messbill.html", {})
@@ -676,9 +672,6 @@ def import_mess_bill(request):
             if ('xls' != extension):
                 if ('xlsx' != extension):
                     return HttpResponse("Upload a Valid Excel (.xls or .xlsx) File")
-            import xlrd
-            import os
-            import tempfile
             fd, tmp = tempfile.mkstemp()
             with os.fdopen(fd, 'wb') as out:
                 out.write(xlfile_uploaded.read())
@@ -709,11 +702,19 @@ def import_mess_bill(request):
                             due = float(col[4].value)
                             month = datetime.strptime(request.POST.get('month'), '%B').date()
                             month = month.replace(day=1, year=year_selected)
+                            # desc is hardcoded and referenced in messbill view also
+                            # any change here should also be done in desc
                             desc = "Mess Due " + month.strftime("%B %y")
-                            dues = Dues.objects.create(student=student, month=month, amount=due, desc=desc)
+                            category, created = DueCategory.objects.get_or_create(name='Mess Bill',
+                                                       description=desc)
+                            dues = Due.objects.create(student=student,
+                                            amount=amount,
+                                            due_category=category,
+                                            description=desc,
+                                            date_added=datetime.now())
                             tot_dues_added += 1
                         except Student.DoesNotExist:
-                            failed += bitsId + ', '
+                            failed += str(bitsId) + ', '
                         except IndexError:
                             os.remove(tmp)
                             return HttpResponse("Make sure the the sheet ({}) have proper header rows.".format(sheet.name))
