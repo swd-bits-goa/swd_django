@@ -1,0 +1,30 @@
+
+
+<form method="POST", enctype="multipart/form-data">
+
+	{%csrf_token%}
+	<label>Upload a xls</label>
+	<input type="file" name="file">
+	<p>Upload xls</p>
+	<button type="submit">Upload</button>
+
+</form>
+
+{%if added %}
+	<p>The number of entries added = {{added}}</p>
+	{%else%}
+		<p>No entries added till now</p>
+{%endif%}
+
+<!--
+<ul>
+	<li>
+		{%for i in forgot%}
+			<p>{{i}}</p>
+		{%endfor%}
+	</li>
+
+</ul>
+
+-->
+<!--<a href="{% url 'forgot' %}">Export all mess defaulters</a>-->

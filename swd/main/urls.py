@@ -43,8 +43,8 @@ urlpatterns = [
     url(r'^sac/',views.sac, name='sac'),
     url(r'^latecomer/', views.latecomer, name="latecomer"),
     url(r'^contact/',views.contact, name='contact'),
-    url(r'^latecomer-upload/',views.late_comer_upload, name='late-comer-upload'),
-
+    url(r'^mess-forgot/',views.mess_unselected, name='forgot'),
+    url(r'^mess_exp/',views.mess_exp, name='mess_exp'),
 
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

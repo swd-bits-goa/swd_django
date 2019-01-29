@@ -10,7 +10,7 @@ from django.contrib import messages
 from django.utils.timezone import make_aware
 from django.core.mail import send_mail
 from django.conf import settings
-import xlrd, io
+import xlrd, io, xlwt
 
 from braces import views
 
@@ -904,36 +904,73 @@ def antiragging(request):
     }
     return render(request,"antiragging.html",context)
 
-def late_comer_upload(request):
-    template = "late_comer_upload.html"
+def mess_unselected(request):  
+    no_of_mess_option_added = 0
+    if request.POST:
+        if request.FILES:
+            mess_file = request.FILES['file']
 
-    if request.method == "GET":
-        return render(request, template)
+            import tempfile, os
+            fd, tmp = tempfile.mkstemp()
+            with os.fdopen(fd, 'wb') as out:
+                out.write(mess_file.read())
+            workbook = xlrd.open_workbook(tmp)
 
-    latecomer = request.FILES['file']
+            idx = 1
+            
+
+            for sheet in workbook.sheets():
+                for i in sheet.get_rows():
+                    if str(i[1].value)=="ID":
+                        continue
+
+                    # Format : Name | Bits ID | MESS
+                    bid = str(i[1].value)
+                    s = Student.objects.get(bitsId=bid)
+                    month = date.today().month +1
+                    my = datetime(date.today().year, month, 1)
+                    messop = MessOption.objects.create(student = s, monthYear = my, mess = str(i[2].value))
+                    no_of_mess_option_added += 1
+
+    context = {'added': no_of_mess_option_added}
+    return render(request, "mess_defaulters_upload.html", context)
+
+def mess_exp(request):
     
-    import tempfile, os
-    fd, tmp = tempfile.mkstemp()
-    with os.fdopen(fd, 'wb') as out:
-        out.write(latecomer.read())
-    workbook = xlrd.open_workbook(tmp)
+    messopted = MessOption.objects.filter(monthYear__gte=date.today())
+    
+    ids = []
 
-    #wb = xlrd.open_workbook(latecomer)
-    idx = 0
+    for i in range(len(messopted)):
+        ids.append(messopted[i].student.bitsId)
 
-    for sheet in workbook.sheets():
-        for col in sheet.get_rows():
-            idx += 1
-            try:
-                bid = col[1].value
-                date = datetime(*xlrd.xldate.xldate_as_tuple(col[2].value, workbook.datemode))
-                #return HttpResponse(date)
-                student_obj = Student.objects.get(bitsId=bid)
-                late_comer_obj = LateComer.objects.create(
-                        student = student_obj,
-                        dateTime = date
-                    )
-            except Student.DoesNotExist:
-                return HttpResponse("Student does not exist")
+    students = Student.objects.exclude(bitsId__in=ids)
+    
 
-    return render(request, template)
+     
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename="mess_defaulters.xls"'
+
+    wb = xlwt.Workbook(encoding='utf-8')
+    ws = wb.add_sheet('Mess Defaulters')
+
+    # Sheet header, first row
+    row_num = 0
+
+    font_style = xlwt.XFStyle()
+    font_style.font.bold = True
+
+    columns = ['Name', 'ID', 'Mess Alloted']
+
+    for col_num in range(len(columns)):
+        ws.write(row_num, col_num, columns[col_num], font_style)
+
+    font_style = xlwt.XFStyle()
+    s_list = students.values_list('name', 'bitsId')
+    for s in s_list:
+        row_num += 1
+        for col_num in range(len(s)):
+            ws.write(row_num, col_num, s[col_num], font_style)
+
+    wb.save(response)
+    return response
