@@ -365,7 +365,6 @@ class Due(models.Model):
         verbose_name_plural = "Dues"
 
     def __str__(self):
-<<<<<<< HEAD
         return self.student.bitsId + "'s due entry with amount " + str(self.amount)
 
 class DuesPublished(models.Model):
