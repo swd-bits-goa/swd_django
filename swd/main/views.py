@@ -719,11 +719,20 @@ def store(request):
 
 def dues(request):
     student = Student.objects.get(user=request.user)
-    month = datetime.today().month
-    itemdues = ItemBuy.objects.filter(student=student, created__month=month)
-    teedues = TeeBuy.objects.filter(student=student, created__month=month)
+
+    try:
+        lasted = DuesPublished.objects.latest('date_published').date_published
+    except:
+        lasted = datetime(year=2004, month=1, day=1) # Before college was founded
+
+    dues = Due.objects.filter(student=student)
+    itemdues = ItemBuy.objects.filter(student=student,
+                                      created__gte=lasted)
+    teedues = TeeBuy.objects.filter(student=student,
+                                      created__gte=lasted)
     context = {
         'student' : student,
+        'dues': dues,
         'itemdues' : itemdues,
         'teedues' : teedues,
     }
