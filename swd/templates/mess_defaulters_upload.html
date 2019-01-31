@@ -1,5 +1,3 @@
-<a href="{% url 'mess_exp' %}">Export defaulters list</a>
-
 <form method="POST", enctype="multipart/form-data">
 
 	{%csrf_token%}
@@ -16,15 +14,3 @@
 		<p>No entries added till now</p>
 {%endif%}
 
-<!--
-<ul>
-	<li>
-		{%for i in forgot%}
-			<p>{{i}}</p>
-		{%endfor%}
-	</li>
-
-</ul>
-
--->
-<!--<a href="{% url 'forgot' %}">Export all mess defaulters</a>-->

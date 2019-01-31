@@ -906,7 +906,7 @@ def antiragging(request):
     return render(request,"antiragging.html",context)
 
 
-def mess_unselected(request):  
+def mess_import(request):  
 
     no_of_mess_option_added = 0
     if request.POST:
@@ -939,51 +939,67 @@ def mess_unselected(request):
 
 def mess_exp(request):
     
-    messopted = MessOption.objects.filter(monthYear__gte=date.today())
-    
-    ids = []
+    if request.POST:
+        year = int(request.POST.get('year'))
+        month = int(request.POST.get('month'))
+        
+        gt_month = 0
 
-    for i in range(len(messopted)):
-        ids.append(messopted[i].student.bitsId)
+        if month == 12:
+            gt_month = 1
+            gt_year = year+1
+        else:
+            gt_month = month + 1
+            gt_year = year
 
-    grad_ps = HostelPS.objects.filter(Q(status__exact="Graduate") | Q(status__exact="PS2"))
+        messopted = MessOption.objects.filter(monthYear__gte=datetime(year, month, 1), monthYear__lt=datetime(gt_year, gt_month,1))
+        ids = []
+        for i in range(len(messopted)):
+            ids.append(messopted[i].student.bitsId)
+        grad_ps = HostelPS.objects.filter(Q(status__exact="Graduate") | Q(status__exact="PS2"))
+        for i in range(len(grad_ps)):
+            ids.append(grad_ps[i].student.bitsId)
 
-    for i in range(len(grad_ps)):
-        ids.append(grad_ps[i].student.bitsId)
 
-    #ids = ids.distinct()
+        students = Student.objects.exclude(bitsId__in=ids)
+        
 
+         
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = 'attachment; filename="mess_defaulters.xls"'
 
-    students = Student.objects.exclude(bitsId__in=ids)
-    
+        wb = xlwt.Workbook(encoding='utf-8')
+        ws = wb.add_sheet('Mess Defaulters')
 
-     
-    response = HttpResponse(content_type='application/ms-excel')
-    response['Content-Disposition'] = 'attachment; filename="mess_defaulters.xls"'
+        # Sheet header, first row
+        row_num = 0
 
-    wb = xlwt.Workbook(encoding='utf-8')
-    ws = wb.add_sheet('Mess Defaulters')
+        font_style = xlwt.XFStyle()
+        font_style.font.bold = True
 
-    # Sheet header, first row
-    row_num = 0
+        columns = ['Name', 'ID', 'Mess Alloted']
 
-    font_style = xlwt.XFStyle()
-    font_style.font.bold = True
+        for col_num in range(len(columns)):
+            ws.write(row_num, col_num, columns[col_num], font_style)
 
-    columns = ['Name', 'ID', 'Mess Alloted']
+        font_style = xlwt.XFStyle()
+        s_list = students.values_list('name', 'bitsId')
+        for s in s_list:
+            row_num += 1
+            for col_num in range(len(s)):
+                ws.write(row_num, col_num, s[col_num], font_style)
 
-    for col_num in range(len(columns)):
-        ws.write(row_num, col_num, columns[col_num], font_style)
+        wb.save(response)
+        return response 
 
-    font_style = xlwt.XFStyle()
-    s_list = students.values_list('name', 'bitsId')
-    for s in s_list:
-        row_num += 1
-        for col_num in range(len(s)):
-            ws.write(row_num, col_num, s[col_num], font_style)
+    years = [x for x in range(date.today().year-4, date.today().year+4,1)]
+    months = [x for x in range(1,13,1)]
+    context = { 'years': years,
+                'months': months,
+                }
 
-    wb.save(response)
-    return response 
+    return render(request, "mess_export.html", context)
+
 
 @user_passes_test(lambda a: a.is_superuser)
 def dues_dashboard(request):
