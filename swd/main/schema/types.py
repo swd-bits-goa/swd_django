@@ -99,3 +99,11 @@ class TransactionType(DjangoObjectType):
 class MessBillType(DjangoObjectType):   
     class Meta:
         model = MessBill
+
+class DueCategoryType(DjangoObjectType):
+    class Meta:
+        model = DueCategory
+
+class DueType(DjangoObjectType):
+    class Meta:
+        model = Due

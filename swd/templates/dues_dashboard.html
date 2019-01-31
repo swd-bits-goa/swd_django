@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+	<div class="container">
+		{% if messages %}
+			<ul class="collection">
+				{% for message in messages %}
+					<li class="collection-item">{{ message }}</li>
+				{% endfor %}
+			</ul>
+		{% endif %}
+
+		<h4>Import Dues from Excel sheet</h4>
+		<form action="{% url "import_dues_from_sheet" %}" method="POST" enctype="multipart/form-data">
+			{% csrf_token %}
+			<input type="file" name="dues_sheet" />
+
+			<button class="btn waves-effect waves-light blue" type="submit">
+				Import Dues from spreadsheet
+			</button>
+		</form>
+
+		<br />
+
+		<h4>Publish Dues from database</h4>
+		<form action="{% url 'publish_dues' %}" method="POST">
+			{% csrf_token %}
+			<button type="submit" class="btn waves-effect waves-light">
+				Publish Dues (cannot be undone)
+			</button>
+		</form>
+	</div>
+{% endblock %}
