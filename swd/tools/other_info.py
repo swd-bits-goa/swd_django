@@ -1,3 +1,5 @@
+from django.http import HttpResponse
+
 from .dev_info import info 
 
 def index(request):
@@ -21,3 +23,5 @@ def index(request):
         except Exception as e:
             print(e)
             print('fail')
+
+    return HttpResponse("Done")

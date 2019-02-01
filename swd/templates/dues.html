@@ -31,6 +31,9 @@
                     </div>
                 </li>
             {% endfor %}
+            {% for i in otherdues %}
+                <li class="collection-item"><div>{{ i.desc }}<a href="#!" class="secondary-content"> Rs. {{ i.amount }}</a></div></li>
+            {% endfor %}
         </ul>
     </div>
     <br><br>
