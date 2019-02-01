@@ -45,7 +45,7 @@ urlpatterns = [
     url(r'^contact/',views.contact, name='contact'),
 
     url(r'^admin/import_mess_bill/', views.import_mess_bill, name='import_mess_bill'),
-    url(r'^admin/mess-forgot/',views.mess_import, name='forgot'),
+    url(r'^admin/mess_option_upload/',views.mess_import, name='forgot'),
     url(r'^admin/mess_exp/',views.mess_exp, name='mess_exp'),
     #url(r'^mess_filter/',views.mess_filter, name='mess_filter'),
     url(r'^admin/dues_dashboard/', views.dues_dashboard, name='dues_dashboard'),
