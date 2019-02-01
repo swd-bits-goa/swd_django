@@ -1,0 +1,23 @@
+<p>Select year and month of mess defaulters</p>
+<form method="POST">
+	
+	{%csrf_token%}
+	<select name="year">
+		
+		{%for i in years%}
+			<option value="{{i}}">{{i}}</option>
+		{%endfor%}
+	</select>
+
+	<select name="month">
+		
+		{%for i in months%}
+			<option value="{{i}}">{{i}}</option>
+		{%endfor%}
+
+	</select>
+	
+	<button type="submit">Submit</button>
+
+
+</form>

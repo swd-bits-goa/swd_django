@@ -10,6 +10,7 @@ from django.contrib import messages
 from django.utils.timezone import make_aware
 from django.core.mail import send_mail
 from django.conf import settings
+import xlrd, xlwt
 
 from braces import views
 
@@ -903,6 +904,102 @@ def antiragging(request):
                     'queryset' : AntiRagging.objects.all()
     }
     return render(request,"antiragging.html",context)
+
+
+def mess_import(request):  
+
+    no_of_mess_option_added = 0
+    if request.POST:
+        if request.FILES:
+            mess_file = request.FILES['file']
+
+            import tempfile
+            fd, tmp = tempfile.mkstemp()
+            with os.fdopen(fd, 'wb') as out:
+                out.write(mess_file.read())
+            workbook = xlrd.open_workbook(tmp)
+
+            idx = 1
+            
+
+            for sheet in workbook.sheets():
+                for i in sheet.get_rows():
+                    if str(i[1].value)=="ID":
+                        continue
+                    # Format : Name | Bits ID | MESS
+                    bid = str(i[1].value)
+                    s = Student.objects.get(bitsId=bid)
+                    month = date.today().month +1
+                    my = datetime(date.today().year, month, 1)
+                    messop = MessOption.objects.create(student = s, monthYear = my, mess = str(i[2].value))
+                    no_of_mess_option_added += 1
+
+    context = {'added': no_of_mess_option_added}
+    return render(request, "mess_defaulters_upload.html", context)
+
+def mess_exp(request):
+    
+    if request.POST:
+        year = int(request.POST.get('year'))
+        month = int(request.POST.get('month'))
+        
+        gt_month = 0
+
+        if month == 12:
+            gt_month = 1
+            gt_year = year+1
+        else:
+            gt_month = month + 1
+            gt_year = year
+
+        messopted = MessOption.objects.filter(monthYear__gte=datetime(year, month, 1), monthYear__lt=datetime(gt_year, gt_month,1))
+        ids = []
+        for i in range(len(messopted)):
+            ids.append(messopted[i].student.bitsId)
+        grad_ps = HostelPS.objects.filter(Q(status__exact="Graduate") | Q(status__exact="PS2"))
+        for i in range(len(grad_ps)):
+            ids.append(grad_ps[i].student.bitsId)
+
+
+        students = Student.objects.exclude(bitsId__in=ids)
+        
+
+         
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = 'attachment; filename="mess_defaulters.xls"'
+
+        wb = xlwt.Workbook(encoding='utf-8')
+        ws = wb.add_sheet('Mess Defaulters')
+
+        # Sheet header, first row
+        row_num = 0
+
+        font_style = xlwt.XFStyle()
+        font_style.font.bold = True
+
+        columns = ['Name', 'ID', 'Mess Alloted']
+
+        for col_num in range(len(columns)):
+            ws.write(row_num, col_num, columns[col_num], font_style)
+
+        font_style = xlwt.XFStyle()
+        s_list = students.values_list('name', 'bitsId')
+        for s in s_list:
+            row_num += 1
+            for col_num in range(len(s)):
+                ws.write(row_num, col_num, s[col_num], font_style)
+
+        wb.save(response)
+        return response 
+
+    years = [x for x in range(date.today().year-4, date.today().year+4,1)]
+    months = [x for x in range(1,13,1)]
+    context = { 'years': years,
+                'months': months,
+                }
+
+    return render(request, "mess_export.html", context)
+
 
 @user_passes_test(lambda a: a.is_superuser)
 def dues_dashboard(request):
