@@ -3,12 +3,33 @@
 
 <div class="container">
     <div class="section">
+        <h4>Published dues</h4>
         <ul class="collection">
-            {% for i in itemdues %}
-                <li class="collection-item"><div>{{ i.item.title }}<a href="#!" class="secondary-content">Rs. {{ i.item.price }}</a></div></li>
+            {% for due in dues %}
+                <li class="collection-item">
+                    <div>
+                        {{ due.due_category.name }}
+                        <a href="#!" class="secondary-content">Rs. {{ due.amount }}</a>
+                    </div>
+                </li>
             {% endfor %}
-            {% for i in teedues %}
-                <li class="collection-item"><div>{{ i.tee.title }}<a href="#!" class="secondary-content"> Rs. {{ i.totamt }}</a></div></li>
+        </ul>
+
+        <h4>Unpublished dues (Tees and items)</h4>
+        <ul class="collection">
+            {% for item in itemdues %}
+                <li class="collection-item"><div>{{ item.item.title }}<a href="#!" class="secondary-content">Rs. {{ item.item.price }}</a></div></li>
+            {% endfor %}
+
+            {% for tee in teedues %}
+                <li class="collection-item">
+                    <div>
+                        {{ tee.tee.title }}
+                        <a href="#!" class="secondary-content">
+                        Rs. {{ tee.totamt }}
+                        </a>
+                    </div>
+                </li>
             {% endfor %}
             {% for i in otherdues %}
                 <li class="collection-item"><div>{{ i.desc }}<a href="#!" class="secondary-content"> Rs. {{ i.amount }}</a></div></li>
