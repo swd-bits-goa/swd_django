@@ -991,7 +991,7 @@ def antiragging(request):
     }
     return render(request,"antiragging.html",context)
 
-
+@user_passes_test(lambda u: u.is_superuser)
 def mess_import(request):  
 
     no_of_mess_option_added = 0
@@ -1023,6 +1023,7 @@ def mess_import(request):
     context = {'added': no_of_mess_option_added}
     return render(request, "mess_defaulters_upload.html", context)
 
+@user_passes_test(lambda u: u.is_superuser)
 def mess_exp(request):
     
     if request.POST:
