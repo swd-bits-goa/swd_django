@@ -36,7 +36,6 @@ urlpatterns = [
     url(r'^search/', views.search, name="search"),
     url(r'^student/(?P<id>\d+)/$',views.studentDetails, name="studentDetails"),
     url(r'^messbill/', views.messbill, name='messbill'),
-    url(r'^import_mess_bill/', views.import_mess_bill, name='import_mess_bill'),
     url(r'^notice/',views.notice, name='notice'),
     url(r'^antiragging/',views.antiragging, name='antiragging'),
     url(r'^swd/',views.swd, name='swd'),
@@ -45,11 +44,12 @@ urlpatterns = [
     url(r'^latecomer/', views.latecomer, name="latecomer"),
     url(r'^contact/',views.contact, name='contact'),
 
-    url(r'^mess-forgot/',views.mess_import, name='forgot'),
-    url(r'^mess_exp/',views.mess_exp, name='mess_exp'),
+    url(r'^admin/import_mess_bill/', views.import_mess_bill, name='import_mess_bill'),
+    url(r'^admin/mess-forgot/',views.mess_import, name='forgot'),
+    url(r'^admin/mess_exp/',views.mess_exp, name='mess_exp'),
     #url(r'^mess_filter/',views.mess_filter, name='mess_filter'),
-    url(r'^dues_dashboard/', views.dues_dashboard, name='dues_dashboard'),
-    url(r'^import_dues_from_sheet/', views.import_dues_from_sheet, name='import_dues_from_sheet'),
-    url(r'^publish_dues/', views.publish_dues, name='publish_dues'),
+    url(r'^admin/dues_dashboard/', views.dues_dashboard, name='dues_dashboard'),
+    url(r'^admin/import_dues_from_sheet/', views.import_dues_from_sheet, name='import_dues_from_sheet'),
+    url(r'^admin/publish_dues/', views.publish_dues, name='publish_dues'),
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

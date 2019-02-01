@@ -993,7 +993,7 @@ def antiragging(request):
 
 @user_passes_test(lambda u: u.is_superuser)
 def mess_import(request):  
-
+    updateTxt=''
     no_of_mess_option_added = 0
     if request.POST:
         if request.FILES:
@@ -1019,8 +1019,9 @@ def mess_import(request):
                     my = datetime(date.today().year, month, 1)
                     messop = MessOption.objects.create(student = s, monthYear = my, mess = str(i[2].value))
                     no_of_mess_option_added += 1
-
-    context = {'added': no_of_mess_option_added}
+            updateTxt = "{} entries added to the database from this upload"
+            messages.success(request, updateTxt.format(no_of_mess_option_added))
+    context = {'added': updateTxt}
     return render(request, "mess_defaulters_upload.html", context)
 
 @user_passes_test(lambda u: u.is_superuser)
@@ -1075,6 +1076,9 @@ def mess_exp(request):
             row_num += 1
             for col_num in range(len(s)):
                 ws.write(row_num, col_num, s[col_num], font_style)
+
+        updateTxt = "{} entries added to the database from this upload"
+        messages.success(request, updateTxt.format(row_num))
 
         wb.save(response)
         return response 
