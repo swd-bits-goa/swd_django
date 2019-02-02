@@ -29,6 +29,8 @@ import xlrd
 import xlwt
 import os
 import tempfile
+import json
+
 
 def noPhD(func):
     def check(request, *args, **kwargs):
@@ -584,9 +586,14 @@ def messbill(request):
             ws.write(row_num, col_num, columns[col_num][0], h2_font_style)
             ws.col(col_num).width = columns[col_num][1]
 
-        messbill = MessBill.objects.latest()
-        amount = messbill.amount
-        rebate = messbill.rebate
+        # messbill = MessBill.objects.latest()
+        # amount = messbill.amount
+        # rebate = messbill.rebate
+        
+        with open(settings.CONSTANTS_LOCATION, 'r') as fp:
+            data = json.load(fp)
+        amount = float(data['mess-amount'])
+        rebate = float(data['mess-rebate'])
 
         days = end_date - start_date
         days = days.days + 1
@@ -818,7 +825,11 @@ def dues(request):
     for other in otherdues:
         if other is not None:
             total_amount += other.amount            
-    balance = float(22000) - float(total_amount)
+
+    with open(settings.CONSTANTS_LOCATION, 'r') as fp:
+        data = json.load(fp)
+    swd_adv = float(data['swd-advance'])
+    balance = swd_adv - float(total_amount)
     context = {
         'student': student,
         'itemdues': itemdues,
@@ -1214,3 +1225,17 @@ def publish_dues(request):
         messages.error(request, "Only POST requests are allowed")
 
     return redirect('dues_dashboard')
+
+@user_passes_test(lambda a: a.is_superuser)
+def edit_constants(request):
+    with open(settings.CONSTANTS_LOCATION, 'r') as fp:
+        data = json.load(fp)
+    data_json = json.dumps(data)
+    if request.POST:
+        new_data = {}
+        for element in data:
+            new_data[element] = request.POST.get(element)
+        with open(settings.CONSTANTS_LOCATION, 'w') as fw:
+            json.dump(new_data, fw)
+        messages.success(request, "constants.json updated")
+    return render(request, "constants.html", {"initial": data_json})

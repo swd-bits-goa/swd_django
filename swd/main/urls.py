@@ -51,5 +51,6 @@ urlpatterns = [
     url(r'^dues_dashboard/', views.dues_dashboard, name='dues_dashboard'),
     url(r'^import_dues_from_sheet/', views.import_dues_from_sheet, name='import_dues_from_sheet'),
     url(r'^publish_dues/', views.publish_dues, name='publish_dues'),
+    url(r'^admin/edit_constants/', views.edit_constants, name='edit_constants'),
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
