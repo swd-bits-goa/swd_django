@@ -803,16 +803,28 @@ def dues(request):
     except:
         lasted = datetime(year=2004, month=1, day=1) # Before college was founded
 
-    dues = Due.objects.filter(student=student)
+    otherdues = Due.objects.filter(student=student)
     itemdues = ItemBuy.objects.filter(student=student,
                                       created__gte=lasted)
     teedues = TeeBuy.objects.filter(student=student,
                                       created__gte=lasted)
+    total_amount = 0
+    for item in itemdues:
+        if item is not None:
+            total_amount += item.item.price
+    for tee in teedues:
+        if tee is not None:
+            total_amount += tee.totamt
+    for other in otherdues:
+        if other is not None:
+            total_amount += other.amount            
+    balance = float(22000) - float(total_amount)
     context = {
-        'student' : student,
-        'dues': dues,
-        'itemdues' : itemdues,
-        'teedues' : teedues,
+        'student': student,
+        'itemdues': itemdues,
+        'teedues': teedues,
+        'balance': balance,
+        'otherdues': otherdues,
     }
 
     return render(request, "dues.html", context)
