@@ -1,5 +1,3 @@
-/* eslint no-unused-vars:0 */
-
 import React from "react";
 import PropTypes from "prop-types";
 import {
@@ -12,12 +10,13 @@ import {
 } from "material-ui/Card";
 import MessCard from "./MessCard";
 import { Mobile } from "../../Components/Responsive";
+import { Tablet } from "../../Components/Responsive";
 import {CardContentLoader} from "../../Components/Loaders";
 import InfoCard from "../../Components/InfoCard";
 import ExpandableCard from "../../Components/ExpandableCard";
 import background from "./Background.svg";
 import networkErrorHandler from "./networkErrorHandler";
-import bdome from "./BDome.svg";
+import bdome from "./backdrop.png";
 import s from "./Home.css";
 import gql from "graphql-tag";
 import { graphql, compose } from "react-apollo";
@@ -104,37 +103,70 @@ options : {
     
 
     return (
-         <div
-          className={s.container}
-        >
-{
-this.state.username
-  ? <MessCardWithData/>
-  : null
-}
-{
-  !this.context.loggedIn
-  ? (
-            <div className={s.imgContainer}>
-                 <img src={bdome} style={{ width: "100%"}} alt="BITS Pilani, KK Birla Goa Campus" />
-                <div className={s.bottomleft}>BITS Pilani, Goa Campus</div>
-            </div>
-  )
-  : null
-}
-            <div className={s.container2}>
-              <InfoCard title="Latest News" list={this.props.news} />
-              {/* TODO: Handle apollo errors */}
-              {this.props.userInfoQuery && this.props.userInfoQuery.networkStatus === 7 ? (
-                <div>
-                  {this.props.userInfoQuery.currentUser &&
-                    this.props.userInfoQuery.currentUser.username}
-                </div>
-              ) : (
-                <div>loading</div>
-              )}
-            </div>
-        </div>
+      <div className={s.mainContainer}>
+        <Mobile>
+          <div className={s.container}>
+              {
+              this.state.username
+                ? <MessCardWithData/>
+                : null
+              }
+              {
+                !this.context.loggedIn
+                ? (
+                          <div className={s.imgContainer}>
+                              <img src={bdome} style={{ width: "100%"}} alt="BITS Pilani, KK Birla Goa Campus" />
+                              <div className={s.bottomleft}>BITS Pilani, Goa Campus</div>
+                          </div>
+                )
+                : null
+              }
+              <div className={s.container2}>
+                <InfoCard title="Latest News" list={this.props.news} />
+                {/* TODO: Handle apollo errors */}
+                {this.props.userInfoQuery && this.props.userInfoQuery.networkStatus === 7 ? (
+                  <div>
+                    {this.props.userInfoQuery.currentUser &&
+                      this.props.userInfoQuery.currentUser.username}
+                  </div>
+                ) : (
+                  <div>loading</div>
+                )}
+              </div>
+          </div>
+        </Mobile> 
+        <Tablet>
+        <div className={s.container}>
+              {
+              this.state.username
+                ? <MessCardWithData/>
+                : null
+              }
+              {
+                !this.context.loggedIn
+                ? (
+                          <div className={s.imgContainer}>
+                              <img src={bdome} style={{ width: "100%"}} alt="BITS Pilani, KK Birla Goa Campus" />
+                              <div className={s.bottomleft}>BITS Pilani, Goa Campus</div>
+                          </div>
+                )
+                : null
+              }
+              <div className={s.container2}>
+                <InfoCard title="Latest News" list={this.props.news} />
+                {/* TODO: Handle apollo errors */}
+                {this.props.userInfoQuery && this.props.userInfoQuery.networkStatus === 7 ? (
+                  <div>
+                    {this.props.userInfoQuery.currentUser &&
+                      this.props.userInfoQuery.currentUser.username}
+                  </div>
+                ) : (
+                  <div>loading</div>
+                )}
+              </div>
+          </div>
+        </Tablet>
+      </div> 
     );
   }
 }

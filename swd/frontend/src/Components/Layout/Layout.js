@@ -29,8 +29,8 @@ class Layout extends React.Component {
               searchMode={this.props.searchMode}
               />
             {this.props.children}
-            <Footer
-              isLoggedIn={this.props.isLoggedIn}/>
+            {/* <Footer
+              isLoggedIn={this.props.isLoggedIn}/> */}
           </div>
 
         </div>

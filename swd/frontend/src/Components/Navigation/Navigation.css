@@ -10,9 +10,22 @@
 .AppBar {
   display: block;
   width: 100%;
+  height: 91px;
+  background-color: white;
 }
 
 .title {
   cursor: pointer;
   color: #0b2326;
+}
+
+.toolbarStyle{
+  background-color: white;
+  height: 91px;
+}
+
+.AppBarDesktop{
+  height: 155px;
+  display: block;
+  width: 100%;
 }
