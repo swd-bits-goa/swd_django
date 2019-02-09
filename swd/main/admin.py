@@ -14,11 +14,12 @@ from .resources import *
 class HostelPSAdmin(admin.ModelAdmin):
     search_fields = ['student__name', 'student__bitsId']
 
-models = [Warden, Staff, DayScholar, CSA, DayPass, LateComer, InOut, Disco, MessOptionOpen, Transaction, MessBill, TeeAdd, ItemAdd, HostelSuperintendent, Notice, FileAdd, Document, AntiRagging, DueCategory, Due, DuesPublished]
+models = [Warden, Staff, DayScholar, CSA, DayPass, LateComer, InOut, Disco, MessOptionOpen, Transaction, MessBill, TeeAdd, ItemAdd, HostelSuperintendent, Notice, FileAdd, Document, AntiRagging, DueCategory, DuesPublished]
 
 
 @admin.register(Bonafide)
 class BonafideAdmin(admin.ModelAdmin):
+    search_fields = ['reason','otherReason', 'reqDate','student__name','student__bitsId']
     list_display = (
         'id',
         'student',
@@ -71,6 +72,11 @@ class MessOptionAdmin(ExportActionModelAdmin,admin.ModelAdmin):
 class LeaveAdmin(admin.ModelAdmin):
     search_fields = ['student__name', 'student__bitsId','dateTimeStart','id']
     actions = [export_xls, ]
+
+@admin.register(Due)
+class DueAdmin(admin.ModelAdmin):
+    search_fields = ['student','amount','due_category','description','date_added']
+
 
 admin.site.register(Student, StudentAdmin)
 admin.site.register(HostelPS, HostelPSAdmin)

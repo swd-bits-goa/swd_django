@@ -17,6 +17,7 @@ from braces import views
 from django.contrib.auth.models import User
 
 from calendar import monthrange
+from dateutil import rrule
 
 from django.db.models import Q
 from .models import BRANCH, HOSTELS
@@ -25,6 +26,7 @@ import swd.config as config
 
 import re
 import xlrd
+import xlwt
 import os
 import tempfile
 
@@ -536,20 +538,39 @@ def daypass(request):
 
 @user_passes_test(lambda u: u.is_superuser)
 def messbill(request):
-    selected = request.GET['ids']
-    values = [x for x in selected.split(',')]
-    if request.POST:
-        import xlwt
-        response = HttpResponse(content_type='application/ms-excel')
-        response['Content-Disposition'] = 'attachment; filename=rebate.xls'
-        wb = xlwt.Workbook(encoding='utf-8')
-        ws = wb.add_sheet("A Mess")
-        ws2 = wb.add_sheet("C Mess")
-        ws3 = wb.add_sheet("Indeterminate")
+    # Exports Mess Bill dues in an excel file
+    # template: messbill.html
 
-        row_num = 0
-        row_num_2 = 0
-        row_num_3 = 0
+    if request.GET:
+        selected = request.GET['ids']
+        values = [x for x in selected.split(',')]
+    if request.POST:
+        messOpt = request.POST.get('mess')
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = 'attachment; filename='+ str(messOpt) +'-MessBill.xls'
+        wb = xlwt.Workbook(encoding='utf-8')
+        ws = wb.add_sheet(str(messOpt) + "-Mess")
+
+        heading_style = xlwt.easyxf('font: bold on, height 280; align: wrap on, vert centre, horiz center')
+        h2_font_style = xlwt.easyxf('font: bold on')
+        font_style = xlwt.easyxf('align: wrap on')
+        
+        # This function is not documented but given in examples of repo
+        #     here: https://github.com/python-excel/xlwt/blob/master/examples/merged.py
+        # Prototype:
+        #     sheet.write_merge(row1, row2, col1, col2, 'text', fontStyle)
+        ws.write_merge(0, 0, 0, 4, str(messOpt) + "-Mess", heading_style)
+
+        start_date = datetime.strptime(request.POST.get('start_date'), '%d %B, %Y').date()
+        end_date = datetime.strptime(request.POST.get('end_date'), '%d %B, %Y').date()
+        end_date = end_date if end_date<date.today() else date.today()
+
+        ws.write(1, 0, "From:", h2_font_style)
+        ws.write(1, 1, start_date.strftime('%d/%b/%Y'), font_style)
+        ws.write(1, 2, "To:", h2_font_style)
+        ws.write(1, 3, end_date.strftime('%d/%b/%Y'), font_style)
+
+        row_num = 2        
 
         columns = [
             (u"Name", 6000),
@@ -559,52 +580,27 @@ def messbill(request):
             (u"Final Amount", 3000),
         ]
 
-        font_style = xlwt.XFStyle()
-        font_style.font.bold = True
-
         for col_num in range(len(columns)):
-            ws.write(row_num, col_num, columns[col_num][0], font_style)
-            ws2.write(row_num, col_num, columns[col_num][0], font_style)
-            ws3.write(row_num, col_num, columns[col_num][0], font_style)
-            # set column width
+            ws.write(row_num, col_num, columns[col_num][0], h2_font_style)
             ws.col(col_num).width = columns[col_num][1]
-            ws2.col(col_num).width = columns[col_num][1]
-            ws3.col(col_num).width = columns[col_num][1]
 
-        font_style = xlwt.XFStyle()
-        font_style.alignment.wrap = 1
-
-        start_date = datetime.strptime(request.POST.get('start_date'), '%d %B, %Y').date()
-        end_date = datetime.strptime(request.POST.get('end_date'), '%d %B, %Y').date()
-
-        messbill = MessBill.objects.first()
+        messbill = MessBill.objects.latest()
         amount = messbill.amount
         rebate = messbill.rebate
-
-        end_date = end_date if end_date<date.today() else date.today()
 
         days = end_date - start_date
         days = days.days + 1
 
-        if request.POST.get('mess') is not 'N':
-            values = MessOption.objects.filter(mess=request.POST.get(
-                'mess'), monthYear=start_date.replace(day=1))
+        values = MessOption.objects.filter(
+            mess=messOpt, 
+            monthYear__range=(start_date.replace(day=1), end_date.replace(day=1))
+        )
         for k in values:
-            if request.POST.get('mess') is not 'N':
-                obj = k.student
-            else:
-                obj = Student.objects.get(bitsId=k)
-                try:
-                    mess = MessOption.objects.get(
-                        student=obj, monthYear=start_date.replace(day=1))
-                except:
-                    mess = MessOption.objects.create(
-                        student=obj, monthYear=start_date.replace(day=1), mess='N')
 
-            leaves = Daypass.objects.filter(student=obj)
-
+            obj = k.student
+            leaves = Leave.objects.filter(student=obj)
+            # Count no of days for which rebate is given
             noofdays = 0
-
             for leave in leaves:
                 if leave.approved == True:
                     if leave.dateTimeStart.date() >= start_date and leave.dateTimeStart.date() <= end_date and leave.dateTimeEnd.date() >= end_date:
@@ -618,38 +614,120 @@ def messbill(request):
                                         leave.dateTimeStart.date()).days + 1
                     elif leave.dateTimeStart.date() <= start_date and leave.dateTimeEnd.date() >= end_date:
                         noofdays += abs(end_date - start_date).days + 1
-            finalamt = amount * days - rebate * noofdays
+            if request.POST.get('extype') is 'R':
+                finalamt = amount * days - rebate * noofdays
 
-            row = [
-                obj.name,
-                obj.bitsId,
-                amount * days,
-                rebate * noofdays,
-                finalamt
-            ]
+                row = [
+                    obj.name,
+                    obj.bitsId,
+                    amount * days,
+                    rebate * noofdays,
+                    finalamt
+                ]
 
-            if request.POST.get('mess') is not 'N':
                 row_num += 1
                 for col_num in range(len(row)):
                     ws.write(row_num, col_num, row[col_num], font_style)
-            else:
-                if mess.mess == 'A':
+
+            elif request.POST.get('extype') is 'F':
+                month_list = list(rrule.rrule(rrule.MONTHLY, dtstart=start_date, until=end_date))
+                for month in month_list:
+                    # The desc has to match with the desc in created Dues object
+                    #       exactly same as desc created in import_mess_bill view
+                    desc = "Mess Due " + month.strftime("%B %y")
+                    dues = Due.objects.filter(student=obj, description=desc).first()
+                    if dues is not None:
+                        finalamt = dues.amount
+                    else:
+                        continue
+
+                    row = [
+                        obj.name,
+                        obj.bitsId,
+                        amount * days,
+                        rebate * noofdays,
+                        finalamt,
+                        month.strftime("%B %y")
+                    ]
+
                     row_num += 1
                     for col_num in range(len(row)):
                         ws.write(row_num, col_num, row[col_num], font_style)
-                elif mess.mess == 'C':
-                    row_num_2 += 1
-                    for col_num in range(len(row)):
-                        ws2.write(row_num_2, col_num, row[col_num], font_style)
-                else:
-                    row_num_3 += 1
-                    for col_num in range(len(row)):
-                        ws3.write(row_num_3, col_num, row[col_num], font_style)
+            else:
+                messages.error(request, 'Invalid: extype={} found'.format(request.POST.get('extype')))
+
 
         wb.save(response)
+        messages.success(request, "Export done. Download will automatically start.")
         return response
 
     return render(request, "messbill.html", {})
+
+@user_passes_test(lambda u: u.is_superuser)
+def import_mess_bill(request):
+    # Template: import_mess_bill.html
+    if request.POST:
+        if request.FILES:
+            xlfile_uploaded = request.FILES['newrebate']
+            extension = xlfile_uploaded.name.rsplit('.', 1)[1]
+            if ('xls' != extension):
+                if ('xlsx' != extension):
+                    return HttpResponse("Upload a Valid Excel (.xls or .xlsx) File")
+            fd, tmp = tempfile.mkstemp()
+            with os.fdopen(fd, 'wb') as out:
+                out.write(xlfile_uploaded.read())
+            workbook = xlrd.open_workbook(tmp)
+            tot_dues_added = 0
+            failed = ''
+            year_selected = int(request.POST.get('year'))
+            if year_selected == '':                
+                datetime.now().year
+            for sheet in workbook.sheets():
+                idx = 2
+                try:
+                    if (sheet.cell_value(2, 1) != 'ID') or (sheet.cell_value(2, 4) != 'Final Amount'):
+                        os.remove(tmp)
+                        return HttpResponse("Make sure the the sheet ({}) have proper header rows.".format(sheet.name))
+                except IndexError:
+                    os.remove(tmp)
+                    return HttpResponse("Make sure the the sheet ({}) have proper header rows.".format(sheet.name))
+                for col in sheet.get_rows():
+                    idx += 1
+                    # Skipping third row (for header)
+                    # The last column(4) 'Final Amount' contains the dues
+                    # Name | ID | Amount | Rebate | Final Amount
+                    if idx > 2:
+                        bitsId = col[1].value
+                        try:
+                            student = Student.objects.get(bitsId=bitsId)
+                            due = float(col[4].value)
+                            month = datetime.strptime(request.POST.get('month'), '%B').date()
+                            month = month.replace(day=1, year=year_selected)
+                            # desc is hardcoded and referenced in messbill view also
+                            # any change here should also be done in desc
+                            desc = "Mess Due " + month.strftime("%B %y")
+                            category, created = DueCategory.objects.get_or_create(name='Mess Bill',
+                                                       description=desc)
+                            dues = Due.objects.create(student=student,
+                                            amount=amount,
+                                            due_category=category,
+                                            description=desc,
+                                            date_added=datetime.now())
+                            tot_dues_added += 1
+                        except Student.DoesNotExist:
+                            failed += str(bitsId) + ', '
+                        except IndexError:
+                            os.remove(tmp)
+                            return HttpResponse("Make sure the the sheet ({}) have proper header rows.".format(sheet.name))
+
+            os.remove(tmp)
+            if failed == '':
+                failed = str(0)
+            return HttpResponse(str(tot_dues_added) + " Dues successfully added.<br>" + failed + " bitsIDs not found in database")
+        return HttpResponse("Upload file")
+    return render(request, "import_mess_bill.html", {})
+
+
 
 def store(request):
     student = Student.objects.get(user=request.user)
@@ -720,13 +798,33 @@ def store(request):
 
 def dues(request):
     student = Student.objects.get(user=request.user)
-    month = datetime.today().month
-    itemdues = ItemBuy.objects.filter(student=student, created__month=month)
-    teedues = TeeBuy.objects.filter(student=student, created__month=month)
+    try:
+        lasted = DuesPublished.objects.latest('date_published').date_published
+    except:
+        lasted = datetime(year=2004, month=1, day=1) # Before college was founded
+
+    otherdues = Due.objects.filter(student=student)
+    itemdues = ItemBuy.objects.filter(student=student,
+                                      created__gte=lasted)
+    teedues = TeeBuy.objects.filter(student=student,
+                                      created__gte=lasted)
+    total_amount = 0
+    for item in itemdues:
+        if item is not None:
+            total_amount += item.item.price
+    for tee in teedues:
+        if tee is not None:
+            total_amount += tee.totamt
+    for other in otherdues:
+        if other is not None:
+            total_amount += other.amount            
+    balance = float(22000) - float(total_amount)
     context = {
-        'student' : student,
-        'itemdues' : itemdues,
-        'teedues' : teedues,
+        'student': student,
+        'itemdues': itemdues,
+        'teedues': teedues,
+        'balance': balance,
+        'otherdues': otherdues,
     }
 
     return render(request, "dues.html", context)
@@ -906,6 +1004,8 @@ def antiragging(request):
     return render(request,"antiragging.html",context)
 
 
+
+@user_passes_test(lambda u: u.is_superuser)
 def mess_import(request):  
 
     no_of_mess_option_added = 0
@@ -937,6 +1037,7 @@ def mess_import(request):
     context = {'added': no_of_mess_option_added}
     return render(request, "mess_defaulters_upload.html", context)
 
+@user_passes_test(lambda u: u.is_superuser)
 def mess_exp(request):
     
     if request.POST:
