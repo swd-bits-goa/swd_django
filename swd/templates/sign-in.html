@@ -21,11 +21,6 @@
                 <div class="card-content">
                   <span class="card-title">Sign in to access SWD</span>
 
-                {% comment %} <a href="javascript:void(0);">Student Welfare Division, BITS Pilani, Goa</a> {% endcomment %}
-                {% if messages %} {% for message in messages %}
-                  <span class="new badge {{ message.tags }}" data-badge-caption="{{ message }}"></span>
-                {% endfor %} {% endif %}
-
                 <form id="sign_in" method="POST">
                    {% csrf_token %}
                   <div class="input-field" id="username">
@@ -61,7 +56,7 @@
       </style>
 
     </div>
-
+{% include 'includes/messages.html' %}
       <!--Import jQuery before materialize.js-->
       <script type="text/javascript" src="{% static 'js/jquery.js' %}"></script>
       <script src="{% static 'js/materialize.js' %}"></script>

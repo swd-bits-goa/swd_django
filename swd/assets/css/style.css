@@ -6,9 +6,38 @@
  * Made By MaterializeCSS.com
  */
 
+nav ul {
+  margin-right: -20%;
+}
 .icon-block {
   padding: 0 15px;
 }
 .icon-block .material-icons {
 	font-size: inherit;
+}
+.profileImg{
+  height: 40px;
+  width: 40px;
+}
+
+.messages{
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+.single-message-error{
+  background-color: darkmagenta;
+}
+.single-message-success{
+  background-color: #009688;
+}
+.single-message-info{
+  background-color: burlywood;
+}
+.single-message-warning{
+  background-color: #d4e157;
+}
+.single-message-debug{
+  background-color: darkmagenta;
 }

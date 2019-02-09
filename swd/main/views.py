@@ -10,7 +10,6 @@ from django.contrib import messages
 from django.utils.timezone import make_aware
 from django.core.mail import send_mail
 from django.conf import settings
-import xlrd, xlwt
 
 from braces import views
 
@@ -795,7 +794,7 @@ def store(request):
             # teebuy = TeeBuy.objects.create(tee = teeno, student=student, )
     return render(request, "store.html", context)
 
-
+@login_required
 def dues(request):
     student = Student.objects.get(user=request.user)
     try:
@@ -925,8 +924,12 @@ def studentDetails(request,id=None):
                      'disco' : disco,
             }
             return render(request,"studentdetails.html",context)
+        else:
+            messages.error(request, "Unauthorised access. Contact Admin.")
+            return render(request, "home1.html", {})            
     else:
-        return render(request, 'home1.html',{})
+        messages.error(request, "Login to gain access.")
+        return redirect('login')
 
 @login_required
 def documents(request):
@@ -955,9 +958,9 @@ def documents(request):
     return render(request,"documents.html",context)
 
 def latecomer(request):
-    finallist=[]
-    late = LateComer.objects.all() 
     if request.user.is_authenticated:
+        finallist=[]
+        late = LateComer.objects.all() 
         if is_warden(request.user):
             option = 'wardenbase.html'
             warden = Warden.objects.get(user=request.user)
@@ -980,10 +983,13 @@ def latecomer(request):
                         'option' : option,
                         'list' : finallist,
             }
-
+        else:
+            messages.error(request, "Unauthorised access. Contact Admin.")
+            return render(request, "home1.html", {})
         return render(request,"latecomer.html",context)
     else:
-        return render(request, 'home1.html',{})
+        messages.error(request, "Login to gain access")
+        return redirect('login')
 
 def antiragging(request):
     context = {

@@ -19,24 +19,7 @@
 
 <body>
     <nav class="nav-extended">
-        <div class="nav-wrapper">
-            <a href="#" class="brand-logo">&nbsp;Student Welfare Division</a>
-            <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
-            <ul id="nav-mobile" class="right hide-on-med-and-down">
-                <li class=""><a href="/profile" class="valign-wrapper"><img class="circle profileImg" src="/media/{{ student.profile_picture }}">&nbsp;{{ student.name|title }}</a></li>
-                <li><a href="/logout">Logout</a></li>
-            </ul>
-            <ul class="side-nav" id="mobile-demo">
-                <li><a href="/profile" class="valign-wrapper"><img class="circle profileImg" src="/media/{{ student.profile_picture }}">&nbsp;{{ student.name|title }}</a></li>
-                <li><a href="/logout">Logout</a></li>
-            </ul>
-            <style>
-                .profileImg {
-                    max-width: 35px;
-                    height:auto
-                }
-            </style>
-        </div>
+        {% include 'includes/header.html' %}
         <div class="nav-content">
             <ul class="tabs tabs-transparent">
                 {% load main_extras %}
@@ -51,85 +34,11 @@
             </ul>
         </div>
     </nav>
-    {% comment %} <nav class="" role="navigation">
-        <div class="nav-wrapper"><a id="logo-container" href="#" class="brand-logo"></a>
-            <ul id="dropdown1" class="dropdown-content">
-                <li><a href="/profile"><i class="material-icons">person_outline</i>Profile</a></li>
-                <li><a href="/logout"><i class="material-icons">exit_to_app</i>Logout</a></li>
-            </ul>
-            <ul class="right hide-on-med-and-down">
-                <li><a class="dropdown-button" href="#!" data-activates="dropdown1">&nbsp;&nbsp;&nbsp;&nbsp;Settings<i class="material-icons right">arrow_drop_down</i></a></li>
-            </ul>
-
-            <ul id="nav-mobile" class="side-nav">
-                <li><a href="/profile">Profile</a></li>
-                <li><a href="/logout">Logout</a></li>
-            </ul>
-            <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
-        </div>
-    </nav> {% endcomment %}
     <div class="section no-pad-bot" id="index-banner">
     </div>
-    {% comment %} <ul id="slide-out" class="side-nav fixed">
-        <li>
-            <div class="user-view">
-                <div class="background">
-                    <img src="{% static 'img/office.jpg' %}">
-                </div>
-                <a href="#!user"><img class="circle" src="/media/{{ student.profile_picture }}"></a>
-                <a href="#!name"><span class="white-text name">{{ student.name|title }}</span></a>
-                <a href="#!email"><span class="white-text email">{{ student.bitsId }}</span></a>
-            </div>
-        </li>
-         {% load main_extras %}
-        <li class="{% active_page request 'dashboard' %}"><a href="/dashboard"><i class="material-icons">dashboard</i>Dashboard</a></li>
-        {% if not student.nophd %}<li class="{% active_page request 'messoption' %}"><a href="/messoption"><i class="material-icons">local_dining</i>Mess Option</a></li>{% endif %}
-        {% if not student.nophd %}<li class="{% active_page request 'leave' %}"><a href="/leave"><i class="material-icons">flight_takeoff</i>Leave</a></li>{% endif %}
-        <li class="{% active_page request 'certificates' %}"><a href="/certificates"><i class="material-icons">assignment</i>Certificates</a></li>
-        <li>
-            <div class="divider"></div>
-        </li>
-    </ul> {% endcomment %}
 {% block content %}
 {% endblock %}
-
-    <!-- <footer class="page-footer orange">
-        <div class="container">
-            <div class="row">
-                <div class="col l6 s12">
-                    <h5 class="white-text">SWD</h5>
-                    <p class="grey-text text-lighten-4">Student Welfare Division</p>
-
-
-                </div>
-                <div class="col l3 s12">
-                    <h5 class="white-text">Settings</h5>
-                    <ul>
-                        <li><a class="white-text" href="#!">Link 1</a></li>
-                        <li><a class="white-text" href="#!">Link 2</a></li>
-                        <li><a class="white-text" href="#!">Link 3</a></li>
-                        <li><a class="white-text" href="#!">Link 4</a></li>
-                    </ul>
-                </div>
-                <div class="col l3 s12">
-                    <h5 class="white-text">Connect</h5>
-                    <ul>
-                        <li><a class="white-text" href="#!">Link 1</a></li>
-                        <li><a class="white-text" href="#!">Link 2</a></li>
-                        <li><a class="white-text" href="#!">Link 3</a></li>
-                        <li><a class="white-text" href="#!">Link 4</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        <div class="footer-copyright">
-            <div class="container">
-                Made by <a class="orange-text text-lighten-3" href="http://materializecss.com">OSDLabs</a>
-            </div>
-        </div>
-    </footer> -->
-    <!--  Scripts-->
-
+{% include 'includes/messages.html' %}
     <script>
         $(document).ready(function () {
             $('select').material_select();
@@ -164,44 +73,4 @@
     </script>
 
 </body>
-
 </html>
-
-            <!-- #User Info -->
-            <!-- Menu -->
-            <!-- <div class="menu">
-                {% load main_extras %}
-                <ul class="list">
-                    <li class="header">MAIN NAVIGATION</li>
-                    <li class="{% active_page request 'dashboard' %}">
-                    <a href="/dashboard">
-                            <i class="material-icons">home</i>
-                            <span>Home</span>
-                        </a>
-                    </li>
-                        <li class="{% active_page request 'profile' %}">
-                            <a href="/profile">
-                            <i class="material-icons">text_fields</i>
-                            <span>Profile</span>
-                        </a>
-                        </li>
-                        <li class="{% active_page request 'messoption' %}">
-                            <a href="/messoption">
-                            <i class="material-icons">layers</i>
-                            <span>Mess Option</span>
-                        </a>
-                        </li>
-                        <li class="{% active_page request 'leave' %}">
-                            <a href="/leave">
-                            <i class="material-icons">text_fields</i>
-                            <span>Leave</span>
-                        </a>
-                        </li>
-                        <li class="{% active_page request 'certificates' %}">
-                            <a href="/certificates">
-                            <i class="material-icons">layers</i>
-                            <span>Certificates</span>
-                        </a>
-                        </li>
-                </ul>
-            </div> -->
