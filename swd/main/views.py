@@ -1216,3 +1216,16 @@ def publish_dues(request):
         messages.error(request, "Only POST requests are allowed")
 
     return redirect('dues_dashboard')
+
+
+def dash_security(request):
+    from datetime import time
+    t = time(0,0)
+    t1 = time(23,59)
+    d = date.today()
+    #
+    approved = Leave.objects.filter(approved__exact=True, dateTimeStart__gte=datetime.combine(d,t), dateTimeStart__lte=datetime.combine(d,t1))
+
+    context = {'leaves' : approved}
+
+    return render(request, "dash_security.html", context)
