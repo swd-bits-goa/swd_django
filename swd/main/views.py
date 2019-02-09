@@ -71,12 +71,12 @@ def dashboard(request):
         'address': address
     }
     #mess
-    messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
-    messopen = messopen.exclude(dateOpen__gt=date.today())
+    messopen = MessOptionOpen.objects.filter(dateClose__gte=datetime.today())
+    #messopen = messopen.exclude(dateOpen__gt=date.today())
     if messopen:
         messoption = MessOption.objects.filter(monthYear=messopen[0].monthYear, student=student)
 
-    if messopen and not messoption and datetime.today().date() < messopen[0].dateClose:
+    if messopen and not messoption and datetime.today() < messopen[0].dateClose:
         form = MessForm(request.POST)
         context = {
             'option': 0,
