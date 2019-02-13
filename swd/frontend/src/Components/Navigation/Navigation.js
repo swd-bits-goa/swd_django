@@ -1,4 +1,3 @@
-
 /* eslint no-unused-vars:0 */
 import React from 'react';
 import PropTypes from 'prop-types';
@@ -10,6 +9,7 @@ import NavigationMenu from 'material-ui/svg-icons/navigation/menu';
 import { Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle } from 'material-ui/Toolbar';
 import NavigationExpandMoreIcon from 'material-ui/svg-icons/navigation/expand-more';
 import MenuItem from 'material-ui/MenuItem';
+import Menu from 'material-ui/Menu';
 import IconMenu from 'material-ui/IconMenu';
 import RaisedButton from 'material-ui/RaisedButton';
 import ActionSearch from 'material-ui/svg-icons/action/search';
@@ -21,13 +21,17 @@ import Sidebar from '../Sidebar/Sidebar.js';
 import s from './Navigation.css';
 import logoUrl from './logo-small.png';
 import LoginModal from './LoginModal';
-import { Mobile } from '../Responsive';
+import { Mobile, Tablet } from '../Responsive';
 import Search from '../Search/Search.js';
 import SearchBarWithAnimation from '../Search/SearchBar.js';
 import {Link, BrowserRouter, Route} from 'react-router-dom';
 import Layout from "../Layout/Layout";
 import backIcon from './back.svg';
+import bits from './bits.svg';
+import swd from './swd.svg';
+import line from './line.svg';
 import {cyan500, cyan900, white} from "material-ui/styles/colors";
+import { darkBlack } from 'material-ui/styles/colors';
 
 class Navigation extends React.Component {
   static propTypes = {
@@ -68,48 +72,66 @@ constructor(props) {
   }
 
   render() {
+   
+
     const filledIcon = {
       width: 24,
       height: 24,
     };
       const toolbarStyle = {
-          backgroundColor: cyan500,
+          backgroundColor: white,
+          height: 91,
       }
       const appBarColor = {
-          color: white
+          color: darkBlack
       }
     return (
 
       // There's a noticeable lag when rendering components based on
       // media queries for the first time
-      <Mobile>
-      <div>
-        <div className={s.AppBar}>
+      <div className={s.mainDiv}>
+        <Mobile>
+          <div>
+            <div className={s.AppBar}>
+              <Toolbar style={toolbarStyle}>
+                <ToolbarGroup firstChild>
+                    {!this.state.searchMode?
+                        <IconButton onClick={this.handleSideBarToggle}><NavigationMenu color={"#074F57"} height={44}/></IconButton>
+                        :<IconButton onClick={this.handleCloseSearch} ><img src={backIcon} height={25}/></IconButton>}
+
+                  <Sidebar open={this.state.sidebarOpen} toggleOpen={this.handleSideBarToggle} isLoggedIn={this.props.isLoggedIn}/>
+                    {this.state.searchMode?<SearchBarWithAnimation style={{width: '80%'}}/>:<Link to='/' style={{textDecoration : "none"}}><img src={bits} height={44} alt="BITS Pilani Goa Campus"/> <img src={line} height={44} alt="divider" /> <img src={swd} height={44} alt="Student Welfare Division"/></Link>}
+
+                </ToolbarGroup>
+                <ToolbarGroup lastChild style={{position: 'relative'}}>
+                  {this.state.searchMode?<span/>:<Link to='/search/' style={{position: 'absolute', left: 5}}><IconButton iconStyle={filledIcon} style={{paddingLeft: 0, paddingRight: 20}} onClick={this.handleSearch}><ActionSearch color={"#000"} /></IconButton></Link>}
+                  {this.state.searchMode?<span/>:<ToolbarSeparator style={{position: 'absolute', left: 20}}/>}
+                
+                </ToolbarGroup>
+                
+              </Toolbar>
+            </div>
+          </div>
+        </Mobile>
+        <Tablet>
+          <div className={s.AppBarDespktop}>
           <Toolbar style={toolbarStyle}>
-            <ToolbarGroup firstChild>
-                {!this.state.searchMode?
-                    <IconButton onClick={this.handleSideBarToggle}><NavigationMenu color={white} /></IconButton>
-                    :<IconButton onClick={this.handleCloseSearch} ><img src={backIcon} height={25}/></IconButton>}
+                <ToolbarGroup firstChild>
+                  <Link to='/' style={{textDecoration : "none"}}>
+                    <img src={bits} height={44} alt="BITS Pilani Goa Campus"/>
+                    <img src={line} height={50} alt="divider" />
+                    <img src={swd} height={50} alt="Student Welfare Division"/></Link>
 
-              <Sidebar open={this.state.sidebarOpen} toggleOpen={this.handleSideBarToggle} />
-                {this.state.searchMode?<SearchBarWithAnimation style={{width: '80%'}}/>:<Link to='/' style={{textDecoration : "none"}}><ToolbarTitle style={appBarColor} text="SWD" /></Link>}
+                </ToolbarGroup>
+                <ToolbarGroup>
 
-            </ToolbarGroup>
-            <ToolbarGroup lastChild style={{position: 'relative'}}>
-              {this.state.searchMode?<span/>:<Link to='/search/' style={{position: 'absolute', left: 5}}><IconButton iconStyle={filledIcon} style={{paddingLeft: 0, paddingRight: 20}} onClick={this.handleSearch}><ActionSearch color={"#fff"} /></IconButton></Link>}
-              {this.state.searchMode?<span/>:<ToolbarSeparator style={{position: 'absolute', left: 20}}/>}
-              {!this.state.searchMode? !(this.props.isLoggedIn) ? 
-              <FlatButton label="Login" onTouchTap={this.goToLogin}  style={{left: 20, color: cyan900}}/>
-              :
-             <FlatButton label="Logout" onTouchTap={this.handleLogout}  style={{left: 20, color: cyan900}}/>
-              :<span/>}
-
-            </ToolbarGroup>
-            
-          </Toolbar>
-        </div>
+                </ToolbarGroup>
+              </Toolbar>   
+          </div> 
+        </Tablet>
+      
       </div>
-      </Mobile>
+     
     );
 
   }

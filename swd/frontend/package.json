@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@material-ui/core": "^3.9.2",
     "apollo-client-preset": "^1.0.5",
     "graphql": "^0.11.3",
     "graphql-tag": "^2.6.1",
