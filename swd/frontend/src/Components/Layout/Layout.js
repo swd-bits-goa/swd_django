@@ -23,6 +23,7 @@ class Layout extends React.Component {
 
         <div className={s.container}>
           <div>
+          
             <Header
               isLoggedIn={this.props.isLoggedIn}
               logout={this.props.logout}

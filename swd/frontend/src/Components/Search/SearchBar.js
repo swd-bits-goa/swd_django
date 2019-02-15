@@ -1,7 +1,7 @@
 import React from 'react';
-import SearchBar from 'material-ui-search-bar';
+// import SearchBar from 'material-ui-search-bar';
 import {withRouter} from 'react-router';
-import CSSTransitionGroup from 'react-addons-css-transition-group';
+// import CSSTransitionGroup from 'react-addons-css-transition-group';
 
 class SearchBarWithAnimation extends React.Component{
 	constructor(props){
@@ -20,21 +20,21 @@ class SearchBarWithAnimation extends React.Component{
 
 	render(){
 		return(
-			<CSSTransitionGroup
-		      		transitionName="searchbox"
-		      		transitionAppear={true}
-		      		transitionAppearTimeout={700}
-		      		transitionEnter={false}
-		      		transitionLeave={false}>
-				<SearchBar
+			// <CSSTransitionGroup
+		  //     		transitionName="searchbox"
+		  //     		transitionAppear={true}
+		  //     		transitionAppearTimeout={700}
+		  //     		transitionEnter={false}
+		  //     		transitionLeave={false}>
+				{/* <SearchBar
 					value={this.state.searchText}
 	                onRequestSearch={() => console.log('onRequestSearch')}
 	                spellCheck={false}
 	                placeholder={"Search by name or ID"}
 	                id="searchbar"
 	                style={{width:'86vw'}}
-	                onChange={this.getSearch}/>
-	        </CSSTransitionGroup>
+	                onChange={this.getSearch}/> */}
+	        // </CSSTransitionGroup>
 		);
 
 	}

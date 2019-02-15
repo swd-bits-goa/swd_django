@@ -5,15 +5,11 @@ import { ApolloClient } from "apollo-client";
 import { HttpLink } from "apollo-link-http";
 import { ApolloLink, concat } from "apollo-link";
 import { InMemoryCache } from "apollo-cache-inmemory";
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import Home from "./Routes/home/Home";
 import AboutSWD from "./Routes/aboutSWD/AboutSWD";
 import Layout from "./Components/Layout";
-import logo from "./logo.svg";
 import PropTypes from "prop-types";
-import injectTapEventPlugin from "react-tap-event-plugin";
-import Search from './Components/Search/Search.js';
+// import Search from './Components/Search/Search.js';
 import Profile from "./Routes/profile/Profile";
 import Login from "./Routes/login/Login";
 import Certificates from './Routes/Certificates/Certificates';
@@ -21,10 +17,8 @@ import Certificates from './Routes/Certificates/Certificates';
 // react-tap-event-plugin provides onTouchTap() to all React Components.
 // It's a mobile-friendly onClick() alternative for components in Material-UI,
 // especially useful for the buttons.
-injectTapEventPlugin();
 
 //Sets the material-ui theme colors and settings
-const muiTheme = getMuiTheme({userAgent: navigator.userAgent});
 
 const link = new HttpLink({
   uri: "http://localhost:8000/graphql",
@@ -99,7 +93,6 @@ class App extends React.Component {
     return (
       // apollo interfacing
       <ApolloProvider client={client}>
-        <MuiThemeProvider muiTheme={muiTheme}>
         <Router>
           <Switch>
             {/* // Might need to add routing behaviour to take care of expired sessions */}
@@ -113,7 +106,7 @@ class App extends React.Component {
               path="/search/:query?"
                 component={({ match })=>(
                   <Layout isLoggedIn={this.state.loggedIn} logout={this.logout} searchMode={true}>
-                    <Search searchQuery={match.params.query}/>
+                    {/* <Search searchQuery={match.params.query}/> */}
                   </Layout>
                 )}/>
              <PrivateRoute
@@ -145,6 +138,7 @@ class App extends React.Component {
             <Route
                path="/"
               component={() => (
+              
                 <Layout isLoggedIn={this.state.loggedIn} logout={this.logout} searchMode={false}>
                   <Home news={this.state.latestNews} />
                 </Layout>
@@ -152,7 +146,6 @@ class App extends React.Component {
             /> 
           </Switch>
         </Router>
-        </MuiThemeProvider>
       </ApolloProvider>
             
     );
