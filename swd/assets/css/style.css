@@ -15,6 +15,7 @@
 .icon-block .material-icons {
 	font-size: inherit;
 }
+
 #swd {
   width: 16vw;
   margin-top: 5%;
@@ -73,4 +74,16 @@ nav .button-collapse i{
   #swd {
     width: 45vw;
   }
+
+
+.fresh-orange {
+  color: #F46036 !important;
+}
+
+.desert-yellow {
+  background-color: #FFBE57 !important;
+}
+
+.deep-green {
+  color: #074F57 !important;
 }
