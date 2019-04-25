@@ -6,9 +6,71 @@
  * Made By MaterializeCSS.com
  */
 
+ body{
+  font-family: 'Montserrat', sans-serif;
+ }
 .icon-block {
   padding: 0 15px;
 }
 .icon-block .material-icons {
 	font-size: inherit;
+}
+#swd {
+  width: 16vw;
+  margin-top: 5%;
+  margin-left: 5%;
+}
+
+nav {
+  background-color: white;
+}
+
+nav ul a {
+  color: #074F57;
+  transition: none;
+}
+.tabs{
+  margin-top: 10px;
+  height: 40px;
+}
+
+#login>a{
+  color: white;
+  margin-top: 7px;
+}
+
+nav .button-collapse i{
+  color: #074F57;
+  margin-left: 10%;
+}
+
+.side-nav {
+  background-color: #074F57;
+  color: white;
+
+}
+
+.side-nav li {
+  margin: 8px;
+  background-color: #1C5960;
+}
+.side-nav li:hover {
+  background-color: #FFBE57;
+}
+
+.tabs.tabs-transparent {
+  background-color: #1C5960;
+  color: white;
+}
+
+.side-nav li > a{
+  color: white;
+}
+@media screen and (max-width: 800px) {
+  .desktop{
+    display: none;
+  }
+  #swd {
+    width: 45vw;
+  }
 }
