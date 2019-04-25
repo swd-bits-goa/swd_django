@@ -1,24 +1,12 @@
+{% extends 'indexbase.html' %}
 {% load staticfiles %}
-  <!DOCTYPE html>
-  <html>
-    <head>
-      <!--Import Google Icon Font-->
-      <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-      <!--Import materialize.css
-        <link type="text/css" rel="stylesheet" href="{% static 'css/materialize.css' %}"  media="screen,projection"/>
-        -->
-        <link href="{% static 'css/materialize.css' %}" type="text/css" rel="stylesheet" media="screen,projection" />
-        <link href="{% static 'css/style.css' %}" type="text/css" rel="stylesheet" media="screen,projection" />
-  <title>SWD BITS Goa</title>
-    </head>
-
-    <body>
+{% block content %}
       <div class="container">
         <div class="row valign-wrapper" id="bodyWrap">
           <div class="col s1">
 
           </div>
-          <div class="col s8">
+          <div class="col s10">
               <!-- <div class="card darken-1">
                 <div class="card-content"> -->
                   <span class="card-title fresh-orange"><h4>My Account</h4></span>
@@ -42,6 +30,7 @@
                   <button type="submit" class="waves-effect waves-light btn desert-yellow" id="loginbtn"><span class="deep-green">Login</span></button>
 
                 </form>
+                <br>
                 {% if messages %} {% for message in messages %}
                 <span class="badge fresh-orange" data-badge-caption="{{ message }}!"></span>
                 {% endfor %} {% endif %}
@@ -69,7 +58,5 @@
 
     </div>
 
-      <!--Import jQuery before materialize.js-->
-      <script type="text/javascript" src="{% static 'js/jquery.js' %}"></script>
-      <script src="{% static 'js/materialize.js' %}"></script>
-</html>
+    
+{% endblock %}
