@@ -30,8 +30,10 @@ nav ul a {
   color: #074F57;
   transition: none;
 }
+nav ul a:hover {
+  background-color: #FFBE57;
+}
 .tabs{
-  margin-top: 10px;
   height: 40px;
 }
 
@@ -50,6 +52,12 @@ nav .button-collapse i{
   color: white;
 
 }
+.mobile {
+  display: none;
+}
+.dashboard-quick-action {
+  height: 100%;
+}
 
 .side-nav li {
   margin: 8px;
@@ -60,12 +68,57 @@ nav .button-collapse i{
 }
 
 .tabs.tabs-transparent {
-  background-color: #1C5960;
+  background-color: #074F57;
   color: white;
 }
 
 .side-nav li > a{
   color: white;
+}
+
+.dashboard-name {
+  color: #FFBE57
+}
+.light-grey {
+  color: #C4C4C4;
+}
+
+.center {
+  margin: auto 0;
+}
+.new-green {
+  background-color: #1C5960;
+} 
+.no-pad-bot{
+  display: none;
+}
+.section{
+  padding-top: 0;
+}
+.fresh-orange {
+  color: #F46036 !important;
+}
+.desert-yellow {
+  background-color: #FFBE57 !important;
+}
+.deep-green {
+  color: #074F57 !important;
+}
+.back-green {
+  background-color: #074F57 !important;
+}
+.grey-text {
+  margin: 5px;
+}
+.grey-text>a {
+  color: #9e9e9e;
+}
+.page-footer {
+  position:fixed;
+  bottom: 0;
+  width: 100%;
+  height: 5%;
+  padding-top: 0;
 }
 @media screen and (max-width: 800px) {
   .desktop{
@@ -74,16 +127,6 @@ nav .button-collapse i{
   #swd {
     width: 45vw;
   }
-
-
-.fresh-orange {
-  color: #F46036 !important;
 }
 
-.desert-yellow {
-  background-color: #FFBE57 !important;
-}
 
-.deep-green {
-  color: #074F57 !important;
-}
