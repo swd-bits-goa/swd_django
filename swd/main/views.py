@@ -39,6 +39,14 @@ def noPhD(func):
     return check
 
 def index(request):
+    if request.user.is_authenticated:
+        if request.user.is_staff:
+                return redirect('/admin')
+        if Warden.objects.filter(user=request.user):
+            return redirect('/warden')
+        if HostelSuperintendent.objects.filter(user=request.user):
+            return redirect('/hostelsuperintendent')
+        return redirect('dashboard')
     return render(request, 'home1.html',{})
 
 

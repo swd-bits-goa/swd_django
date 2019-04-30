@@ -16,12 +16,12 @@
         {% endif %}
         {% if tees %}
         <div class="section">
-            <h4 class="center-align">Tees</h4>
+            <h4 class="center-align">T-Shirts</h4>
             <!--   Icon Section   -->
             <div class="row">
             {% for i in tees %}
                 
-                    <div class="col s3 l3">
+                    <div class="col s12 l3">
                         <div class="card">
                             <div class="card-image">
                                 <img src="/media/{{ i.pic }}" style="background-color:red;"/>
@@ -48,7 +48,7 @@
             <div class="row">
             {% for i in items %}
                 
-                    <div class="col s3 l3">
+                    <div class="col s12 l3">
                         <div class="card">
                             <div class="card-image">
                                 <img src="/media/{{ i.pic }}" style="background-color:red;"/>
@@ -92,10 +92,10 @@
         $("#modalheader").html(items[info][0])
         $("#modalinfo").html(`
         <div class="row">
-            <div class="col s5 l5">
+            <div class="col s12 l5">
                 <img src="/media/` + items[info][2] + `">
             </div>
-            <div class="col s7 l7">
+            <div class="col s12 l7">
 
                 <p align="justify">` + items[info][1] + `</p>
                 <p align="right" id="price"><b> Rs.` + items[info][3] + `</b></p>
@@ -164,10 +164,10 @@
         }
         $("#modalinfo").html(`
         <div class="row">
-            <div class="col s5 l5">
+            <div class="col s12 l5">
                 <img src="/media/` + tees[info][2] + `">
             </div>
-            <div class="col s7 l7">
+            <div class="col s12 l7">
                 <form method="POST">
                     {% csrf_token %}
                 <p align="justify">` + tees[info][1] + `</p>

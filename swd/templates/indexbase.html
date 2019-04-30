@@ -1,20 +1,61 @@
 {% load staticfiles %}
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-  <meta name="viewport" content="width=1024">
-  <title>SWD BITS Goa</title>
+  <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>SWD BITS Pilani KK Birla Goa Campus</title>
 
   <!-- CSS  -->
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link href="{% static 'css/materialize.css' %}" type="text/css" rel="stylesheet" media="screen,projection" />
   <link href="{% static 'css/style.css' %}" type="text/css" rel="stylesheet" media="screen,projection" />
+  <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
 </head>
 
 <body>
-  <nav class="light-blue lighten-1" role="navigation">
+    <nav class="nav-extended" role="navigation">
+        <div class="nav-wrapper">
+          <a href="/#" class="brand-logo"><img id="swd" src="{% static 'img/swd.png' %}"></a>
+          <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
+          <ul id="nav-mobile" class="right hide-on-med-and-down">
+              <li><a href="/#">Home</a></li>
+              <li><a href="/swd">Services</a></li>
+              <li><a href="/csa">CSA</a></li>
+              <li><a href="/sac">SAC</a></li>
+              <li><a href="/antiragging">Anti-Ragging</a></li>
+              <li><a href="/contact">Contact Us</a></li>
+              <li><a href="/search">Search</a></li>
+              <li><a href="/login">Log In</a></li>
+
+          </ul>
+          <ul class="side-nav" id="mobile-demo">
+              <li><img src="{% static 'img/person.svg' %}"></imgsrc></li>
+              <li><a href="/#">Home</a></li>
+              <li><a href="/swd">Services</a></li>
+              <li><a href="/csa">CSA</a></li>
+              <li><a href="/sac">SAC</a></li>
+              <li><a href="/antiragging">Anti-Ragging</a></li>
+              <li><a href="/contact">Contact Us</a></li>
+              <li><a href="/search">Search</a></li>
+              <li id="login"><a href="/login">Log In</a></li>
+          </ul>
+        </div>
+        <div class="nav-content">
+          <ul class="tabs tabs-transparent desktop">
+              <!-- <li id="login"><a href="/swd">Mess Option</a></li>
+              <li id="login"><a href="/csa">Leave</a></li>
+              <li id="login"><a href="/sac">Events</a></li>
+              <li id="login"><a href="/sac">Dues</a></li>
+              <li id="login"><a href="/sac">Certificates</a></li>
+              <li id="login"><a href="/login">Log In</a></li> -->
+          </ul>
+        </div>
+      </nav>
+
+  <!-- <nav class="light-blue lighten-1" role="navigation">
     <div class="nav-wrapper container"><a id="logo-container" href="/#" class="brand-logo">Student Welfare Division</a>
       <ul class="right hide-on-med-and-down">
         <li><a href="/swd">SWD</a></li>
@@ -39,7 +80,7 @@
       </ul>
       <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
     </div>
-  </nav>
+  </nav> -->
 {% block content %}
 {% endblock %}
 

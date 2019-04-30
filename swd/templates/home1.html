@@ -2,28 +2,12 @@
 {% load staticfiles %}
 {% block content %}
 
-  <div class="section no-pad-bot" id="index-banner">
-    <div class="container">
-      <br><br>
-  <div class="card">
-    <div class="card-content">
-      <h1 class="header center orange-text darken-5">BITS Pilani, K.K. Birla Goa Campus</h1>
-      <div class="row center">
-        <h5 class="header col s12 light">BITS Pilani, Goa Campus is one of the premier technical and science institutes for higher education in India. It was
-        started in 2004, with the first batch graduating in 2008.</h5>
-      </div>
-      {% comment %} <div class="row center">
-        <a href="http://materializecss.com/getting-started.html" id="download-button" class="btn-large waves-effect waves-light orange">Get Started</a>
-      </div> {% endcomment %}
-      <br><br>
-    </div>
-  </div>
-</div>
-</div>
-
+<img src="{% static 'img/swd-back.png' %}" width="100%">
 
   <div class="container">
+  
     <div class="section">
+      
 
       <!--   Icon Section   -->
   <div class="row">
@@ -115,7 +99,7 @@
       object-fit: cover;
     }
     body {
-      background-image: url("{% static 'img/bits-goa1.jpg' %}"); opacity: .9;filter: alpha(opacity=.9);
+      opacity: 1;filter: alpha(opacity=.9);
       background-attachment: fixed;
       background-repeat: no-repeat;
       height: 100px;

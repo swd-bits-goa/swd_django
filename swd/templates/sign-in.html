@@ -1,49 +1,45 @@
+{% extends 'indexbase.html' %}
 {% load staticfiles %}
-  <!DOCTYPE html>
-  <html>
-    <head>
-      <!--Import Google Icon Font-->
-      <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-      <!--Import materialize.css
-        <link type="text/css" rel="stylesheet" href="{% static 'css/materialize.css' %}"  media="screen,projection"/>
-        -->
-        <link href="{% static 'css/materialize.css' %}" type="text/css" rel="stylesheet" media="screen,projection" />
-        <link href="{% static 'css/style.css' %}" type="text/css" rel="stylesheet" media="screen,projection" />
-  <title>SWD BITS Goa</title>
-    </head>
-
-    <body>
+{% block content %}
       <div class="container">
         <div class="row valign-wrapper" id="bodyWrap">
-          <div class="col s12 m6 offset-m3">
-            <h2 class="black-text" align="center">Student Welfare Division</h2>
-              <div class="card darken-1">
-                <div class="card-content">
-                  <span class="card-title">Sign in to access SWD</span>
+          <div class="col s1">
+
+          </div>
+          <div class="col s10">
+              <!-- <div class="card darken-1">
+                <div class="card-content"> -->
+                  <span class="card-title fresh-orange"><h4>My Account</h4></span>
+                  <br>
 
                 {% comment %} <a href="javascript:void(0);">Student Welfare Division, BITS Pilani, Goa</a> {% endcomment %}
-                {% if messages %} {% for message in messages %}
-                  <span class="new badge {{ message.tags }}" data-badge-caption="{{ message }}"></span>
-                {% endfor %} {% endif %}
+                
 
                 <form id="sign_in" method="POST">
                    {% csrf_token %}
-                  <div class="input-field" id="username">
-                      <input  type="text" class="validate" name="username">
+                  <div class="input-field" id="username" >
+                      <input  type="text" class="validate" name="username" autocomplete='username' autocorrect="off" autocapitalize="none">
                       <label for="username">Username</label>
                   </div>
 
                   <div class="input-field" id="password">
-                    <input  type="password" class="validate" name="password">
+                    <input  type="password" class="validate valid" name="password" autocomplete="current-password">
                     <label for="password">Password</label>
                   </div>
 
-                  <button type="submit" class="waves-effect waves-light btn" id="loginbtn">Login</button>
+                  <button type="submit" class="waves-effect waves-light btn desert-yellow" id="loginbtn"><span class="deep-green">Login</span></button>
 
                 </form>
+                <br>
+                {% if messages %} {% for message in messages %}
+                <span class="badge fresh-orange" data-badge-caption="{{ message }}!"></span>
+                {% endfor %} {% endif %}
 
-            </div>
-          </div>
+            <!-- </div>
+          </div> -->
+        </div>
+        <div class="col s1">
+        
         </div>
 
 
@@ -52,17 +48,15 @@
         #bodyWrap {
           height:90vh;
         }
-        body {
+        /* body {
           background-image: url("{% static 'img/bits-goa-campus.jpg' %}"); opacity: .9;filter: alpha(opacity=.9);
           background-repeat: no-repeat;
           height: 100vh;
           background-size: cover;
-        }
+        } */
       </style>
 
     </div>
 
-      <!--Import jQuery before materialize.js-->
-      <script type="text/javascript" src="{% static 'js/jquery.js' %}"></script>
-      <script src="{% static 'js/materialize.js' %}"></script>
-</html>
+    
+{% endblock %}

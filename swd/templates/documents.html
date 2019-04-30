@@ -2,9 +2,9 @@
 
 
 <div class="container">
-    <div class="section">
+    <div class="section" style="margin-top:20px;">
     	{% for document in queryset %}
-        <div><a class="waves-effect waves-light btn" href="{{ document.link }}">{{ document.title }}</a></div><br>
+        <div class="center"><a class="waves-effect waves-light btn" href="{{ document.link }}">{{ document.title }}</a></div><br>
     	{% endfor %}
         
     </div>
