@@ -1,3 +1,4 @@
+{% extends option %}
 {% block content %}
 {% if student %}
 <div>
@@ -8,7 +9,7 @@
             <div class="col s12 l12">
                 <div class="card">
                     <div class="card-content">
-                        <span class="card-title center"><a href="#!user"><img class="circle" src="/media/{{ student.profile_picture }}"></a></span>
+                        <span class="card-title">My Profile</span>
                         <table class="striped">
                             <tbody>
                                 <tr>
@@ -114,7 +115,6 @@
     $('.addressval').show()
     $('.addressval')[0].focus()
   })
-
   $(document).on('click', '.saveAddr', (e) => {
     var flag=1;
     for(var i=0;i<6;i++){
