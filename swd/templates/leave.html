@@ -10,7 +10,7 @@
                 <div class="card">
                     <div class="card-content">
                         <span class="card-title">Apply for Leave</span>
-                        {% if option == 0 %}
+                        {% if option1 == 0 %}
                         <form method="POST">
                             {% csrf_token %}
                             <div class="col-md-12">
@@ -24,7 +24,7 @@
                                 <button class="btn btn-block bg-green waves-effect" type="submit">SUBMIT</button>
                             </div>
                         </form>
-                        {% elif option == 1 %}
+                        {% elif option1 == 1 %}
                             <p>Leave Successfully applied. Please wait for approval</p>
                             <p>Leave applied from {{ dateStart }}({{ timeStart }}) to {{ dateEnd }}({{ timeEnd }})</p>
                         {% else %}

@@ -15,17 +15,17 @@
                 <form method="GET">
                     {% csrf_token %}
                     <div class="row">
-                        <div class="input-field col s6 offset-s3">
+                        <div class="input-field col s10 offset-s1">
                             <input name="name" id="name" type="text" class="validate">
                             <label for="name">Name</label>  
                         </div>
                     </div>
                     <div class="row">
-                        <div class="input-field col s3 offset-s3">
+                        <div class="input-field col s5 offset-s1">
                             <input name="bitsId" id="bitsId" type="text" class="validate">
                             <label for="bitsId">BITS ID</label>
                         </div>
-                        <div class="input-field col s3">
+                        <div class="input-field col s5">
                             <select name="branch" id="branch">
                                 <option value="" selected>Not Selected</option>
                                 {% for key, value in branches.items %}
@@ -41,7 +41,7 @@
                     </div>
                     
                     <div class="row">
-                        <div class="input-field col s3 offset-s3">
+                        <div class="input-field col s10 offset-s1">
                             <select name="hostel" id="hostel">
                                 <option value="" selected>Not Selected</option>
                                 {% for i in hostels %}
@@ -50,7 +50,7 @@
                             </select>
                             <label>Hostel</label>
                         </div>
-                        <div class="input-field col s3">
+                        <div class="input-field col s5 offset-s1">
                             <input name="room" id="room" type="text" class="validate">
                             <label for="room">Room</label>
                         </div>

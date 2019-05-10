@@ -9,7 +9,7 @@
             <div class="col s12 l6">
                 <div class="card">
                     <div class="card-content">
-                        <span class="card-title">Apply for Bonafide Certificate</span>{% if option == 0 %}
+                        <span class="card-title">Apply for Bonafide Certificate</span>{% if option1 == 0 %}
                         <form method="POST">
                             {% csrf_token %}
                             <div class="col-md-12">
@@ -23,9 +23,9 @@
                                 <button class="btn btn-block bg-green waves-effect" type="submit">SUBMIT</button>
                             </div>
                         </form>
-                        {% elif option == 1 %}
+                        {% elif option1 == 1 %}
                         <p>Applied for Bonafide Certificate. Please check SWD office in 3 days.</p>
-                        {% elif option == 3 %}
+                        {% elif option1 == 3 %}
                         <p>Application for Bonafide Certificate is 3 per sem. </p>
                         {% else %}
                         <p>Sorry, there was some problem with form submission. Please fill all the fields correctly.</p>

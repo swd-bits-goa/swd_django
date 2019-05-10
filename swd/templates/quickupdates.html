@@ -1,7 +1,7 @@
 {% block content %}
 {% if student %}
 
-<div class="col l3 m3 desktop new-green dashboard-quick-action">
+<div class="col l3 m3 desktop new-green dashboard-quick-action" style="color:white">
     <div class="quick-info center">
         <div class="container">
           <div class="row">
@@ -15,62 +15,38 @@
         </div>
         
     </div>
-        <table class="quick-1 back-green centered">
-            <tbody>
-              <tr>
-                <td>Mess Option</td>
-                <td>
-                    {% if option == 0 %}
-                        <span class="new badge blue comm" data-badge-caption="Option open"></span>
-                        {% elif option == 1 %}
-                        <span class="new badge green comm" data-badge-caption="Option filled: {{mess}} Mess"></span>
-                        {% else %}
-                        <span class="new badge red comm" data-badge-caption="Option closed"></span>
-                        {% endif %}
-                </td>
-                <td> <a class="waves-effect waves-light btn" href="/messoption">Check</a>
-                </td>
-              </tr>
-              {% for leave in leaves|slice:":1" %}
-              <tr>
-                <td>Leave Application</td>
-                <td>
-                  {% if leave.approved == 1%}
-                  <span class="new badge green comm" data-badge-caption="Approved"></span> {% elif leave.disapproved == 1 %}
-                  <span class="new badge red comm" data-badge-caption="Not Approved"></span> {% else %}
-                  <span class="new badge blue comm" data-badge-caption="In Process"></span> {% endif %}
-                </td>
-                <td><a class="waves-effect waves-light btn" href="/leave">Check</a></td>
-              </tr>
-              {% endfor %}
-
-              {% for bonafide in bonafides|slice:":1" %}
-              <tr>
-                <td>Bonafide Application</td>
-                <td>
-                  {% if bonafide.printed == 0 %}
-                  <span class="new badge red comm" data-badge-caption="Not Printed"></span> {% else %}
-                  <span class="new badge green comm" data-badge-caption="Printed"></span> {% endif %}
-                </td>
-                <td><a class="waves-effect waves-light btn" href="/certificates">Check</a></td>
-              </tr>
-              {% endfor %}
-
-              {% for daypass in daypasss|slice:":1" %}
-              <tr>
-                <td>DayPass Application</td>
-                <td>
-                  {% if daypass.approved == 1%}
-                  <span class="new badge green comm" data-badge-caption="Approved"></span> {% elif daypass.disapproved == 1 %}
-                  <span class="new badge red comm" data-badge-caption="Not Approved"></span> {% else %}
-                  <span class="new badge blue comm" data-badge-caption="In Process"></span> {% endif %}
-                </td>
-                <td><a class="waves-effect waves-light btn" href="/daypass">Check</a></td>
-              </tr>
-              {% endfor %}
-
-            </tbody>
-          </table>
+    <div class="mess-option quick-1 back-green" >
+        {% if option == 0 %}
+        Mess Option is now open. Head to Mess Option Section.
+            {% elif option == 1 %}
+            You have chosen {{mess.mess}} for <i>{{mess.monthYear|date:'M Y'}}</i>
+            {% else %}
+            Mess Option is closed
+            {% endif %}
+    </div>
+    {% for leave in leaves|slice:":1" %}
+    <div class="leave quick-1 back-green" > 
+        {% if leave.approved == 1%}
+        Your Leave from <i>{{leave.dateTimeStart}}</i> to <i>{{leave.dateTimeEnd}}</i> is Approved {% elif leave.disapproved == 1 %}
+        Your Leave from <i>{{leave.dateTimeStart}}</i> to <i>{{leave.dateTimeEnd}}</i> is Not Approved</span> {% else %}
+        Your Leave from <i>{{leave.dateTimeStart}}</i> to <i>{{leave.dateTimeEnd}}</i> is under review</span> {% endif %}
+    </div>
+    {% endfor %}
+    {% for bonafide in bonafides|slice:":1" %}
+    <div class="leave quick-1 back-green" >
+        {% if bonafide.printed == 1 %}
+        Your Bonafide certificate for <i>{{bonafide.reason}}</i> is printed. Please Collect from SWD Office {% else %}
+        Your Bonafide certificate is <i>{{bonafide.reason}}</i> under process. {% endif %}
+    </div>
+    {% endfor %}
+    {% for daypass in daypasss|slice:":1" %}
+    <div class="leave quick-1 back-green" >
+        {% if daypass.approved == 1%}
+                  Your Day Pass application for <i>{{daypass.dateTime}}</i> is Approved {% elif daypass.disapproved == 1 %}
+                  Your Day Pass Application for <i>{{daypass.dateTime}}</i> is Rejected {% else %}
+                  Your Day Pass Application for <i>{{daypass.dateTime}}</i> is Under Review {% endif %}
+    </div>
+    {% endfor %}
     </div>
 
     <style>
@@ -87,6 +63,8 @@
     .quick-1 {
       border-radius: 5px;
       color: white;
+      padding: 16px;
+      margin-bottom: 5px;
     }
     </style>
 
