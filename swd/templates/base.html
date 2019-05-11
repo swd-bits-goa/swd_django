@@ -36,7 +36,7 @@
     <script src="{% static 'js/init.js' %}"></script>
 </head>
 
-<body>
+<body style="overflow: hidden">
     <nav class="nav-extended">
         <div class="nav-wrapper">
                 <a href="/#" class="brand-logo"><img id="swd" src="{% static 'img/swd.png' %}"></a>
@@ -46,7 +46,25 @@
                 <li><a href="/logout">Logout</a></li>
             </ul>
             <ul class="side-nav" id="mobile-demo">
-                <li><a href="/profile" class="valign-wrapper"><img class="circle profileImg" src="/media/{{ student.profile_picture }}">&nbsp;{{ student.name|title }}</a></li>
+                    <div class="container-fluid" style="margin-top:10px">
+                        <div class="row" style="position: relative">
+                            <div class="col sm-2">
+                                    <a href="/profile" class="valign-wrapper">
+                                        <img style="max-width:80px" class="circle profileImg" src="/media/{{ student.profile_picture }}">
+                                    </a>
+                            </div>
+                            <div class="col sm-10" style="line-height:20px; position: absolute;
+                            top: 50%;
+                            left: 40%;
+                            transform: translate(0, -50%);">
+                                    {{ student.name }}<br>
+                                    {{ student.bitsId }}
+                            </div>
+                        </div>
+                    </div>
+                    
+               
+                
                 <li class="tab"><a href="/dashboard" target="_self">Dashboard</a></li>
                 {% if not student.nophd %}<li class="tab"><a href="/messoption" target="_self">Mess Option</a></li>{% endif %}
                 {% if not student.nophd %}<li class="tab"><a href="/leave" target="_self">Leave</a></li>{% endif %}
@@ -130,7 +148,7 @@
             <div class="col l3 desktop">
                     {% include 'quickupdates.html' %} 
             </div>
-            <div class="col l9 s12">
+            <div class="col l9 s12" style="overflow-y: auto; height: 100vh; padding-bottom: 70px">
                 {% block content %}
                 {% endblock %}
                 </div>
@@ -139,7 +157,7 @@
     </div>
 
 
-    <footer class="page-footer back-green desktop">
+    <footer class="page-footer back-green desktop" style="z-index:2">
                     <p class="grey-text center">Student Welfare Division | <a href="/developers">Developers</a></p>
     </footer>
     <!--  Scripts-->
@@ -152,15 +170,15 @@
         // var yesterday = new Date((new Date()).valueOf()-1000*60*60*24);
 
         $('.datepicker').pickadate({
-            // disable: [
-            //     { from: [0,0,0], to: yesterday }
-            // ],
+           
             selectMonths: true, // Creates a dropdown to control month
-            selectYears: 5, // Creates a dropdown of 15 years to control year,
+            selectYears: 15, // Creates a dropdown of 15 years to control year,
             today: 'Today',
             clear: 'Clear',
             close: 'Ok',
-            closeOnSelect: false // Close upon selecting a date,
+            closeOnSelect: false, // Close upon selecting a date,
+            container: undefined, // ex. 'body' will append picker to body
+     
         });
 
         $('.timepicker').pickatime({
@@ -169,10 +187,11 @@
             twelvehour: false, // Use AM/PM or 24-hour format
             donetext: 'OK', // text for done-button
             cleartext: 'Clear', // text for clear-button
-            canceltext: 'Cancel', // Text for cancel-button
+            canceltext: 'Cancel', // Text for cancel-button,
+            container: undefined, // ex. 'body' will append picker to body
             autoclose: false, // automatic close timepicker
             ampmclickable: true, // make AM PM clickable
-            aftershow: function () { } //Function for after opening timepicker
+            aftershow: function(){} //Function for after opening timepicker
         });
 
     </script>

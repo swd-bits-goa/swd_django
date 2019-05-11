@@ -3,13 +3,14 @@
 
 <div class="col l3 m3 desktop new-green dashboard-quick-action" style="color:white">
     <div class="quick-info center">
-        <div class="container">
+        <div class="container-fluid" style="position: relative;">
           <div class="row">
             <div class="col lg-6">
-                <a href="#!user"><img class="circle" src="/media/{{ student.profile_picture }}"></a>
+                <a href="/profile"><img class="circle" style="max-width: 100px;" src="/media/{{ student.profile_picture }}"></a>
             </div>
-            <div class="col lg-6 light-grey">
-                {{ student.name }}
+            <div class="col lg-6 light-grey name">
+                {{ student.name }}<br>
+                {{student.bitsId}}
             </div>
           </div>
         </div>
@@ -24,6 +25,9 @@
             Mess Option is closed
             {% endif %}
     </div>
+    <div class="leave quick-1 back-green" >
+            Your current SWD Balance is Rs.<i> {{ balance|floatformat:2 }}</i>
+    </div>
     {% for leave in leaves|slice:":1" %}
     <div class="leave quick-1 back-green" > 
         {% if leave.approved == 1%}
@@ -36,7 +40,7 @@
     <div class="leave quick-1 back-green" >
         {% if bonafide.printed == 1 %}
         Your Bonafide certificate for <i>{{bonafide.reason}}</i> is printed. Please Collect from SWD Office {% else %}
-        Your Bonafide certificate is <i>{{bonafide.reason}}</i> under process. {% endif %}
+        Your Bonafide certificate for <i>{{bonafide.reason}}</i> is under process. {% endif %}
     </div>
     {% endfor %}
     {% for daypass in daypasss|slice:":1" %}
@@ -53,7 +57,9 @@
     .dashboard-quick-action {
         position: fixed;
         left: 0 !important;
+        height: 200%;
         top: 0;
+        overflow: hidden;
         z-index: -1;
     }
     .quick-info {
@@ -65,6 +71,14 @@
       color: white;
       padding: 16px;
       margin-bottom: 5px;
+    }
+    .name {
+            position: absolute;
+            top: 70%;
+            left: 70%;
+            height: 30%;
+            width: 50%;
+            margin: -15% 0 0 -25%;
     }
     </style>
 

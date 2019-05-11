@@ -1,4 +1,4 @@
-{% extends option %}
+{% extends option1 %}
 {% block content %}
 {% if student %}
 <div>
@@ -67,15 +67,7 @@
                     </div>
                 </div>
             </div>
-            {% if student.profile_picture %}
-            <div class="col s3 l3">
-                <div class="card">
-                    <div class="card-content">
-                        <div><img style="width:100%" src="/media/{{ student.profile_picture }}"></div>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
+            
         </div>
     </div>
     <br><br>

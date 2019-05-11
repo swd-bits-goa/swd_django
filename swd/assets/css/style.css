@@ -130,6 +130,7 @@ nav .button-collapse i{
   background-color: #FFBE57;
   height: 3px;
 }
+
 @media screen and (max-width: 800px) {
   .desktop{
     display: none;
