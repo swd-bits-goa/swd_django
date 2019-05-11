@@ -10,6 +10,7 @@ from django.contrib import messages
 from django.utils.timezone import make_aware
 from django.core.mail import send_mail
 from django.conf import settings
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 import xlrd, xlwt
 
 from braces import views
@@ -48,8 +49,18 @@ def index(request):
             return redirect('/hostelsuperintendent')
         return redirect('dashboard')
     else:
+        notice_list = Notice.objects.all().order_by('-id')
+        page = request.GET.get('page', 1)
+        paginator = Paginator(notice_list, 10)
+        try:
+            notices = paginator.page(page)
+        except PageNotAnInteger:
+            notices = paginator.page(1)
+        except EmptyPage:
+            notices = paginator.page(paginator.num_pages)
+
         context = {
-        'queryset' : Notice.objects.all().order_by('-id')
+        'queryset' : notices,
         }
         return render(request, 'home1.html',context)
 
@@ -81,13 +92,25 @@ def dashboard(request):
     items = ItemAdd.objects.filter(available=True)
     teesj = TeeAdd.objects.filter(available=True).values_list('title')
 
+    notice_list = Notice.objects.all().order_by('-id')
+    page = request.GET.get('page', 1)
+    paginator = Paginator(notice_list, 10)
+    try:
+        notices = paginator.page(page)
+    except PageNotAnInteger:
+        notices = paginator.page(1)
+    except EmptyPage:
+        notices = paginator.page(paginator.num_pages)
+
+
     context = {
         'student': student,
         'leaves': leaves,
         'bonafides': bonafides,
         'daypasss': daypasss,
         'address': address,
-        'queryset' : Notice.objects.all().order_by('-id'),
+        'queryset' : notices,
+        'notices' : Notice.objects.count(),
         'student': student,
         'tees': tees,
         'items': items,
@@ -116,7 +139,7 @@ def dashboard(request):
             'bonafides': bonafides,
             'daypasss': daypasss,
             'address': address,
-            'queryset' : Notice.objects.all().order_by('-id'),
+            'queryset' : notices,
             'student': student,
             'tees': tees,
             'items': items,

@@ -16,6 +16,32 @@
               </div>
             	{% endfor %}  
             </p>
+
+            {% if queryset.has_other_pages %}
+            <ul class="pagination">
+
+              {% if queryset.has_previous %}
+              <li class="waves-effect"><a href="?page={{ queryset.previous_page_number }}"><i class="material-icons">chevron_left</i></a></li>
+              {% else %}
+              <li class="disabled"><a href="#"><i class="material-icons">chevron_left</i></a></li>
+              {% endif %}
+
+            {% for i in queryset.paginator.page_range %}
+            {% if queryset.number == i %}
+            <li class="active"><a href="#!">{{ i }}</a></li>
+            {% else %}
+            <li class="waves-effect"><a href="?page={{ i }}">{{ i }}</a></li>
+            {% endif %}
+            {% endfor %}
+
+            {% if queryset.has_next %}
+            <li class="waves-effect"i><a href="?page={{ queryset.next_page_number }}"><i class="material-icons">chevron_right</i></a></li>
+            {% else %}
+            <li class="disabled"><a href="#"><i class="material-icons">chevron_right</i></a></li>
+            {% endif %}
+          </ul>
+          {% endif %}
+     
         </div>
     </div>
 
