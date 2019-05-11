@@ -20,17 +20,18 @@
     <div class="container">
       <div class="row valign-wrapper" id="bodyWrap">
 
-        <div class="col s12 m6 offset-m3">
-          <h2 class="black-text" align="center">Student Welfare Division</h2>
+        <div class="col s12 m6 offset-m3" style="text-align:center">
+            <img id="back-swd" class="center" src="{% static 'img/logo.png' %}" width="50%">
+          <h4 class="black-text" align="center">Student Welfare Division</h4>
           <div class="card darken-1">
             <div class="card-content">
               <span class="card-title"></span> {% comment %} <a href="javascript:void(0);">Student Welfare Division, BITS Pilani, Goa</a>              {% endcomment %}
 
               <h5 align="center">You have successfully logged out.</h5>
               <div class="row">
-              <div class="card-action col s12 m4 offset-m4 center">
-                <a href="/">Home</a>
-                <a href="/login">Login</a>
+              <div class="card-action col s12 m12 center">
+                  <a href="/"><button class="waves-effect waves-light btn desert-yellow" id="loginbtn"><span class="deep-green">Home</span></button></a>
+                  <a href="/login"><button class="waves-effect waves-light btn desert-yellow" id="loginbtn"><span class="deep-green">Login</span></button></a>
               </div>
               </div>
 
