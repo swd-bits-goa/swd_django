@@ -2,7 +2,30 @@
 {% load staticfiles %}
 {% block content %}
 
-<img id="back-swd" src="{% static 'img/swd-back.png' %}" width="100%">
+<div class="backdrop-container">
+  <img id="back-swd" src="{% static 'img/swd-back.png' %}" width="100%">
+  <div class="card login-box desktop">
+      <h5 style="color:#F46036">Sign In</h5>
+      <form id="sign_in" method="POST" action="login/">
+      {% csrf_token %}
+     <div class="input-field" id="username" >
+         <input  type="text" class="validate" name="username" autocomplete='username' autocorrect="off" autocapitalize="none">
+         <label for="username">Username</label>
+     </div>
+
+     <div class="input-field" id="password">
+       <input  type="password" class="validate valid" name="password" autocomplete="current-password">
+       <label for="password">Password</label>
+     </div>
+
+     <button type="submit" class="waves-effect waves-light btn desert-yellow" id="loginbtn"><span class="deep-green">Login</span></button>
+
+   </form>
+   <br>
+   {% if messages %} {% for message in messages %}
+   <span class="badge fresh-orange" data-badge-caption="{{ message }}!"></span>
+   {% endfor %} {% endif %}</div>
+</div>
 
   <div class="container-fluid">
   
@@ -11,7 +34,9 @@
             <div class="col s12 m6 desktop">
 
                     <h4 style="color:#074F57">About</h4>
-                    <p>Student Welfare Division is an integral part</p>
+                    <p style="justify-content: center;">The Student Welfare Division at BITS Pilani, K.K. Birla Goa Campus shall always strive to provide the most conducive environment to bring out the best out of every student. It is our endeavor to do anything and everything possible to make the student's stay in the campus the most memorable one. 
+                      <br><br>
+                        Our division cares for every student and shall always look into their needs that may arise from time to time.</p>
             
             </div>
             <div class="col s12 m6">
@@ -33,6 +58,17 @@
       background-position: center;
       background-size: cover;
     }
+    .backdrop-container{
+    position: relative;
+    }
+    .login-box{
+      position: absolute;
+      top: 16px;
+      right: 20px;
+      width: 460px;
+      padding: 14px;
+    }
+    
   </style>
 {% endblock %}
 
