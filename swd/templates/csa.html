@@ -1,24 +1,30 @@
 {% extends 'indexbase.html' %} {% block content %}
 
-<h1><div align="center">Council for Student Affairs {{ year }} - {{ year|add:"1" }}</h1></div>
-<div class="row">
-  {% for person in csa %}
-  <div class="column">
-    <div class="card">
-    <p class ="img">
-      <img src="/media/{{ person.pic }}" style="width:30%">
-     </p>
-      <div class="container">
-        <h4>{{ person.title }}</h4>
-        <p class="title">{{ person.student.name }} - {{ person.student.bitsId }}</p>
-        <p>{{ person.student.phone }}</p>
-        <p><a href="mailto:{{ person.email }}">{{ person.email }}</a></p>
+<div class="container" style="line-height: 1">
+  <span class="heading" >Council for Student Affairs<br>{{ year }} - {{ year|add:"1" }}</p>
+  <div class="row">
+    {% for person in csa %}
+    <div class="column">
+     
+    <p>
+        <img class="circle img-csa" src="/media/{{ person.pic }}">
+      </p>
+        <div class="csa">
+          <span class="post-title">{{ person.title }}</span>
+          <div class="divider"></div>
+          <span class="title">{{ person.student.name }}<br>{{ person.student.bitsId }}</span><br>
+          <span class="phone">{{ person.student.phone }}</span><br>
+          <span class="mail"><a href="mailto:{{ person.email }}">{{ person.email }}</a></span>
+        </div>
       </div>
-    </div>
+ 
+    {% endfor %}
   </div>
-  {% endfor %}
 </div>
 <style>
+  .img-csa{
+    width:190px;
+  }
 .column {
     float: left;
     width: 50%;
@@ -41,14 +47,71 @@
     display: table;
 }
 .title {
-    color: grey;
+    color: black;
+    font-size: 25px;
+    font-style: italic;
 }
-.img{
+.img-csa{
 	float: left;
 	padding: 0 16px;
-
 }
-
+.heading{
+  font-size: 37px; color: #F46036;
+}
+.post-title{
+  font-size: 30px;
+  font-weight: bold;
+  color: #074F57;
+}
+.divider {
+  height: 7px;
+  width: 48px;
+  background-color: #FFBE57;
+}
+.phone {
+  font-size: 20px;
+  font-style: italic;
+  color: black;
+}
+.mail a{
+  font-size: 20px;
+  font-style: italic;
+  color: black;
+}
+@media screen and (max-width: 800px) {
+  .heading{
+    font-size: 20px;
+    position: absolute;
+    top: 70px;
+  }
+  .img-csa {
+    width: 84px;
+    padding: 0;
+    float: left;
+  }
+  .csa{
+    float: right;
+  }
+  .post-title{
+  font-size: 16px;
+}
+.divider {
+  height: 3px;
+  width: 21px;
+}
+.phone {
+  font-size: 10px;
+}
+.mail a{
+  font-size: 10px;
+}
+.title{
+  font-size: 13px;
+}
+.column{
+  padding: 0;
+} 
+}
 
 </style>
 {% endblock %}
