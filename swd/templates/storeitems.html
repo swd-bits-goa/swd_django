@@ -21,14 +21,22 @@
                 
                     <div class="col s12 l3">
                         <div class="card">
-                            <div class="card-image">
-                                <img src="/media/{{ i.pic }}" style="background-color:FFBE57;"/>
+                            <div class="card-img-swd" style="height: 280px; width: 200px; position: relative; margin: 0 auto;">
+                                <img src="/media/{{ i.pic }}" style="position: absolute;
+                                bottom: 0;
+                                left: 0;
+                                right: 0;
+                                top: 0;
+                                margin: auto;
+                                max-width: 100%;
+                                max-height: 100%;
+                                "/>
                                 <a class="btn-floating halfway-fab waves-effect waves-light desert-yellow" onclick="openTeeModal({{ i.id }})"><i class="material-icons">shopping_cart</i></a>
                             </div>
                             <div class="card-content">
-                                <span class="card-title">{{ i.title }}</span>
-                                <p>{{ i.desc }}</p>
-                                <br>
+                                <p style="font-size: 20px">{{ i.title }}</p>
+                                <p style="color: grey">{{ i.desc }}</p>
+                              
                                 <p><b>Price: {{ i.price }}</b></p>
                             </div>
                         </div>
@@ -49,14 +57,22 @@
                 
                     <div class="col s12 l3">
                         <div class="card">
-                            <div class="card-image">
-                                <img src="/media/{{ i.pic }}" style="background-color:#FFBE57;"/>
+                                <div class="card-img-swd" style="height: 280px; width: 200px; position: relative; margin: 0 auto;">
+                                        <img src="/media/{{ i.pic }}"style="position: absolute;
+                                bottom: 0;
+                                left: 0;
+                                right: 0;
+                                top: 0;
+                                margin: auto;
+                                max-width: 100%;
+                                max-height: 100%;
+                                "/>
                                 <a class="btn-floating halfway-fab waves-effect waves-light desert-yellow" onclick="openItemModal({{ i.id }})"><i class="material-icons">shopping_cart</i></a>
                             </div>
                             <div class="card-content">
-                                <span class="card-title">{{ i.title }}</span>
-                                <p>{{ i.desc }}</p>
-                                <br>
+                                    <p style="font-size: 20px">{{ i.title }}</p>
+                                <p style="color: grey">{{ i.desc }}</p>
+                              
                                 <p><b>Price: {{ i.price }}</b></p>
                             </div>
                         </div>
