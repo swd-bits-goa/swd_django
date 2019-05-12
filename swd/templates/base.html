@@ -38,7 +38,7 @@
 
 <body style="overflow: hidden">
     <nav class="nav-extended">
-        <div class="nav-wrapper">
+        <div class="nav-wrapper" style="margin-bottom: 5px;">
                 <a href="/#" class="brand-logo"><img id="swd" src="{% static 'img/swd.png' %}"></a>
             <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
             <ul id="nav-mobile" class="right hide-on-med-and-down">
@@ -47,7 +47,7 @@
             </ul>
             <ul class="side-nav" id="mobile-demo">
                     <div class="container-fluid" style="margin-top:10px">
-                        <div class="row" style="position: relative">
+                        <div class="row" style="position: relative; margin-top: 20px">
                             <div class="col sm-2">
                                     <a href="/profile" class="valign-wrapper">
                                         <img style="max-width:80px" class="circle profileImg" src="/media/{{ student.profile_picture }}">
@@ -83,7 +83,7 @@
                 }
             </style>
         </div>
-        <div class="nav-content desktop">
+        <div class="nav-content desktop" style="margin-bottom:5px;">
             <ul class="tabs tabs-transparent">
                 {% load main_extras %}
                 <li class="tab"><a href="/dashboard" class="{% active_page request 'dashboard' %}" target="_self">Dashboard</a></li>

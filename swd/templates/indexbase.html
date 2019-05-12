@@ -52,15 +52,31 @@
 
           </ul>
           <ul class="side-nav" id="mobile-demo">
-              <li><img src="{% static 'img/person.svg' %}"></imgsrc></li>
+              <div class="container-fluid" style="margin-top:10px">
+                  <div class="row" style="position: relative">
+                      <div class="col sm-2">
+                              <a href="/" class="valign-wrapper">
+                                  <img style="max-width:80px" class="circle profileImg" src="{% static 'img/person.svg' %}">
+                              </a>
+                      </div>
+                      <div class="col sm-10" style=" position: absolute;
+                      top: 60%;
+                      left: 40%;
+                      transform: translate(0, -50%);">
+                              Not Logged in
+                      </div>
+                  </div>
+              </div>
+              <!-- <li><img src="{% static 'img/person.svg' %}"></imgsrc>Not Logged in</li> -->
               <li><a href="/#">Home</a></li>
+              <li id="login"><a href="/login">Log In</a></li>
               <li><a href="/swd">Services</a></li>
               <li><a href="/csa">CSA</a></li>
               <li><a href="/sac">SAC</a></li>
               <li><a href="/antiragging">Anti-Ragging</a></li>
               <li><a href="/contact">Contact Us</a></li>
               <li><a href="/search">Search</a></li>
-              <li id="login"><a href="/login">Log In</a></li>
+              
               <div class="center"><a href="/developers" style="color: white; hover: none;">Developers</a></div>
           </ul>
         </div>
