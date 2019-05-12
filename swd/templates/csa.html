@@ -1,7 +1,7 @@
 {% extends 'indexbase.html' %} {% block content %}
 
 <div class="container" style="line-height: 1">
-  <span class="heading" >Council for Student Affairs<br>{{ year }} - {{ year|add:"1" }}</p>
+  <span class="heading" >Council for Student Affairs<br>{{ year }} - {{ year|add:"1" }}</span>
   <div class="row">
     {% for person in csa %}
     <div class="column">
@@ -81,8 +81,7 @@
 @media screen and (max-width: 800px) {
   .heading{
     font-size: 20px;
-    position: absolute;
-    top: 70px;
+    top: 80px;
   }
   .img-csa {
     width: 84px;
