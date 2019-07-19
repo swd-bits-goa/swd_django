@@ -1,6 +1,6 @@
 from django.http import HttpResponse
 
-from .dev_info import cgpa 
+from .dev_info import cgpa
 
 def index(request):
     from main.models import Student
