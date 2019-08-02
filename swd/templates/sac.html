@@ -2,76 +2,81 @@
 {% load staticfiles %}
 {% block content %}
 <div class="content-sac">
-
-    <div class="left-content">
-        <h5 class='head'>Student Activity Center (SAC)</h5>
-        <div class="upper-part">
-            <div class="row">
-                <div class="col-lg-4 left-part">
-                    <h6 class='table-head'>Incharge</h6>
-                    <hr width='30px' color='#ff8000' align='left' style='height: 5px;padding: 0;margin: 0 margin-bottom: 10px'>
-                    <p class='table-info'><strong>Mr. Chandu G.Lamani</strong> (Physical Education Instructor and SAC incharge)</p>
-                </div>
-                <div class="col-lg-4 middle-part">
-                    <h6 class='table-head'>Timings</h6>
-                    <hr width='30px' color='#ff8000' align='left' style='height: 5px;padding: 0;margin: 0 margin-bottom: 10px'>
-                    <p class='table-info'><strong>Weekdays:</strong> 5:30AM to 8:00AM
-                        <br> 5:30PM to 9:30PM
-                        <br>
-                        <br><strong>Weekends: </strong> 5:30PM to 9:30PM
-                        <br> Off on institute holidays</p>
-                </div>
-            </div>
-            <!-- Row ends -->
+  <h2>Student Activity Center</h2>
+  <div class="row">
+    <div class="leftpart left col l8">
+      <div class="upperpart">
+        <div class="row">
+          <div class="incharge col l5 s12 m12">
+            <table>
+              <td class='sac-heading i' align='left'>Incharge<hr color='orange' width='30px' align='left' style="height:3px;margin-top: 0;"></td>
+              <td class='table-content'>
+                <table class='name'>
+                  <td><b>Mr. Chandu G.Lamani</b> (Physical Education Instructor and SAC incharge)</td>
+                </table>
+              </td>
+            </table>
+          </div>
+          <div class="timings col l5 s12 m12">
+            <table>
+              <td class='sac-heading' align='left'>Timings<hr color='orange' width='30px' align='left' style="height:3px;margin-top: 0;"></td>
+              <td class='table-content'>
+                <table class='inner-table'>
+                  <tr>
+                    <td class='sub-headings'><b>Weekdays:</b> </td>
+                    <td class='table-inner-content'>5:30AM to 8:00AM</td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td class='table-inner-content'>5:30PM to 9:30PM</td>
+                  </tr>
+                  <tr>
+                    <td class='sub-headings'><b>Weekends:</b></td>
+                    <td class='table-inner-content'>5:30PM to 9:30PM</td>
+                  </tr>
+                </table>
+                <p class='off'>Off on Institute Holidays</p>
+              </td>
+            </table>
+          </div>
         </div>
-        <!-- Upper Part ends -->
-        <!-- Lower Part Starts -->
-        <div class="lower-part">
-            <br>
-            <br>
-            <h6 class='table-head'>Sports Facilities</h6>
-            <hr width='30px' color='#ff8000' align='left' style='height: 5px;padding: 0;margin: 0; margin-bottom: 10px'>
-            <div class="row">
-                <div class="col-lg-4 lower-left">
-                    <h6 class='secondary-heading'>Indoor</h6>
-                    <p>Gymnasium-Modern - All weight trainings and cardio machines</p>
-                    <p>Badminton wooden courts - Four courts</p>
-                    <p>Squash court - One court</p>
-                    <p>Table Tennis hall - Five tables</p>
-                    <p>Carrom Room and Chess Room - Five Carrom boards and Ten Chess boards</p>
-                    <p>Taekwondo Martial Arts Room - One Room</p>
-                    <p>Prayer Room - One Room</p>
-                    <p>Dance Room - One Room</p>
-                </div>
-                <div class="col-lg-4 lower-right">
-                    <h6 class='secondary-heading'>Outdoor</h6>
-                    <p>BasketBall Courts - Two Courts</p>
-                    <p>Cricket Ground - One Ground</p>
-                    <p>Cricket nets - Practice Facilities, Practice Four nets</p>
-                    <p>Football Ground - One Ground</p>
-                    <p>Futsal - One Court</p>
-                    <p>Volleyball Courts - Two Courts</p>
-                    <p>Tennis Courts - Two Courts</p>
-                </div>
 
-            </div>
-            <!-- Row ends -->
-
+      </div>
+      <div class="lowerpart">
+        <section class='sac-heading' align='left'>Sports Facilities<hr color='orange' width='30px' align='left' style="height:3px;margin-top: 0;"></section>
+        <div class="row">
+          <div class="col l5 s12 outdoor">
+            <h6>Outdoor</h6><hr>
+            <p>Gymnasium-Modern - All weight trainings and cardio machines</p>
+            <p>Badminton wooden courts - Four courts</p>
+            <p>Squash court - One court</p>
+            <p>Table Tennis hall - Five tables</p>
+            <p>Carrom Room and Chess Room - Five Carrom boards and Ten Chess boards</p>
+            <p>Taekwondo Martial Arts Room - One Room</p>
+            <p>Prayer Room - One Room</p>
+            <p>Dance Room - One Room</p>
+          </div>
+          <div class="col l5 s12 indoor">
+            <h6>Indoor</h6><hr>
+            <p>BasketBall Courts - Two Courts</p>
+            <p>Cricket Ground - One Ground</p>
+            <p>Cricket nets - Practice Facilities, Practice Four nets</p>
+            <p>Football Ground - One Ground</p>
+            <p>Futsal - One Court</p>
+            <p>Volleyball Courts - Two Courts</p>
+            <p>Tennis Courts - Two Courts</p>
+          </div>
         </div>
-        <!-- Lower Part ends -->
-
+      </div>
     </div>
-    <!-- Left-content ends -->
-
-    <!-- Right content starts -->
-    <!-- Side Images -->
-    <div class="sideimg">
-        <div class="img-right clearfix">
-            <img src="{% static 'img/office.jpg' %}" alt="Not found" class='img-sac'>
-            <img src="{% static 'img/office.jpg' %}" alt="Not found" class='img-sac'>
-        </div>
+    <div class="rightpart right col l4">
+      <img class='img-sac' src="{% static 'img/office.jpg' %}" alt="">
+      <img class='img-sac' src="{% static 'img/office.jpg' %}" alt="">
     </div>
-    <!-- Right content ends -->
+  </div>
+
+
 
 </div>
+
 {% endblock %}
