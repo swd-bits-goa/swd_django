@@ -31,8 +31,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: keep the secret key used in production secret!
 
 
-
-
 if PRODUCTION:
     ALLOWED_HOSTS = ['10.10.10.121']
 else:
@@ -194,6 +192,8 @@ STATIC_ROOT = 'static'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
+
+CONSTANTS_LOCATION = os.path.join(MEDIA_ROOT, 'constants.json')
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR,  'assets'),
