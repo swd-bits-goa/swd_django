@@ -1,4 +1,5 @@
 {% load staticfiles %}
+{% load main_extras %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -15,36 +16,30 @@
 
 <body>
     <nav class="nav-extended">
-        <div class="nav-wrapper">
-            <a href="#" class="brand-logo">&nbsp;Student Welfare Division</a>
-            <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
-            <ul id="nav-mobile" class="right hide-on-med-and-down">
-                <li class=""><a href="/profile" class="valign-wrapper"><img class="circle profileImg" src="{% static 'img/profile-swd.jpg' %}">&nbsp;{{ warden.name|title }}</a></li>
-                <li><a href="/logout">Logout</a></li>
-            </ul>
-            <ul class="side-nav" id="mobile-demo">
-                <li><a href="/profile" class="valign-wrapper"><img class="circle profileImg" src="{% static 'img/profile-swd.jpg' %}">&nbsp;{{ warden.name|title }}</a></li>
-                <li><a href="/logout">Logout</a></li>
-            </ul>
-            <style>
-                .profileImg {
-                    max-width: 35px;
-                    height: auto
-                }
-            </style>
-        </div>
+        {% include 'includes/header.html' %}
         <div class="nav-content">
             <ul class="tabs tabs-transparent">
-                {% load main_extras %}
-                <li class="tab"><a href="/warden" class="{% active_page request 'warden' %}" target="_self">Leave Applications</a></li>
-                <li class="tab"><a href="/latecomer" class="{% active_page request 'latecomer' %}" target="_self">Late Comers</a></li>
-                <li class="tab"><a href="/documents" class="{% active_page request 'documents' %}" target="_self">Documents</a></li>
-                <li class="tab"><a href="/search" class="{% active_page request 'search' %}" target="_self">Search</a></li>
+                <li class="tab">
+                <a href="{% url 'warden' %}" class="{% active_page request 'warden' %}" target="_self">
+                    Leave Applications
+                </a>
+                </li>
+                <li class="tab">
+                <a href="{% url 'latecomer' %}" class="{% active_page request 'latecomer' %}" target="_self">
+                    Late Comers
+                </a>
+                </li>
+                <li class="tab">
+                <a href="{% url 'documents' %}" class="{% active_page request 'documents' %}" target="_self">
+                    Documents
+                </a>
+                </li>
             </ul>
         </div>
     </nav>
 {% block content %}
 {% endblock %} 
+{% include 'includes/messages.html' %}
 <!--  Scripts-->
 
     <script src="{% static 'js/jquery.js' %}"></script>

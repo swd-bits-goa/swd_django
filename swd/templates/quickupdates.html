@@ -1,0 +1,87 @@
+{% block content %}
+{% if student %}
+
+<div class="col l3 m3 desktop new-green dashboard-quick-action" style="color:white">
+    <div class="quick-info center">
+        <div class="container-fluid" style="position: relative;">
+          <div class="row">
+            <div class="col lg-6">
+                <a href="/profile"><img class="circle" style="max-width: 100px;" src="/media/{{ student.profile_picture }}"></a>
+            </div>
+            <div class="col lg-6 light-grey name">
+                {{ student.name }}<br>
+                {{student.bitsId}}
+            </div>
+          </div>
+        </div>
+        
+    </div>
+    <div class="mess-option quick-1 back-green" >
+        {% if option == 0 %}
+        Mess Option is now open. Head to Mess Option Section.
+            {% elif option == 1 %}
+            You have chosen {{mess.mess}} for <i>{{mess.monthYear|date:'M Y'}}</i>
+            {% else %}
+            Mess Option is closed
+            {% endif %}
+    </div>
+    <div class="leave quick-1 back-green" >
+            Your current SWD Balance is Rs.<i> {{ balance|floatformat:2 }}</i>
+    </div>
+    {% for leave in leaves|slice:":1" %}
+    <div class="leave quick-1 back-green" > 
+        {% if leave.approved == 1%}
+        Your Leave from <i>{{leave.dateTimeStart}}</i> to <i>{{leave.dateTimeEnd}}</i> is Approved {% elif leave.disapproved == 1 %}
+        Your Leave from <i>{{leave.dateTimeStart}}</i> to <i>{{leave.dateTimeEnd}}</i> is Not Approved</span> {% else %}
+        Your Leave from <i>{{leave.dateTimeStart}}</i> to <i>{{leave.dateTimeEnd}}</i> is under review</span> {% endif %}
+    </div>
+    {% endfor %}
+    {% for bonafide in bonafides|slice:":1" %}
+    <div class="leave quick-1 back-green" >
+        {% if bonafide.printed == 1 %}
+        Your Bonafide certificate for <i>{{bonafide.reason}}</i> is printed. Please Collect from SWD Office {% else %}
+        Your Bonafide certificate for <i>{{bonafide.reason}}</i> is under process. {% endif %}
+    </div>
+    {% endfor %}
+    {% for daypass in daypasss|slice:":1" %}
+    <div class="leave quick-1 back-green" >
+        {% if daypass.approved == 1%}
+                  Your Day Pass application for <i>{{daypass.dateTime}}</i> is Approved {% elif daypass.disapproved == 1 %}
+                  Your Day Pass Application for <i>{{daypass.dateTime}}</i> is Rejected {% else %}
+                  Your Day Pass Application for <i>{{daypass.dateTime}}</i> is Under Review {% endif %}
+    </div>
+    {% endfor %}
+    </div>
+
+    <style>
+    .dashboard-quick-action {
+        position: fixed;
+        left: 0 !important;
+        height: 200%;
+        top: 0;
+        overflow: hidden;
+        z-index: -1;
+    }
+    .quick-info {
+      margin: 40px auto;
+      margin-top: 150px;
+    }
+    .quick-1 {
+      border-radius: 5px;
+      color: white;
+      padding: 16px;
+      margin-bottom: 5px;
+    }
+    .name {
+            position: absolute;
+            top: 70%;
+            left: 70%;
+            height: 30%;
+            width: 50%;
+            margin: -15% 0 0 -25%;
+    }
+    </style>
+
+    {% endif %}
+
+{% endblock %}

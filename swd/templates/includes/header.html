@@ -1,0 +1,50 @@
+{% load static %}
+<nav class="light-blue lighten-1" role="navigation">
+  <div class="nav-wrapper container"><a id="logo-container" href="/" class="brand-logo">Student Welfare Division</a>
+    <ul class="right hide-on-med-and-down">
+      <li><a href="{% url 'swd' %}">SWD</a></li>
+      <li><a href="{% url 'csa' %}">CSA</a></li>
+      <li><a href="{% url 'sac' %}">SAC</a></li>
+      <li><a href="{% url 'antiragging' %}">Anti-Ragging</a></li>
+      <li><a href="{% url 'notice' %}">Notice</a></li>
+      <li><a href="{% url 'search' %}">Search</a></li>
+      <li><a href="{% url 'contact' %}">Contact Us</a></li>
+      {% if not user.is_authenticated %}
+        <li><a href="{% url 'login' %}">Login</a></li>
+      {% else %}
+        <li>
+            {% if not user.is_superuser %}
+            <a href="{% url 'profile' %}" class="valign-wrapper">
+            {% else %}
+            <a href="/admin/" class="valign-wrapper">
+            {% endif %}
+            {% if user.profile_picture %}
+              <img class="circle profileImg" src="/media/{{ user.profile_picture}}">
+            {% else %}
+              <img class="circle profileImg" src="{% static 'img/profile-swd.jpg' %}">
+            {% endif %}
+            &nbsp;{{ user|title }}
+            </a>
+        </li>
+        <li><a href="{% url 'logout' %}">Logout</a></li>
+      {% endif %}
+    </ul>
+    <ul id="nav-mobile" class="side-nav">
+      <li><a href="{% url 'swd' %}">SWD</a></li>
+      <li><a href="{% url 'csa' %}">CSA</a></li>
+      <li><a href="{% url 'sac' %}">SAC</a></li>
+      <li><a href="{% url 'antiragging' %}">Anti-Ragging</a></li>
+      <li><a href="{% url 'notice' %}">Notice</a></li>
+      <li><a href="{% url 'search' %}">Search</a></li>
+      <li><a href="{% url 'contact' %}">Contact Us</a></li>
+      {% if not user.is_authenticated %}
+        <li><a href="{% url 'login' %}">Login</a></li>
+      {% else %}
+        <li><a href="{% url 'logout' %}">Logout</a></li>
+      {% endif %}
+    </ul>
+    <a href="#" data-activates="nav-mobile" class="button-collapse">
+      <i class="material-icons">menu</i>
+    </a>
+  </div>
+</nav>

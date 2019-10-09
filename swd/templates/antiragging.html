@@ -1,12 +1,24 @@
 {% extends 'indexbase.html' %} {% block content %}
 
 <div class="container">
-    <div class="section">
+        <span class="heading" >Anti Ragging</span><br><br>
+    <div class="section" style="text-align: center">
     	{% for document in queryset %}
-        <div><a class="waves-effect waves-light btn" href="{{ document.link }}">{{ document.title }}</a></div><br>
+        <div><a class="waves-effect waves-light btn desert-yellow " href="{{ document.link }}">{{ document.title }}</a></div><br>
     	{% endfor %}
     </div>
     <br><br>
 </div>
+
+<style>
+.heading{
+  font-size: 37px; color: #F46036;
+}
+@media screen and (max-width: 800px) {
+  .heading{
+    font-size: 20px;
+    top: 70px;
+  }
+</style>
 
 {% endblock %}

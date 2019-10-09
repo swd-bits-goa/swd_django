@@ -59,7 +59,8 @@
   color: #8b1014 !important; }
 
 .red {
-  background-color: #F44336 !important; }
+  background-color: #F44336 !important;
+  }
 
 .red-text {
   color: #F44336 !important; }
@@ -1238,7 +1239,8 @@
   background-color: #ff9800 !important; }
 
 .orange-text {
-  color: #ff9800 !important; }
+  color: #f46036 !important;
+  }
 
 .orange.lighten-5 {
   background-color: #fff3e0 !important; }
@@ -1974,7 +1976,8 @@ a {
 
 .valign-wrapper {
   display: flex;
-  align-items: center; }
+  align-items: center;
+  }
 
 .clearfix {
   clear: both; }
@@ -2475,8 +2478,9 @@ span.badge {
     font-weight: 300;
     font-size: 0.8rem;
     color: #fff;
-    background-color: #FF5722;
-    border-radius: 2px; }
+    /* background-color: #FF5722; */
+    border-radius: 2px;
+    }
   span.badge.new:after {
     content: " new"; }
   span.badge[data-badge-caption]::after {
@@ -3718,7 +3722,8 @@ small {
   text-align: center;
   letter-spacing: .5px;
   transition: .2s ease-out;
-  cursor: pointer; }
+  cursor: pointer;
+  }
   .btn:hover, .btn-large:hover {
     background-color: #ff6a3c; }
 
