@@ -76,14 +76,14 @@ def login_success(request):
 #     url = Student.objects.get(user=request.user).profile_picture
 #     print(url)
 #     ext = url.name.split('.')[-1]
-    
+
 #     try:
 #         with open(url.name, "rb") as f:
 #             return HttpResponse(f.read(), content_type="image/"+ext)
 #     except IOError:
 #         with open("assets/img/profile-swd.jpg", "rb") as f:
 #             return HttpResponse(f.read(), content_type="image/jpg")
-  
+
 @login_required
 def dashboard(request):
     student = Student.objects.get(user=request.user)
@@ -138,7 +138,7 @@ def dashboard(request):
             total_amount += tee.totamt
     for other in otherdues:
         if other is not None:
-            total_amount += other.amount            
+            total_amount += other.amount
     balance = float(22000) - float(total_amount)
 
     #mess
@@ -215,7 +215,7 @@ def profile(request):
                 total_amount += tee.totamt
         for other in otherdues:
             if other is not None:
-                total_amount += other.amount            
+                total_amount += other.amount
         balance = float(22000) - float(total_amount)
 
         #mess
@@ -251,7 +251,7 @@ def profile(request):
             student.address = address
             student.save()
             return HttpResponse("{ status: 'ok' }")
-            
+
     return render(request, "profile.html", context)
 
 
@@ -303,7 +303,7 @@ def messoption(request):
     bonafides = Bonafide.objects.filter(student=student, reqDate__gte=date.today() - timedelta(days=7))
     messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
     messopen = messopen.exclude(dateOpen__gt=date.today())
-   
+
 
     if messopen:
         messoption = MessOption.objects.filter(monthYear=messopen[0].monthYear, student=student)
@@ -334,7 +334,7 @@ def messoption(request):
             total_amount += tee.totamt
     for other in otherdues:
         if other is not None:
-            total_amount += other.amount            
+            total_amount += other.amount
     balance = float(22000) - float(total_amount)
 
     edit = 0
@@ -355,8 +355,8 @@ def messoption(request):
             'daypasss': daypasss,}
     elif messopen and messoption:
         context = {
-            'option': 1, 
-            'mess': messoption[0], 
+            'option': 1,
+            'mess': messoption[0],
             'student': student,
             'balance': balance,
             'leaves': leaves,
@@ -364,7 +364,7 @@ def messoption(request):
             'daypasss': daypasss,}
     else:
         context = {
-            'option': 2, 
+            'option': 2,
             'student': student,
             'leaves': leaves,
             'balance': balance,
@@ -427,7 +427,7 @@ def leave(request):
             total_amount += tee.totamt
     for other in otherdues:
         if other is not None:
-            total_amount += other.amount            
+            total_amount += other.amount
     balance = float(22000) - float(total_amount)
 
     form = LeaveForm()
@@ -466,7 +466,7 @@ def leave(request):
             if config.EMAIL_PROD:
                 email_to=[Warden.objects.get(hostel=HostelPS.objects.get(student=student).hostel).email]
             else:
-                email_to=["swdbitstest@gmail.com"]                                                                     # For testing 
+                email_to=["swdbitstest@gmail.com"]                                                                     # For testing
             mailObj=Leave.objects.latest('id')
             mail_subject="New Leave ID: "+ str(mailObj.id)
             mail_message="Leave Application applied by "+ mailObj.student.name +" with leave id: " + str(mailObj.id) + ".\n"
@@ -508,7 +508,7 @@ def certificates(request):
     leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
     daypasss = DayPass.objects.filter(student=student, dateTime__gte=date.today() - timedelta(days=7))
     bonafides = Bonafide.objects.filter(student=student, reqDate__gte=date.today() - timedelta(days=7))
-    
+
 #dues
     try:
         lasted = DuesPublished.objects.latest('date_published').date_published
@@ -529,7 +529,7 @@ def certificates(request):
             total_amount += tee.totamt
     for other in otherdues:
         if other is not None:
-            total_amount += other.amount            
+            total_amount += other.amount
     balance = float(22000) - float(total_amount)
 
     #mess
@@ -772,7 +772,7 @@ def hostelsuperintendentdaypassapprove(request, daypass):
         send_mail(mail_subject,mail_message,settings.EMAIL_HOST_USER,email_to,fail_silently=False)
         daypass.save()
         return redirect('hostelsuperintendent')
-    
+
 
     return render(request, "hostelsuperintendent.html", context)
 
@@ -819,7 +819,7 @@ def daypass(request):
             total_amount += tee.totamt
     for other in otherdues:
         if other is not None:
-            total_amount += other.amount            
+            total_amount += other.amount
     balance = float(22000) - float(total_amount)
 
     form = DayPassForm()
@@ -857,7 +857,7 @@ def daypass(request):
                 email_to=[HostelSuperintendent.objects.get(hostel=HostelPS.objects.get(student=student).hostel).email]
             else:
                 email_to=["swdbitstest@gmail.com"]
-                                                                                   # For testing 
+                                                                                   # For testing
             mailObj=DayPass.objects.latest('id')
             mail_subject="New Daypass ID: "+ str(mailObj.id)
             mail_message="Daypass Application applied by "+ mailObj.student.name +" with id: " + str(mailObj.id) + ".\n"
@@ -894,7 +894,7 @@ def messbill(request):
         heading_style = xlwt.easyxf('font: bold on, height 280; align: wrap on, vert centre, horiz center')
         h2_font_style = xlwt.easyxf('font: bold on')
         font_style = xlwt.easyxf('align: wrap on')
-        
+
         # This function is not documented but given in examples of repo
         #     here: https://github.com/python-excel/xlwt/blob/master/examples/merged.py
         # Prototype:
@@ -910,7 +910,7 @@ def messbill(request):
         ws.write(1, 2, "To:", h2_font_style)
         ws.write(1, 3, end_date.strftime('%d/%b/%Y'), font_style)
 
-        row_num = 2        
+        row_num = 2
 
         columns = [
             (u"Name", 6000),
@@ -932,7 +932,7 @@ def messbill(request):
         days = days.days + 1
 
         values = MessOption.objects.filter(
-            mess=messOpt, 
+            mess=messOpt,
             monthYear__range=(start_date.replace(day=1), end_date.replace(day=1))
         )
         for k in values:
@@ -1020,7 +1020,7 @@ def import_mess_bill(request):
             tot_dues_added = 0
             failed = ''
             year_selected = int(request.POST.get('year'))
-            if year_selected == '':                
+            if year_selected == '':
                 datetime.now().year
             for sheet in workbook.sheets():
                 idx = 2
@@ -1077,7 +1077,7 @@ def store(request):
     tees = TeeAdd.objects.filter(available=True)
     items = ItemAdd.objects.filter(available=True)
     teesj = TeeAdd.objects.filter(available=True).values_list('title')
-    
+
     try:
         lasted = DuesPublished.objects.latest('date_published').date_published
     except:
@@ -1097,7 +1097,7 @@ def store(request):
             total_amount += tee.totamt
     for other in otherdues:
         if other is not None:
-            total_amount += other.amount            
+            total_amount += other.amount
     balance = float(22000) - float(total_amount)
 
     #mess
@@ -1138,7 +1138,7 @@ def store(request):
             bought = False;
             if ItemBuy.objects.filter(student=student,item=itemno).exists():
                 bought = True
-            else: 
+            else:
                 bought = False
             if bought == True:
                 messages.add_message(request, messages.INFO,"You have already paid for "+ itemno.title,extra_tags='orange')
@@ -1190,7 +1190,7 @@ def dues(request):
     leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
     daypasss = DayPass.objects.filter(student=student, dateTime__gte=date.today() - timedelta(days=7))
     bonafides = Bonafide.objects.filter(student=student, reqDate__gte=date.today() - timedelta(days=7))
-    
+
     #mess
     messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
     messopen = messopen.exclude(dateOpen__gt=date.today())
@@ -1226,7 +1226,7 @@ def dues(request):
             total_amount += tee.totamt
     for other in otherdues:
         if other is not None:
-            total_amount += other.amount            
+            total_amount += other.amount
     balance = float(22000) - float(total_amount)
     context = {
         'student': student,
@@ -1306,7 +1306,7 @@ def search(request):
             searchstr['Hostel'] = hostel
         if room is not "":
             searchstr['Room'] = room
-            
+
         postContext = {
             'students' : students,
             'searchstr' : searchstr
@@ -1336,6 +1336,7 @@ def csa(request):
 
 def sac(request):
     return render(request,"sac.html",{})
+    
 def contact(request):
     return render(request,"contact.html",{})
 
@@ -1343,9 +1344,9 @@ def studentDetails(request,id=None):
     if request.user.is_authenticated:
         if is_warden(request.user) or is_hostelsuperintendent(request.user) or request.user.is_superuser:
             student = Student.objects.get(id=id)
-            res=HostelPS.objects.get(student__id=id) 
+            res=HostelPS.objects.get(student__id=id)
             disco=Disco.objects.filter(student__id=id)
-            context = { 
+            context = {
                      'student'  :student,
                      'residence' :res,
                      'disco' : disco,
@@ -1370,7 +1371,7 @@ def documents(request):
     leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
     daypasss = DayPass.objects.filter(student=student, dateTime__gte=date.today() - timedelta(days=7))
     bonafides = Bonafide.objects.filter(student=student, reqDate__gte=date.today() - timedelta(days=7))
-  
+
     #dues
     try:
         lasted = DuesPublished.objects.latest('date_published').date_published
@@ -1391,7 +1392,7 @@ def documents(request):
             total_amount += tee.totamt
     for other in otherdues:
         if other is not None:
-            total_amount += other.amount            
+            total_amount += other.amount
     balance = float(22000) - float(total_amount)
     #mess
     messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
@@ -1408,7 +1409,7 @@ def documents(request):
     else:
         option = 2
         mess = 0
-    
+
 
     if request.user.is_authenticated:
         if is_warden(request.user):
@@ -1481,7 +1482,7 @@ def antiragging(request):
     return render(request,"antiragging.html",context)
 
 @user_passes_test(lambda u: u.is_superuser)
-def mess_import(request):  
+def mess_import(request):
 
     no_of_mess_option_added = 0
     if request.POST:
@@ -1495,7 +1496,7 @@ def mess_import(request):
             workbook = xlrd.open_workbook(tmp)
 
             idx = 1
-            
+
 
             for sheet in workbook.sheets():
                 for i in sheet.get_rows():
@@ -1514,11 +1515,11 @@ def mess_import(request):
 
 @user_passes_test(lambda u: u.is_superuser)
 def mess_exp(request):
-    
+
     if request.POST:
         year = int(request.POST.get('year'))
         month = int(request.POST.get('month'))
-        
+
         gt_month = 0
 
         if month == 12:
@@ -1538,9 +1539,9 @@ def mess_exp(request):
 
 
         students = Student.objects.exclude(bitsId__in=ids)
-        
 
-         
+
+
         response = HttpResponse(content_type='application/ms-excel')
         response['Content-Disposition'] = 'attachment; filename="mess_defaulters.xls"'
 
@@ -1566,7 +1567,7 @@ def mess_exp(request):
                 ws.write(row_num, col_num, s[col_num], font_style)
 
         wb.save(response)
-        return response 
+        return response
 
     years = [x for x in range(date.today().year-4, date.today().year+4,1)]
     months = [x for x in range(1,13,1)]
@@ -1670,7 +1671,7 @@ def developers(request):
                     total_amount += tee.totamt
             for other in otherdues:
                 if other is not None:
-                    total_amount += other.amount            
+                    total_amount += other.amount
             balance = float(22000) - float(total_amount)
 
             #mess
@@ -1716,7 +1717,7 @@ def publish_dues(request):
             ItemBuy -> has foreign key to ItemAdd called item; use item.price,
                        datetime added = created
 
-            Import only if the due above has creation datetime > 
+            Import only if the due above has creation datetime >
             last DuePublished timing
         """
 
