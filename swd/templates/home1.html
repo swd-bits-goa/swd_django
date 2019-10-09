@@ -2,126 +2,73 @@
 {% load staticfiles %}
 {% block content %}
 
-  <div class="section no-pad-bot" id="index-banner">
-    <div class="container">
-      <br><br>
-  <div class="card">
-    <div class="card-content">
-      <h1 class="header center orange-text darken-5">BITS Pilani, K.K. Birla Goa Campus</h1>
-      <div class="row center">
-        <h5 class="header col s12 light">BITS Pilani, Goa Campus is one of the premier technical and science institutes for higher education in India. It was
-        started in 2004, with the first batch graduating in 2008.</h5>
-      </div>
-      {% comment %} <div class="row center">
-        <a href="http://materializecss.com/getting-started.html" id="download-button" class="btn-large waves-effect waves-light orange">Get Started</a>
-      </div> {% endcomment %}
-      <br><br>
-    </div>
-  </div>
-</div>
+<div class="backdrop-container">
+  <img id="back-swd" src="{% static 'img/swd-back.png' %}" width="100%">
+  <div class="card login-box desktop">
+      <h5 style="color:#F46036">Sign In</h5>
+      <form id="sign_in" method="POST" action="login/">
+      {% csrf_token %}
+     <div class="input-field" id="username" >
+         <input  type="text" class="validate" name="username" autocomplete='username' autocorrect="off" autocapitalize="none">
+         <label for="username">Username</label>
+     </div>
+
+     <div class="input-field" id="password">
+       <input  type="password" class="validate valid" name="password" autocomplete="current-password">
+       <label for="password">Password</label>
+     </div>
+
+     <button type="submit" class="waves-effect waves-light btn desert-yellow" id="loginbtn"><span class="deep-green">Login</span></button>
+
+   </form>
+   <br>
+   {% if messages %} {% for message in messages %}
+   <span class="badge fresh-orange" data-badge-caption="{{ message }}!"></span>
+   {% endfor %} {% endif %}</div>
 </div>
 
-
-  <div class="container">
+  <div class="container-fluid">
+  
     <div class="section">
+        <div class="row">
+            <div class="col s12 m6 desktop">
 
-      <!--   Icon Section   -->
-  <div class="row">
-    <div class="col s12 m4">
-    <div class="card">
-      <div class="card-content">
-          <div class="icon-block">
-            <h2 class="center light-blue-text"><i class="material-icons">computer</i></h2>
-            <h5 class="center">Computer Centre</h5>
-            <p class="light">We did most of the heavy lifting for you to provide a default stylings that incorporate our custom components.
-              Additionally, we refined animations and transitions to provide a smoother experience for developers.<br> Link: <a href="cc.bits-goa.ac.in">cc.bits-goa.ac.in</a></p>
-          </div>
+                    <h4 style="color:#074F57">About</h4>
+                    <p style="justify-content: center;">The Student Welfare Division at BITS Pilani, K.K. Birla Goa Campus shall always strive to provide the most conducive environment to bring out the best out of every student. It is our endeavor to do anything and everything possible to make the student's stay in the campus the most memorable one. 
+                      <br><br>
+                        Our division cares for every student and shall always look into their needs that may arise from time to time.</p>
+            
+            </div>
+            <div class="col s12 m6">
+                <h4 style="color:#F46036">Notices</h4>
+                {% include 'notice.html' %} 
+            </div>
         </div>
-      </div>
-    </div>
-
-    <div class="col s12 m4">
-      <div class="card">
-        <div class="card-content">
-          <div class="icon-block">
-            <h2 class="center light-blue-text"><i class="material-icons">chrome_reader_mode</i></h2>
-            <h5 class="center">E.R.P.</h5>
-
-            <p class="light">By utilizing elements and principles of Material Design, we were able to create a framework that incorporates
-              components and animations that provide more feedback to users. Additionally, a single underlying responsive
-              system across all platforms allow for a more unified user experience.<br> Link: <a href="cc.bits-goa.ac.in">cc.bits-goa.ac.in</a></p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="col s12 m4">
-      <div class="card">
-        <div class="card-content">
-          <div class="icon-block">
-            <h2 class="center light-blue-text"><i class="material-icons">folder</i></h2>
-            <h5 class="center">F.T.P.</h5>
-
-            <p class="light">We have provided detailed documentation as well as specific code examples to help new users get started. We are
-              also always open to feedback and can answer any questions a user may have about Materialize.<br> Link: <a href="cc.bits-goa.ac.in">cc.bits-goa.ac.in</a></p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-    </div>
-    <br><br>
-  </div>
-
-  {% comment %} <footer class="page-footer orange">
-    <div class="container">
-      <div class="row">
-        <div class="col l6 s12">
-          <h5 class="white-text">SWD</h5>
-          <p class="grey-text text-lighten-4">Student Welfare Division</p>
-
-
-        </div>
-        <div class="col l3 s12">
-          <h5 class="white-text">Settings</h5>
-          <ul>
-            <li><a class="white-text" href="#!">Link 1</a></li>
-            <li><a class="white-text" href="#!">Link 2</a></li>
-            <li><a class="white-text" href="#!">Link 3</a></li>
-            <li><a class="white-text" href="#!">Link 4</a></li>
-          </ul>
-        </div>
-        <div class="col l3 s12">
-          <h5 class="white-text">Connect</h5>
-          <ul>
-            <li><a class="white-text" href="#!">Link 1</a></li>
-            <li><a class="white-text" href="#!">Link 2</a></li>
-            <li><a class="white-text" href="#!">Link 3</a></li>
-            <li><a class="white-text" href="#!">Link 4</a></li>
-          </ul>
-        </div>
-      </div>
-    </div>
-    <div class="footer-copyright">
-      <div class="container">
-        Made by <a class="orange-text text-lighten-3" href="http://materializecss.com">OSDLabs</a>
-      </div>
-    </div>
-  </footer> {% endcomment %}
+      
 
   <style>
     img{
       object-fit: cover;
     }
     body {
-      background-image: url("{% static 'img/bits-goa1.jpg' %}"); opacity: .9;filter: alpha(opacity=.9);
+      opacity: 1;filter: alpha(opacity=.9);
       background-attachment: fixed;
       background-repeat: no-repeat;
       height: 100px;
       background-position: center;
       background-size: cover;
     }
+    .backdrop-container{
+    position: relative;
+    }
+    .login-box{
+      position: absolute;
+      top: 16px;
+      right: 20px;
+      width: 460px;
+      padding: 14px;
+    }
+    
   </style>
 {% endblock %}
 

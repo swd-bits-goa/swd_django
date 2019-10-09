@@ -11,6 +11,11 @@ from django.utils.timezone import make_aware
 from django.core.mail import send_mail
 from django.conf import settings
 
+
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+import xlrd, xlwt
+
+
 from braces import views
 
 from django.contrib.auth.models import User
@@ -38,7 +43,29 @@ def noPhD(func):
     return check
 
 def index(request):
-    return render(request, 'home1.html',{})
+    if request.user.is_authenticated:
+        if request.user.is_staff:
+                return redirect('/admin')
+        if Warden.objects.filter(user=request.user):
+            return redirect('/warden')
+        if HostelSuperintendent.objects.filter(user=request.user):
+            return redirect('/hostelsuperintendent')
+        return redirect('dashboard')
+    else:
+        notice_list = Notice.objects.all().order_by('-id')
+        page = request.GET.get('page', 1)
+        paginator = Paginator(notice_list, 5)
+        try:
+            notices = paginator.page(page)
+        except PageNotAnInteger:
+            notices = paginator.page(1)
+        except EmptyPage:
+            notices = paginator.page(paginator.num_pages)
+
+        context = {
+        'queryset' : notices,
+        }
+        return render(request, 'home1.html',context)
 
 
 def login_success(request):
@@ -64,13 +91,56 @@ def dashboard(request):
     daypasss = DayPass.objects.filter(student=student, dateTime__gte=date.today() - timedelta(days=7))
     bonafides = Bonafide.objects.filter(student=student, reqDate__gte=date.today() - timedelta(days=7))
     address = student.address
+    tees = TeeAdd.objects.filter(available=True)
+    items = ItemAdd.objects.filter(available=True)
+    teesj = TeeAdd.objects.filter(available=True).values_list('title')
+
+    notice_list = Notice.objects.all().order_by('-id')
+    page = request.GET.get('page', 1)
+    paginator = Paginator(notice_list, 10)
+    try:
+        notices = paginator.page(page)
+    except PageNotAnInteger:
+        notices = paginator.page(1)
+    except EmptyPage:
+        notices = paginator.page(paginator.num_pages)
+
+
     context = {
         'student': student,
         'leaves': leaves,
         'bonafides': bonafides,
         'daypasss': daypasss,
-        'address': address
+        'address': address,
+        'queryset' : notices,
+        'notices' : Notice.objects.count(),
+        'student': student,
+        'tees': tees,
+        'items': items,
     }
+    #dues
+    try:
+        lasted = DuesPublished.objects.latest('date_published').date_published
+    except:
+        lasted = datetime(year=2004, month=1, day=1) # Before college was founded
+
+    otherdues = Due.objects.filter(student=student)
+    itemdues = ItemBuy.objects.filter(student=student,
+                                      created__gte=lasted)
+    teedues = TeeBuy.objects.filter(student=student,
+                                      created__gte=lasted)
+    total_amount = 0
+    for item in itemdues:
+        if item is not None:
+            total_amount += item.item.price
+    for tee in teedues:
+        if tee is not None:
+            total_amount += tee.totamt
+    for other in otherdues:
+        if other is not None:
+            total_amount += other.amount            
+    balance = float(22000) - float(total_amount)
+
     #mess
     messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
     messopen = messopen.exclude(dateOpen__gt=date.today())
@@ -78,33 +148,28 @@ def dashboard(request):
         messoption = MessOption.objects.filter(monthYear=messopen[0].monthYear, student=student)
 
     if messopen and not messoption and datetime.today().date() < messopen[0].dateClose:
-        form = MessForm(request.POST)
-        context = {
-            'option': 0,
-            'student': student,
-            'leaves': leaves,
-            'bonafides': bonafides,
-            'daypasss': daypasss,
-            'address': address
-            }
+        option = 0
+        mess = 0
     elif messopen and messoption:
-        context = {
-            'option': 1,
-            'mess': messoption[0].mess,
-            'student': student,
-            'leaves': leaves,
-            'bonafides': bonafides,
-            'daypasss': daypasss,
-            'address': address
-            }
+        option = 1
+        mess = messoption[0]
     else:
-        context = {
-            'option': 2,
+        option = 2
+        mess = 0
+
+    context = {
+            'option': option,
+            'mess': mess,
             'student': student,
             'leaves': leaves,
             'bonafides': bonafides,
             'daypasss': daypasss,
-            'address': address
+            'balance': balance,
+            'address': address,
+            'queryset' : notices,
+            'student': student,
+            'tees': tees,
+            'items': items,
             }
 
     return render(request, "dashboard.html", context)
@@ -115,21 +180,69 @@ def profile(request):
     if is_warden(request.user):
         warden = Warden.objects.get(user=request.user)
         context = {
-            'option' : 'wardenbase.html',
+            'option1' : 'wardenbase.html',
             'warden' : warden,
         }
     elif is_hostelsuperintendent(request.user):
         hostelsuperintendent = HostelSuperintendent.objects.get(user=request.user)
         context = {
-            'option' : 'superintendentbase.html',
+            'option1' : 'superintendentbase.html',
             'hostelsuperintendent' : hostelsuperintendent
         }
     else:
         student = Student.objects.get(user=request.user)
         hostelps = HostelPS.objects.get(student=student)
+        leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
+        daypasss = DayPass.objects.filter(student=student, dateTime__gte=date.today() - timedelta(days=7))
+        bonafides = Bonafide.objects.filter(student=student, reqDate__gte=date.today() - timedelta(days=7))
+        #dues
+        try:
+            lasted = DuesPublished.objects.latest('date_published').date_published
+        except:
+            lasted = datetime(year=2004, month=1, day=1) # Before college was founded
+
+        otherdues = Due.objects.filter(student=student)
+        itemdues = ItemBuy.objects.filter(student=student,
+                                        created__gte=lasted)
+        teedues = TeeBuy.objects.filter(student=student,
+                                        created__gte=lasted)
+        total_amount = 0
+        for item in itemdues:
+            if item is not None:
+                total_amount += item.item.price
+        for tee in teedues:
+            if tee is not None:
+                total_amount += tee.totamt
+        for other in otherdues:
+            if other is not None:
+                total_amount += other.amount            
+        balance = float(22000) - float(total_amount)
+
+        #mess
+        messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
+        messopen = messopen.exclude(dateOpen__gt=date.today())
+        if messopen:
+            messoption = MessOption.objects.filter(monthYear=messopen[0].monthYear, student=student)
+
+        if messopen and not messoption and datetime.today().date() < messopen[0].dateClose:
+            option = 0
+            mess = 0
+        elif messopen and messoption:
+            option = 1
+            mess = messoption[0]
+        else:
+            option = 2
+            mess = 0
+
         context = {
-            'option' : 'base.html',
+            'option1' : 'base.html',
             'student': student,
+            'option': option,
+            'mess': mess,
+            'leaves': leaves,
+            'bonafides': bonafides,
+            'daypasss': daypasss,
+            'balance': balance,
             'hostelps':hostelps,
         }
         if request.POST:
@@ -184,14 +297,46 @@ def logoutform(request):
 @login_required
 @noPhD
 def messoption(request):
+    student = Student.objects.get(user=request.user)
+    leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
+    daypasss = DayPass.objects.filter(student=student, dateTime__gte=date.today() - timedelta(days=7))
+    bonafides = Bonafide.objects.filter(student=student, reqDate__gte=date.today() - timedelta(days=7))
     messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
     messopen = messopen.exclude(dateOpen__gt=date.today())
-    student = Student.objects.get(user=request.user)
+   
 
     if messopen:
         messoption = MessOption.objects.filter(monthYear=messopen[0].monthYear, student=student)
 
-    context = {'student': student}
+    context = {
+        'student': student,
+        'leaves': leaves,
+        'bonafides': bonafides,
+        'daypasss': daypasss,
+    }
+#dues
+    try:
+        lasted = DuesPublished.objects.latest('date_published').date_published
+    except:
+        lasted = datetime(year=2004, month=1, day=1) # Before college was founded
+
+    otherdues = Due.objects.filter(student=student)
+    itemdues = ItemBuy.objects.filter(student=student,
+                                      created__gte=lasted)
+    teedues = TeeBuy.objects.filter(student=student,
+                                      created__gte=lasted)
+    total_amount = 0
+    for item in itemdues:
+        if item is not None:
+            total_amount += item.item.price
+    for tee in teedues:
+        if tee is not None:
+            total_amount += tee.totamt
+    for other in otherdues:
+        if other is not None:
+            total_amount += other.amount            
+    balance = float(22000) - float(total_amount)
+
     edit = 0
 
     if request.GET:
@@ -199,11 +344,33 @@ def messoption(request):
 
     if (messopen and not messoption and datetime.today().date() < messopen[0].dateClose) or (messopen and edit):
         form = MessForm(request.POST)
-        context = {'option': 0, 'form': form, 'dateClose': messopen[0].dateClose, 'student': student}
+        context = {
+            'option': 0,
+            'form': form,
+            'dateClose': messopen[0].dateClose,
+            'student': student,
+            'balance': balance,
+            'leaves': leaves,
+            'bonafides': bonafides,
+            'daypasss': daypasss,}
     elif messopen and messoption:
-        context = {'option': 1, 'mess': messoption[0].mess, 'student': student}
+        context = {
+            'option': 1, 
+            'mess': messoption[0], 
+            'student': student,
+            'balance': balance,
+            'leaves': leaves,
+            'bonafides': bonafides,
+            'daypasss': daypasss,}
     else:
-        context = {'option': 2, 'student': student}
+        context = {
+            'option': 2, 
+            'student': student,
+            'leaves': leaves,
+            'balance': balance,
+            'bonafides': bonafides,
+            'daypasss': daypasss,
+            }
 
     if request.POST:
         mess = request.POST.get('mess')
@@ -219,10 +386,59 @@ def messoption(request):
 @login_required
 @noPhD
 def leave(request):
+    dashboard
     student = Student.objects.get(user=request.user)
+    leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
+    daypasss = DayPass.objects.filter(student=student, dateTime__gte=date.today() - timedelta(days=7))
+    bonafides = Bonafide.objects.filter(student=student, reqDate__gte=date.today() - timedelta(days=7))
+    #mess
+    messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
+    messopen = messopen.exclude(dateOpen__gt=date.today())
+    if messopen:
+        messoption = MessOption.objects.filter(monthYear=messopen[0].monthYear, student=student)
+
+    if messopen and not messoption and datetime.today().date() < messopen[0].dateClose:
+        option = 0
+        mess = 0
+    elif messopen and messoption:
+        option = 1
+        mess = messoption[0]
+    else:
+        option = 2
+        mess = 0
+
+        #dues
+    try:
+        lasted = DuesPublished.objects.latest('date_published').date_published
+    except:
+        lasted = datetime(year=2004, month=1, day=1) # Before college was founded
+
+    otherdues = Due.objects.filter(student=student)
+    itemdues = ItemBuy.objects.filter(student=student,
+                                      created__gte=lasted)
+    teedues = TeeBuy.objects.filter(student=student,
+                                      created__gte=lasted)
+    total_amount = 0
+    for item in itemdues:
+        if item is not None:
+            total_amount += item.item.price
+    for tee in teedues:
+        if tee is not None:
+            total_amount += tee.totamt
+    for other in otherdues:
+        if other is not None:
+            total_amount += other.amount            
+    balance = float(22000) - float(total_amount)
+
     form = LeaveForm()
     context = {
-        'option' : 0,
+        'option': option,
+        'mess': mess,
+        'leaves': leaves,
+        'bonafides': bonafides,
+        'daypasss': daypasss,
+        'option1' : 0,
+        'balance' : balance,
         'student': student,
         'form': form
     }
@@ -259,7 +475,13 @@ def leave(request):
             send_mail(mail_subject,mail_message,settings.EMAIL_HOST_USER,email_to,fail_silently=False)
 
             context = {
-                'option': 1,
+                'option': option,
+                'mess': mess,
+                'leaves': leaves,
+                'bonafides': bonafides,
+                'balance' : balance,
+                'daypasss': daypasss,
+                'option1': 1,
                 'dateStart': request.POST.get('dateStart'),
                 'dateEnd': request.POST.get('dateEnd'),
                 'timeStart': request.POST.get('timeStart'),
@@ -267,7 +489,13 @@ def leave(request):
             }
         else:
             context = {
-                'option': 2,
+                'option': option,
+                'mess': mess,
+                'leaves': leaves,
+                'bonafides': bonafides,
+                'balance' : balance,
+                'daypasss': daypasss,
+                'option1': 2,
                 'form': form
             }
             print(form.errors)
@@ -277,11 +505,60 @@ def leave(request):
 @login_required
 def certificates(request):
     student = Student.objects.get(user=request.user)
+    leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
+    daypasss = DayPass.objects.filter(student=student, dateTime__gte=date.today() - timedelta(days=7))
+    bonafides = Bonafide.objects.filter(student=student, reqDate__gte=date.today() - timedelta(days=7))
+    
+#dues
+    try:
+        lasted = DuesPublished.objects.latest('date_published').date_published
+    except:
+        lasted = datetime(year=2004, month=1, day=1) # Before college was founded
+
+    otherdues = Due.objects.filter(student=student)
+    itemdues = ItemBuy.objects.filter(student=student,
+                                      created__gte=lasted)
+    teedues = TeeBuy.objects.filter(student=student,
+                                      created__gte=lasted)
+    total_amount = 0
+    for item in itemdues:
+        if item is not None:
+            total_amount += item.item.price
+    for tee in teedues:
+        if tee is not None:
+            total_amount += tee.totamt
+    for other in otherdues:
+        if other is not None:
+            total_amount += other.amount            
+    balance = float(22000) - float(total_amount)
+
+    #mess
+    messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
+    messopen = messopen.exclude(dateOpen__gt=date.today())
+    if messopen:
+        messoption = MessOption.objects.filter(monthYear=messopen[0].monthYear, student=student)
+
+    if messopen and not messoption and datetime.today().date() < messopen[0].dateClose:
+        option = 0
+        mess = 0
+    elif messopen and messoption:
+        option = 1
+        mess = messoption[0]
+    else:
+        option = 2
+        mess = 0
+
     form = BonafideForm()
     context = {
-        'option': 0,
+        'option': option,
+        'mess': mess,
+        'option1': 0,
         'student': student,
-        'form': form
+        'balance': balance,
+        'form': form,
+        'leaves': leaves,
+        'bonafides': bonafides,
+        'daypasss': daypasss,
     }
     queryset=Bonafide.objects.filter(student=student);
     bonafideContext = {
@@ -301,15 +578,31 @@ def certificates(request):
                 bonafideform.save()
 
                 context = {
-                    'option': 1,
+                    'option1': 1,
+                    'option': option,
+                    'mess': mess,
+                    'balance': balance,
+                    'student': student,
+                    'form': form,
+                    'leaves': leaves,
+                    'bonafides': bonafides,
+                    'daypasss': daypasss,
                 }
             else:
                 context = {
-                    'option': 2,
+                    'option': option,
+                    'mess': mess,
+                    'option1': 2,
+                    'student': student,
+                    'form': form,
+                    'leaves': leaves,
+                    'balance': balance,
+                    'bonafides': bonafides,
+                    'daypasss': daypasss,
                 }
     else:
         context = {
-              'option': 3,
+              'option1': 3,
             }
 
     return render(request, "certificates.html", dict(context, **bonafideContext))
@@ -487,11 +780,59 @@ def hostelsuperintendentdaypassapprove(request, daypass):
 @login_required
 def daypass(request):
     student = Student.objects.get(user=request.user)
+    leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
+    daypasss = DayPass.objects.filter(student=student, dateTime__gte=date.today() - timedelta(days=7))
+    bonafides = Bonafide.objects.filter(student=student, reqDate__gte=date.today() - timedelta(days=7))
+    #mess
+    messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
+    messopen = messopen.exclude(dateOpen__gt=date.today())
+    if messopen:
+        messoption = MessOption.objects.filter(monthYear=messopen[0].monthYear, student=student)
+
+    if messopen and not messoption and datetime.today().date() < messopen[0].dateClose:
+        option = 0
+        mess = 0
+    elif messopen and messoption:
+        option = 1
+        mess = messoption[0]
+    else:
+        option = 2
+        mess = 0
+
+        #dues
+    try:
+        lasted = DuesPublished.objects.latest('date_published').date_published
+    except:
+        lasted = datetime(year=2004, month=1, day=1) # Before college was founded
+
+    otherdues = Due.objects.filter(student=student)
+    itemdues = ItemBuy.objects.filter(student=student,
+                                      created__gte=lasted)
+    teedues = TeeBuy.objects.filter(student=student,
+                                      created__gte=lasted)
+    total_amount = 0
+    for item in itemdues:
+        if item is not None:
+            total_amount += item.item.price
+    for tee in teedues:
+        if tee is not None:
+            total_amount += tee.totamt
+    for other in otherdues:
+        if other is not None:
+            total_amount += other.amount            
+    balance = float(22000) - float(total_amount)
+
     form = DayPassForm()
     context = {
-        'option' : 0,
+        'option1' : 0,
         'student': student,
-        'form': form
+        'form': form,
+        'option': option,
+        'mess': mess,
+        'balance': balance,
+        'leaves': leaves,
+        'bonafides': bonafides,
+        'daypasss': daypasss,
     }
 
     daypassContext = {
@@ -502,11 +843,11 @@ def daypass(request):
         form = DayPassForm(request.POST)
         if form.is_valid():
             daypassform = form.save(commit=False)
-            date = datetime.strptime(request.POST.get('date'), '%d %B, %Y').date()
+            date1 = datetime.strptime(request.POST.get('date'), '%d %B, %Y').date()
             time = datetime.strptime(request.POST.get('time'), '%H:%M').time()
             intime = datetime.strptime(request.POST.get('intime'), '%H:%M').time()
-            dateTime = datetime.combine(date, time)
-            inTime = datetime.combine(date,intime)
+            dateTime = datetime.combine(date1, time)
+            inTime = datetime.combine(date1,intime)
             daypassform.dateTime = make_aware(dateTime)
             daypassform.student = student
             daypassform.inTime = make_aware(inTime)
@@ -523,13 +864,13 @@ def daypass(request):
             send_mail(mail_subject,mail_message,settings.EMAIL_HOST_USER,email_to,fail_silently=False)
 
             context = {
-                'option': 1,
+                'option1': 1,
                 'date': request.POST.get('date'),
 
             }
         else:
             context = {
-                'option': 2,
+                'option1': 2,
                 'form': form
             }
             print(form.errors)
@@ -730,15 +1071,64 @@ def import_mess_bill(request):
 
 def store(request):
     student = Student.objects.get(user=request.user)
+    leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
+    daypasss = DayPass.objects.filter(student=student, dateTime__gte=date.today() - timedelta(days=7))
+    bonafides = Bonafide.objects.filter(student=student, reqDate__gte=date.today() - timedelta(days=7))
     tees = TeeAdd.objects.filter(available=True)
     items = ItemAdd.objects.filter(available=True)
     teesj = TeeAdd.objects.filter(available=True).values_list('title')
+    
+    try:
+        lasted = DuesPublished.objects.latest('date_published').date_published
+    except:
+        lasted = datetime(year=2004, month=1, day=1) # Before college was founded
+
+    otherdues = Due.objects.filter(student=student)
+    itemdues = ItemBuy.objects.filter(student=student,
+                                      created__gte=lasted)
+    teedues = TeeBuy.objects.filter(student=student,
+                                      created__gte=lasted)
+    total_amount = 0
+    for item in itemdues:
+        if item is not None:
+            total_amount += item.item.price
+    for tee in teedues:
+        if tee is not None:
+            total_amount += tee.totamt
+    for other in otherdues:
+        if other is not None:
+            total_amount += other.amount            
+    balance = float(22000) - float(total_amount)
+
+    #mess
+    messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
+    messopen = messopen.exclude(dateOpen__gt=date.today())
+    if messopen:
+        messoption = MessOption.objects.filter(monthYear=messopen[0].monthYear, student=student)
+
+    if messopen and not messoption and datetime.today().date() < messopen[0].dateClose:
+        option = 0
+        mess = 0
+    elif messopen and messoption:
+        option = 1
+        mess = messoption[0]
+    else:
+        option = 2
+        mess = 0
+
+
 
     # tees_json = json.dumps(list(tees), cls=DjangoJSONEncoder)
     context = {
         'student': student,
         'tees': tees,
         'items': items,
+        'option': option,
+        'balance': balance,
+        'mess': mess,
+        'leaves': leaves,
+        'bonafides': bonafides,
+        'daypasss': daypasss,
         # 'tees_json': tees_json,
     }
 
@@ -797,21 +1187,58 @@ def store(request):
 @login_required
 def dues(request):
     student = Student.objects.get(user=request.user)
+    leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
+    daypasss = DayPass.objects.filter(student=student, dateTime__gte=date.today() - timedelta(days=7))
+    bonafides = Bonafide.objects.filter(student=student, reqDate__gte=date.today() - timedelta(days=7))
+    
+    #mess
+    messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
+    messopen = messopen.exclude(dateOpen__gt=date.today())
+    if messopen:
+        messoption = MessOption.objects.filter(monthYear=messopen[0].monthYear, student=student)
+
+    if messopen and not messoption and datetime.today().date() < messopen[0].dateClose:
+        option = 0
+        mess = 0
+    elif messopen and messoption:
+        option = 1
+        mess = messoption[0]
+    else:
+        option = 2
+        mess = 0
+
     try:
         lasted = DuesPublished.objects.latest('date_published').date_published
     except:
         lasted = datetime(year=2004, month=1, day=1) # Before college was founded
 
-    dues = Due.objects.filter(student=student)
+    otherdues = Due.objects.filter(student=student)
     itemdues = ItemBuy.objects.filter(student=student,
                                       created__gte=lasted)
     teedues = TeeBuy.objects.filter(student=student,
                                       created__gte=lasted)
+    total_amount = 0
+    for item in itemdues:
+        if item is not None:
+            total_amount += item.item.price
+    for tee in teedues:
+        if tee is not None:
+            total_amount += tee.totamt
+    for other in otherdues:
+        if other is not None:
+            total_amount += other.amount            
+    balance = float(22000) - float(total_amount)
     context = {
-        'student' : student,
-        'dues': dues,
-        'itemdues' : itemdues,
-        'teedues' : teedues,
+        'student': student,
+        'itemdues': itemdues,
+        'teedues': teedues,
+        'balance': balance,
+        'otherdues': otherdues,
+        'option': option,
+        'mess': mess,
+        'leaves': leaves,
+        'bonafides': bonafides,
+        'daypasss': daypasss,
     }
 
     return render(request, "dues.html", context)
@@ -930,30 +1357,86 @@ def studentDetails(request,id=None):
     else:
         messages.error(request, "Login to gain access.")
         return redirect('login')
+#        context = {
+#        'queryset' : Notice.objects.all().order_by('-id')
+#        }
+#        return render(request, 'home1.html',context)
+
 
 @login_required
 def documents(request):
+
+    student = Student.objects.get(user=request.user)
+    leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
+    daypasss = DayPass.objects.filter(student=student, dateTime__gte=date.today() - timedelta(days=7))
+    bonafides = Bonafide.objects.filter(student=student, reqDate__gte=date.today() - timedelta(days=7))
+  
+    #dues
+    try:
+        lasted = DuesPublished.objects.latest('date_published').date_published
+    except:
+        lasted = datetime(year=2004, month=1, day=1) # Before college was founded
+
+    otherdues = Due.objects.filter(student=student)
+    itemdues = ItemBuy.objects.filter(student=student,
+                                      created__gte=lasted)
+    teedues = TeeBuy.objects.filter(student=student,
+                                      created__gte=lasted)
+    total_amount = 0
+    for item in itemdues:
+        if item is not None:
+            total_amount += item.item.price
+    for tee in teedues:
+        if tee is not None:
+            total_amount += tee.totamt
+    for other in otherdues:
+        if other is not None:
+            total_amount += other.amount            
+    balance = float(22000) - float(total_amount)
+    #mess
+    messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
+    messopen = messopen.exclude(dateOpen__gt=date.today())
+    if messopen:
+        messoption = MessOption.objects.filter(monthYear=messopen[0].monthYear, student=student)
+
+    if messopen and not messoption and datetime.today().date() < messopen[0].dateClose:
+        option = 0
+        mess = 0
+    elif messopen and messoption:
+        option = 1
+        mess = messoption[0]
+    else:
+        option = 2
+        mess = 0
+    
+
     if request.user.is_authenticated:
         if is_warden(request.user):
             warden = Warden.objects.get(user=request.user)
             context = {
-                            'option' : 'wardenbase.html',
+                            'option1' : 'wardenbase.html',
                             'warden' : warden,
                             'queryset' : Document.objects.all(),
             }
         elif is_hostelsuperintendent(request.user):
             hostelsuperintendent = HostelSuperintendent.objects.get(user=request.user)
             context = {
-                            'option' : 'superintendentbase.html',
+                            'option1' : 'superintendentbase.html',
                             'hostelsuperintendent' : hostelsuperintendent,
                             'queryset' : Document.objects.all(),
             }
         else:
             student = Student.objects.get(user=request.user)
             context = {
-                            'option' : 'base.html',
+                            'option1' : 'base.html',
                             'student' : student,
                             'queryset' : Document.objects.all(),
+                            'option': option,
+                            'mess': mess,
+                            'balance': balance,
+                            'leaves': leaves,
+                            'bonafides': bonafides,
+                            'daypasss': daypasss,
             }
     return render(request,"documents.html",context)
 
@@ -1160,6 +1643,69 @@ def import_dues_from_sheet(request):
         messages.error(request, "Only POST requests are allowed")
 
     return redirect('dues_dashboard')
+
+def developers(request):
+    if request.user.is_authenticated:
+            student = Student.objects.get(user=request.user)
+            leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
+            daypasss = DayPass.objects.filter(student=student, dateTime__gte=date.today() - timedelta(days=7))
+            bonafides = Bonafide.objects.filter(student=student, reqDate__gte=date.today() - timedelta(days=7))
+            #dues
+            try:
+                lasted = DuesPublished.objects.latest('date_published').date_published
+            except:
+                lasted = datetime(year=2004, month=1, day=1) # Before college was founded
+
+            otherdues = Due.objects.filter(student=student)
+            itemdues = ItemBuy.objects.filter(student=student,
+                                            created__gte=lasted)
+            teedues = TeeBuy.objects.filter(student=student,
+                                            created__gte=lasted)
+            total_amount = 0
+            for item in itemdues:
+                if item is not None:
+                    total_amount += item.item.price
+            for tee in teedues:
+                if tee is not None:
+                    total_amount += tee.totamt
+            for other in otherdues:
+                if other is not None:
+                    total_amount += other.amount            
+            balance = float(22000) - float(total_amount)
+
+            #mess
+            messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
+            messopen = messopen.exclude(dateOpen__gt=date.today())
+            if messopen:
+                messoption = MessOption.objects.filter(monthYear=messopen[0].monthYear, student=student)
+
+            if messopen and not messoption and datetime.today().date() < messopen[0].dateClose:
+                option = 0
+                mess = 0
+            elif messopen and messoption:
+                option = 1
+                mess = messoption[0]
+            else:
+                option = 2
+                mess = 0
+
+            context = {
+                        'option1' : 'base.html',
+                        'student': student,
+                        'option': option,
+                        'mess': mess,
+                        'leaves': leaves,
+                        'bonafides': bonafides,
+                        'daypasss': daypasss,
+                        'balance': balance,
+            }
+    else:
+            context = {
+                'option1' : 'indexbase.html',
+        }
+
+    return render(request, "developers.html", context)
+
 
 @user_passes_test(lambda a: a.is_superuser)
 def publish_dues(request):

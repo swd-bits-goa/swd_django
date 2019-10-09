@@ -3,22 +3,23 @@
 
 <div class="container">
     <div class="section">
-        <h4>Published dues</h4>
         <ul class="collection">
+        <li class="collection-item">
+            <div class="blue-text">
+                Advance
+                <a href="#!" class="secondary-content blue-text">Rs. 22,000.00</a>
+            </div>
+        </li>
             {% for due in dues %}
                 <li class="collection-item">
                     <div>
                         {{ due.due_category.name }}
-                        <a href="#!" class="secondary-content">Rs. {{ due.amount }}</a>
+                        <a href="#!" class="secondary-content">Rs. {{ due.amount|floatformat:2  }}</a>
                     </div>
                 </li>
             {% endfor %}
-        </ul>
-
-        <h4>Unpublished dues (Tees and items)</h4>
-        <ul class="collection">
             {% for item in itemdues %}
-                <li class="collection-item"><div>{{ item.item.title }}<a href="#!" class="secondary-content">Rs. {{ item.item.price }}</a></div></li>
+                <li class="collection-item"><div>{{ item.item.title }}<a href="#!" class="secondary-content">Rs. {{ item.item.price|floatformat:2  }}</a></div></li>
             {% endfor %}
 
             {% for tee in teedues %}
@@ -26,14 +27,20 @@
                     <div>
                         {{ tee.tee.title }}
                         <a href="#!" class="secondary-content">
-                        Rs. {{ tee.totamt }}
+                        - Rs. {{ tee.totamt|floatformat:2  }}
                         </a>
                     </div>
                 </li>
             {% endfor %}
             {% for i in otherdues %}
-                <li class="collection-item"><div>{{ i.desc }}<a href="#!" class="secondary-content"> Rs. {{ i.amount }}</a></div></li>
+                <li class="collection-item"><div>{{ i.description }}<a href="#!" class="secondary-content"> - Rs. {{ i.amount|floatformat:2  }}</a></div></li>
             {% endfor %}
+        <li class="collection-item">
+            <div class="green-text">
+                Balance
+                <a href="#!" class="secondary-content green-text">Rs. {{ balance|floatformat:2 }}</a>
+            </div>
+        </li>
         </ul>
     </div>
     <br><br>
