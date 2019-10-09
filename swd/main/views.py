@@ -142,11 +142,21 @@ def dashboard(request):
     balance = float(22000) - float(total_amount)
 
     #mess
-    messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
-    messopen = messopen.exclude(dateOpen__gt=date.today())
+    messopen = MessOptionOpen.objects.filter(dateClose__gte=datetime.today())
+    #messopen = messopen.exclude(dateOpen__gt=date.today())
     if messopen:
         messoption = MessOption.objects.filter(monthYear=messopen[0].monthYear, student=student)
-
+        
+    if messopen and not messoption and datetime.today() < messopen[0].dateClose:
+        form = MessForm(request.POST)
+        context = {
+            'option': 0,
+            'student': student,
+            'leaves': leaves,
+            'bonafides': bonafides,
+            'daypasss': daypasss,
+            'address': address
+            }
     if messopen and not messoption and datetime.today().date() < messopen[0].dateClose:
         option = 0
         mess = 0
@@ -1481,6 +1491,8 @@ def antiragging(request):
     }
     return render(request,"antiragging.html",context)
 
+
+
 @user_passes_test(lambda u: u.is_superuser)
 def mess_import(request):
 
@@ -1755,3 +1767,16 @@ def publish_dues(request):
         messages.error(request, "Only POST requests are allowed")
 
     return redirect('dues_dashboard')
+
+
+def dash_security(request):
+    from datetime import time
+    t = time(0,0)
+    t1 = time(23,59)
+    d = date.today()
+    #
+    approved = Leave.objects.filter(approved__exact=True, dateTimeStart__gte=datetime.combine(d,t), dateTimeStart__lte=datetime.combine(d,t1))
+
+    context = {'leaves' : approved}
+
+    return render(request, "dash_security.html", context)
