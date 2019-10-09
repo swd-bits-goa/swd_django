@@ -38,6 +38,9 @@
 </head>
 
 <body>
+
+{% include 'includes/header.html' %}
+
     <nav class="nav-extended" role="navigation">
         <div class="nav-wrapper">
           <a href="/#" class="brand-logo"><img id="swd" src="{% static 'img/swd.png' %}"></a>
@@ -123,9 +126,10 @@
   <footer class="page-footer back-green desktop" style="z-index:2">
       <p class="grey-text center">Student Welfare Division | <a href="/developers">Developers</a></p>
 </footer>
+
 {% block content %}
 {% endblock %}
-
+{% include 'includes/messages.html' %}
   <!--  Scripts-->
   <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
   <script src="{% static 'js/materialize.js' %}"></script>
