@@ -27,11 +27,16 @@
                     <div>
                         {{ tee.tee.title }}
                         <a href="#!" class="secondary-content">
-                        Rs. {{ tee.totamt|floatformat:2  }}
+                        - Rs. {{ tee.totamt|floatformat:2  }}
                         </a>
                     </div>
                 </li>
             {% endfor %}
+
+            {% for i in otherdues %}
+                <li class="collection-item"><div>{{ i.description }}<a href="#!" class="secondary-content"> - Rs. {{ i.amount|floatformat:2  }}</a></div></li>
+            {% endfor %}
+
         <li class="collection-item">
             <div class="green-text">
                 Balance

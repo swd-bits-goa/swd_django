@@ -44,7 +44,8 @@ urlpatterns = [
     url(r'^sac/',views.sac, name='sac'),
     url(r'^latecomer/', views.latecomer, name="latecomer"),
     url(r'^contact/',views.contact, name='contact'),
-
+    url(r'^dash_security/',views.dash_security, name='dash_security'),
+    url(r'^developers/', views.developers, name="developers"),
     url(r'^mess-forgot/',views.mess_import, name='forgot'),
     url(r'^mess_exp/',views.mess_exp, name='mess_exp'),
     #url(r'^mess_filter/',views.mess_filter, name='mess_filter'),

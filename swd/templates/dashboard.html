@@ -1,8 +1,13 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
+  
 {% block content %}
-<div class="container">
-    <div class="card grey lighten-4">
+
+<div class="container-fluid ">
+    <h4 style="color:#F46036; margin: 0; padding: 8px; font-size: 31px">Recent Notices</h4>
+          {% include 'notice.html' %} 
+          {% include 'storeitems.html' %}
+    <div class="card new-green lighten-4 mobile">
       <div class="card-content">
         <div class="row">
           <div class="col s6 l12">

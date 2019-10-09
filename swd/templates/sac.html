@@ -1,127 +1,82 @@
-{% extends 'indexbase.html' %} {% block content %}
+{% extends 'indexbase.html' %}
+{% load staticfiles %}
+{% block content %}
+<div class="content-sac">
+  <h2>Student Activity Center</h2>
+  <div class="row">
+    <div class="leftpart left col l8">
+      <div class="upperpart">
+        <div class="row">
+          <div class="incharge col l5 s12 m12">
+            <table>
+              <td class='sac-heading i' align='left'>Incharge<hr color='orange' width='30px' align='left' style="height:3px;margin-top: 0;"></td>
+              <td class='table-content'>
+                <table class='name'>
+                  <td><b>Mr. Chandu G.Lamani</b> (Physical Education Instructor and SAC incharge)</td>
+                </table>
+              </td>
+            </table>
+          </div>
+          <div class="timings col l5 s12 m12">
+            <table>
+              <td class='sac-heading' align='left'>Timings<hr color='orange' width='30px' align='left' style="height:3px;margin-top: 0;"></td>
+              <td class='table-content'>
+                <table class='inner-table'>
+                  <tr>
+                    <td class='sub-headings'><b>Weekdays:</b> </td>
+                    <td class='table-inner-content'>5:30AM to 8:00AM</td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td class='table-inner-content'>5:30PM to 9:30PM</td>
+                  </tr>
+                  <tr>
+                    <td class='sub-headings'><b>Weekends:</b></td>
+                    <td class='table-inner-content'>5:30PM to 9:30PM</td>
+                  </tr>
+                </table>
+                <p class='off'>Off on Institute Holidays</p>
+              </td>
+            </table>
+          </div>
+        </div>
 
-      
-<div class="card">  	
-	<div class="card content">	
-		<table class="centered bordered striped">
-			
-			<tr align="center">
-				<th style="text-align: center">Incharge</th>
-				<th </th>
-			</tr>
+      </div>
+      <div class="lowerpart">
+        <section class='sac-heading' align='left'>Sports Facilities<hr color='orange' width='30px' align='left' style="height:3px;margin-top: 0;"></section>
+        <div class="row">
+          <div class="col l5 s12 outdoor">
+            <h6>Outdoor</h6><hr>
+            <p>Gymnasium-Modern - All weight trainings and cardio machines</p>
+            <p>Badminton wooden courts - Four courts</p>
+            <p>Squash court - One court</p>
+            <p>Table Tennis hall - Five tables</p>
+            <p>Carrom Room and Chess Room - Five Carrom boards and Ten Chess boards</p>
+            <p>Taekwondo Martial Arts Room - One Room</p>
+            <p>Prayer Room - One Room</p>
+            <p>Dance Room - One Room</p>
+          </div>
+          <div class="col l5 s12 indoor">
+            <h6>Indoor</h6><hr>
+            <p>BasketBall Courts - Two Courts</p>
+            <p>Cricket Ground - One Ground</p>
+            <p>Cricket nets - Practice Facilities, Practice Four nets</p>
+            <p>Football Ground - One Ground</p>
+            <p>Futsal - One Court</p>
+            <p>Volleyball Courts - Two Courts</p>
+            <p>Tennis Courts - Two Courts</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="rightpart right col l4">
+      <img class='img-sac' src="{% static 'img/office.jpg' %}" alt="">
+      <img class='img-sac' src="{% static 'img/office.jpg' %}" alt="">
+    </div>
+  </div>
 
-			<tr align="center">
-				<td> Mr. Chandu G. Lamani</td>
-				<td>Physical Education Instructor In Charge SAC & Sports</td>
-			</tr>
-		</table>
-	</div>
-	<div class="card content">
-	<p align="center" style="color:#663333; font-size:15px; font-family:Arial, Helvetica, sans-serif;" ><b> SAC </b>is open for faculty and students from:<br/>
-	Monday to Saturday:  <b>5:30am to 8:00am & 5:30pm to 9:30pm </b><br/>
-	Sunday : <b>5:30pm to 9:30pm </b>
-	Institute Holidays : <b>OFF </b></p>
-	</div>
-	<div class="card content">
-		<p align="center" style="font-size:16px; font-family:Arial, Helvetica, sans-serif; color:#000066"> <b>INDOOR SPORTS FACILITIES</b></p>
-			<table class="centered bordered striped">
-			<tr>
-				<th style="text-align: center">Sports</th>
-				<th style="text-align: center"> Details </th>
-			</tr>
-		
-			<tr align="center">
-				<td>Gymnasium – Modern </td>
-				<td>All weight Training and Cardio Machines</td>
-			</tr>
-			
-			<tr align="center">
-				<td>Badminton Wooden courts</td>
-				<td >Four (4 ) Courts</td>
-			</tr>
-			
-			<tr align="center">
-				<td>Squash Court </td>
-				<td>One (1) Court </td>
-			</tr>
-			
-			<tr align="center">
-				<td>Table Tennis Hall </td>
-				<td>Five Tables</td>
-			</tr>
-			
-			<tr align="center">
-				<td>Carrom Room & Chess Room</td>
-				<td>Five Carrom Boards & 10 Chess Boards </td>
-			</tr>
-			
-			<tr align="center">
-				<td>Taekwondo Martial Art Room </td>
-				<td>One (1) Room </td>
-			</tr>
-			
-			<tr align="center">
-				<td>Prayer Room </td>
-				<td>One (1) Room </td>
-			</tr>
-			
-			<tr align="center">
-				<td>Dance Room </td>
-				<td>One (1) Room </td>
-			</tr>
-			
-			<tr align="center">
-				<td>Pool Table  </td>
-				<td >One (1) Room </td>
-			</tr>
-		</table><br/>
-		<p align="center" style="font-size:16px; font-family:Arial, Helvetica, sans-serif; color:#000066"> <b>OUTDOOR SPORTS FACILITIES</b></p>
-   		
-			<table class="centered bordered striped">
-   			<tr>
-   				<th style="text-align: center">Sports</th>
-				<th style="text-align: center">Details </th>
-			</tr>
-			
-			<tr align="center">
-				<td>Basketball Court  </td>
-				<td>Two (2) Courts </td>
-			</tr>
-			
-			<tr align="center">
-				<td>Cricket Ground  </td>
-				<td>One (1) Ground </td>
-			</tr>
-			
-			<tr align="center">
-				<td>Cricket Nets – Practice Facilities </td>
-				<td>Four (4) Practice Pitches </td>
-			</tr>
-			
-			<tr align="center">
-				<td>Football Ground  </td>
-				<td>One (1) Ground</td>
-			</tr>
-			
-			<tr align="center">
-				<td>Futsal  </td>
-				<td>One (1) court </td>
-			</tr>
-			
-			<tr align="center">
-				<td id="contact1">Volleyball Courts </td>
-				<td id="contact1">Two (2) Courts</td>
-			</tr>
-			
-			<tr align="center">
-				<td id="contact1">Tennis Courts </td>
-				<td id="contact1">Two (2) Courts</td>
-			</tr>
-		</table><br/>
-	</div>
-		
-			</div>
-	     </div>	
-	</div>
+
+
+</div>
 
 {% endblock %}

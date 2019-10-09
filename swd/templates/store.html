@@ -1,3 +1,4 @@
+
 {% extends 'base.html' %} {% block content %}
 
 
@@ -9,11 +10,6 @@
         </div>
     </div>
     <div class="container">
-         {% if messages %}
-                {% for message in messages %}
-                    <span class="new badge {{ message.tags }}" data-badge-caption="{{ message }}"></span>
-                {% endfor %}
-        {% endif %}
         {% if tees %}
         <div class="section">
             <h4 class="center-align">Tees</h4>
@@ -220,4 +216,9 @@
     }
      
 </script>
+
+{% extends 'base.html' %}
+{% block content %}
+{% include 'storeitems.html' %}
+
 {% endblock %}

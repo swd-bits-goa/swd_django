@@ -272,8 +272,8 @@ class Disco(models.Model):
 
 class MessOptionOpen(models.Model):
     monthYear = models.DateField()
-    dateOpen = models.DateField()
-    dateClose = models.DateField()
+    dateOpen = models.DateTimeField()
+    dateClose = models.DateTimeField()
 
     def __str__(self):
         return str(self.monthYear.month) + ' Open: ' + str(self.dateOpen) + ' Close: ' + str(self.dateClose)
