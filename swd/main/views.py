@@ -1251,7 +1251,7 @@ def dues(request):
     swd_adv = float(data['swd-advance'])
     balance = swd_adv - float(total_amount)
 
-            total_amount += other.amount
+    total_amount += other.amount
     balance = float(22000) - float(total_amount)
 
     context = {
