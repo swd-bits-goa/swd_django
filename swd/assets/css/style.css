@@ -1,4 +1,3 @@
-
 /* Custom Stylesheet */
 /**
  * Use this file to override Materialize files so you can update
@@ -10,192 +9,12 @@
  body{
   font-family: 'Montserrat', sans-serif;
  }
-
 .icon-block {
   padding: 0 15px;
 }
 .icon-block .material-icons {
 	font-size: inherit;
 }
-
-#swd {
-  width: 60%;
-  margin-top: 10px;
-  margin-left: 10px;
-}
-
-
-
-nav {
-  background-color: white;
-}
-
-nav ul a {
-  color: #074F57;
-  transition: none;
-}
-nav ul a:hover {
-  background-color: #FFBE57;
-}
-.tabs{
-  height: 40px;
-}
-
-#login>a{
-  color: white;
-  margin-top: 7px;
-}
-
-nav .button-collapse i{
-  color: #074F57;
-  margin-left: 10%;
-}
-
-.side-nav {
-  background-color: #074F57;
-  color: white;
-
-}
-.mobile {
-  display: none;
-}
-.dashboard-quick-action {
-  height: 100%;
-}
-
-.side-nav li {
-  margin: 8px;
-  background-color: #1C5960;
-}
-.side-nav li:hover {
-  background-color: #FFBE57;
-}
-
-.tabs.tabs-transparent {
-  background-color: #074F57;
-  color: white;
-}
-
-.side-nav li > a{
-  color: white;
-}
-
-.dashboard-name {
-  color: #FFBE57
-}
-.light-grey {
-  color: #C4C4C4;
-}
-
-.center {
-  margin: auto 0;
-}
-.new-green {
-  background-color: #1C5960;
-}
-.no-pad-bot{
-  display: none;
-}
-.section{
-  padding-top: 0;
-}
-.fresh-orange {
-  color: #F46036 !important;
-}
-.desert-yellow {
-  background-color: #FFBE57 !important;
-}
-.deep-green {
-  color: #074F57 !important;
-}
-.back-green {
-  background-color: #074F57 !important;
-}
-.grey-text {
-  margin: 5px;
-}
-.grey-text>a {
-  color: #9e9e9e;
-}
-.page-footer {
-  position:fixed;
-  bottom: 0;
-  width: 100%;
-  height: 5%;
-  z-index: 2;
-  padding-top: 0;
-}
-.card-content{
-  padding: 0;
-}
-.tabs.tabs-transparent .indicator{
-  background-color: #FFBE57;
-  height: 3px;
-}
-
-@media screen and (max-width: 800px) {
-  .desktop{
-    display: none;
-  }
-  #back-swd {
-    height:150px ;
-  }
-  #swd {
-    width: 45vw;
-  }
-}
-=======
-/* Custom Stylesheet */
-/**
- * Use this file to override Materialize files so you can update
- * the core Materialize files in the future
- *
- * Made By MaterializeCSS.com
- */
-
-
-nav ul {
-  margin-right: -20%;
-}
-
- body{
-  font-family: 'Montserrat', sans-serif;
- }
-
-.icon-block {
-  padding: 0 15px;
-}
-.icon-block .material-icons {
-	font-size: inherit;
-}
-
-.profileImg{
-  height: 40px;
-  width: 40px;
-}
-
-.messages{
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-}
-.single-message-error{
-  background-color: darkmagenta;
-}
-.single-message-success{
-  background-color: #009688;
-}
-.single-message-info{
-  background-color: burlywood;
-}
-.single-message-warning{
-  background-color: #d4e157;
-}
-.single-message-debug{
-  background-color: darkmagenta;
-}
-
 
 #swd {
   width: 60%;
@@ -323,4 +142,5 @@ nav .button-collapse i{
     width: 45vw;
   }
 }
+
 

@@ -12,10 +12,8 @@
                   <span class="card-title fresh-orange"><h4>My Account</h4></span>
                   <br>
 
-
                 {% comment %} <a href="javascript:void(0);">Student Welfare Division, BITS Pilani, Goa</a> {% endcomment %}
                 
-
 
                 <form id="sign_in" method="POST">
                    {% csrf_token %}
@@ -60,13 +58,5 @@
 
     </div>
 
-{% include 'includes/messages.html' %}
-      <!--Import jQuery before materialize.js-->
-      <script type="text/javascript" src="{% static 'js/jquery.js' %}"></script>
-      <script src="{% static 'js/materialize.js' %}"></script>
-</html>
-
-
     
 {% endblock %}
-

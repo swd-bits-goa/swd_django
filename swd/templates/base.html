@@ -38,10 +38,6 @@
 
 <body style="overflow: hidden">
     <nav class="nav-extended">
-
-        {% include 'includes/header.html' %}
-        <div class="nav-content">
-
         <div class="nav-wrapper" style="margin-bottom: 5px;">
                 <a href="/#" class="brand-logo"><img id="swd" src="{% static 'img/swd.png' %}"></a>
             <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
@@ -88,7 +84,6 @@
             </style>
         </div>
         <div class="nav-content desktop" style="margin-bottom:5px;">
-
             <ul class="tabs tabs-transparent">
                 {% load main_extras %}
                 <li class="tab"><a href="/dashboard" class="{% active_page request 'dashboard' %}" target="_self">Dashboard</a></li>
@@ -102,13 +97,6 @@
             </ul>
         </div>
     </nav>
-
-    <div class="section no-pad-bot" id="index-banner">
-    </div>
-{% block content %}
-{% endblock %}
-{% include 'includes/messages.html' %}
-
     {% comment %} <nav class="" role="navigation">
         <div class="nav-wrapper"><a id="logo-container" href="#" class="brand-logo"></a>
             <ul id="dropdown1" class="dropdown-content">
@@ -174,7 +162,6 @@
     </footer>
     <!--  Scripts-->
 
-
     <script>
         $(document).ready(function () {
             $('select').material_select();
@@ -212,7 +199,3 @@
 </body>
 
 </html>
-
-
-</html>
-

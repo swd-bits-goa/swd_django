@@ -1,6 +1,14 @@
 {% extends 'base.html' %}
 
 {% block content %}
+	<div class="container">
+		{% if messages %}
+			<ul class="collection">
+				{% for message in messages %}
+					<li class="collection-item">{{ message }}</li>
+				{% endfor %}
+			</ul>
+		{% endif %}
 
 		<h4>Import Dues from Excel sheet</h4>
 		<form action="{% url "import_dues_from_sheet" %}" method="POST" enctype="multipart/form-data">

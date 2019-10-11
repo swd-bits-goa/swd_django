@@ -1243,15 +1243,12 @@ def dues(request):
             total_amount += tee.totamt
     for other in otherdues:
         if other is not None:
-
             total_amount += other.amount            
 
     with open(settings.CONSTANTS_LOCATION, 'r') as fp:
         data = json.load(fp)
     swd_adv = float(data['swd-advance'])
     balance = swd_adv - float(total_amount)
-
-    total_amount += other.amount
     balance = float(22000) - float(total_amount)
 
     context = {
