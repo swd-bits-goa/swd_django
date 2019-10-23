@@ -133,6 +133,14 @@ class Student(models.Model):
     def __str__(self):
         return self.bitsId + ' (' + self.name + ')'
 
+    def change_cgpa(self, new_cg):
+        if ((new_cg > 0.0) and (new_cg <= 10.0)):
+            self.cgpa = new_cg
+            self.save()
+            return True
+        else:
+            return False
+
 class DayScholar(models.Model):
     student = models.OneToOneField('Student', on_delete = models.CASCADE)
 

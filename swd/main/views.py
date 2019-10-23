@@ -27,6 +27,7 @@ from django.db.models import Q
 from .models import BRANCH, HOSTELS
 
 import swd.config as config
+from tools.utils import conv_to_array
 
 import re
 import xlrd
@@ -1808,4 +1809,32 @@ def dash_security(request):
     context = {'leaves' : approved}
 
     return render(request, "dash_security.html", context)
+
+
+def import_cgpa(request):
+    if request.POST:
+        if request.FILES:
+            csv_file = request.FILES['csv_file']
+            if not csv_file.name.endswith('.csv'):
+                return HttpResponse("Not a CSV File")
+            
+            fd, tmp = tempfile.mkstemp()
+            with os.fdopen(fd, 'wb') as out:
+                out.write(csv_file.read())
+
+            csv_data = conv_to_array(tmp)
+
+            for row in csv_data:
+                try:
+                    student = Student.object.get(row['studentID'])
+                except Student.ObjectDoesNotExist:
+                    print(row['studentID'] + " not found in database. Skipping")
+                    continue
+                change = student.change_cgpa(float(row['cgpa']))
+                if change is False:
+                    print(row['studentID'] + " does not have a valid CGPA of " \
+                         + str(row['cgpa']))
+            print("CGPA Update Complete")
+    
+    return render(request, "update_cgpa.html", {})
 

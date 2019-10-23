@@ -1,0 +1,46 @@
+{% extends "admin/base_site.html" %}
+
+{% load static %}
+
+{% block title %}
+Update CGPA | Admin
+{% endblock title %}
+
+{% block extrahead %}
+<script src="{% static 'js/jquery.js' %}"></script>
+{% endblock extrahead %}
+
+
+{% block content %}
+<div class="container">
+	<h2>Update CGPA of Enrolled Students</h2>
+	<form method="post" id="form_constants" novalidate="">
+		{% csrf_token %}
+
+	<fieldset class="module form-elements initialized selected">
+        <input type="file" name="csv_file" />
+	</fieldset>
+	<div class="submit-row">
+		<input class="default" type="submit" value="Save" name="_save">
+	</div>
+	</form>
+	<script>
+		var initialData = {{initial|safe}};
+		const form = $('.form-elements');
+		for (item in initialData){
+			abc = form.append(
+				'<div class="form-row field-'+ item +'">'+
+				'<div>'+
+				'<label for="id_'+ item +'">'+
+					item + ':&nbsp;&nbsp;&nbsp;&nbsp;' +
+				'</label>' +
+				'<input type="text" name="' + item + 
+				'" class="vTextField" maxlength="30" id="id_' + item +
+				'" value="' + initialData[item] + '">' +
+				'</div>'+
+				'</div>'				
+			);
+		}
+	</script>
+	
+{% endblock %}
