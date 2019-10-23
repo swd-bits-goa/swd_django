@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.shortcuts import redirect
+
 from main.models import *
 from django.utils.html import format_html
 import urllib
@@ -46,9 +48,14 @@ def export_xls(modeladmin, request, queryset):
 
 export_xls.short_description = u"Export Mess Bill"
 
+
+def update_cgpa(modeladmin, request, queryset):
+    return redirect('import_cgpa')
+update_cgpa.short_description = u"Update CGPAs with Excel File"
+
 class StudentAdmin(admin.ModelAdmin):
     search_fields = ['name', 'bitsId']
-    actions = [export_xls, ]
+    actions = [export_xls, update_cgpa, ]
 
 
 @admin.register(TeeBuy)
