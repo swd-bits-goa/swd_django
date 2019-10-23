@@ -15,7 +15,6 @@ from django.conf import settings
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 import xlrd, xlwt
 
-
 from braces import views
 
 from django.contrib.auth.models import User
@@ -27,7 +26,6 @@ from django.db.models import Q
 from .models import BRANCH, HOSTELS
 
 import swd.config as config
-from tools.utils import conv_to_array
 
 import re
 import xlrd
@@ -1810,31 +1808,71 @@ def dash_security(request):
 
     return render(request, "dash_security.html", context)
 
-
+@user_passes_test(lambda u: u.is_superuser)
 def import_cgpa(request):
+    """
+        Takes Excel Sheet as FILE input.
+        Updates CGPA of the listed students in rows.
+        The header row must contain 'studentID' and 'CGPA' as col names.
+    """
+    message_str = ''
+    message_tag = messages.INFO
     if request.POST:
         if request.FILES:
-            csv_file = request.FILES['csv_file']
-            if not csv_file.name.endswith('.csv'):
-                return HttpResponse("Not a CSV File")
+            xl_file = request.FILES['xl_file']
+            extension = xl_file.name.rsplit('.', 1)[1]
+            if ('xls' != extension):
+                if ('xlsx' != extension):
+                    messages.error(request, "Please upload .xls or .xlsx file only")
+                    messages.add_message(request,
+                                        message_tag, 
+                                        message_str)
+                    return render(request, "update_cgpa.html", {})
             
             fd, tmp = tempfile.mkstemp()
             with os.fdopen(fd, 'wb') as out:
-                out.write(csv_file.read())
-
-            csv_data = conv_to_array(tmp)
-
-            for row in csv_data:
-                try:
-                    student = Student.object.get(row['studentID'])
-                except Student.ObjectDoesNotExist:
-                    print(row['studentID'] + " not found in database. Skipping")
-                    continue
-                change = student.change_cgpa(float(row['cgpa']))
-                if change is False:
-                    print(row['studentID'] + " does not have a valid CGPA of " \
-                         + str(row['cgpa']))
-            print("CGPA Update Complete")
+                out.write(xl_file.read())
+            workbook = xlrd.open_workbook(tmp)
+            count = 0
+            idx = 1
+            header = {}
+            for sheet in workbook.sheets():
+                for row in sheet.get_rows():
+                    if idx == 1:
+                        col_no = 0
+                        for cell in row:
+                            header[str(cell.value)] = col_no
+                            col_no = col_no + 1
+                        idx = 0
+                        continue
+                    try:
+                        student = Student.objects.get(bitsId=row[header['studentID']].value)
+                    except Student.DoesNotExist:
+                        message_str = str(row[header['studentID']].value) + " not found in " \
+                            "database"
+                        messages.add_message(request,
+                                            message_tag, 
+                                            message_str)
+                        print(message_str)
+                        continue
+                    change = student.change_cgpa(float(row[header['CGPA']].value))
+                    if change is False:
+                        message_str = str(row[header['studentID']].value) + " does not have " \
+                            "a valid CGPA " + str(row[header['CGPA']].value)
+                        messages.add_message(request,
+                                            message_tag, 
+                                            message_str)
+                        print(message_str)
+                    else:
+                        print(str(row[header['studentID']].value) + " cgpa changed.")
+                        count = count + 1
+            message_str = "CGPAs successfully updated of " + str(count) + " students."
+        else:
+            message_str = "No File Added."
     
+    if message_str is not '':
+        messages.add_message(request,
+                            message_tag, 
+                            message_str)
     return render(request, "update_cgpa.html", {})
 
