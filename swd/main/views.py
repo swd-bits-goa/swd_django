@@ -21,6 +21,7 @@ from django.contrib.auth.models import User
 
 from calendar import monthrange
 from dateutil import rrule
+from datetime import datetime
 
 from django.db.models import Q
 from .models import BRANCH, HOSTELS
@@ -1809,16 +1810,28 @@ def dash_security(request):
     return render(request, "dash_security.html", context)
 
 @user_passes_test(lambda u: u.is_superuser)
+
 def import_cgpa(request):
     """
         Takes Excel Sheet as FILE input.
         Updates CGPA of the listed students in rows.
         The header row must contain 'studentID' and 'CGPA' as col names.
+
+def add_new_students(request):
+    """
+        Takes Excel Sheet as FILE input.
+        Adds New Students to the database.
+        The date fields expect a dd-Mon-yy value
+        For example: 07-Jan-97
+
     """
     message_str = ''
     message_tag = messages.INFO
     if request.POST:
         if request.FILES:
+
+            # Read Excel File into a temp file
+
             xl_file = request.FILES['xl_file']
             extension = xl_file.name.rsplit('.', 1)[1]
             if ('xls' != extension):
@@ -1827,8 +1840,11 @@ def import_cgpa(request):
                     messages.add_message(request,
                                         message_tag, 
                                         message_str)
+
                     return render(request, "update_cgpa.html", {})
-            
+                    return render(request, "add_students.html", {})
+
+
             fd, tmp = tempfile.mkstemp()
             with os.fdopen(fd, 'wb') as out:
                 out.write(xl_file.read())
@@ -1841,11 +1857,12 @@ def import_cgpa(request):
                     if idx == 1:
                         col_no = 0
                         for cell in row:
+                            # Store the column names in dictionary
                             header[str(cell.value)] = col_no
                             col_no = col_no + 1
                         idx = 0
                         continue
-                    try:
+                   try:
                         student = Student.objects.get(bitsId=row[header['studentID']].value)
                     except Student.DoesNotExist:
                         message_str = str(row[header['studentID']].value) + " not found in " \
@@ -1870,9 +1887,54 @@ def import_cgpa(request):
         else:
             message_str = "No File Added."
     
+
+                    for key, value in header.items():
+                        print(key, row[value].value)
+                    # create User model first then Student model
+                    emailID = row[header['INSTITUTE EMAIL ID']].value
+                    username = emailID.split('@', 1)[0]
+                    password = User.objects.make_random_password()
+                    user = User.objects.create_user(
+                        username=username,
+                        email=emailID,
+                        password=password)
+
+                    # Date of Birth and Date of Admit
+                    # These col values are expected to be in dd-Mon-yy format
+                    # For Example: 07-Jan-97
+                    dob = row[header['Stu_DOB']].value
+                    rev_bDay = datetime.strptime(dob, '%d-%b-%y').strftime('%Y-%m-%d')
+                    do_admit = row[header['admit']].value
+                    rev_admit = datetime.strptime(do_admit, '%d-%b-%y').strftime('%Y-%m-%d')
+                    
+                    student = Student.objects.create(
+                        user=user,
+                        bitsId=row[header['studentID']].value,
+                        name=row[header['name']].value,
+                        bDay=rev_bDay,
+                        admit=rev_admit,
+                        gender=row[header['Stu_gender']].value,
+                        phone=row[header['stu_mobile']].value,
+                        email=row[header['stu_email (other then institute)']].value,
+                        address=row[header['ADDRESS']].value,
+                        bloodGroup=row[header['bloodgp']].value,
+                        parentName=row[header['fname']].value,
+                        parentPhone=row[header['parent mobno']].value,
+                        parentEmail=row[header['parent mail']].value
+                        )
+                    count = count + 1
+            message_str = str(count) + " new students added."
+        else:
+            message_str = "No File Uploaded."
+
+
     if message_str is not '':
         messages.add_message(request,
                             message_tag, 
                             message_str)
+
     return render(request, "update_cgpa.html", {})
+
+    return render(request, "add_students.html", {})
+
 

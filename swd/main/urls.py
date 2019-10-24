@@ -53,6 +53,10 @@ urlpatterns = [
     url(r'^import_dues_from_sheet/', views.import_dues_from_sheet, name='import_dues_from_sheet'),
     url(r'^publish_dues/', views.publish_dues, name='publish_dues'),
     url(r'^admin/edit_constants/', views.edit_constants, name='edit_constants'),
+
     url(r'^admin/import_cgpa/', views.import_cgpa, name='import_cgpa')
+
+    url(r'^admin/add_new_students/', views.add_new_students, name='add_new_students'),
+
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
