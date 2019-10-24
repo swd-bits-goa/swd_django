@@ -1,0 +1,29 @@
+{% extends "admin/base_site.html" %}
+
+{% load static %}
+
+{% block title %}
+Add Students | Admin
+{% endblock title %}
+
+{% block extrahead %}
+<script src="{% static 'js/jquery.js' %}"></script>
+{% endblock extrahead %}
+
+
+{% block content %}
+<div class="container">
+	<h2>Add Newly Admitted Students to Database</h2>
+
+	<form enctype="multipart/form-data" method="post" id="add_students_form">
+
+		{% csrf_token %}
+
+		<fieldset class="module form-elements initialized selected">
+			<input type="file" name="xl_file" id="xl_file" />
+		</fieldset>
+		<div class="submit-row">
+			<input class="default" type="submit" value="Add" name="_save">
+		</div>
+	</form>
+{% endblock %}
