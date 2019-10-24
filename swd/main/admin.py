@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.shortcuts import redirect
 from main.models import *
 from django.utils.html import format_html
 import urllib
@@ -46,9 +47,14 @@ def export_xls(modeladmin, request, queryset):
 
 export_xls.short_description = u"Export Mess Bill"
 
+
+def add_new_students(modeladmin, request, queryset):
+    return redirect('add_new_students')
+add_new_students.description = u"Add New Students from Excel"
+
 class StudentAdmin(admin.ModelAdmin):
     search_fields = ['name', 'bitsId']
-    actions = [export_xls, ]
+    actions = [export_xls, add_new_students, ]
 
 
 @admin.register(TeeBuy)
