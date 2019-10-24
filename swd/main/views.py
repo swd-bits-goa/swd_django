@@ -15,7 +15,6 @@ from django.conf import settings
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 import xlrd, xlwt
 
-
 from braces import views
 
 from django.contrib.auth.models import User
@@ -1811,18 +1810,28 @@ def dash_security(request):
     return render(request, "dash_security.html", context)
 
 @user_passes_test(lambda u: u.is_superuser)
+
+def import_cgpa(request):
+    """
+        Takes Excel Sheet as FILE input.
+        Updates CGPA of the listed students in rows.
+        The header row must contain 'studentID' and 'CGPA' as col names.
+
 def add_new_students(request):
     """
         Takes Excel Sheet as FILE input.
         Adds New Students to the database.
         The date fields expect a dd-Mon-yy value
         For example: 07-Jan-97
+
     """
     message_str = ''
     message_tag = messages.INFO
     if request.POST:
         if request.FILES:
+
             # Read Excel File into a temp file
+
             xl_file = request.FILES['xl_file']
             extension = xl_file.name.rsplit('.', 1)[1]
             if ('xls' != extension):
@@ -1831,13 +1840,15 @@ def add_new_students(request):
                     messages.add_message(request,
                                         message_tag, 
                                         message_str)
+
+                    return render(request, "update_cgpa.html", {})
                     return render(request, "add_students.html", {})
+
 
             fd, tmp = tempfile.mkstemp()
             with os.fdopen(fd, 'wb') as out:
                 out.write(xl_file.read())
             workbook = xlrd.open_workbook(tmp)
-
             count = 0
             idx = 1
             header = {}
@@ -1851,6 +1862,32 @@ def add_new_students(request):
                             col_no = col_no + 1
                         idx = 0
                         continue
+                   try:
+                        student = Student.objects.get(bitsId=row[header['studentID']].value)
+                    except Student.DoesNotExist:
+                        message_str = str(row[header['studentID']].value) + " not found in " \
+                            "database"
+                        messages.add_message(request,
+                                            message_tag, 
+                                            message_str)
+                        print(message_str)
+                        continue
+                    change = student.change_cgpa(float(row[header['CGPA']].value))
+                    if change is False:
+                        message_str = str(row[header['studentID']].value) + " does not have " \
+                            "a valid CGPA " + str(row[header['CGPA']].value)
+                        messages.add_message(request,
+                                            message_tag, 
+                                            message_str)
+                        print(message_str)
+                    else:
+                        print(str(row[header['studentID']].value) + " cgpa changed.")
+                        count = count + 1
+            message_str = "CGPAs successfully updated of " + str(count) + " students."
+        else:
+            message_str = "No File Added."
+    
+
                     for key, value in header.items():
                         print(key, row[value].value)
                     # create User model first then Student model
@@ -1890,9 +1927,14 @@ def add_new_students(request):
         else:
             message_str = "No File Uploaded."
 
+
     if message_str is not '':
         messages.add_message(request,
                             message_tag, 
                             message_str)
+
+    return render(request, "update_cgpa.html", {})
+
     return render(request, "add_students.html", {})
+
 
