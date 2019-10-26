@@ -478,7 +478,7 @@ def leave(request):
             if config.EMAIL_PROD:
                 email_to=[Warden.objects.get(hostel=HostelPS.objects.get(student=student).hostel).email]
             else:
-                email_to=["swdbitstest@gmail.com"]                                                                     # For testing
+                email_to=["spammailashad@gmail.com"]                                                                     # For testing
             mailObj=Leave.objects.latest('id')
             mail_subject="New Leave ID: "+ str(mailObj.id)
             mail_message="Leave Application applied by "+ mailObj.student.name +" with leave id: " + str(mailObj.id) + ".\n"
@@ -1816,22 +1816,12 @@ def import_cgpa(request):
         Takes Excel Sheet as FILE input.
         Updates CGPA of the listed students in rows.
         The header row must contain 'studentID' and 'CGPA' as col names.
-
-def add_new_students(request):
     """
-        Takes Excel Sheet as FILE input.
-        Adds New Students to the database.
-        The date fields expect a dd-Mon-yy value
-        For example: 07-Jan-97
 
-    """
     message_str = ''
     message_tag = messages.INFO
     if request.POST:
         if request.FILES:
-
-            # Read Excel File into a temp file
-
             xl_file = request.FILES['xl_file']
             extension = xl_file.name.rsplit('.', 1)[1]
             if ('xls' != extension):
@@ -1840,10 +1830,7 @@ def add_new_students(request):
                     messages.add_message(request,
                                         message_tag, 
                                         message_str)
-
                     return render(request, "update_cgpa.html", {})
-                    return render(request, "add_students.html", {})
-
 
             fd, tmp = tempfile.mkstemp()
             with os.fdopen(fd, 'wb') as out:
@@ -1857,12 +1844,11 @@ def add_new_students(request):
                     if idx == 1:
                         col_no = 0
                         for cell in row:
-                            # Store the column names in dictionary
                             header[str(cell.value)] = col_no
                             col_no = col_no + 1
                         idx = 0
                         continue
-                   try:
+                    try:
                         student = Student.objects.get(bitsId=row[header['studentID']].value)
                     except Student.DoesNotExist:
                         message_str = str(row[header['studentID']].value) + " not found in " \
@@ -1886,14 +1872,71 @@ def add_new_students(request):
             message_str = "CGPAs successfully updated of " + str(count) + " students."
         else:
             message_str = "No File Added."
-    
 
-                    for key, value in header.items():
-                        print(key, row[value].value)
+    if message_str is not '':
+        messages.add_message(request,
+                            message_tag, 
+                            message_str)
+    return render(request, "update_cgpa.html", {})
+
+
+def add_new_students(request):
+    """
+        Takes Excel Sheet as FILE input.
+        Adds New Students to the database.
+        The date fields expect a dd-Mon-yy value
+        For example: 07-Jan-97
+    """
+    message_str = ''
+    message_tag = messages.INFO
+    if request.POST:
+        if request.FILES:
+            # Read Excel File into a temp file
+            xl_file = request.FILES['xl_file']
+            extension = xl_file.name.rsplit('.', 1)[1]
+            if ('xls' != extension):
+                if ('xlsx' != extension):
+                    messages.error(request, "Please upload .xls or .xlsx file only")
+                    messages.add_message(request,
+                                        message_tag, 
+                                        message_str)
+                    return render(request, "add_students.html", {})
+
+            fd, tmp = tempfile.mkstemp()
+            with os.fdopen(fd, 'wb') as out:
+                out.write(xl_file.read())
+            workbook = xlrd.open_workbook(tmp)
+
+            count = 0
+            idx = 1
+            header = {}
+            for sheet in workbook.sheets():
+                for row in sheet.get_rows():
+                    if idx == 1:
+                        col_no = 0
+                        for cell in row:
+                            # Store the column names in dictionary
+                            header[str(cell.value)] = col_no
+                            col_no = col_no + 1
+                        idx = 0
+                        continue
+                    #for key, value in header.items():
+                    #    print(key, row[value].value)
                     # create User model first then Student model
                     emailID = row[header['INSTITUTE EMAIL ID']].value
                     username = emailID.split('@', 1)[0]
+                    print(username)
                     password = User.objects.make_random_password()
+
+                    # Date of Birth and Date of Admit
+                    # These col values are expected to be in dd-Mon-yy format
+                    # For Example: 07-Jan-97
+                    
+                    try:
+                        user = User.objects.get(username=username)
+                        user.delete()
+                    except User.DoesNotExist:
+                        pass
                     user = User.objects.create_user(
                         username=username,
                         email=emailID,
@@ -1902,17 +1945,39 @@ def add_new_students(request):
                     # Date of Birth and Date of Admit
                     # These col values are expected to be in dd-Mon-yy format
                     # For Example: 07-Jan-97
-                    dob = row[header['Stu_DOB']].value
-                    rev_bDay = datetime.strptime(dob, '%d-%b-%y').strftime('%Y-%m-%d')
-                    do_admit = row[header['admit']].value
-                    rev_admit = datetime.strptime(do_admit, '%d-%b-%y').strftime('%Y-%m-%d')
-                    
+                    dob = row[header['Stu_DOB']]
+                    #print(dob)
+                    if dob.ctype == 1: # XL_CELL_TEXT
+                        rev_bDay = datetime.strptime(dob.value, '%d-%b-%y').strftime('%Y-%m-%d')
+                        print(rev_bDay)
+                    elif (dob.ctype == 3): # XL_CELL_DATE
+                        rev_bDay = xlrd.xldate.xldate_as_datetime(dob.value, 0)
+                        print(rev_bDay)
+                    else:
+                        rev_bDay = datetime.strptime('01Jan1985', '%d%b%Y')
+                        print(rev_bDay)
+                    #print(dob.ctype)
+                    do_admit = row[header['admit']]
+                    print(do_admit)
+                    if (do_admit.ctype == 1): # XL_CELL_TEXT
+                        print("hello")
+                        rev_admit = datetime.strptime(do_admit.value, '%d-%b-%y').strftime('%Y-%m-%d')
+                        print(rev_admit)
+                    elif do_admit.ctype == 3: # XL_CELL_DATE
+                        rev_admit = xlrd.xldate.xldate_as_datetime(do_admit.value, 0)
+                        print(rev_admit)
+                    else:
+                        rev_admit = datetime.strptime('01Jan1985', '%d%b%Y')
+                        print(rev_admit)
+
+                    print(rev_bDay)
+                    print(rev_admit)
                     student = Student.objects.create(
                         user=user,
                         bitsId=row[header['studentID']].value,
                         name=row[header['name']].value,
-                        bDay=rev_bDay,
-                        admit=rev_admit,
+                        bDay=dob,
+                        admit=do_admit,
                         gender=row[header['Stu_gender']].value,
                         phone=row[header['stu_mobile']].value,
                         email=row[header['stu_email (other then institute)']].value,
@@ -1927,14 +1992,9 @@ def add_new_students(request):
         else:
             message_str = "No File Uploaded."
 
-
     if message_str is not '':
         messages.add_message(request,
                             message_tag, 
                             message_str)
-
-    return render(request, "update_cgpa.html", {})
-
     return render(request, "add_students.html", {})
-
 
