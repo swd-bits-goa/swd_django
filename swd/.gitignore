@@ -4,6 +4,8 @@
 __pycache__/
 local_settings.py
 
+swd/lib/
+swd/bin/
 .env
 db.sqlite3
 node_modules
@@ -16,3 +18,4 @@ studentimgs
 studentimg
 *.swp
 *.patch
+venv/

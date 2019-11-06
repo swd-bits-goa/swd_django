@@ -1,12 +1,15 @@
 from django.contrib.auth.models import User
 from urllib.request import urlopen
 from urllib.parse import urlencode
+from django.contrib.auth.backends import ModelBackend
 
-class LDAPAuthBackend:
-    def authenticate(self, username=None, password=None):
+class LDAPAuthBackend(ModelBackend):
+    def authenticate(self, request, username=None, password=None):
         try:
+            print(username, password)
             with urlopen("http://10.10.10.20/auth.php?" + urlencode({'u': username, 'p': password}), timeout=5) as authfile:
                 string = authfile.read()
+                
                 print(string)
                 if string.decode('utf-8') == 'true':
                     try:

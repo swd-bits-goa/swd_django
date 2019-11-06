@@ -149,7 +149,7 @@ def dashboard(request):
     if messopen:
         messoption = MessOption.objects.filter(monthYear=messopen[0].monthYear, student=student)
         
-    if messopen and not messoption and datetime.today() < messopen[0].dateClose:
+    if messopen and not messoption and datetime.today().date() < messopen[0].dateClose:
         form = MessForm(request.POST)
         context = {
             'option': 0,
@@ -1976,8 +1976,8 @@ def add_new_students(request):
                         user=user,
                         bitsId=row[header['studentID']].value,
                         name=row[header['name']].value,
-                        bDay=dob,
-                        admit=do_admit,
+                        bDay=rev_bDay,
+                        admit=rev_admit,
                         gender=row[header['Stu_gender']].value,
                         phone=row[header['stu_mobile']].value,
                         email=row[header['stu_email (other then institute)']].value,

@@ -32,7 +32,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 if PRODUCTION:
-    ALLOWED_HOSTS = ['10.10.10.121']
+    ALLOWED_HOSTS = ['10.10.10.121', 'newswd.bits-goa.ac.in']
 else:
     ALLOWED_HOSTS = []
 
@@ -94,10 +94,11 @@ MIDDLEWARE = [
 if PRODUCTION:
     AUTHENTICATION_BACKENDS = (
         'main.auth_backend.LDAPAuthBackend',
-        'django.contrib.auth.backends.ModelBackend',
+	'django.contrib.auth.backends.ModelBackend'
         )
 else:
     AUTHENTICATION_BACKENDS = (
+#	'main.auth_backend.LDAPAuthBackend',
         'django.contrib.auth.backends.ModelBackend',
     )
 
@@ -181,7 +182,7 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)
