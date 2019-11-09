@@ -13,7 +13,7 @@
           <span class="post-title">{{ person.title }}</span>
           <div class="divider"></div>
           <span class="title">{{ person.student.name }}<br>{{ person.student.bitsId }}</span><br>
-          <span class="phone">{{ person.student.phone }}</span><br>
+          <span class="phone">{{ person.student.phone|floatformat }}</span><br>
           <span class="mail"><a href="mailto:{{ person.email }}">{{ person.email }}</a></span>
         </div>
       </div>

@@ -71,7 +71,9 @@ HOSTELS = (
     ('CH6', 'CH6'),
     ('CH7', 'CH7'),
     ('DH1', 'DH1'),
-    ('DH2', 'DH2')
+    ('DH2', 'DH2'),
+    ('DH3', 'DH3'),
+    ('DH4', 'DH4'),
 )
 
 class Warden(models.Model):
@@ -280,8 +282,8 @@ class Disco(models.Model):
 
 class MessOptionOpen(models.Model):
     monthYear = models.DateField()
-    dateOpen = models.DateTimeField()
-    dateClose = models.DateTimeField()
+    dateOpen = models.DateField()
+    dateClose = models.DateField()
 
     def __str__(self):
         return str(self.monthYear.month) + ' Open: ' + str(self.dateOpen) + ' Close: ' + str(self.dateClose)
