@@ -383,17 +383,6 @@ class DuesPublished(models.Model):
     def __str__(self):
         return str(self.date_published)
 
-class Notice(models.Model):
-    
-    date = models.DateField(editable=False) 
-    title = models.CharField(max_length=100)
-    desc = models.TextField()
-    def __str__(self):
-        return self.desc
-    def save(self, *args, **kwargs):
-        self.date = timezone.now()
-        super().save(*args, **kwargs)
-
 class FileAdd(models.Model):
 
     file = models.FileField()
@@ -405,6 +394,20 @@ class FileAdd(models.Model):
     def save(self, *args, **kwargs):
         self.link = '/media/' + self.file.name 
         super().save(*args, **kwargs)
+
+
+class Notice(models.Model):
+    
+    date = models.DateField(editable=False) 
+    title = models.CharField(max_length=100)
+    desc = models.TextField()
+    file = models.ForeignKey(FileAdd, on_delete=models.CASCADE)
+    def __str__(self):
+        return self.desc
+    def save(self, *args, **kwargs):
+        self.date = timezone.now()
+        super().save(*args, **kwargs)
+
 
 class Document(models.Model):
     title = models.CharField(max_length=100)

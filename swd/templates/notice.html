@@ -8,7 +8,9 @@
         			{% for notice in queryset %}
         			<p>
               <div class="card" style="padding:16px;">
+                <a href="{{notice.file.link}}">
               <div class="card-title" >{{ notice.title|safe }}</div>
+            </a>
                 <div class="card-content" style="padding: 0;">
                 <i style="font-size:12px">{{ notice.date }}</i>
                 {{ notice.desc|safe|linebreaks}}
