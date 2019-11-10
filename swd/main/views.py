@@ -1978,7 +1978,7 @@ def add_new_students(request):
                         name=row[header['name']].value,
                         bDay=rev_bDay,
                         admit=rev_admit,
-                        gender=row[header['Stu_gender']].value,
+                        gender=row[header['Stu_gender']].value[0],
                         phone=row[header['stu_mobile']].value,
                         email=row[header['stu_email (other then institute)']].value,
                         address=row[header['ADDRESS']].value,
