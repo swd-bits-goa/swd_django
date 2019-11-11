@@ -1948,7 +1948,7 @@ def add_new_students(request):
                     dob = row[header['Stu_DOB']]
                     #print(dob)
                     if dob.ctype == 1: # XL_CELL_TEXT
-                        rev_bDay = datetime.strptime(dob.value, '%d-%b-%y').strftime('%Y-%m-%d')
+                        rev_bDay = datetime.strptime(dob.value, '%d/%m/%Y').strftime('%Y-%m-%d')
                         print(rev_bDay)
                     elif (dob.ctype == 3): # XL_CELL_DATE
                         rev_bDay = xlrd.xldate.xldate_as_datetime(dob.value, 0)
@@ -1960,8 +1960,8 @@ def add_new_students(request):
                     do_admit = row[header['admit']]
                     print(do_admit)
                     if (do_admit.ctype == 1): # XL_CELL_TEXT
-                        print("hello")
-                        rev_admit = datetime.strptime(do_admit.value, '%d-%b-%y').strftime('%Y-%m-%d')
+                        #print("hello")
+                        rev_admit = datetime.strptime(do_admit.value, '%d/%m/%Y').strftime('%Y-%m-%d')
                         print(rev_admit)
                     elif do_admit.ctype == 3: # XL_CELL_DATE
                         rev_admit = xlrd.xldate.xldate_as_datetime(do_admit.value, 0)
@@ -1970,8 +1970,8 @@ def add_new_students(request):
                         rev_admit = datetime.strptime('01Jan1985', '%d%b%Y')
                         print(rev_admit)
 
-                    print(rev_bDay)
-                    print(rev_admit)
+                    #print(rev_bDay)
+                    #print(rev_admit)
                     student = Student.objects.create(
                         user=user,
                         bitsId=row[header['studentID']].value,
