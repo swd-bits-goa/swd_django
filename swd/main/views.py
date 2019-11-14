@@ -1875,7 +1875,7 @@ def import_cgpa(request):
                             message_str)
     return render(request, "update_cgpa.html", {})
 
-
+@user_passes_test(lambda u: u.is_superuser)
 def add_new_students(request):
     """
         Takes Excel Sheet as FILE input.
@@ -1993,5 +1993,82 @@ def add_new_students(request):
         messages.add_message(request,
                             message_tag, 
                             message_str)
-    return render(request, "add_students.html", {})
+    return render(request, "add_students.html", {'header': "Add Newly Admitted Students to Database"})
 
+@user_passes_test(lambda u: u.is_superuser)
+def add_wardens(request):
+    message_str = ''
+    message_tag = messages.INFO
+    if request.POST:
+        if request.FILES:
+            # Read Excel File into a temp file
+            xl_file = request.FILES['xl_file']
+            extension = xl_file.name.rsplit('.', 1)[1]
+            if ('xls' != extension):
+                if ('xlsx' != extension):
+                    messages.error(request, "Please upload .xls or .xlsx file only")
+                    messages.add_message(request,
+                                        message_tag, 
+                                        message_str)
+                    return render(request, "add_students.html", {})
+
+            fd, tmp = tempfile.mkstemp()
+            with os.fdopen(fd, 'wb') as out:
+                out.write(xl_file.read())
+            workbook = xlrd.open_workbook(tmp)
+
+            count = 0
+            idx = 1
+            header = {}
+            for sheet in workbook.sheets():
+                for row in sheet.get_rows():
+                    if idx == 1:
+                        col_no = 0
+                        for cell in row:
+                            # Store the column names in dictionary
+                            header[str(cell.value)] = col_no
+                            col_no = col_no + 1
+                        idx = 0
+                        continue
+                    #for key, value in header.items():
+                    #    print(key, row[value].value)
+                    # create User model first then Student model
+                    emailID = row[header['Warden Email ID']].value
+                    username = emailID.split('@', 1)[0]
+                    #print(username)
+                    password = User.objects.make_random_password()
+
+                    # Date of Birth and Date of Admit
+                    # These col values are expected to be in dd-Mon-yy format
+                    # For Example: 07-Jan-97
+                    
+                    try:
+                        user = User.objects.get(username=username)
+                        user.delete()
+                    except User.DoesNotExist:
+                        pass
+                    user = User.objects.create_user(
+                        username=username,
+                        email=emailID,
+                        password=password)
+
+                    
+                    warden = Warden.objects.create(
+                        user=user,
+                        name=row[header['name']].value,
+                        phone=row[header['phone']].value,
+                        email=emailID,
+                        chamber=row[header['chamber']].value,
+                        residence=row[header['residence']].value,
+                        hostel=row[header['hostel']].value,
+                        )
+                    count = count + 1
+            message_str = str(count) + " new wardens added."
+        else:
+            message_str = "No File Uploaded."
+
+    if message_str is not '':
+        messages.add_message(request,
+                            message_tag, 
+                            message_str)
+    return render(request, "add_students.html", {'header': "Add new wardens"})

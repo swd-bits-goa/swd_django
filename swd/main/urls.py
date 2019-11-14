@@ -57,6 +57,6 @@ urlpatterns = [
     url(r'^admin/import_cgpa/', views.import_cgpa, name='import_cgpa'),
 
     url(r'^admin/add_new_students/', views.add_new_students, name='add_new_students'),
-
+    url(r'^admin/add_new_wardens/', views.add_wardens, name='add_wardens'),
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
