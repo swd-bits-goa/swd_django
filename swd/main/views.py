@@ -1974,18 +1974,18 @@ def add_new_students(request):
                     #print(rev_admit)
                     student = Student.objects.create(
                         user=user,
-                        bitsId=row[header['studentID']].value,
-                        name=row[header['name']].value,
+                        bitsId=str(row[header['studentID']].value)[:15],
+                        name=str(row[header['name']].value)[:50],
                         bDay=rev_bDay,
                         admit=rev_admit,
-                        gender=row[header['Stu_gender']].value[0],
-                        phone=row[header['stu_mobile']].value,
-                        email=row[header['stu_email (other then institute)']].value,
-                        address=row[header['ADDRESS']].value,
-                        bloodGroup=row[header['bloodgp']].value,
-                        parentName=row[header['fname']].value,
-                        parentPhone=row[header['parent mobno']].value,
-                        parentEmail=row[header['parent mail']].value
+                        gender=str(row[header['Stu_gender']].value)[0],
+                        phone=str(row[header['stu_mobile']].value)[:15],
+                        email=str(row[header['stu_email (other then institute)']].value),
+                        address=str(row[header['ADDRESS']].value),
+                        bloodGroup=str(row[header['bloodgp']].value)[:10],
+                        parentName=str(row[header['fname']].value)[:50],
+                        parentPhone=str(row[header['parent mobno']].value)[:20],
+                        parentEmail=str(row[header['parent mail']].value)[:50]
                         )
                     count = count + 1
             message_str = str(count) + " new students added."
