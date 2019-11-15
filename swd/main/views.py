@@ -1916,8 +1916,7 @@ def add_new_students(request):
                             col_no = col_no + 1
                         idx = 0
                         continue
-                    #for key, value in header.items():
-                    #    print(key, row[value].value)
+                    
                     # create User model first then Student model
                     emailID = row[header['INSTITUTE EMAIL ID']].value
                     username = emailID.split('@', 1)[0]
@@ -1942,7 +1941,7 @@ def add_new_students(request):
                     # These col values are expected to be in dd-Mon-yy format
                     # For Example: 07-Jan-97
                     dob = row[header['Stu_DOB']]
-                    #print(dob)
+                    
                     if dob.ctype == 1: # XL_CELL_TEXT
                         rev_bDay = datetime.strptime(dob.value, '%d/%m/%Y').strftime('%Y-%m-%d')
                         print(rev_bDay)
@@ -1952,11 +1951,11 @@ def add_new_students(request):
                     else:
                         rev_bDay = datetime.strptime('01Jan1985', '%d%b%Y')
                         print(rev_bDay)
-                    #print(dob.ctype)
+                    
                     do_admit = row[header['admit']]
                     print(do_admit)
                     if (do_admit.ctype == 1): # XL_CELL_TEXT
-                        #print("hello")
+                        
                         rev_admit = datetime.strptime(do_admit.value, '%d/%m/%Y').strftime('%Y-%m-%d')
                         print(rev_admit)
                     elif do_admit.ctype == 3: # XL_CELL_DATE
@@ -1965,9 +1964,6 @@ def add_new_students(request):
                     else:
                         rev_admit = datetime.strptime('01Jan1985', '%d%b%Y')
                         print(rev_admit)
-
-                    #print(rev_bDay)
-                    #print(rev_admit)
                     student = Student.objects.create(
                         user=user,
                         bitsId=row[header['studentID']].value,
@@ -2010,7 +2006,7 @@ def add_wardens(request):
                     messages.add_message(request,
                                         message_tag, 
                                         message_str)
-                    return render(request, "add_students.html", {})
+                    return render(request, "add_students.html", {'header': "Add new wardens"})
 
             fd, tmp = tempfile.mkstemp()
             with os.fdopen(fd, 'wb') as out:
@@ -2030,18 +2026,10 @@ def add_wardens(request):
                             col_no = col_no + 1
                         idx = 0
                         continue
-                    #for key, value in header.items():
-                    #    print(key, row[value].value)
                     # create User model first then Student model
                     emailID = row[header['Warden Email ID']].value
                     username = emailID.split('@', 1)[0]
-                    #print(username)
                     password = User.objects.make_random_password()
-
-                    # Date of Birth and Date of Admit
-                    # These col values are expected to be in dd-Mon-yy format
-                    # For Example: 07-Jan-97
-                    
                     try:
                         user = User.objects.get(username=username)
                         user.delete()
@@ -2064,6 +2052,74 @@ def add_wardens(request):
                         )
                     count = count + 1
             message_str = str(count) + " new wardens added."
+        else:
+            message_str = "No File Uploaded."
+
+    if message_str is not '':
+        messages.add_message(request,
+                            message_tag, 
+                            message_str)
+    return render(request, "add_students.html", {'header': "Add new wardens"})
+
+@user_passes_test(lambda u: u.is_superuser)
+def add_superintendents(request):
+    message_str = ''
+    message_tag = messages.INFO
+    if request.POST:
+        if request.FILES:
+            # Read Excel File into a temp file
+            xl_file = request.FILES['xl_file']
+            extension = xl_file.name.rsplit('.', 1)[1]
+            if ('xls' != extension):
+                if ('xlsx' != extension):
+                    messages.error(request, "Please upload .xls or .xlsx file only")
+                    messages.add_message(request,
+                                        message_tag, 
+                                        message_str)
+                    return render(request, "add_students.html", {'header': "Add new superintendent"})
+
+            fd, tmp = tempfile.mkstemp()
+            with os.fdopen(fd, 'wb') as out:
+                out.write(xl_file.read())
+            workbook = xlrd.open_workbook(tmp)
+
+            count = 0
+            idx = 1
+            header = {}
+            for sheet in workbook.sheets():
+                for row in sheet.get_rows():
+                    if idx == 1:
+                        col_no = 0
+                        for cell in row:
+                            # Store the column names in dictionary
+                            header[str(cell.value)] = col_no
+                            col_no = col_no + 1
+                        idx = 0
+                        continue
+                    # create User model first then Student model
+                    emailID = row[header['Superintendent Email ID']].value
+                    username = emailID.split('@', 1)[0]
+                    
+                    password = User.objects.make_random_password()
+                    try:
+                        user = User.objects.get(username=username)
+                        user.delete()
+                    except User.DoesNotExist:
+                        pass
+                    user = User.objects.create_user(
+                        username=username,
+                        email=emailID,
+                        password=password)
+
+                    
+                    si = HostelSuperintendent.objects.create(
+                        user=user,
+                        name=row[header['name']].value,
+                        email=emailID,
+                        hostel=row[header['hostel']].value,
+                        )
+                    count = count + 1
+            message_str = str(count) + " new superintendents added."
         else:
             message_str = "No File Uploaded."
 
