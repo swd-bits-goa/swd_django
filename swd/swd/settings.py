@@ -98,7 +98,7 @@ if PRODUCTION:
         )
 else:
     AUTHENTICATION_BACKENDS = (
-#	'main.auth_backend.LDAPAuthBackend',
+    	'main.auth_backend.LDAPAuthBackend',
         'django.contrib.auth.backends.ModelBackend',
     )
 
@@ -211,4 +211,4 @@ LOGIN_URL = '/login'
 
 # STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
-DATA_UPLOAD_MAX_NUMBER_FIELDS = 2000
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 5000

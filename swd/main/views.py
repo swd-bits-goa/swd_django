@@ -701,7 +701,7 @@ def wardenleaveapprove(request, leave):
         if config.EMAIL_PROD:
             email_to = [leave.student.email]
         else:
-            email_to = ["swdbitstest@gmail.com"]
+            email_to = ["spammailashad@gmail.com"]
         mail_subject="Leave Status - "
         mail_message=leave.student.name+",\n"
 
@@ -1389,51 +1389,6 @@ def studentDetails(request,id=None):
 
 @login_required
 def documents(request):
-
-    student = Student.objects.get(user=request.user)
-    leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
-    daypasss = DayPass.objects.filter(student=student, dateTime__gte=date.today() - timedelta(days=7))
-    bonafides = Bonafide.objects.filter(student=student, reqDate__gte=date.today() - timedelta(days=7))
-
-    #dues
-    try:
-        lasted = DuesPublished.objects.latest('date_published').date_published
-    except:
-        lasted = datetime(year=2004, month=1, day=1) # Before college was founded
-
-    otherdues = Due.objects.filter(student=student)
-    itemdues = ItemBuy.objects.filter(student=student,
-                                      created__gte=lasted)
-    teedues = TeeBuy.objects.filter(student=student,
-                                      created__gte=lasted)
-    total_amount = 0
-    for item in itemdues:
-        if item is not None:
-            total_amount += item.item.price
-    for tee in teedues:
-        if tee is not None:
-            total_amount += tee.totamt
-    for other in otherdues:
-        if other is not None:
-            total_amount += other.amount
-    balance = float(22000) - float(total_amount)
-    #mess
-    messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
-    messopen = messopen.exclude(dateOpen__gt=date.today())
-    if messopen:
-        messoption = MessOption.objects.filter(monthYear=messopen[0].monthYear, student=student)
-
-    if messopen and not messoption and datetime.today().date() < messopen[0].dateClose:
-        option = 0
-        mess = 0
-    elif messopen and messoption:
-        option = 1
-        mess = messoption[0]
-    else:
-        option = 2
-        mess = 0
-
-
     if request.user.is_authenticated:
         if is_warden(request.user):
             warden = Warden.objects.get(user=request.user)
@@ -1451,6 +1406,47 @@ def documents(request):
             }
         else:
             student = Student.objects.get(user=request.user)
+            leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
+            daypasss = DayPass.objects.filter(student=student, dateTime__gte=date.today() - timedelta(days=7))
+            bonafides = Bonafide.objects.filter(student=student, reqDate__gte=date.today() - timedelta(days=7))
+
+            #dues
+            try:
+                lasted = DuesPublished.objects.latest('date_published').date_published
+            except:
+                lasted = datetime(year=2004, month=1, day=1) # Before college was founded
+
+            otherdues = Due.objects.filter(student=student)
+            itemdues = ItemBuy.objects.filter(student=student,
+                                              created__gte=lasted)
+            teedues = TeeBuy.objects.filter(student=student,
+                                              created__gte=lasted)
+            total_amount = 0
+            for item in itemdues:
+                if item is not None:
+                    total_amount += item.item.price
+            for tee in teedues:
+                if tee is not None:
+                    total_amount += tee.totamt
+            for other in otherdues:
+                if other is not None:
+                    total_amount += other.amount
+            balance = float(22000) - float(total_amount)
+            #mess
+            messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
+            messopen = messopen.exclude(dateOpen__gt=date.today())
+            if messopen:
+                messoption = MessOption.objects.filter(monthYear=messopen[0].monthYear, student=student)
+
+            if messopen and not messoption and datetime.today().date() < messopen[0].dateClose:
+                option = 0
+                mess = 0
+            elif messopen and messoption:
+                option = 1
+                mess = messoption[0]
+            else:
+                option = 2
+                mess = 0
             context = {
                             'option1' : 'base.html',
                             'student' : student,
@@ -1651,12 +1647,12 @@ def import_dues_from_sheet(request):
                         continue
 
                     for i, category in enumerate(categories):
-                        amount = row[i+2].value
+                        amount = float(row[i+2].value)
                         Due.objects.create(student=student,
                                            amount=amount,
                                            due_category=category,
                                            description=category.name,
-                                           date_added=datetime.now())
+                                           date_added=datetime.now().date())
 
                     print (row)
 
@@ -1879,7 +1875,7 @@ def import_cgpa(request):
                             message_str)
     return render(request, "update_cgpa.html", {})
 
-
+@user_passes_test(lambda u: u.is_superuser)
 def add_new_students(request):
     """
         Takes Excel Sheet as FILE input.
@@ -1920,8 +1916,7 @@ def add_new_students(request):
                             col_no = col_no + 1
                         idx = 0
                         continue
-                    #for key, value in header.items():
-                    #    print(key, row[value].value)
+                    
                     # create User model first then Student model
                     emailID = row[header['INSTITUTE EMAIL ID']].value
                     username = emailID.split('@', 1)[0]
@@ -1946,7 +1941,7 @@ def add_new_students(request):
                     # These col values are expected to be in dd-Mon-yy format
                     # For Example: 07-Jan-97
                     dob = row[header['Stu_DOB']]
-                    #print(dob)
+                    
                     if dob.ctype == 1: # XL_CELL_TEXT
                         rev_bDay = datetime.strptime(dob.value, '%d/%m/%Y').strftime('%Y-%m-%d')
                         print(rev_bDay)
@@ -1956,11 +1951,11 @@ def add_new_students(request):
                     else:
                         rev_bDay = datetime.strptime('01Jan1985', '%d%b%Y')
                         print(rev_bDay)
-                    #print(dob.ctype)
+                    
                     do_admit = row[header['admit']]
                     print(do_admit)
                     if (do_admit.ctype == 1): # XL_CELL_TEXT
-                        #print("hello")
+                        
                         rev_admit = datetime.strptime(do_admit.value, '%d/%m/%Y').strftime('%Y-%m-%d')
                         print(rev_admit)
                     elif do_admit.ctype == 3: # XL_CELL_DATE
@@ -1969,9 +1964,6 @@ def add_new_students(request):
                     else:
                         rev_admit = datetime.strptime('01Jan1985', '%d%b%Y')
                         print(rev_admit)
-
-                    #print(rev_bDay)
-                    #print(rev_admit)
                     student = Student.objects.create(
                         user=user,
                         bitsId=str(row[header['studentID']].value)[:15],
@@ -1987,6 +1979,7 @@ def add_new_students(request):
                         parentPhone=str(row[header['parent mobno']].value)[:20],
                         parentEmail=str(row[header['parent mail']].value)[:50]
                         )
+                    print(row[header['studentID']].value)
                     count = count + 1
             message_str = str(count) + " new students added."
         else:
@@ -1996,5 +1989,142 @@ def add_new_students(request):
         messages.add_message(request,
                             message_tag, 
                             message_str)
-    return render(request, "add_students.html", {})
+    return render(request, "add_students.html", {'header': "Add Newly Admitted Students to Database"})
 
+@user_passes_test(lambda u: u.is_superuser)
+def add_wardens(request):
+    message_str = ''
+    message_tag = messages.INFO
+    if request.POST:
+        if request.FILES:
+            # Read Excel File into a temp file
+            xl_file = request.FILES['xl_file']
+            extension = xl_file.name.rsplit('.', 1)[1]
+            if ('xls' != extension):
+                if ('xlsx' != extension):
+                    messages.error(request, "Please upload .xls or .xlsx file only")
+                    messages.add_message(request,
+                                        message_tag, 
+                                        message_str)
+                    return render(request, "add_students.html", {'header': "Add new wardens"})
+
+            fd, tmp = tempfile.mkstemp()
+            with os.fdopen(fd, 'wb') as out:
+                out.write(xl_file.read())
+            workbook = xlrd.open_workbook(tmp)
+
+            count = 0
+            idx = 1
+            header = {}
+            for sheet in workbook.sheets():
+                for row in sheet.get_rows():
+                    if idx == 1:
+                        col_no = 0
+                        for cell in row:
+                            # Store the column names in dictionary
+                            header[str(cell.value)] = col_no
+                            col_no = col_no + 1
+                        idx = 0
+                        continue
+                    # create User model first then Student model
+                    emailID = row[header['Warden Email ID']].value
+                    username = emailID.split('@', 1)[0]
+                    password = User.objects.make_random_password()
+                    try:
+                        user = User.objects.get(username=username)
+                        user.delete()
+                    except User.DoesNotExist:
+                        pass
+                    user = User.objects.create_user(
+                        username=username,
+                        email=emailID,
+                        password=password)
+
+                    
+                    warden = Warden.objects.create(
+                        user=user,
+                        name=row[header['name']].value,
+                        phone=row[header['phone']].value,
+                        email=emailID,
+                        chamber=row[header['chamber']].value,
+                        residence=row[header['residence']].value,
+                        hostel=row[header['hostel']].value,
+                        )
+                    count = count + 1
+            message_str = str(count) + " new wardens added."
+        else:
+            message_str = "No File Uploaded."
+
+    if message_str is not '':
+        messages.add_message(request,
+                            message_tag, 
+                            message_str)
+    return render(request, "add_students.html", {'header': "Add new wardens"})
+
+@user_passes_test(lambda u: u.is_superuser)
+def add_superintendents(request):
+    message_str = ''
+    message_tag = messages.INFO
+    if request.POST:
+        if request.FILES:
+            # Read Excel File into a temp file
+            xl_file = request.FILES['xl_file']
+            extension = xl_file.name.rsplit('.', 1)[1]
+            if ('xls' != extension):
+                if ('xlsx' != extension):
+                    messages.error(request, "Please upload .xls or .xlsx file only")
+                    messages.add_message(request,
+                                        message_tag, 
+                                        message_str)
+                    return render(request, "add_students.html", {'header': "Add new superintendent"})
+
+            fd, tmp = tempfile.mkstemp()
+            with os.fdopen(fd, 'wb') as out:
+                out.write(xl_file.read())
+            workbook = xlrd.open_workbook(tmp)
+
+            count = 0
+            idx = 1
+            header = {}
+            for sheet in workbook.sheets():
+                for row in sheet.get_rows():
+                    if idx == 1:
+                        col_no = 0
+                        for cell in row:
+                            # Store the column names in dictionary
+                            header[str(cell.value)] = col_no
+                            col_no = col_no + 1
+                        idx = 0
+                        continue
+                    # create User model first then Student model
+                    emailID = row[header['Superintendent Email ID']].value
+                    username = emailID.split('@', 1)[0]
+                    
+                    password = User.objects.make_random_password()
+                    try:
+                        user = User.objects.get(username=username)
+                        user.delete()
+                    except User.DoesNotExist:
+                        pass
+                    user = User.objects.create_user(
+                        username=username,
+                        email=emailID,
+                        password=password)
+
+                    
+                    si = HostelSuperintendent.objects.create(
+                        user=user,
+                        name=row[header['name']].value,
+                        email=emailID,
+                        hostel=row[header['hostel']].value,
+                        )
+                    count = count + 1
+            message_str = str(count) + " new superintendents added."
+        else:
+            message_str = "No File Uploaded."
+
+    if message_str is not '':
+        messages.add_message(request,
+                            message_tag, 
+                            message_str)
+    return render(request, "add_students.html", {'header': "Add new wardens"})
