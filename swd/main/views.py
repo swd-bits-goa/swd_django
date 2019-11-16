@@ -2027,7 +2027,7 @@ def add_wardens(request):
                         idx = 0
                         continue
                     # create User model first then Student model
-                    emailID = row[header['Warden Email ID']].value
+                    emailID = row[header['Email:@goa.bits-pilani.ac.in']].value + "@goa.bits-pilani.ac.in"
                     username = emailID.split('@', 1)[0]
                     password = User.objects.make_random_password()
                     try:
@@ -2043,12 +2043,11 @@ def add_wardens(request):
                     
                     warden = Warden.objects.create(
                         user=user,
-                        name=row[header['name']].value,
-                        phone=row[header['phone']].value,
+                        name=row[header['Name']].value,
+                        phone=row[header['Tel:(Off.)']].value,
                         email=emailID,
-                        chamber=row[header['chamber']].value,
-                        residence=row[header['residence']].value,
-                        hostel=row[header['hostel']].value,
+                        chamber=row[header['Chamber No.']].value,
+                        hostel=row[header['Function']].value,
                         )
                     count = count + 1
             message_str = str(count) + " new wardens added."
