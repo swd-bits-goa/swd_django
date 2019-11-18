@@ -79,7 +79,7 @@ HOSTELS = (
 class Warden(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=50, null=True, blank=True)
-    chamber = models.CharField(max_length=10, null=True, blank=True)
+    chamber = models.CharField(max_length=15, null=True, blank=True)
     residence = models.CharField(max_length=10, null=True, blank=True)
     phone = models.CharField(max_length=15, null=True, blank=True)
     email = models.EmailField(null=True, blank=True)
@@ -413,8 +413,7 @@ class Notice(models.Model):
 
 class Document(models.Model):
     title = models.CharField(max_length=100)
-    link = models.CharField(max_length=100)
-
+    file = models.ForeignKey(FileAdd, on_delete=models.CASCADE)
     def __str__(self):
         return self.title    
 class AntiRagging(models.Model):

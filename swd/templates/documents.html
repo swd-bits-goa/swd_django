@@ -4,7 +4,7 @@
 <div class="container">
     <div class="section" style="margin-top:20px;">
     	{% for document in queryset %}
-        <div class="center"><a class="waves-effect waves-light btn desert-yellow" href="{{ document.link }}">{{ document.title }}</a></div><br>
+        <div class="center"><a class="waves-effect waves-light btn desert-yellow" href="{{ document.file.link }}">{{ document.title }}</a></div><br>
     	{% endfor %}
         
     </div>
