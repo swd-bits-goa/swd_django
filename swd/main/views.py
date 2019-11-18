@@ -481,8 +481,21 @@ def leave(request):
                 email_to=["spammailashad@gmail.com"]                                                                     # For testing
             mailObj=Leave.objects.latest('id')
             mail_subject="New Leave ID: "+ str(mailObj.id)
+            if mailObj.student.parentEmail is None:
+                parentEmail = "No parent mail found"
+            else:
+                parentEmail = mailObj.student.parentEmail
+            if mailObj.student.parentName is None:
+                parentName = "Parent name is null"
+            else:
+                parentName = mailObj.student.parentName
+            if mailObj.student.parentPhone is None:
+                parentPhone = "No parent phone"
+            else:
+                parentPhone = mailObj.student.parentPhone
+                
             mail_message="Leave Application applied by "+ mailObj.student.name +" with leave id: " + str(mailObj.id) + ".\n"
-            mail_message=mail_message + "Parent name: " + mailObj.student.parentName + "\nParent Email: "+ mailObj.student.parentEmail + "\nParent Phone: " + mailObj.student.parentPhone
+            mail_message=mail_message + "Parent name: " + parentName + "\nParent Email: "+ parentEmail + "\nParent Phone: " + parentPhone
             mail_message=mail_message + "\nConsent type: " + mailObj.consent
             send_mail(mail_subject,mail_message,settings.EMAIL_HOST_USER,email_to,fail_silently=False)
 
