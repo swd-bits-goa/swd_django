@@ -5,6 +5,20 @@
 
   <div class="row">
     <div class="col s12 m12">
+            {% if not student_filled_vac %}
+        			<p>
+              <div class="card" style="padding:16px;">
+                <a href="{% url 'vacation_details_fill' %}">
+                  <div class="card-title">{{ vacation.description }} Details Can Be Filled Now</div>
+                </a>
+                <div class="card-content" style="padding: 0;">
+                <span class="red-text">
+                Make sure you fill before {{ vacation.dateClose }}.
+                </span>
+                </div>
+              </div>
+              {% endif %}
+
         			{% for notice in queryset %}
         			<p>
               <div class="card" style="padding:16px;">

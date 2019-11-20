@@ -129,7 +129,6 @@ class Student(models.Model):
     parentEmail = models.CharField(max_length=50, blank=True, null=True)
 
     def nophd(self):
-        print("called")
         return re.match(r"^20\d{2}PHX[PF]\d{3,4}G$", self.bitsId, flags=re.IGNORECASE)
 
     def __str__(self):
@@ -460,7 +459,7 @@ class VacationDatesFill(models.Model):
         else:
             return False
 
-    def create_vacation(self, student, data):
+    def create_vacation(self, student, dateTimeStart, dateTimeEnd):
         """
         Create Leave Objects for the Vacation
 
@@ -474,8 +473,8 @@ class VacationDatesFill(models.Model):
         """
         try:
             leave = Leave(student=student, reason=self.description)
-            leave.dateTimeStart = data['dateTimeStart']
-            leave.dateTimeEnd = data['dateTimeEnd']
+            leave.dateTimeStart = dateTimeStart
+            leave.dateTimeEnd = dateTimeEnd
             leave.approved = True
             leave.disapproved = False
             leave.inprocess = False
@@ -484,5 +483,36 @@ class VacationDatesFill(models.Model):
             return True, leave
         except Exception as e:
             return False, str(e)
-        
-        
+    
+    def check_date_in_range(self, date):
+        """
+        Checks whether the date is between allowDateAfter and allowDateBefore
+
+        params:
+        date: datetime object
+        """
+        if date <= self.allowDateBefore and date >= self.allowDateAfter:
+            return True
+        else:
+            return False
+    
+    def check_start_end_dates_in_range(self, dateTimeStart, dateTimeEnd):
+        """
+        Checks whether both start and end date time objects are in range
+            and start date less than end date
+
+        params:
+        dateTimeStart, dateTimeEnd: datetime object
+        """
+        first_cond = self.check_date_in_range(dateTimeStart) and \
+            self.check_date_in_range(dateTimeEnd)
+        return first_cond and dateTimeStart < dateTimeEnd
+
+    def check_student_filled_details(self, student):
+        """
+        Checks whether the student has already filled the details and
+            leave object is present in database.
+        """
+        objs = Leave.objects.filter(
+            student=student, reason=self.description, comment="Vacation")
+        return objs.count() > 0

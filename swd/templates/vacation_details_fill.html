@@ -12,23 +12,33 @@
                     <p class="light-blue-text">
                         Make sure your vacation dates are between {{ vacation.allowDateAfter }} and {{ vacation.allowDateBefore }}
                     </p>
+                        <br>
+                    <p>
+                    <ul class="red-text">
+                        {% for error in errors %}
+                        <li> {{ error }} </li>
+                        {% endfor %}
+                    </ul>
+                    </p>
                     <p>
                         <form method="POST">
                             {% csrf_token %}
                             <fieldset>
                             <label>Departure Date</label>
-                            <input type="text" class="datepicker">
+                            <input type="text" class="datepicker" name="dateStart">
                             <label>Time</label>
-                            <input type="text" class="timepicker">
+                            <input type="text" class="timepicker" name="timeStart">
                             </fieldset>
                             <fieldset>
                             <label>Arrival Date</label>
-                            <input type="text" class="datepicker">
+                            <input type="text" class="datepicker" name="dateEnd">
                             <label>Time</label>
-                            <input type="text" class="timepicker">
+                            <input type="text" class="timepicker" name="timeEnd">
                             </fieldset>
+                            <button class="btn btn-block bg-green waves-effect" type="submit">SUBMIT</button>
                         </form>
                     </p>
+                    
                     </div>
                 </div>
             </div>
@@ -38,14 +48,4 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<script>
-    var options = {
-        //minDate: ,
-        //maxDate: ,
-        format: 'dd mmmm, yyyy'
-    };
-    $('.datepicker').datepicker();
-    $('.datepicker').pickadate(options);
-
-</script>
 {% endblock extra_scripts %}
