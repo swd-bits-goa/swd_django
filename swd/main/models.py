@@ -423,3 +423,66 @@ class AntiRagging(models.Model):
     def __str__(self):
         return self.title  
 
+
+class VacationDatesFill(models.Model):
+    """
+    Opens option for Students to fill vacation details.
+    Creates Leave objects that do not require Warden approval.
+    """
+    description = models.CharField(max_length=50)
+    dateOpen = models.DateField(
+        help_text="Students can start filling details from this date")
+    dateClose = models.DateField(
+        help_text="Students can fill details only before this date (inclusive)")
+    allowDateAfter = models.DateTimeField(
+        help_text="Allowed Vacation Dates start from this date")
+    allowDateBefore = models.DateTimeField(
+        help_text="Allowed Vacation Dates end before this (inclusive)")
+
+    class Meta:
+        verbose_name = "Vacation Dates Option"
+        verbose_name_plural = "Vacation Dates Option"
+
+    def __str__(self):
+        return str(self.description) + ' Open: ' + str(self.dateOpen) + ' Close: ' + str(self.dateClose)
+
+    def check_student_valid(self, student):
+        """
+        Checks whether the student has already filled vacation details.
+        """
+        leaves_count = Leave.objects.filter(
+            student=student,
+            dateTimeStart__gte=self.allowDateAfter,
+            dateTimeEnd__lte=self.allowDateBefore
+            ).count()
+        if leaves_count == 0:
+            return True
+        else:
+            return False
+
+    def create_vacation(self, student, data):
+        """
+        Create Leave Objects for the Vacation
+
+        param:
+        student : Student Object
+        data : python dictionary
+        
+        returns:
+        True, obj :  when object created
+        False, error: when no object created, error is a str
+        """
+        try:
+            leave = Leave(student=student, reason=self.description)
+            leave.dateTimeStart = data['dateTimeStart']
+            leave.dateTimeEnd = data['dateTimeEnd']
+            leave.approved = True
+            leave.disapproved = False
+            leave.inprocess = False
+            leave.comment = "Vacation"
+            leave.save()
+            return True, leave
+        except Exception as e:
+            return False, str(e)
+        
+        

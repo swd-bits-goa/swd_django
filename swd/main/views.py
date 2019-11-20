@@ -2297,3 +2297,19 @@ def update_parent_contact(request):
                             message_str)
     return render(request, "add_students.html", {'header': "Update Contact"})
 
+
+@login_required
+def vacation_details_fill(request):
+    student = Student.objects.get(user=request.user)
+    vacation_open = VacationDatesFill.objects.filter(dateClose__gte=date.today())
+    if vacation_open:
+        vacation_open = vacation_open[0]
+        student_can_fill = vacation_open.check_student_valid(student)
+        if student_can_fill:
+            return render(request, "vacation_details_fill.html", {
+                "vacation": vacation_open
+            })
+
+    return render(request, "vacation_details_fill.html", {
+        "vacation": vacation_open
+    })
