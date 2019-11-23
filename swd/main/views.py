@@ -243,15 +243,33 @@ def profile(request):
             'balance': balance,
             'hostelps':hostelps,
         }
+
         if request.POST:
             address = request.POST.get('address')
-            #print(address)
-            student.address = address
-            student.save()
+
+            addr_request = AddressChangeRequest(student=student, new_address=address)
+            addr_request.save()
+
             return HttpResponse("{ status: 'ok' }")
 
     return render(request, "profile.html", context)
 
+
+@user_passes_test(lambda a: a.is_superuser)
+def address_approval_dashboard(request):
+    if request.POST:
+        approve = AddressChangeRequest.objects.get(id=request.POST["request_id"])
+
+        if request.POST["approved"] == "false":
+            approve.reject()
+        else:
+            approve.approve()
+
+    address_reqs = AddressChangeRequest.objects.filter(resolved=False)
+
+    return render(request, "address_dashboard.html", {
+        "requests": address_reqs
+    })
 
 
 @csrf_protect

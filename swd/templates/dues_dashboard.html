@@ -21,13 +21,5 @@
 		</form>
 
 		<br />
-
-		<h4>Publish Dues from database</h4>
-		<form action="{% url 'publish_dues' %}" method="POST">
-			{% csrf_token %}
-			<button type="submit" class="btn waves-effect waves-light">
-				Publish Dues (cannot be undone)
-			</button>
-		</form>
 	</div>
 {% endblock %}

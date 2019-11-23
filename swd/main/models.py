@@ -522,3 +522,25 @@ class VacationDatesFill(models.Model):
         objs = Leave.objects.filter(
             student=student, reason=self.description, comment="Vacation")
         return objs.count() > 0
+
+
+class AddressChangeRequest(models.Model):
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    new_address = models.TextField()
+    approved = models.BooleanField(default=False)
+    resolved = models.BooleanField(default=False)
+
+    def approve(self):
+        self.student.address = self.new_address
+        self.approved = True
+        self.resolved = True
+        self.student.save()
+        self.save()
+
+    def reject(self):
+        import pdb; pdb.set_trace()
+        self.approved = False
+        self.resolved = True
+        self.student.save()
+        self.save()
+
