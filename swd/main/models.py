@@ -430,13 +430,18 @@ class VacationDatesFill(models.Model):
     """
     description = models.CharField(max_length=50)
     dateOpen = models.DateField(
-        help_text="Students can start filling details from this date")
+        help_text="Students can start filling details from this date (inclusive)")
     dateClose = models.DateField(
         help_text="Students can fill details only before this date (inclusive)")
     allowDateAfter = models.DateTimeField(
-        help_text="Allowed Vacation Dates start from this date")
+        help_text="Allowed Vacation Dates start from this date (inclusive)")
     allowDateBefore = models.DateTimeField(
         help_text="Allowed Vacation Dates end before this (inclusive)")
+    messOption = models.ForeignKey(
+        MessOptionOpen,
+        on_delete=models.CASCADE,
+        default=None,
+        help_text="Mess Option for the months near corresponding Vacation")
 
     class Meta:
         verbose_name = "Vacation Dates Option"
@@ -491,7 +496,8 @@ class VacationDatesFill(models.Model):
         params:
         date: datetime object
         """
-        if date <= self.allowDateBefore and date >= self.allowDateAfter:
+        if date.date() <= self.allowDateBefore.date() \
+            and date.date() >= self.allowDateAfter.date():
             return True
         else:
             return False

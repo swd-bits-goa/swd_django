@@ -10,7 +10,7 @@ from django.contrib import messages
 from django.utils.timezone import make_aware
 from django.core.mail import send_mail
 from django.conf import settings
-
+from tools.utils import gen_random_datetime
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 import xlrd, xlwt
@@ -96,14 +96,6 @@ def dashboard(request):
     tees = TeeAdd.objects.filter(available=True)
     items = ItemAdd.objects.filter(available=True)
     teesj = TeeAdd.objects.filter(available=True).values_list('title')
-    vacation_details = VacationDatesFill.objects.filter(
-        dateOpen__lte=date.today(), dateClose__gte=date.today())
-    vacation_open = (vacation_details.count() > 0)
-    student_filled = 0
-    vacation = None
-    if vacation_open:
-        vacation = vacation_details[0]
-        student_filled = vacation.check_student_filled_details(student)
     notice_list = Notice.objects.all().order_by('-id')
     page = request.GET.get('page', 1)
     paginator = Paginator(notice_list, 10)
@@ -175,9 +167,7 @@ def dashboard(request):
             'queryset' : notices,
             'student': student,
             'tees': tees,
-            'items': items,
-            'student_filled_vac': student_filled,
-            'vacation': vacation
+            'items': items
             }
 
     return render(request, "dashboard.html", context)
@@ -312,17 +302,10 @@ def messoption(request):
     messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
     messopen = messopen.exclude(dateOpen__gt=date.today())
 
-
     if messopen:
         messoption = MessOption.objects.filter(monthYear=messopen[0].monthYear, student=student)
 
-    context = {
-        'student': student,
-        'leaves': leaves,
-        'bonafides': bonafides,
-        'daypasss': daypasss,
-    }
-#dues
+    # dues
     try:
         lasted = DuesPublished.objects.latest('date_published').date_published
     except:
@@ -379,14 +362,58 @@ def messoption(request):
             'bonafides': bonafides,
             'daypasss': daypasss,
             }
+    
+    vacations = VacationDatesFill.objects.filter(
+        dateClose__gte=date.today(), dateOpen__lte=date.today())
+    errors = []
+    if vacations:
+        vacation_open = vacations[0]
+        student_vacation = Leave.objects.filter(
+            student=student,
+            reason=vacation_open.description)
+        if student_vacation:
+            student_vacation = student_vacation[0]
+        context['vacation'] = vacation_open
+        context['student_vacation'] = student_vacation
 
     if request.POST:
-        mess = request.POST.get('mess')
-        if edit: messoption.delete()
-        messoptionfill = MessOption(student=student, monthYear=messopen[0].monthYear, mess=mess)
-        messoptionfill.save()
-        return redirect('messoption')
+        # Vacation Details Filling when availaible
+        created = False
+        if vacations:
+            dateStart = datetime.strptime(request.POST.get('dateStart'), '%d %B, %Y').date()
+            timeStart = gen_random_datetime().time()
+            dateTimeStart = make_aware(datetime.combine(dateStart, timeStart))
+            dateEnd = datetime.strptime(request.POST.get('dateEnd'), '%d %B, %Y').date()
+            timeEnd = gen_random_datetime().time()
+            dateTimeEnd = make_aware(datetime.combine(dateEnd, timeEnd))
+            
+            if not vacation_open.check_date_in_range(dateTimeEnd):
+                errors.append("End Date Time should be within specified range.")
+            if not vacation_open.check_date_in_range(dateTimeStart):
+                errors.append("Start Date Time should be within specified range.")
+            if vacation_open.check_start_end_dates_in_range(dateTimeStart, dateTimeEnd):
+                if edit:
+                    student_vacation.delete()
+                created, obj = vacation_open.create_vacation(
+                    student, dateTimeStart, dateTimeEnd)
+                if not created:
+                    errors.append(obj)
+            context['errors'] = errors
 
+        if (vacations.count() and len(errors) == 0) or (vacations.count() == 0) or (edit):
+            print("Inside Mess Filling")
+            # Mess Option Filling
+            mess = request.POST.get('mess')
+            if edit:
+                messoption.delete()
+            messoptionfill = MessOption(
+                student=student,
+                monthYear=messopen[0].monthYear,
+                mess=mess)
+            messoptionfill.save()
+
+        if created or (vacations.count() == 0):
+            return redirect('messoption')
 
     return render(request, "mess.html", context)
 
@@ -2292,48 +2319,3 @@ def update_parent_contact(request):
                             message_tag, 
                             message_str)
     return render(request, "add_students.html", {'header': "Update Contact"})
-
-
-@login_required
-def vacation_details_fill(request):
-    student = Student.objects.get(user=request.user)
-    vacations = VacationDatesFill.objects.filter(dateClose__gte=date.today())
-
-    errors = []
-    
-    if vacations:
-        vacation_open = vacations[0]
-        student_can_fill = vacation_open.check_student_valid(student)
-    if not student_can_fill:
-        messages.add_message(
-            request,
-            messages.INFO,
-            "You have already entered the Vacation details. Thank You",
-            extra_tags='red')
-        return redirect('dashboard')
-    if request.POST:
-        dateStart = datetime.strptime(request.POST.get('dateStart'), '%d %B, %Y').date()
-        timeStart = datetime.strptime(request.POST.get('timeStart'), '%H:%M').time()
-        dateTimeStart = make_aware(datetime.combine(dateStart, timeStart))
-        dateEnd = datetime.strptime(request.POST.get('dateEnd'), '%d %B, %Y').date()
-        timeEnd = datetime.strptime(request.POST.get('timeEnd'), '%H:%M').time()
-        dateTimeEnd = make_aware(datetime.combine(dateEnd, timeEnd))
-        
-        if not vacation_open.check_date_in_range(dateTimeEnd):
-            errors.append("End Date Time should be within specified range.")
-        if not vacation_open.check_date_in_range(dateTimeStart):
-            errors.append("Start Date Time should be within specified range.")
-
-        if vacation_open.check_start_end_dates_in_range(dateTimeEnd, dateTimeStart):
-            created, obj = vacation_open.create_vacation(
-                student, dateTimeStart, dateTimeEnd)
-            if created:
-                return redirect('dashboard')
-            else:
-                errors.append(obj)
-
-    return render(request, "vacation_details_fill.html", {
-        "vacation": vacation_open,
-        "errors": errors,
-        "student_can_fill": student_can_fill
-    })
