@@ -9,10 +9,24 @@
             <div class="col s12 l12">
                 <div class="card">
                     <div class="card-content">
-                        <span class="card-title">Mess Option</span>
+                        <span class="card-title">
+                            Mess Option for
+                            {% if vacation %}
+                                {{ vacation.description }}
+                            {% else %}
+                                {{ mess.monthYear|date:'M Y' }}
+                            {% endif %}
+                        </span>
                          {% if option == 0 %}
                         <form method="POST">
                             {% csrf_token %}
+                            <div class="col-md-12">
+                                <ul class="red-text">
+                                    {% for error in errors %}
+                                    <li> {{ error }} </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
                             <div class="col-md-12">
                                 <p>Final date for filling is: {{ dateClose }}</p>
                                  {% for field in form %}
@@ -21,13 +35,42 @@
                                         {{ field.label_tag }}
                                     </div>
                                 {% endfor %}
-                                
                             </div>
+
+                            {% if vacation %}
+                            <p class="light-blue-text">
+                                Make sure your vacation dates are between 
+                                {{ vacation.allowDateAfter }} and {{ vacation.allowDateBefore }}
+                            </p>
+                            <div class="input-field col s12">
+                                <label>Departure Date</label>
+                                <input type="text" class="datepicker" name="dateStart">
+                            </div>
+                            <div class="input-field col s12">
+                            <label>Arrival Date</label>
+                            <input type="text" class="datepicker" name="dateEnd">
+                            </div>
+                            {% endif %}
+
                             <div class="col-xs-4">
                                 <button class="btn btn-block bg-green waves-effect" type="submit">SUBMIT</button>
                             </div>
+
                         </form>
-                        {% elif option == 1 %} You have filled this periods mess as <b> Dining Hall {{mess.mess}} for {{mess.monthYear|date:'M Y'}}</b><a href="/messoption?edit=1" style="float: right"><button class="waves-effect waves-light btn desert-yellow" id="loginbtn"><span class="deep-green">Edit</span></button></a>
+                        {% elif option == 1 %}
+                            You have filled this periods mess as <b> Dining Hall {{mess.mess}}</b> for 
+                            <b>
+                            {% if vacation %}
+                                {{ vacation.description }}
+                            {% else %}
+                                {{mess.monthYear|date:'M Y'}}
+                            {% endif %}
+                            </b>
+                            <a href="/messoption?edit=1" style="float: right">
+                                <button class="waves-effect waves-light btn desert-yellow" id="loginbtn">
+                                    <span class="deep-green">Edit</span>
+                                </button>
+                            </a>
                         {% else %}
                         <p>Sorry, the period for filling the mess options are over. Your mess will be alloted randomly</p>
                         {% endif %}
