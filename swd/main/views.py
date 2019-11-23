@@ -1649,7 +1649,6 @@ def retrieve_or_create_due_category(name, desc=""):
 def import_dues_from_sheet(request):
     if request.POST:
         if request.FILES:
-            print ('files')
             xlfile_uploaded = request.FILES['dues_sheet']
             extension = xlfile_uploaded.name.rsplit('.', 1)[1]
             if ('xls' != extension):
@@ -1682,15 +1681,30 @@ def import_dues_from_sheet(request):
                                 "Student " + str(row[1].value) + " was not found in the database! SKIPPING HIS DUE ROW!")
                         continue
 
-                    for i, category in enumerate(categories):
-                        amount = float(row[i+2].value)
-                        Due.objects.create(student=student,
-                                           amount=amount,
-                                           due_category=category,
-                                           description=category.name,
-                                           date_added=datetime.now().date())
+                    for i, category in enumerate(categories, start=2):
+                        amount = float(row[i].value)
 
-                    print (row)
+                        # Don't add the due if it's zero
+                        if amount == 0: continue
+
+                        # Check if the due already exists with same student
+                        #   and same category, then overwrite that due object
+                        #   instead of making new ones.
+
+                        try:
+                            # If there is a due with the same category name (i.e October Mess Bill '19, etc)
+                            # we just overwrite it.
+                            due = Due.objects.get(student=student,
+                                                 due_category=category,
+                                                 description=category.name)
+                            due.amount = amount
+                            due.save()
+                        except Due.DoesNotExist as e:
+                            Due.objects.create(student=student,
+                                               amount=amount,
+                                               due_category=category,
+                                               description=category.name,
+                                               date_added=datetime.now().date())
 
             os.remove(tmp)
 
