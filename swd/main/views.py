@@ -1388,7 +1388,10 @@ def search(request):
             'students' : students,
             'searchstr' : searchstr
         }
-    return render(request, "search.html", dict(context, **postContext))
+    if request.user.is_authenticated:
+        return render(request, "search_logged_in.html", dict(context, **postContext))
+    else:
+        return render(request, "search.html", dict(context, **postContext))
 
 def notice(request):
     context = {
@@ -2398,7 +2401,7 @@ def upload_latecomer(request):
                             datetime = datetime
                             )
                     except Student.DoesNotExist:
-                        message_str + "ID number: " + row[header['studentID']].value+ " does not exist"
+                        message_str + "ID number: " + row[header['studentID']].value+ " does not exist\n"
                     count = count + 1
             message_str = str(count) + " Latecomers added"
         else:
@@ -2457,6 +2460,8 @@ def upload_disco(request):
                             action = str(row[header['action']].value),
                             date = date
                             )
+                    except Student.DoesNotExist:
+                        message_str + "ID number: " + row[header['studentID']].value+ " does not exist\n"
                     count = count + 1
             message_str = str(count) + " Discos added"
         else:

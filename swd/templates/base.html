@@ -83,7 +83,7 @@
                 }
             </style>
         </div>
-        <div class="nav-content desktop" style="margin-bottom:5px;">
+        <div class="nav-content desktop" style="margin-bottom:10px;">
             <ul class="tabs tabs-transparent">
                 {% load main_extras %}
                 <li class="tab"><a href="/dashboard" class="{% active_page request 'dashboard' %}" target="_self">Dashboard</a></li>
@@ -94,6 +94,7 @@
                 <li class="tab"><a href="/store" class="{% active_page request 'store' %}" target="_self">Store</a></li>
                 <li class="tab"><a href="/dues" class="{% active_page request 'dues' %}" target="_self">Dues</a></li>
                 <li class="tab"><a href="/documents" class="{% active_page request 'documents' %}" target="_self">Documents</a></li>
+                <li class="tab"><a href="/search" class="{% active_page request 'search' %}" target="_self">Search</a></li>
             </ul>
         </div>
     </nav>
@@ -155,11 +156,6 @@
         </div>
 
     </div>
-
-
-    <footer class="page-footer back-green desktop" style="z-index:2">
-                    <p class="grey-text center">Student Welfare Division | <a href="/developers">Developers</a></p>
-    </footer>
     <!--  Scripts-->
 
     <script>
