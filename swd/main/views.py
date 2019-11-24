@@ -2351,3 +2351,119 @@ def update_parent_contact(request):
                             message_tag, 
                             message_str)
     return render(request, "add_students.html", {'header': "Update Contact"})
+
+def upload_latecomer(request):
+    message_str = ''
+    message_tag = messages.INFO
+    if request.POST:
+        if request.FILES:
+            # Read Excel File into a temp file
+            xl_file = request.FILES['xl_file']
+            extension = xl_file.name.rsplit('.', 1)[1]
+            if ('xls' != extension):
+                if ('xlsx' != extension):
+                    messages.error(request, "Please upload .xls or .xlsx file only")
+                    messages.add_message(request,
+                                        message_tag, 
+                                        message_str)
+                    return render(request, "add_students.html", {'header': "Update Parent Contact"})
+
+            fd, tmp = tempfile.mkstemp()
+            with os.fdopen(fd, 'wb') as out:
+                out.write(xl_file.read())
+            workbook = xlrd.open_workbook(tmp)
+
+            count = 0
+            idx = 1
+            header = {}
+            for sheet in workbook.sheets():
+                for row in sheet.get_rows():
+                    if idx == 1:
+                        col_no = 0
+                        for cell in row:
+                            # Store the column names in dictionary
+                            header[str(cell.value)] = col_no
+                            col_no = col_no + 1
+                        idx = 0
+                        continue
+                    # create User model first then Student model
+
+                    try:
+                        s = Student.objects.filter(bitsId=row[header['studentID']].value)
+                        date = datetime.strptime(row[header['date']].value, '%d/%m/%Y').strftime('%Y-%m-%d')
+                        time = datetime.strptime(row[header['time']].value, '%H:%M')
+                        datetime = datetime.combine(date, time)
+                        LateComer.objects.create(
+                            student = s,
+                            datetime = datetime
+                            )
+                    except Student.DoesNotExist:
+                        message_str + "ID number: " + row[header['studentID']].value+ " does not exist"
+                    count = count + 1
+            message_str = str(count) + " Latecomers added"
+        else:
+            message_str = "No File Uploaded."
+
+    if message_str is not '':
+        messages.add_message(request,
+                            message_tag, 
+                            message_str)
+    return render(request, "add_students.html", {'header': "Upload latecomers"})
+
+def upload_disco(request):
+    message_str = ''
+    message_tag = messages.INFO
+    if request.POST:
+        if request.FILES:
+            # Read Excel File into a temp file
+            xl_file = request.FILES['xl_file']
+            extension = xl_file.name.rsplit('.', 1)[1]
+            if ('xls' != extension):
+                if ('xlsx' != extension):
+                    messages.error(request, "Please upload .xls or .xlsx file only")
+                    messages.add_message(request,
+                                        message_tag, 
+                                        message_str)
+                    return render(request, "add_students.html", {'header': "Add new superintendent"})
+
+            fd, tmp = tempfile.mkstemp()
+            with os.fdopen(fd, 'wb') as out:
+                out.write(xl_file.read())
+            workbook = xlrd.open_workbook(tmp)
+
+            count = 0
+            idx = 1
+            header = {}
+            for sheet in workbook.sheets():
+                for row in sheet.get_rows():
+                    if idx == 1:
+                        col_no = 0
+                        for cell in row:
+                            # Store the column names in dictionary
+                            header[str(cell.value)] = col_no
+                            col_no = col_no + 1
+                        idx = 0
+                        continue
+                    # create User model first then Student model
+                    try:
+                        s = Student.objects.filter(bitsId = row[header['studentID']].value)
+                        dateOfViolation = datetime.strptime(row[header['Date of violation']].value, '%d/%m/%Y').strftime('%Y-%m-%d')
+                        date = datetime.strptime(row[header['Date']].value, '%d/%m/%Y').strftime('%Y-%m-%d')
+
+                        disco = Disco.objects.create(
+                            student = s,
+                            dateOfViolation = dateOfViolation,
+                            subject = str(row[header['studentID']].value),
+                            action = str(row[header['action']].value),
+                            date = date
+                            )
+                    count = count + 1
+            message_str = str(count) + " Discos added"
+        else:
+            message_str = "No File Uploaded."
+
+    if message_str is not '':
+        messages.add_message(request,
+                            message_tag, 
+                            message_str)
+    return render(request, "add_students.html", {'header': "Upload disco"})

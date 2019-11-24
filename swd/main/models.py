@@ -538,7 +538,6 @@ class AddressChangeRequest(models.Model):
         self.save()
 
     def reject(self):
-        import pdb; pdb.set_trace()
         self.approved = False
         self.resolved = True
         self.student.save()
