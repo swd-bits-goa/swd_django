@@ -18,6 +18,7 @@
                     </div>
                 </li>
             {% endfor %}
+
             {% for item in itemdues %}
                 <li class="collection-item"><div>{{ item.item.title }}<a href="#!" class="secondary-content">Rs. {{ item.item.price|floatformat:2  }}</a></div></li>
             {% endfor %}

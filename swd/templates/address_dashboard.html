@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block content %}
+	<div class="container">
+		{% if messages %}
+			<ul class="collection">
+				{% for message in messages %}
+					<li class="collection-item">{{ message }}</li>
+				{% endfor %}
+			</ul>
+		{% endif %}
+
+		<h4>Address Change Requests</h4>
+
+        {% for request in requests %}
+            <table class="responsive-table">
+                <tr>
+                    <td>
+                        Name: {{ request.student.name }} <br />
+                        Old address <br />
+                        {{ request.student.address }}
+                        New address <br />
+                        {{ request.new_address }}
+
+                        <br />
+                    </td>
+
+                    <td width=100px>
+                        <form action="/address_dashboard/" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="request_id" value="{{ request.id }}" />
+                            <input type="hidden" name="approved" value="true" />
+                            <button type="submit" class="btn waves-effect">
+                                Approve
+                            </button>
+                        </form>
+                    </td>
+
+                    <td width=100px>
+                        <form action="/address_dashboard/" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="request_id" value="{{ request.id }}" />
+                            <input type="hidden" name="approved" value="false" />
+                            <button type="submit" class="btn waves-effect">
+                                Reject
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            </table>
+
+            <hr />
+        {% endfor %}
+
+		<br />
+	</div>
+{% endblock %}
