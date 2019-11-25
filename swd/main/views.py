@@ -1388,7 +1388,7 @@ def search(request):
             'students' : students,
             'searchstr' : searchstr
         }
-    if request.user.is_authenticated:
+    if request.user.is_authenticated and not is_warden(request.user):
         return render(request, "search_logged_in.html", dict(context, **postContext))
     else:
         return render(request, "search.html", dict(context, **postContext))
@@ -2338,11 +2338,12 @@ def update_parent_contact(request):
                         idx = 0
                         continue
                     # create User model first then Student model
-                    
-                    Student.objects.filter(
-                        bitsId=row[header['studentID']].value
-                        ).update(parentPhone=str(row[header['Parent Phone']].value)[:15])
-
+                    try:
+                        Student.objects.filter(
+                            bitsId=row[header['studentID']].value
+                            ).update(parentPhone=str(row[header['Parent Phone']].value)[:15])
+                    except Exception:
+                        message_str + "Error in student: " + str(row[header['studentID']].value) + "\n"
                     
                     count = count + 1
             message_str = str(count) + " Updated students' contact"
@@ -2472,3 +2473,107 @@ def upload_disco(request):
                             message_tag, 
                             message_str)
     return render(request, "add_students.html", {'header': "Upload disco"})
+
+@user_passes_test(lambda u: u.is_superuser)
+def update_ids(request):
+    message_str = ''
+    message_tag = messages.INFO
+    if request.POST:
+        if request.FILES:
+            # Read Excel File into a temp file
+            xl_file = request.FILES['xl_file']
+            extension = xl_file.name.rsplit('.', 1)[1]
+            if ('xls' != extension):
+                if ('xlsx' != extension):
+                    messages.error(request, "Please upload .xls or .xlsx file only")
+                    messages.add_message(request,
+                                        message_tag, 
+                                        message_str)
+                    return render(request, "add_students.html", {'header': "Update ID numbers"})
+
+            fd, tmp = tempfile.mkstemp()
+            with os.fdopen(fd, 'wb') as out:
+                out.write(xl_file.read())
+            workbook = xlrd.open_workbook(tmp)
+
+            count = 0
+            idx = 1
+            header = {}
+            for sheet in workbook.sheets():
+                for row in sheet.get_rows():
+                    if idx == 1:
+                        col_no = 0
+                        for cell in row:
+                            # Store the column names in dictionary
+                            header[str(cell.value)] = col_no
+                            col_no = col_no + 1
+                        idx = 0
+                        continue
+                    # create User model first then Student model
+                    try:
+                        Student.objects.filter(
+                            bitsId=row[header['Old IDS']].value
+                            ).update(bitsId=str(row[header['New IDS']].value)[:15])
+                    except Exception:
+                        message_str + "Error in student: " + str(row[header['Old IDS']].value) + "\n"
+                    
+                    count = count + 1
+            message_str = str(count) + " Updated IDS"
+        else:
+            message_str = "No File Uploaded."
+
+    if message_str is not '':
+        messages.add_message(request,
+                            message_tag, 
+                            message_str)
+    return render(request, "add_students.html", {'header': "Update IDs"})
+
+@user_passes_test(lambda u: u.is_superuser)
+def update_ps(request):
+    message_str = ''
+    message_tag = messages.INFO
+    if request.POST:
+        if request.FILES:
+            # Read Excel File into a temp file
+            xl_file = request.FILES['xl_file']
+            extension = xl_file.name.rsplit('.', 1)[1]
+            if ('xls' != extension):
+                if ('xlsx' != extension):
+                    messages.error(request, "Please upload .xls or .xlsx file only")
+                    messages.add_message(request,
+                                        message_tag, 
+                                        message_str)
+                    return render(request, "add_students.html", {'header': "Update PS/Thesis"})
+
+            fd, tmp = tempfile.mkstemp()
+            with os.fdopen(fd, 'wb') as out:
+                out.write(xl_file.read())
+            workbook = xlrd.open_workbook(tmp)
+
+            count = 0
+            idx = 1
+            header = {}
+            for sheet in workbook.sheets():
+                for row in sheet.get_rows():
+                    if idx == 1:
+                        col_no = 0
+                        for cell in row:
+                            # Store the column names in dictionary
+                            header[str(cell.value)] = col_no
+                            col_no = col_no + 1
+                        idx = 0
+                        continue
+                    # create User model first then Student model
+                    
+                    student = Student.objects.filter(bitsId=row[header['studentID']].value)
+                    hostel = HostelPS.objects.filter(student=student[0]).update(hostel=None, room=None, acadstudent=False, status=row[header['Status']].value, psStation=row[header['PS Station']].value)
+                    count = count + 1
+            message_str = str(count) + " Updated PS/Thesis"
+        else:
+            message_str = "No File Uploaded."
+
+    if message_str is not '':
+        messages.add_message(request,
+                            message_tag, 
+                            message_str)
+    return render(request, "add_students.html", {'header': "Update PS/Thesis"})

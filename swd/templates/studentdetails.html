@@ -1,4 +1,6 @@
+{% extends 'wardenbase.html' %}
 {% load staticfiles %}
+{% comment %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -31,8 +33,9 @@
     </div>
   </nav>
   
+{% endcomment %}
 
-
+{% block content %}
   <div class="container">
     <div class="section">
         <table class="centered bordered striped">
@@ -109,6 +112,8 @@
    
     </div>
   </div>
+
+  {%endblock%}
 
   <style>
 
