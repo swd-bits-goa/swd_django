@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseForbidden
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import *
@@ -10,7 +10,7 @@ from django.contrib import messages
 from django.utils.timezone import make_aware
 from django.core.mail import send_mail
 from django.conf import settings
-
+from tools.utils import gen_random_datetime
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 import xlrd, xlwt
@@ -96,7 +96,6 @@ def dashboard(request):
     tees = TeeAdd.objects.filter(available=True)
     items = ItemAdd.objects.filter(available=True)
     teesj = TeeAdd.objects.filter(available=True).values_list('title')
-
     notice_list = Notice.objects.all().order_by('-id')
     page = request.GET.get('page', 1)
     paginator = Paginator(notice_list, 10)
@@ -107,19 +106,6 @@ def dashboard(request):
     except EmptyPage:
         notices = paginator.page(paginator.num_pages)
 
-
-    context = {
-        'student': student,
-        'leaves': leaves,
-        'bonafides': bonafides,
-        'daypasss': daypasss,
-        'address': address,
-        'queryset' : notices,
-        'notices' : Notice.objects.count(),
-        'student': student,
-        'tees': tees,
-        'items': items,
-    }
     #dues
     try:
         lasted = DuesPublished.objects.latest('date_published').date_published
@@ -181,7 +167,7 @@ def dashboard(request):
             'queryset' : notices,
             'student': student,
             'tees': tees,
-            'items': items,
+            'items': items
             }
 
     return render(request, "dashboard.html", context)
@@ -257,15 +243,33 @@ def profile(request):
             'balance': balance,
             'hostelps':hostelps,
         }
+
         if request.POST:
             address = request.POST.get('address')
-            #print(address)
-            student.address = address
-            student.save()
+
+            addr_request = AddressChangeRequest(student=student, new_address=address)
+            addr_request.save()
+
             return HttpResponse("{ status: 'ok' }")
 
     return render(request, "profile.html", context)
 
+
+@user_passes_test(lambda a: a.is_superuser)
+def address_approval_dashboard(request):
+    if request.POST:
+        approve = AddressChangeRequest.objects.get(id=request.POST["request_id"])
+
+        if request.POST["approved"] == "false":
+            approve.reject()
+        else:
+            approve.approve()
+
+    address_reqs = AddressChangeRequest.objects.filter(resolved=False)
+
+    return render(request, "address_dashboard.html", {
+        "requests": address_reqs
+    })
 
 
 @csrf_protect
@@ -316,17 +320,10 @@ def messoption(request):
     messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
     messopen = messopen.exclude(dateOpen__gt=date.today())
 
-
     if messopen:
         messoption = MessOption.objects.filter(monthYear=messopen[0].monthYear, student=student)
 
-    context = {
-        'student': student,
-        'leaves': leaves,
-        'bonafides': bonafides,
-        'daypasss': daypasss,
-    }
-#dues
+    # dues
     try:
         lasted = DuesPublished.objects.latest('date_published').date_published
     except:
@@ -383,14 +380,58 @@ def messoption(request):
             'bonafides': bonafides,
             'daypasss': daypasss,
             }
+    
+    vacations = VacationDatesFill.objects.filter(
+        dateClose__gte=date.today(), dateOpen__lte=date.today())
+    errors = []
+    if vacations:
+        vacation_open = vacations[0]
+        student_vacation = Leave.objects.filter(
+            student=student,
+            reason=vacation_open.description)
+        if student_vacation:
+            student_vacation = student_vacation[0]
+        context['vacation'] = vacation_open
+        context['student_vacation'] = student_vacation
 
     if request.POST:
-        mess = request.POST.get('mess')
-        if edit: messoption.delete()
-        messoptionfill = MessOption(student=student, monthYear=messopen[0].monthYear, mess=mess)
-        messoptionfill.save()
-        return redirect('messoption')
+        # Vacation Details Filling when availaible
+        created = False
+        if vacations:
+            dateStart = datetime.strptime(request.POST.get('dateStart'), '%d %B, %Y').date()
+            timeStart = gen_random_datetime().time()
+            dateTimeStart = make_aware(datetime.combine(dateStart, timeStart))
+            dateEnd = datetime.strptime(request.POST.get('dateEnd'), '%d %B, %Y').date()
+            timeEnd = gen_random_datetime().time()
+            dateTimeEnd = make_aware(datetime.combine(dateEnd, timeEnd))
+            
+            if not vacation_open.check_date_in_range(dateTimeEnd):
+                errors.append("End Date Time should be within specified range.")
+            if not vacation_open.check_date_in_range(dateTimeStart):
+                errors.append("Start Date Time should be within specified range.")
+            if vacation_open.check_start_end_dates_in_range(dateTimeStart, dateTimeEnd):
+                if edit:
+                    student_vacation.delete()
+                created, obj = vacation_open.create_vacation(
+                    student, dateTimeStart, dateTimeEnd)
+                if not created:
+                    errors.append(obj)
+            context['errors'] = errors
 
+        if (vacations.count() and len(errors) == 0) or (vacations.count() == 0) or (edit):
+            print("Inside Mess Filling")
+            # Mess Option Filling
+            mess = request.POST.get('mess')
+            if edit:
+                messoption.delete()
+            messoptionfill = MessOption(
+                student=student,
+                monthYear=messopen[0].monthYear,
+                mess=mess)
+            messoptionfill.save()
+
+        if created or (vacations.count() == 0):
+            return redirect('messoption')
 
     return render(request, "mess.html", context)
 
@@ -1347,7 +1388,10 @@ def search(request):
             'students' : students,
             'searchstr' : searchstr
         }
-    return render(request, "search.html", dict(context, **postContext))
+    if request.user.is_authenticated:
+        return render(request, "search_logged_in.html", dict(context, **postContext))
+    else:
+        return render(request, "search.html", dict(context, **postContext))
 
 def notice(request):
     context = {
@@ -1626,7 +1670,6 @@ def retrieve_or_create_due_category(name, desc=""):
 def import_dues_from_sheet(request):
     if request.POST:
         if request.FILES:
-            print ('files')
             xlfile_uploaded = request.FILES['dues_sheet']
             extension = xlfile_uploaded.name.rsplit('.', 1)[1]
             if ('xls' != extension):
@@ -1659,15 +1702,30 @@ def import_dues_from_sheet(request):
                                 "Student " + str(row[1].value) + " was not found in the database! SKIPPING HIS DUE ROW!")
                         continue
 
-                    for i, category in enumerate(categories):
-                        amount = float(row[i+2].value)
-                        Due.objects.create(student=student,
-                                           amount=amount,
-                                           due_category=category,
-                                           description=category.name,
-                                           date_added=datetime.now().date())
+                    for i, category in enumerate(categories, start=2):
+                        amount = float(row[i].value)
 
-                    print (row)
+                        # Don't add the due if it's zero
+                        if amount == 0: continue
+
+                        # Check if the due already exists with same student
+                        #   and same category, then overwrite that due object
+                        #   instead of making new ones.
+
+                        try:
+                            # If there is a due with the same category name (i.e October Mess Bill '19, etc)
+                            # we just overwrite it.
+                            due = Due.objects.get(student=student,
+                                                 due_category=category,
+                                                 description=category.name)
+                            due.amount = amount
+                            due.save()
+                        except Due.DoesNotExist as e:
+                            Due.objects.create(student=student,
+                                               amount=amount,
+                                               due_category=category,
+                                               description=category.name,
+                                               date_added=datetime.now().date())
 
             os.remove(tmp)
 
@@ -2297,3 +2355,120 @@ def update_parent_contact(request):
                             message_str)
     return render(request, "add_students.html", {'header': "Update Contact"})
 
+def upload_latecomer(request):
+    message_str = ''
+    message_tag = messages.INFO
+    if request.POST:
+        if request.FILES:
+            # Read Excel File into a temp file
+            xl_file = request.FILES['xl_file']
+            extension = xl_file.name.rsplit('.', 1)[1]
+            if ('xls' != extension):
+                if ('xlsx' != extension):
+                    messages.error(request, "Please upload .xls or .xlsx file only")
+                    messages.add_message(request,
+                                        message_tag, 
+                                        message_str)
+                    return render(request, "add_students.html", {'header': "Update Parent Contact"})
+
+            fd, tmp = tempfile.mkstemp()
+            with os.fdopen(fd, 'wb') as out:
+                out.write(xl_file.read())
+            workbook = xlrd.open_workbook(tmp)
+
+            count = 0
+            idx = 1
+            header = {}
+            for sheet in workbook.sheets():
+                for row in sheet.get_rows():
+                    if idx == 1:
+                        col_no = 0
+                        for cell in row:
+                            # Store the column names in dictionary
+                            header[str(cell.value)] = col_no
+                            col_no = col_no + 1
+                        idx = 0
+                        continue
+                    # create User model first then Student model
+
+                    try:
+                        s = Student.objects.filter(bitsId=row[header['studentID']].value)
+                        date = datetime.strptime(row[header['date']].value, '%d/%m/%Y').strftime('%Y-%m-%d')
+                        time = datetime.strptime(row[header['time']].value, '%H:%M')
+                        datetime = datetime.combine(date, time)
+                        LateComer.objects.create(
+                            student = s,
+                            datetime = datetime
+                            )
+                    except Student.DoesNotExist:
+                        message_str + "ID number: " + row[header['studentID']].value+ " does not exist\n"
+                    count = count + 1
+            message_str = str(count) + " Latecomers added"
+        else:
+            message_str = "No File Uploaded."
+
+    if message_str is not '':
+        messages.add_message(request,
+                            message_tag, 
+                            message_str)
+    return render(request, "add_students.html", {'header': "Upload latecomers"})
+
+def upload_disco(request):
+    message_str = ''
+    message_tag = messages.INFO
+    if request.POST:
+        if request.FILES:
+            # Read Excel File into a temp file
+            xl_file = request.FILES['xl_file']
+            extension = xl_file.name.rsplit('.', 1)[1]
+            if ('xls' != extension):
+                if ('xlsx' != extension):
+                    messages.error(request, "Please upload .xls or .xlsx file only")
+                    messages.add_message(request,
+                                        message_tag, 
+                                        message_str)
+                    return render(request, "add_students.html", {'header': "Add new superintendent"})
+
+            fd, tmp = tempfile.mkstemp()
+            with os.fdopen(fd, 'wb') as out:
+                out.write(xl_file.read())
+            workbook = xlrd.open_workbook(tmp)
+
+            count = 0
+            idx = 1
+            header = {}
+            for sheet in workbook.sheets():
+                for row in sheet.get_rows():
+                    if idx == 1:
+                        col_no = 0
+                        for cell in row:
+                            # Store the column names in dictionary
+                            header[str(cell.value)] = col_no
+                            col_no = col_no + 1
+                        idx = 0
+                        continue
+                    # create User model first then Student model
+                    try:
+                        s = Student.objects.filter(bitsId = row[header['studentID']].value)
+                        dateOfViolation = datetime.strptime(row[header['Date of violation']].value, '%d/%m/%Y').strftime('%Y-%m-%d')
+                        date = datetime.strptime(row[header['Date']].value, '%d/%m/%Y').strftime('%Y-%m-%d')
+
+                        disco = Disco.objects.create(
+                            student = s,
+                            dateOfViolation = dateOfViolation,
+                            subject = str(row[header['studentID']].value),
+                            action = str(row[header['action']].value),
+                            date = date
+                            )
+                    except Student.DoesNotExist:
+                        message_str + "ID number: " + row[header['studentID']].value+ " does not exist\n"
+                    count = count + 1
+            message_str = str(count) + " Discos added"
+        else:
+            message_str = "No File Uploaded."
+
+    if message_str is not '':
+        messages.add_message(request,
+                            message_tag, 
+                            message_str)
+    return render(request, "add_students.html", {'header': "Upload disco"})

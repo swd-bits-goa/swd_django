@@ -10,12 +10,33 @@ from calendar import monthrange
 from import_export.admin import ExportActionModelAdmin
 from .resources import *
 
-# import django.models.queryset as QuerySet
+
+models = [
+    Warden,
+    Staff,
+    DayScholar,
+    CSA,
+    DayPass,
+    LateComer,
+    InOut,
+    Disco,
+    MessOptionOpen,
+    Transaction,
+    MessBill,
+    TeeAdd,
+    ItemAdd,
+    HostelSuperintendent,
+    Notice,
+    FileAdd,
+    Document,
+    AntiRagging,
+    DueCategory,
+    DuesPublished,
+    VacationDatesFill]
+
 
 class HostelPSAdmin(admin.ModelAdmin):
     search_fields = ['student__name', 'student__bitsId']
-
-models = [Warden, Staff, DayScholar, CSA, DayPass, LateComer, InOut, Disco, MessOptionOpen, Transaction, MessBill, TeeAdd, ItemAdd, HostelSuperintendent, Notice, FileAdd, Document, AntiRagging, DueCategory, DuesPublished]
 
 
 @admin.register(Bonafide)

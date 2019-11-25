@@ -13,6 +13,21 @@
           <div class="col s6 l12">
             <table class="bordered white centered">
               <tbody>
+                {% if not student_filled_vac %}
+                <tr>
+                  <td>{{ vacation }} Details Can Be Filled Now</td>
+                  <td>
+                    <span class="red-text">
+                      Make sure you fill before {{ vacation.dateClose }}.
+                    </span>
+                  </td>
+                  <td>
+                    <a class="waves-effect waves-light btn" href="{% url 'messoption'%}">
+                    Fill Here
+                    </a>
+                  </td>
+                </tr>
+                {% endif %}
                 <tr>
                   <td>Mess Option</td>
                   <td>

@@ -77,8 +77,14 @@
   .comm {
     width:100px;
   }
-  .editAddr, .saveAddr {
+  .editAddr, {
     cursor: pointer;
+    width:10px;
+  }
+
+  .saveAddr {
+    cursor: pointer;
+    width:130px;
   }
   .details th:nth-child(1), .details td:nth-child(1) {
     width: 35%;
@@ -101,7 +107,7 @@
 {% csrf_token %}
 <script>
   $(document).on('click', '.editAddr', (e) => {
-    $('.editAddr').addClass('saveAddr').removeClass('editAddr').text('Save').removeClass('red').addClass('green')
+    $('.editAddr').addClass('saveAddr').removeClass('editAddr').text('Request Change').removeClass('red').addClass('green')
     $(".initialAdress").hide();
     console.log('Show')
     $('.addressval').show()
