@@ -1990,8 +1990,8 @@ def add_new_students(request):
                         continue
                     
                     # create User model first then Student model
-                    emailID = row[header['INSTITUTE EMAIL ID']].value
-                    username = emailID.split('@', 1)[0]
+                    studentID = row[header['studentID']].value
+                    username = 'f' + studentID[0:4] + studentID[8:12]
                     print(username)
                     password = User.objects.make_random_password()
 
@@ -2006,7 +2006,7 @@ def add_new_students(request):
                         pass
                     user = User.objects.create_user(
                         username=username,
-                        email=emailID,
+                        email='random@hello.com',
                         password=password)
 
                     # Date of Birth and Date of Admit
@@ -2015,27 +2015,27 @@ def add_new_students(request):
                     dob = row[header['Stu_DOB']]
                     
                     if dob.ctype == 1: # XL_CELL_TEXT
-                        rev_bDay = datetime.strptime(dob.value, '%d/%m/%Y').strftime('%Y-%m-%d')
-                        print(rev_bDay)
+                        rev_bDay = datetime.strptime(dob.value, '%d-%b-%y').strftime('%Y-%m-%d')
+                        
                     elif (dob.ctype == 3): # XL_CELL_DATE
                         rev_bDay = xlrd.xldate.xldate_as_datetime(dob.value, 0)
-                        print(rev_bDay)
+                        
                     else:
                         rev_bDay = datetime.strptime('01Jan1985', '%d%b%Y')
-                        print(rev_bDay)
+                        
                     
                     do_admit = row[header['admit']]
-                    print(do_admit)
+                    
                     if (do_admit.ctype == 1): # XL_CELL_TEXT
                         
-                        rev_admit = datetime.strptime(do_admit.value, '%d/%m/%Y').strftime('%Y-%m-%d')
-                        print(rev_admit)
+                        rev_admit = datetime.strptime(do_admit.value, '%d-%b-%y').strftime('%Y-%m-%d')
+                        
                     elif do_admit.ctype == 3: # XL_CELL_DATE
                         rev_admit = xlrd.xldate.xldate_as_datetime(do_admit.value, 0)
-                        print(rev_admit)
+                        
                     else:
                         rev_admit = datetime.strptime('01Jan1985', '%d%b%Y')
-                        print(rev_admit)
+                        
                     student = Student.objects.create(
                         user=user,
                         bitsId=str(row[header['studentID']].value)[:15],
@@ -2051,7 +2051,7 @@ def add_new_students(request):
                         parentPhone=str(row[header['parent mobno']].value)[:20],
                         parentEmail=str(row[header['parent mail']].value)[:50]
                         )
-                    print(row[header['studentID']].value)
+                    
                     count = count + 1
             message_str = str(count) + " new students added."
         else:
@@ -2395,7 +2395,7 @@ def upload_latecomer(request):
 
                     try:
                         s = Student.objects.filter(bitsId=row[header['studentID']].value)
-                        date = datetime.strptime(row[header['date']].value, '%d/%m/%Y').strftime('%Y-%m-%d')
+                        date = datetime.strptime(row[header['date']].value, '%d-%b-%y').strftime('%Y-%m-%d')
                         time = datetime.strptime(row[header['time']].value, '%H:%M')
                         datetime = datetime.combine(date, time)
                         LateComer.objects.create(
