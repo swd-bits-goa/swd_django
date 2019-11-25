@@ -93,7 +93,7 @@ def dashboard(request):
     daypasss = DayPass.objects.filter(student=student, dateTime__gte=date.today() - timedelta(days=7))
     bonafides = Bonafide.objects.filter(student=student, reqDate__gte=date.today() - timedelta(days=7))
     address = student.address
-    tees = TeeAdd.objects.filter(available=True)
+    tees = TeeAdd.objects.filter(available=True).order_by('-pk')
     items = ItemAdd.objects.filter(available=True)
     teesj = TeeAdd.objects.filter(available=True).values_list('title')
     notice_list = Notice.objects.all().order_by('-id')
@@ -756,6 +756,7 @@ def wardenleaveapprove(request, leave):
             email_to = [leave.student.email]
         else:
             email_to = ["spammailashad@gmail.com"]
+            email_to = [leave.student.email]
         mail_subject="Leave Status - "
         mail_message=leave.student.name+",\n"
 
@@ -1145,7 +1146,7 @@ def store(request):
     leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
     daypasss = DayPass.objects.filter(student=student, dateTime__gte=date.today() - timedelta(days=7))
     bonafides = Bonafide.objects.filter(student=student, reqDate__gte=date.today() - timedelta(days=7))
-    tees = TeeAdd.objects.filter(available=True)
+    tees = TeeAdd.objects.filter(available=True).order_by('-pk')
     items = ItemAdd.objects.filter(available=True)
     teesj = TeeAdd.objects.filter(available=True).values_list('title')
 
