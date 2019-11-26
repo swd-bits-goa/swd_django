@@ -1992,6 +1992,8 @@ def add_new_students(request):
                     # create User model first then Student model
                     studentID = row[header['studentID']].value
                     username = 'f' + studentID[0:4] + studentID[8:12]
+                    if(username[-1] == 'G'):
+                         username = 'f' + studentID[0:4] + studentID[7:10]
                     print(username)
                     password = User.objects.make_random_password()
 
@@ -2015,7 +2017,7 @@ def add_new_students(request):
                     dob = row[header['Stu_DOB']]
                     
                     if dob.ctype == 1: # XL_CELL_TEXT
-                        rev_bDay = datetime.strptime(dob.value, '%d-%b-%y').strftime('%Y-%m-%d')
+                        rev_bDay = datetime.strptime(dob.value, '%d-%b-%Y').strftime('%Y-%m-%d')
                         
                     elif (dob.ctype == 3): # XL_CELL_DATE
                         rev_bDay = xlrd.xldate.xldate_as_datetime(dob.value, 0)
@@ -2028,7 +2030,7 @@ def add_new_students(request):
                     
                     if (do_admit.ctype == 1): # XL_CELL_TEXT
                         
-                        rev_admit = datetime.strptime(do_admit.value, '%d-%b-%y').strftime('%Y-%m-%d')
+                        rev_admit = datetime.strptime(do_admit.value, '%d/%m/%Y').strftime('%Y-%m-%d')
                         
                     elif do_admit.ctype == 3: # XL_CELL_DATE
                         rev_admit = xlrd.xldate.xldate_as_datetime(do_admit.value, 0)
