@@ -387,7 +387,7 @@ class DuesPublished(models.Model):
 class FileAdd(models.Model):
 
     file = models.FileField()
-    link = models.CharField(max_length=200,blank=True,null=True, editable = False)
+    link = models.CharField(max_length=200, blank=True, null=True, editable = False, default='/')
 
     def __str__(self):
         return self.link
@@ -402,7 +402,7 @@ class Notice(models.Model):
     date = models.DateField(editable=False) 
     title = models.CharField(max_length=100)
     desc = models.TextField()
-    file = models.ForeignKey(FileAdd, on_delete=models.CASCADE)
+    file = models.ForeignKey(FileAdd, on_delete=models.CASCADE, null=True)
     def __str__(self):
         return self.desc
     def save(self, *args, **kwargs):
@@ -413,7 +413,7 @@ class Notice(models.Model):
 class Document(models.Model):
     title = models.CharField(max_length=100)
     #file = models.ForeignKey(FileAdd, on_delete=models.CASCADE, null=True, blank=True)
-    link = models.CharField(max_length=50)
+    link = models.CharField(max_length=50, blank=True, null=True)
     def __str__(self):
         return self.title    
 class AntiRagging(models.Model):
