@@ -93,7 +93,7 @@ def dashboard(request):
     daypasss = DayPass.objects.filter(student=student, dateTime__gte=date.today() - timedelta(days=7))
     bonafides = Bonafide.objects.filter(student=student, reqDate__gte=date.today() - timedelta(days=7))
     address = student.address
-    tees = TeeAdd.objects.filter(available=True)
+    tees = TeeAdd.objects.filter(available=True).order_by('-pk')
     items = ItemAdd.objects.filter(available=True)
     teesj = TeeAdd.objects.filter(available=True).values_list('title')
     notice_list = Notice.objects.all().order_by('-id')
@@ -756,6 +756,7 @@ def wardenleaveapprove(request, leave):
             email_to = [leave.student.email]
         else:
             email_to = ["spammailashad@gmail.com"]
+            email_to = [leave.student.email]
         mail_subject="Leave Status - "
         mail_message=leave.student.name+",\n"
 
@@ -1145,7 +1146,7 @@ def store(request):
     leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
     daypasss = DayPass.objects.filter(student=student, dateTime__gte=date.today() - timedelta(days=7))
     bonafides = Bonafide.objects.filter(student=student, reqDate__gte=date.today() - timedelta(days=7))
-    tees = TeeAdd.objects.filter(available=True)
+    tees = TeeAdd.objects.filter(available=True).order_by('-pk')
     items = ItemAdd.objects.filter(available=True)
     teesj = TeeAdd.objects.filter(available=True).values_list('title')
 
@@ -1388,7 +1389,7 @@ def search(request):
             'students' : students,
             'searchstr' : searchstr
         }
-    if request.user.is_authenticated:
+    if request.user.is_authenticated and not is_warden(request.user):
         return render(request, "search_logged_in.html", dict(context, **postContext))
     else:
         return render(request, "search.html", dict(context, **postContext))
@@ -1989,8 +1990,8 @@ def add_new_students(request):
                         continue
                     
                     # create User model first then Student model
-                    emailID = row[header['INSTITUTE EMAIL ID']].value
-                    username = emailID.split('@', 1)[0]
+                    studentID = row[header['studentID']].value
+                    username = 'f' + studentID[0:4] + studentID[8:12]
                     print(username)
                     password = User.objects.make_random_password()
 
@@ -2005,7 +2006,7 @@ def add_new_students(request):
                         pass
                     user = User.objects.create_user(
                         username=username,
-                        email=emailID,
+                        email='random@hello.com',
                         password=password)
 
                     # Date of Birth and Date of Admit
@@ -2014,27 +2015,27 @@ def add_new_students(request):
                     dob = row[header['Stu_DOB']]
                     
                     if dob.ctype == 1: # XL_CELL_TEXT
-                        rev_bDay = datetime.strptime(dob.value, '%d/%m/%Y').strftime('%Y-%m-%d')
-                        print(rev_bDay)
+                        rev_bDay = datetime.strptime(dob.value, '%d-%b-%y').strftime('%Y-%m-%d')
+                        
                     elif (dob.ctype == 3): # XL_CELL_DATE
                         rev_bDay = xlrd.xldate.xldate_as_datetime(dob.value, 0)
-                        print(rev_bDay)
+                        
                     else:
                         rev_bDay = datetime.strptime('01Jan1985', '%d%b%Y')
-                        print(rev_bDay)
+                        
                     
                     do_admit = row[header['admit']]
-                    print(do_admit)
+                    
                     if (do_admit.ctype == 1): # XL_CELL_TEXT
                         
-                        rev_admit = datetime.strptime(do_admit.value, '%d/%m/%Y').strftime('%Y-%m-%d')
-                        print(rev_admit)
+                        rev_admit = datetime.strptime(do_admit.value, '%d-%b-%y').strftime('%Y-%m-%d')
+                        
                     elif do_admit.ctype == 3: # XL_CELL_DATE
                         rev_admit = xlrd.xldate.xldate_as_datetime(do_admit.value, 0)
-                        print(rev_admit)
+                        
                     else:
                         rev_admit = datetime.strptime('01Jan1985', '%d%b%Y')
-                        print(rev_admit)
+                        
                     student = Student.objects.create(
                         user=user,
                         bitsId=str(row[header['studentID']].value)[:15],
@@ -2050,7 +2051,7 @@ def add_new_students(request):
                         parentPhone=str(row[header['parent mobno']].value)[:20],
                         parentEmail=str(row[header['parent mail']].value)[:50]
                         )
-                    print(row[header['studentID']].value)
+                    
                     count = count + 1
             message_str = str(count) + " new students added."
         else:
@@ -2338,11 +2339,12 @@ def update_parent_contact(request):
                         idx = 0
                         continue
                     # create User model first then Student model
-                    
-                    Student.objects.filter(
-                        bitsId=row[header['studentID']].value
-                        ).update(parentPhone=str(row[header['Parent Phone']].value)[:15])
-
+                    try:
+                        Student.objects.filter(
+                            bitsId=row[header['studentID']].value
+                            ).update(parentPhone=str(row[header['Parent Phone']].value)[:15])
+                    except Exception:
+                        message_str + "Error in student: " + str(row[header['studentID']].value) + "\n"
                     
                     count = count + 1
             message_str = str(count) + " Updated students' contact"
@@ -2393,7 +2395,7 @@ def upload_latecomer(request):
 
                     try:
                         s = Student.objects.filter(bitsId=row[header['studentID']].value)
-                        date = datetime.strptime(row[header['date']].value, '%d/%m/%Y').strftime('%Y-%m-%d')
+                        date = datetime.strptime(row[header['date']].value, '%d-%b-%y').strftime('%Y-%m-%d')
                         time = datetime.strptime(row[header['time']].value, '%H:%M')
                         datetime = datetime.combine(date, time)
                         LateComer.objects.create(
@@ -2472,3 +2474,107 @@ def upload_disco(request):
                             message_tag, 
                             message_str)
     return render(request, "add_students.html", {'header': "Upload disco"})
+
+@user_passes_test(lambda u: u.is_superuser)
+def update_ids(request):
+    message_str = ''
+    message_tag = messages.INFO
+    if request.POST:
+        if request.FILES:
+            # Read Excel File into a temp file
+            xl_file = request.FILES['xl_file']
+            extension = xl_file.name.rsplit('.', 1)[1]
+            if ('xls' != extension):
+                if ('xlsx' != extension):
+                    messages.error(request, "Please upload .xls or .xlsx file only")
+                    messages.add_message(request,
+                                        message_tag, 
+                                        message_str)
+                    return render(request, "add_students.html", {'header': "Update ID numbers"})
+
+            fd, tmp = tempfile.mkstemp()
+            with os.fdopen(fd, 'wb') as out:
+                out.write(xl_file.read())
+            workbook = xlrd.open_workbook(tmp)
+
+            count = 0
+            idx = 1
+            header = {}
+            for sheet in workbook.sheets():
+                for row in sheet.get_rows():
+                    if idx == 1:
+                        col_no = 0
+                        for cell in row:
+                            # Store the column names in dictionary
+                            header[str(cell.value)] = col_no
+                            col_no = col_no + 1
+                        idx = 0
+                        continue
+                    # create User model first then Student model
+                    try:
+                        Student.objects.filter(
+                            bitsId=row[header['Old IDS']].value
+                            ).update(bitsId=str(row[header['New IDS']].value)[:15])
+                    except Exception:
+                        message_str + "Error in student: " + str(row[header['Old IDS']].value) + "\n"
+                    
+                    count = count + 1
+            message_str = str(count) + " Updated IDS"
+        else:
+            message_str = "No File Uploaded."
+
+    if message_str is not '':
+        messages.add_message(request,
+                            message_tag, 
+                            message_str)
+    return render(request, "add_students.html", {'header': "Update IDs"})
+
+@user_passes_test(lambda u: u.is_superuser)
+def update_ps(request):
+    message_str = ''
+    message_tag = messages.INFO
+    if request.POST:
+        if request.FILES:
+            # Read Excel File into a temp file
+            xl_file = request.FILES['xl_file']
+            extension = xl_file.name.rsplit('.', 1)[1]
+            if ('xls' != extension):
+                if ('xlsx' != extension):
+                    messages.error(request, "Please upload .xls or .xlsx file only")
+                    messages.add_message(request,
+                                        message_tag, 
+                                        message_str)
+                    return render(request, "add_students.html", {'header': "Update PS/Thesis"})
+
+            fd, tmp = tempfile.mkstemp()
+            with os.fdopen(fd, 'wb') as out:
+                out.write(xl_file.read())
+            workbook = xlrd.open_workbook(tmp)
+
+            count = 0
+            idx = 1
+            header = {}
+            for sheet in workbook.sheets():
+                for row in sheet.get_rows():
+                    if idx == 1:
+                        col_no = 0
+                        for cell in row:
+                            # Store the column names in dictionary
+                            header[str(cell.value)] = col_no
+                            col_no = col_no + 1
+                        idx = 0
+                        continue
+                    # create User model first then Student model
+                    
+                    student = Student.objects.filter(bitsId=row[header['studentID']].value)
+                    hostel = HostelPS.objects.filter(student=student[0]).update(hostel=None, room=None, acadstudent=False, status=row[header['Status']].value, psStation=row[header['PS Station']].value)
+                    count = count + 1
+            message_str = str(count) + " Updated PS/Thesis"
+        else:
+            message_str = "No File Uploaded."
+
+    if message_str is not '':
+        messages.add_message(request,
+                            message_tag, 
+                            message_str)
+    return render(request, "add_students.html", {'header': "Update PS/Thesis"})

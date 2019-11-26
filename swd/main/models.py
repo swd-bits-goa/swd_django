@@ -152,9 +152,9 @@ class HostelPS(models.Model):
     student = models.OneToOneField('Student', on_delete = models.CASCADE, related_name='hostelps')
     acadstudent = models.BooleanField()
     status = models.CharField(max_length=10, choices=STUDENT_STATUS)
-    psStation = models.CharField(max_length=20, null=True, blank=True)
+    psStation = models.CharField(max_length=100, null=True, blank=True)
     hostel = models.CharField(max_length=5, null=True, blank=True, choices=HOSTELS)
-    room = models.CharField(max_length=4, null=True, blank=True)
+    room = models.CharField(max_length=7, null=True, blank=True)
 
     def __str__(self):
         return self.student.bitsId + ' (' + self.student.name + ')'

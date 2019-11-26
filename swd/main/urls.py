@@ -60,8 +60,9 @@ urlpatterns = [
 
     url(r'^admin/add_new_students/', views.add_new_students, name='add_new_students'),
     url(r'^admin/add_new_wardens/', views.add_wardens, name='add_wardens'),
-    url(r'^admin/update_hostel/', views.update_hostel, name='add_wardens'),
-    url(r'^admin/update_phone/', views.update_contact, name='add_wardens'),
-    url(r'^admin/update_parent_phone/', views.update_parent_contact, name='add_wardens'),
-
+    url(r'^admin/update_hostel/', views.update_hostel, name='add_hostels'),
+    url(r'^admin/update_phone/', views.update_contact, name='add_phone'),
+    url(r'^admin/update_parent_phone/', views.update_parent_contact, name='add_parentphone'),
+    url(r'^admin/update_ids/', views.update_ids, name='update_ids'),
+    url(r'^admin/update_ps/', views.update_ps, name='update_ps'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
