@@ -2044,7 +2044,7 @@ def add_new_students(request):
                         name=str(row[header['name']].value)[:50],
                         bDay=rev_bDay,
                         admit=rev_admit,
-                        gender=str(row[header['Stu_gender']].value)[0],
+                        gender=str(row[header['Stu_gender']].value)[:1],
                         phone=str(row[header['stu_mobile']].value)[:15],
                         email=str(row[header['stu_email (other then institute)']].value),
                         address=str(row[header['ADDRESS']].value),
