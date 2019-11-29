@@ -1322,7 +1322,7 @@ def dues(request):
     return render(request, "dues.html", context)
 
 
-def search(request):
+def search(request):    
     perm=0;
     option='indexbase.html';
     context = {
@@ -1332,6 +1332,63 @@ def search(request):
         'option' :option
     }
     if request.user.is_authenticated:
+        student = Student.objects.get(user=request.user)
+        leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
+        daypasss = DayPass.objects.filter(student=student, dateTime__gte=date.today() - timedelta(days=7))
+        bonafides = Bonafide.objects.filter(student=student, reqDate__gte=date.today() - timedelta(days=7))
+
+        #mess
+        messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
+        messopen = messopen.exclude(dateOpen__gt=date.today())
+        if messopen:
+            messoption = MessOption.objects.filter(monthYear=messopen[0].monthYear, student=student)
+
+        if messopen and not messoption and datetime.today().date() < messopen[0].dateClose:
+            option = 0
+            mess = 0
+        elif messopen and messoption:
+            option = 1
+            mess = messoption[0]
+        else:
+            option = 2
+            mess = 0
+
+        try:
+            lasted = DuesPublished.objects.latest('date_published').date_published
+        except:
+            lasted = datetime(year=2004, month=1, day=1) # Before college was founded
+
+        otherdues = Due.objects.filter(student=student)
+        itemdues = ItemBuy.objects.filter(student=student,
+                                        created__gte=lasted)
+        teedues = TeeBuy.objects.filter(student=student,
+                                        created__gte=lasted)
+        total_amount = 0
+        for item in itemdues:
+            if item is not None:
+                total_amount += item.item.price
+        for tee in teedues:
+            if tee is not None:
+                total_amount += tee.totamt
+        for other in otherdues:
+            if other is not None:
+                total_amount += other.amount
+        balance = float(22000) - float(total_amount)
+
+        context = {
+           'hostels' : [i[0] for i in HOSTELS],
+           'branches' : BRANCH,
+           'permission': perm,
+           'option' :option,
+           'student' :student ,
+           'leaves': leaves,
+           'option': option,
+           'mess': mess,
+           'bonafides': bonafides,
+           'daypasss': daypasss,
+           'balance': balance
+        }
+
         if is_warden(request.user):
             warden = Warden.objects.get(user=request.user)
             option = 'wardenbase.html'
@@ -1362,6 +1419,8 @@ def search(request):
                 'permission': perm,
                 'option' :option,
             }
+        
+          
     postContext = {}
     if request.GET:
         name = request.GET.get('name')

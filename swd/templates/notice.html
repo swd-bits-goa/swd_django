@@ -1,46 +1,49 @@
 {% block content %}
 
-  <div class="container-fluid">
-    <div class="section">
+<div class="container-fluid">
+  <div class="section">
 
-  <div class="row">
-    <div class="col s12 m12">
-            {% if not student_filled_vac %}
-        			<p>
-              <div class="card" style="padding:16px;">
-                <a href="{% url 'messoption' %}">
-                  <div class="card-title">{{ vacation.description }} Details Can Be Filled Now</div>
-                </a>
-                <div class="card-content" style="padding: 0;">
-                <span class="red-text">
-                Make sure you fill before {{ vacation.dateClose }}.
-                </span>
-                </div>
+    <div class="row">
+      <div class="col s12 m12">
+        {% if not student_filled_vac %}
+        <p>
+          <div class="card" style="padding:16px;">
+            <a href="{% url 'messoption' %}">
+              <div class="card-title" style="font-size: 18px;">{{ vacation.description }} Details Can Be Filled Now
               </div>
-              {% endif %}
-
-        			{% for notice in queryset %}
-        			<p>
-              <div class="card" style="padding:16px;">
-                <a href="{{notice.file.link}}">
-              <div class="card-title" >{{ notice.title|safe }}</div>
             </a>
-                <div class="card-content" style="padding: 0;">
+            <div class="card-content" style="padding: 0;">
+              <span class="red-text">
+                Make sure you fill before {{ vacation.dateClose }}.
+              </span>
+            </div>
+          </div>
+          {% endif %}
+
+          {% for notice in queryset %}
+          <p>
+            <div class="card" style="padding:16px;">
+              <a href="{{notice.file.link}}">
+                <div class="card-title" style="font-size: 18px;">{{ notice.title|safe }}</div>
+              </a>
+              <div class="card-content" style="padding: 0;">
+
                 <i style="font-size:12px">{{ notice.date }}</i>
                 {{ notice.desc|safe|linebreaks}}
-                </div>
               </div>
-            	{% endfor %}  
-            </p>
+            </div>
+            {% endfor %}
+          </p>
 
-            {% if queryset.has_other_pages %}
-            <ul class="pagination">
+          {% if queryset.has_other_pages %}
+          <ul class="pagination">
 
-              {% if queryset.has_previous %}
-              <li class="waves-effect"><a href="?page={{ queryset.previous_page_number }}"><i class="material-icons">chevron_left</i></a></li>
-              {% else %}
-              <li class="disabled"><a href="#"><i class="material-icons">chevron_left</i></a></li>
-              {% endif %}
+            {% if queryset.has_previous %}
+            <li class="waves-effect"><a href="?page={{ queryset.previous_page_number }}"><i
+                  class="material-icons">chevron_left</i></a></li>
+            {% else %}
+            <li class="disabled"><a href="#"><i class="material-icons">chevron_left</i></a></li>
+            {% endif %}
 
             {% for i in queryset.paginator.page_range %}
             {% if queryset.number == i %}
@@ -51,18 +54,19 @@
             {% endfor %}
 
             {% if queryset.has_next %}
-            <li class="waves-effect"i><a href="?page={{ queryset.next_page_number }}"><i class="material-icons">chevron_right</i></a></li>
+            <li class="waves-effect" i><a href="?page={{ queryset.next_page_number }}"><i
+                  class="material-icons">chevron_right</i></a></li>
             {% else %}
             <li class="disabled"><a href="#"><i class="material-icons">chevron_right</i></a></li>
             {% endif %}
           </ul>
           {% endif %}
-     
-        </div>
+
+      </div>
     </div>
 
-    </div>
-    <br><br>
   </div>
+  <br><br>
+</div>
 
 {% endblock %}

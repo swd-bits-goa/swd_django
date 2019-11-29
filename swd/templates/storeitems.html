@@ -7,22 +7,22 @@
         </div>
     </div>
     <div class="container-fluid">
-         {% if messages %}
-                {% for message in messages %}
-                    <span class="new badge {{ message.tags }}" data-badge-caption="{{ message }}"></span>
-                {% endfor %}
+        {% if messages %}
+        {% for message in messages %}
+        <span class="new badge {{ message.tags }}" data-badge-caption="{{ message }}"></span>
+        {% endfor %}
         {% endif %}
         {% if tees %}
         <div class="section">
-                <h4 style="color:#F46036; margin: 0; padding: 8px; font-size: 31px"> T-Shirts</h4>
-                <!--   Icon Section   -->
+            <h4 style="color:#F46036; margin: 0; padding: 8px; font-size: 31px"> T-Shirts</h4>
+            <!--   Icon Section   -->
             <div class="row">
-            {% for i in tees %}
-                
-                    <div class="col s12 l3">
-                        <div class="card">
-                            <div class="card-img-swd" style="height: 280px; width: 200px; position: relative; margin: 0 auto;">
-                                <img src="/media/{{ i.pic }}" style="position: absolute;
+                {% for i in tees %}
+                <div class="col s12 l3 ">
+                    <div class="card card-store">
+                        <div class="card-img-swd"
+                            style="height: 280px; width: 200px; position: relative; margin: 0 auto;">
+                            <img src="/media/{{ i.pic }}" style="position: absolute;
                                 bottom: 0;
                                 left: 0;
                                 right: 0;
@@ -30,35 +30,36 @@
                                 margin: auto;
                                 max-width: 100%;
                                 max-height: 100%;
-                                "/>
-                                <a class="btn-floating halfway-fab waves-effect waves-light desert-yellow" onclick="openTeeModal({{ i.id }})"><i class="material-icons">shopping_cart</i></a>
-                            </div>
-                            <div class="card-content">
-                                <p style="font-size: 20px">{{ i.title }}</p>
-                                <p style="color: grey">{{ i.desc }}</p>
-                              
-                                <p><b>Price: {{ i.price }}</b></p>
-                            </div>
+                                " />
+                            <a class="btn-floating halfway-fab waves-effect waves-light desert-yellow"
+                                onclick="openTeeModal({{ i.id }})"><i class="material-icons">shopping_cart</i></a>
+                        </div>
+                        <div class="card-content">
+                            <p style="font-size: 16px"><b>{{ i.title }}</b></p>
+                            <p style="color:#4e4e4e">{{ i.desc }}</p>
+
+                            <p style="color: #B12704;"><b>₹{{ i.price }}</b></p>
                         </div>
                     </div>
+                </div>
 
-            {% endfor %}
+                {% endfor %}
             </div>
 
         </div>
         {% endif %}
         {% if items %}
-            <div class="section">
-                    <h4 style="color:#F46036; margin: 0; padding: 8px; font-size: 31px">Events</h4>
+        <div class="section">
+            <h4 style="color:#F46036; margin: 0; padding: 8px; font-size: 31px">Events</h4>
 
             <!--   Icon Section   -->
             <div class="row">
-            {% for i in items %}
-                
-                    <div class="col s12 l3">
-                        <div class="card">
-                                <div class="card-img-swd" style="height: 280px; width: 200px; position: relative; margin: 0 auto;">
-                                        <img src="/media/{{ i.pic }}"style="position: absolute;
+                {% for i in items %}
+                <div class="col s12 l3">
+                    <div class="card card-store">
+                        <div class="card-img-swd"
+                            style="height: 280px; width: 200px; position: relative; margin: 0 auto;">
+                            <img src="/media/{{ i.pic }}" style="position: absolute;
                                 bottom: 0;
                                 left: 0;
                                 right: 0;
@@ -66,19 +67,20 @@
                                 margin: auto;
                                 max-width: 100%;
                                 max-height: 100%;
-                                "/>
-                                <a class="btn-floating halfway-fab waves-effect waves-light desert-yellow" onclick="openItemModal({{ i.id }})"><i class="material-icons">shopping_cart</i></a>
-                            </div>
-                            <div class="card-content">
-                                    <p style="font-size: 20px">{{ i.title }}</p>
-                                <p style="color: grey">{{ i.desc }}</p>
-                              
-                                <p><b>Price: {{ i.price }}</b></p>
-                            </div>
+                                " />
+                            <a class="btn-floating halfway-fab waves-effect waves-light desert-yellow"
+                                onclick="openItemModal({{ i.id }})"><i class="material-icons">shopping_cart</i></a>
+                        </div>
+                        <div class="card-content">
+                            <p style="font-size: 14px"><b>{{ i.title }}</b></p>
+                            <p style="color: grey">{{ i.desc }}</p>
+
+                            <p><b>Price: {{ i.price }}</b></p>
                         </div>
                     </div>
+                </div>
 
-            {% endfor %}
+                {% endfor %}
             </div>
 
         </div>
@@ -89,23 +91,33 @@
 </div>
 
 <style>
+    .card-store {
+        box-shadow: none;
+        background: #efefef;
+        text-align: center;
+    }
+
     #modalinfo img {
-        max-width:100%;
-        max-height:100%;
+        max-width: 100%;
+        max-height: 100%;
+    }
+
+    .card-img-swd {
+        border-bottom: 1px solid grey;
     }
 </style>
 
 <script>
-    $(document).ready(function(){
+    $(document).ready(function () {
         $('.modal').modal();
         $('select').material_select();
     });
 
-    openItemModal = function(info) {
+    openItemModal = function (info) {
         info = parseInt(info)
         var items = { {% for i in items %} "{{ i.id }}" : ["{{ i.title|safe }}", `{{ i.desc|safe }}`, "{{ i.pic|safe }}", "{{ i.price }}", "{{ i.nick|safe }}", "{{ i.colors|safe }}", "{{ i.sizes|safe }}", "{{ i.available }}"], {% endfor %} }
-        $("#modalheader").html(items[info][0])
-        $("#modalinfo").html(`
+    $("#modalheader").html(items[info][0])
+    $("#modalinfo").html(`
         <div class="row">
             <div class="col s12 l5">
                 <img src="/media/` + items[info][2] + `">
@@ -113,7 +125,7 @@
             <div class="col s12 l7">
 
                 <p align="justify">` + items[info][1] + `</p>
-                <p align="right" id="price"><b> Rs.` + items[info][3] + `</b></p>
+                <p align="right" id="price"><b> ₹` + items[info][3] + `</b></p>
                 <p>
                     <input id="agree" type="checkbox" class="filled-in"/>
                     <label for="agree">I agree to buy this item and understand that the amount will be deducted from my account</label for="agree">
@@ -128,56 +140,56 @@
                 </form>
             </div>
         `)
-        
-        $("#modal1").modal('open')
-        $("#agree").change(function () {
-            if ($(this).prop('checked')) {
-                $("#itembuy").removeClass("disabled");
-            } else {
-                $("#itembuy").addClass("disabled");
-            }
-        });
+
+    $("#modal1").modal('open')
+    $("#agree").change(function () {
+        if ($(this).prop('checked')) {
+            $("#itembuy").removeClass("disabled");
+        } else {
+            $("#itembuy").addClass("disabled");
+        }
+    });
     }
 
-    openTeeModal = function(info) {
+    openTeeModal = function (info) {
         info = parseInt(info)
         var tees = { {% for i in tees %} "{{ i.id }}" : ["{{ i.title|safe }}", `{{ i.desc|safe }}`, "{{ i.pic|safe }}", "{{ i.price }}", "{{ i.nick|safe }}", "{{ i.colors|safe }}", "{{ i.sizes|safe }}", "{{ i.available }}"], {% endfor %} }
-        console.log(tees)
-        $("#modalheader").html(tees[info][0])
-        var nick = "";
-        var colors = "";
-        var sizes = "";
-        if (tees[info][4] == "True") {
-            nick = `
+    console.log(tees)
+    $("#modalheader").html(tees[info][0])
+    var nick = "";
+    var colors = "";
+    var sizes = "";
+    if (tees[info][4] == "True") {
+        nick = `
             <div class="input-field col s12">
                 <input id="nick" name="nick" type="text" class="validate">
                 <label for="nick">Nick</label>
             </div>
             `
-        }
-        if (tees[info][5] != "None") {
-            colorlist = tees[info][5].split(",");
-            colors = `
+    }
+    if (tees[info][5] != "None") {
+        colorlist = tees[info][5].split(",");
+        colors = `
             <div class="input-field col s6">
                 <select id="colors" name="colors">
             `
-            for (var i = 0; i < colorlist.length; i++) {
-                colors += `<option value="` + colorlist[i] + `">` + colorlist[i] + `</option>`
-            }
-            colors += `</select><label for="colors">Colors</label></div>`
+        for (var i = 0; i < colorlist.length; i++) {
+            colors += `<option value="` + colorlist[i] + `">` + colorlist[i] + `</option>`
         }
-        if (tees[info][6] != "None") {
-            sizelist = tees[info][6].split(",");
-            sizes = `
+        colors += `</select><label for="colors">Colors</label></div>`
+    }
+    if (tees[info][6] != "None") {
+        sizelist = tees[info][6].split(",");
+        sizes = `
             <div class="input-field col s6">
                 <select id="sizes" name="sizes">
             `
-            for (var i = 0; i < sizelist.length; i++) {
-                sizes += `<option value="` + sizelist[i] + `">` + sizelist[i] + `</option>`
-            }
-            sizes += `</select><label for="sizes">Sizes</label></div>`
+        for (var i = 0; i < sizelist.length; i++) {
+            sizes += `<option value="` + sizelist[i] + `">` + sizelist[i] + `</option>`
         }
-        $("#modalinfo").html(`
+        sizes += `</select><label for="sizes">Sizes</label></div>`
+    }
+    $("#modalinfo").html(`
         <div class="row">
             <div class="col s12 l5">
                 <img src="/media/` + tees[info][2] + `">
@@ -186,7 +198,7 @@
                 <form method="POST" action="/store/">
                     {% csrf_token %}
                 <p align="justify">` + tees[info][1] + `</p>
-                <p align="right" id="price"><b> Rs.` + tees[info][3] + `</b></p>
+                <p align="right" id="price"><b> ₹` + tees[info][3] + `</b></p>
                 ` + nick + colors + sizes + `    
                 <div class="input-field col s4 offset-s8">
                     <input id="quantity" name="quantity" type="text" class="validate">
@@ -206,33 +218,33 @@
             </div>
         `)
 
-        var buyable=false;
-        $('#quantity').on('input',function(e){
-            if (isNaN(parseInt($('#quantity').val()))) {
-                $("#money").text('Please enter valid number.')
-                $("#teebuy").addClass("disabled");
-                buyable=false;
-            }
-            else if ((parseInt($('#quantity').val()))>=9 || (parseInt($('#quantity').val()))<=0) {
-                $("#money").text('Please enter quantity between 0 and 9.')
-                $("#teebuy").addClass("disabled");
-                buyable=false;
-            }
-            else {
-                $("#money").text('Total Amount : Rs.' + parseInt($('#quantity').val()) * tees[info][3])
-                buyable=true;
-            }
-        });
-        $("#teeagree").change(function () {
-            if ($(this).prop('checked') && buyable==true) {
-                $("#teebuy").removeClass("disabled");
-            } else {
-                $("#teebuy").addClass("disabled");
-            }
-        });
-        $('select').material_select();
-        $("#modal1").modal('open')
+    var buyable = false;
+    $('#quantity').on('input', function (e) {
+        if (isNaN(parseInt($('#quantity').val()))) {
+            $("#money").text('Please enter valid number.')
+            $("#teebuy").addClass("disabled");
+            buyable = false;
+        }
+        else if ((parseInt($('#quantity').val())) >= 9 || (parseInt($('#quantity').val())) <= 0) {
+            $("#money").text('Please enter quantity between 0 and 9.')
+            $("#teebuy").addClass("disabled");
+            buyable = false;
+        }
+        else {
+            $("#money").text('Total Amount : ₹' + parseInt($('#quantity').val()) * tees[info][3])
+            buyable = true;
+        }
+    });
+    $("#teeagree").change(function () {
+        if ($(this).prop('checked') && buyable == true) {
+            $("#teebuy").removeClass("disabled");
+        } else {
+            $("#teebuy").addClass("disabled");
+        }
+    });
+    $('select').material_select();
+    $("#modal1").modal('open')
     }
-     
+
 </script>
 {% endblock %}

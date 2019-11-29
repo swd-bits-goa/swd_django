@@ -123,12 +123,15 @@ nav .button-collapse i{
   z-index: 2;
   padding-top: 0;
 }
-.card-content{
-  padding: 0;
-}
+
 .tabs.tabs-transparent .indicator{
   background-color: #FFBE57;
   height: 3px;
+}
+
+.btn-floating.halfway-fab{
+  position: absolute;
+  right: 0px;
 }
 
 @media screen and (max-width: 800px) {
@@ -141,6 +144,14 @@ nav .button-collapse i{
   #swd {
     width: 45vw;
   }
+  .card-content{
+    padding: 0 !important;
+    overflow: auto !important;
+    text-align: center;
+    padding-top: 24px !important;
+    padding-bottom: 24px !important;
+  }
+
 }
 
 
