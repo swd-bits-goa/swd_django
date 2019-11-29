@@ -1991,9 +1991,21 @@ def add_new_students(request):
                     
                     # create User model first then Student model
                     studentID = row[header['studentID']].value
-                    username = 'f' + studentID[0:4] + studentID[8:12]
-                    if(username[-1] == 'G'):
-                         username = 'f' + studentID[0:4] + studentID[7:10]
+                    if len(studentID)==13:
+                        if studentID[5] == 'P':
+                            username = 'p' + studentID[0:4] + studentID[8:12]
+                        elif studentID[5] == 'H':
+                            username = 'h' + studentID[0:4] + studentID[8:12]
+                        else:
+                            username = 'f' + studentID[0:4] + studentID[8:12]
+
+                    else:
+                        if studentID[5] == 'P':
+                            username = 'p' + studentID[0:4] + studentID[8:11]
+                        elif studentID[5] == 'H':
+                            username = 'h' + studentID[0:4] + studentID[8:11]
+                        else:
+                            username = 'f' + studentID[0:4] + studentID[8:11]
                     print(username)
                     password = User.objects.make_random_password()
 
