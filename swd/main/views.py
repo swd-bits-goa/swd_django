@@ -2051,17 +2051,17 @@ def add_new_students(request):
                     # create User model first then Student model
                     studentID = row[header['studentID']].value
                     if len(studentID)==13:
-                        if studentID[5] == 'P':
+                        if studentID[4] == 'P':
                             username = 'p' + studentID[0:4] + studentID[8:12]
-                        elif studentID[5] == 'H':
+                        elif studentID[4] == 'H':
                             username = 'h' + studentID[0:4] + studentID[8:12]
                         else:
                             username = 'f' + studentID[0:4] + studentID[8:12]
 
                     else:
-                        if studentID[5] == 'P':
+                        if studentID[4] == 'P':
                             username = 'p' + studentID[0:4] + studentID[8:11]
-                        elif studentID[5] == 'H':
+                        elif studentID[4] == 'H':
                             username = 'h' + studentID[0:4] + studentID[8:11]
                         else:
                             username = 'f' + studentID[0:4] + studentID[8:11]
