@@ -2315,8 +2315,12 @@ def update_hostel(request):
                         student = Student.objects.get(bitsId=row[header['studentID']].value)
                         #print(student)
                     except Student.DoesNotExist:
-                        message_str + studentID + " does not exist in database \n"
-                        print("here")
+                        message_str = row[header['studentID']].value + " does not exist in database \n"
+                        if message_str is not '':
+                            messages.add_message(request,
+                            message_tag, 
+                            message_str)
+                        continue
                     try:
                         print(student)
                         hostel = HostelPS.objects.get(student=student)
@@ -2326,11 +2330,16 @@ def update_hostel(request):
                         hostel.psStation = ""
                         hostel.status = "Student"
                         hostel.save()
+                        count = count + 1
                     except HostelPS.DoesNotExist:
-                        HostelPS.objects.create(student=student, hostel=row[header['Hostel']].value, room=str(row[header['Room']].value)[:3], acadstudent=True, status="Student", psStation="")
-                        message_str + row[header['studentID']].value + " failed to update \n"
+                        HostelPS.objects.create(student=student, hostel=row[header['Hostel']].value, room=str(row[header['Room']].value), acadstudent=True, status="Student", psStation="")
+                        message_str = row[header['studentID']].value + " failed to update \n"
                         print("create")
-                    count = count + 1
+                        count = count + 1
+                    if message_str is not '':
+                        messages.add_message(request,
+                            message_tag, 
+                            message_str)
             message_str = str(count) + " Updated students' hostel"
         else:
             message_str = "No File Uploaded."
