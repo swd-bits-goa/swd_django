@@ -2108,24 +2108,27 @@ def add_new_students(request):
                         
                     else:
                         rev_admit = datetime.strptime('01Jan1985', '%d%b%Y')
-                        
-                    student = Student.objects.create(
-                        user=user,
-                        bitsId=str(row[header['studentID']].value)[:15],
-                        name=str(row[header['name']].value)[:50],
-                        bDay=rev_bDay,
-                        admit=rev_admit,
-                        gender=str(row[header['Stu_gender']].value)[:1],
-                        phone=str(row[header['stu_mobile']].value)[:15],
-                        email=str(row[header['stu_email (other then institute)']].value),
-                        address=str(row[header['ADDRESS']].value),
-                        bloodGroup=str(row[header['bloodgp']].value)[:10],
-                        parentName=str(row[header['fname']].value)[:50],
-                        parentPhone=str(row[header['parent mobno']].value)[:20],
-                        parentEmail=str(row[header['parent mail']].value)[:50]
+
+                    try:    
+                        student = Student.objects.create(
+                            user=user,
+                            bitsId=str(row[header['studentID']].value)[:15],
+                            name=str(row[header['name']].value)[:50],
+                            bDay=rev_bDay,
+                            admit=rev_admit,
+                            gender=str(row[header['Stu_gender']].value)[0],
+                            phone=str(row[header['stu_mobile']].value)[:15],
+                            email=str(row[header['stu_email (other then institute)']].value),
+                            address=str(row[header['ADDRESS']].value),
+                            bloodGroup=str(row[header['bloodgp']].value)[:10],
+                            parentName=str(row[header['fname']].value)[:50],
+                            parentPhone=str(row[header['parent mobno']].value)[:20],
+                            parentEmail=str(row[header['parent mail']].value)[:50]
                         )
-                    
-                    count = count + 1
+                        count = count + 1
+                    except Exception:
+                        message_str + studentID + " failed"
+                            
             message_str = str(count) + " new students added."
         else:
             message_str = "No File Uploaded."
@@ -2309,10 +2312,35 @@ def update_hostel(request):
                         idx = 0
                         continue
                     # create User model first then Student model
-                    
-                    student = Student.objects.filter(bitsId=row[header['studentID']].value)
-                    hostel = HostelPS.objects.filter(student=student[0]).update(hostel=row[header['Hostel']].value, room=str(row[header['Room']].value))
-                    count = count + 1
+                    try:
+                        student = Student.objects.get(bitsId=row[header['studentID']].value)
+                        #print(student)
+                    except Student.DoesNotExist:
+                        message_str = row[header['studentID']].value + " does not exist in database \n"
+                        if message_str is not '':
+                            messages.add_message(request,
+                            message_tag, 
+                            message_str)
+                        continue
+                    try:
+                        print(student)
+                        hostel = HostelPS.objects.get(student=student)
+                        hostel.acadstudent=True
+                        hostel.hostel = row[header['Hostel']].value
+                        hostel.room = str(row[header['Room']].value)
+                        hostel.psStation = ""
+                        hostel.status = "Student"
+                        hostel.save()
+                        count = count + 1
+                    except HostelPS.DoesNotExist:
+                        HostelPS.objects.create(student=student, hostel=row[header['Hostel']].value, room=str(row[header['Room']].value), acadstudent=True, status="Student", psStation="")
+                        message_str = row[header['studentID']].value + " failed to update \n"
+                        print("create")
+                        count = count + 1
+                    if message_str is not '':
+                        messages.add_message(request,
+                            message_tag, 
+                            message_str)
             message_str = str(count) + " Updated students' hostel"
         else:
             message_str = "No File Uploaded."
@@ -2416,10 +2444,11 @@ def update_parent_contact(request):
                         Student.objects.filter(
                             bitsId=row[header['studentID']].value
                             ).update(parentPhone=str(row[header['Parent Phone']].value)[:15])
+                        count = count + 1
                     except Exception:
                         message_str + "Error in student: " + str(row[header['studentID']].value) + "\n"
                     
-                    count = count + 1
+                    
             message_str = str(count) + " Updated students' contact"
         else:
             message_str = "No File Uploaded."
@@ -2475,9 +2504,10 @@ def upload_latecomer(request):
                             student = s,
                             datetime = datetime
                             )
+                        count = count + 1
                     except Student.DoesNotExist:
                         message_str + "ID number: " + row[header['studentID']].value+ " does not exist\n"
-                    count = count + 1
+                    
             message_str = str(count) + " Latecomers added"
         else:
             message_str = "No File Uploaded."
@@ -2535,9 +2565,10 @@ def upload_disco(request):
                             action = str(row[header['action']].value),
                             date = date
                             )
+                        count = count + 1
                     except Student.DoesNotExist:
                         message_str + "ID number: " + row[header['studentID']].value+ " does not exist\n"
-                    count = count + 1
+                    
             message_str = str(count) + " Discos added"
         else:
             message_str = "No File Uploaded."
@@ -2588,10 +2619,11 @@ def update_ids(request):
                         Student.objects.filter(
                             bitsId=row[header['Old IDS']].value
                             ).update(bitsId=str(row[header['New IDS']].value)[:15])
+                        count = count + 1
                     except Exception:
                         message_str + "Error in student: " + str(row[header['Old IDS']].value) + "\n"
                     
-                    count = count + 1
+                    
             message_str = str(count) + " Updated IDS"
         else:
             message_str = "No File Uploaded."
@@ -2638,10 +2670,16 @@ def update_ps(request):
                         idx = 0
                         continue
                     # create User model first then Student model
+                    try:
+                        student = Student.objects.filter(bitsId=row[header['studentID']].value)
+                    except Exception:
+                        message_str + "student " + studentID + " not in database"
+                    try:
+                        hostel = HostelPS.objects.filter(student=student[0]).update(hostel=None, room=None, acadstudent=False, status=row[header['Status']].value, psStation=row[header['PS Station']].value)
+                        count = count + 1
+                    except Exception:
+                        message_str + "update failed for " + studentID
                     
-                    student = Student.objects.filter(bitsId=row[header['studentID']].value)
-                    hostel = HostelPS.objects.filter(student=student[0]).update(hostel=None, room=None, acadstudent=False, status=row[header['Status']].value, psStation=row[header['PS Station']].value)
-                    count = count + 1
             message_str = str(count) + " Updated PS/Thesis"
         else:
             message_str = "No File Uploaded."
