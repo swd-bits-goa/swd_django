@@ -92,7 +92,7 @@ class HostelSuperintendent(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=50, null=True, blank=True)
     email = models.EmailField(null=True, blank=True)
-    hostel = models.CharField(max_length=5, choices=HOSTELS, null=True, blank=True)
+    hostel = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return self.hostel + ' ' + self.name + ' ' + self.email
