@@ -153,8 +153,8 @@ class HostelPS(models.Model):
     acadstudent = models.BooleanField()
     status = models.CharField(max_length=10, choices=STUDENT_STATUS)
     psStation = models.CharField(max_length=100, null=True, blank=True)
-    hostel = models.CharField(max_length=5, null=True, blank=True, choices=HOSTELS)
-    room = models.CharField(max_length=7, null=True, blank=True)
+    hostel = models.TextField(null=True, blank=True)
+    room = models.CharField(max_length = 7, null=True, blank=True)
 
     def __str__(self):
         return self.student.bitsId + ' (' + self.student.name + ')'
@@ -313,7 +313,7 @@ class TeeAdd(models.Model):
     desc = models.TextField()
     pic = models.ImageField(blank=True, null=True)
     price = models.FloatField()
-    nick_price = models.FloatField(blank = True)
+    nick_price = models.FloatField(blank = True, null = True)
     nick = models.BooleanField(blank=True)
     colors = models.CharField(max_length=100, blank=True, null=True)
     sizes = models.CharField(max_length=100, blank=True, null=True)

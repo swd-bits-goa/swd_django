@@ -2372,8 +2372,8 @@ def update_hostel(request):
                         count = count + 1
                     except HostelPS.DoesNotExist:
                         HostelPS.objects.create(student=student, hostel=row[header['Hostel']].value, room=str(row[header['Room']].value), acadstudent=True, status="Student", psStation="")
-                        message_str = row[header['studentID']].value + " failed to update \n"
-                        print("create")
+                        #message_str = row[header['studentID']].value + " failed to update \n"
+                        #print("create")
                         count = count + 1
                     if message_str is not '':
                         messages.add_message(request,
