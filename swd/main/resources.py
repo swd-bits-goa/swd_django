@@ -35,3 +35,8 @@ class MessOptionResource(resources.ModelResource):
     class Meta:
         model = MessOption
         fields = ('monthYear','student__name','student__bitsId','mess',)
+
+class StudentResource(resources.ModelResource):
+    class Meta:
+        model = Student
+        fields = ('bitsId', 'name')

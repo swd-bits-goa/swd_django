@@ -722,7 +722,9 @@ def hostelsuperintendent(request):
     hostelsuperintendents = HostelSuperintendent.objects.filter(user=request.user)
     daypass = []
     for hostelsuperintendent in hostelsuperintendents:
-        daypass += DayPass.objects.filter(student__hostelps__hostel__icontains=hostelsuperintendent.hostel).order_by('approved', '-id')
+        for hostel in hostelsuperintendent.hostel.split(', '):
+            daypass += DayPass.objects.filter(student__hostelps__hostel__icontains=hostel).order_by('approved', '-id')
+    print(daypass)
     context = {
         'option':1,
         'hostelsuperintendent': hostelsuperintendent,
@@ -921,14 +923,14 @@ def daypass(request):
             daypassform.save()
 
             if config.EMAIL_PROD:
-                email_to=[HostelSuperintendent.objects.get(hostel=HostelPS.objects.get(student=student).hostel).email]
+                email_to=[HostelSuperintendent.objects.get(hostel__icontains=HostelPS.objects.get(student=student).hostel).email]
             else:
                 email_to=["swdbitstest@gmail.com"]
                                                                                    # For testing
             mailObj=DayPass.objects.latest('id')
             mail_subject="New Daypass ID: "+ str(mailObj.id)
             mail_message="Daypass Application applied by "+ mailObj.student.name +" with id: " + str(mailObj.id) + ".\n"
-            send_mail(mail_subject,mail_message,settings.EMAIL_HOST_USER,email_to,fail_silently=False)
+            #send_mail(mail_subject,mail_message,settings.EMAIL_HOST_USER,email_to,fail_silently=False)
 
             context = {
                 'option1': 1,
@@ -1230,9 +1232,9 @@ def store(request):
                 qty = request.POST.get('quantity')
                 # Validation
                 message_error = ""
-                if teeno.nick == True:
-                    if nick == "":
-                        message_error = "No nick provided. Please provide a nick."
+                #if teeno.nick == True:
+                #    if nick == "":
+                #        message_error = "No nick provided. Please provide a nick."
                 if teeno.sizes and sizes not in teeno.sizes.split(','):
                     message_error = "Size doesn't match the database."
                 if teeno.colors and colors not in teeno.colors.split(','):
@@ -1321,7 +1323,7 @@ def dues(request):
 
     return render(request, "dues.html", context)
 
-
+@login_required
 def search(request):    
     perm=0;
     option='indexbase.html';
@@ -1331,7 +1333,38 @@ def search(request):
         'permission': perm,
         'option' :option
     }
-    if request.user.is_authenticated:
+    
+    if is_warden(request.user):
+        warden = Warden.objects.get(user=request.user)
+        option = 'wardenbase.html'
+        perm=1
+        context = {
+            'hostels' : [i[0] for i in HOSTELS],
+            'branches' : BRANCH,
+            'permission': perm,
+            'option' :option,
+            'warden' : warden,
+        }
+    elif is_hostelsuperintendent(request.user):
+        option = 'superintendentbase.html'
+        perm=1
+        hostelsuperintendent = HostelSuperintendent.objects.get(user=request.user)
+        context = {
+            'hostels' : [i[0] for i in HOSTELS],
+            'branches' : BRANCH,
+            'permission': perm,
+            'option' :option,
+            'hostelsuperintendent':hostelsuperintendent,
+        }
+    elif request.user.is_superuser:
+        perm=1
+        context = {
+            'hostels' : [i[0] for i in HOSTELS],
+            'branches' : BRANCH,
+            'permission': perm,
+            'option' :option,
+        }
+    elif request.user.is_authenticated:
         student = Student.objects.get(user=request.user)
         leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
         daypasss = DayPass.objects.filter(student=student, dateTime__gte=date.today() - timedelta(days=7))
@@ -1389,38 +1422,7 @@ def search(request):
            'balance': balance
         }
 
-        if is_warden(request.user):
-            warden = Warden.objects.get(user=request.user)
-            option = 'wardenbase.html'
-            perm=1
-            context = {
-                'hostels' : [i[0] for i in HOSTELS],
-                'branches' : BRANCH,
-                'permission': perm,
-                'option' :option,
-                'warden' : warden,
-            }
-        elif is_hostelsuperintendent(request.user):
-            option = 'superintendentbase.html'
-            perm=1
-            hostelsuperintendent = HostelSuperintendent.objects.get(user=request.user)
-            context = {
-                'hostels' : [i[0] for i in HOSTELS],
-                'branches' : BRANCH,
-                'permission': perm,
-                'option' :option,
-                'hostelsuperintendent':hostelsuperintendent,
-            }
-        elif request.user.is_superuser:
-            perm=1
-            context = {
-                'hostels' : [i[0] for i in HOSTELS],
-                'branches' : BRANCH,
-                'permission': perm,
-                'option' :option,
-            }
-        
-          
+      
     postContext = {}
     if request.GET:
         name = request.GET.get('name')
@@ -1448,10 +1450,46 @@ def search(request):
             'students' : students,
             'searchstr' : searchstr
         }
-    if request.user.is_authenticated and not is_warden(request.user):
+    
+    if request.user.is_authenticated and not is_warden(request.user) and not is_hostelsuperintendent(request.user):
         return render(request, "search_logged_in.html", dict(context, **postContext))
     else:
         return render(request, "search.html", dict(context, **postContext))
+
+def search_no_login(request):
+    context = {
+        'hostels' : [i[0] for i in HOSTELS],
+        'branches' : BRANCH,
+        'option': 'indexbase.html'
+    }
+    postContext = {}
+    if request.GET:
+        name = request.GET.get('name')
+        bitsId = request.GET.get('bitsId')
+        branch = request.GET.get('branch')
+        hostel = request.GET.get('hostel')
+        room = request.GET.get('room')
+
+        students = Student.objects.filter(Q(name__contains=name) & Q(bitsId__contains=bitsId) & Q(bitsId__contains=branch) & Q(hostelps__hostel__contains=hostel) & Q(hostelps__room__contains=room))[:50]
+
+        searchstr = {}
+
+        if name is not "":
+            searchstr['Name'] = name
+        if bitsId is not "":
+            searchstr['BITS ID'] = bitsId
+        if branch is not "":
+            searchstr['Branch'] = branch
+        if hostel is not "":
+            searchstr['Hostel'] = hostel
+        if room is not "":
+            searchstr['Room'] = room
+            
+        postContext = {
+            'students' : students,
+            'searchstr' : searchstr
+        }
+    return render(request, "search.html", dict(context, **postContext))
 
 def notice(request):
     context = {

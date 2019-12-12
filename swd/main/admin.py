@@ -74,7 +74,7 @@ def update_cgpa(modeladmin, request, queryset):
     return redirect('import_cgpa')
 update_cgpa.short_description = u"Update CGPAs with Excel File"
 
-class StudentAdmin(admin.ModelAdmin):
+class StudentAdmin(ExportActionModelAdmin):
     search_fields = ['name', 'bitsId']
     actions = [export_xls, update_cgpa, ]
 
@@ -82,7 +82,7 @@ def add_new_students(modeladmin, request, queryset):
     return redirect('add_new_students')
 add_new_students.description = u"Add New Students from Excel"
 
-class StudentAdmin(admin.ModelAdmin):
+class StudentAdmin(ExportActionModelAdmin):
     search_fields = ['name', 'bitsId']
     actions = [export_xls, add_new_students, ]
 

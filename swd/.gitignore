@@ -19,3 +19,5 @@ studentimg
 *.swp
 *.patch
 venv/
+media/
+ProfilePictures/

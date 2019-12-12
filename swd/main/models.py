@@ -92,7 +92,7 @@ class HostelSuperintendent(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=50, null=True, blank=True)
     email = models.EmailField(null=True, blank=True)
-    hostel = models.CharField(max_length=5, choices=HOSTELS, null=True, blank=True)
+    hostel = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return self.hostel + ' ' + self.name + ' ' + self.email
@@ -313,6 +313,7 @@ class TeeAdd(models.Model):
     desc = models.TextField()
     pic = models.ImageField(blank=True, null=True)
     price = models.FloatField()
+    nick_price = models.FloatField(blank = True)
     nick = models.BooleanField(blank=True)
     colors = models.CharField(max_length=100, blank=True, null=True)
     sizes = models.CharField(max_length=100, blank=True, null=True)
@@ -345,7 +346,10 @@ class TeeBuy(models.Model):
         return self.student.bitsId + ' ' + self.tee.title
 
     def save(self, *args, **kwargs):
-        self.totamt = float(self.qty) * float(self.tee.price)
+        if self.nick == "":
+            self.totamt = float(self.qty) * float(self.tee.price)
+        else:
+            self.totamt = float(self.qty) * float(self.tee.nick_price)
         super(TeeBuy, self).save(*args, **kwargs)
   
 class ItemBuy(models.Model):
