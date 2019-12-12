@@ -38,7 +38,10 @@
                             <p style="font-size: 16px"><b>{{ i.title }}</b></p>
                             <p style="color:#4e4e4e">{{ i.desc }}</p>
 
-                            <p style="color: #B12704;"><b>₹{{ i.price }}</b></p>
+                            <p style="color: #B12704;">Price without nick: <b>₹{{ i.price }}</b></p>
+                            {% if i.nick %}
+                            <p style="color: #B12704;">Price with nick: <b>₹{{ i.nick_price }}</b></p>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -125,7 +128,7 @@
             <div class="col s12 l7">
 
                 <p align="justify">` + items[info][1] + `</p>
-                <p align="right" id="price"><b> ₹` + items[info][3] + `</b></p>
+                <p align="right" id="price"><b>Price without nick: ₹` + items[info][3] + `</b></p>
                 <p>
                     <input id="agree" type="checkbox" class="filled-in"/>
                     <label for="agree">I agree to buy this item and understand that the amount will be deducted from my account</label for="agree">
@@ -153,7 +156,7 @@
 
     openTeeModal = function (info) {
         info = parseInt(info)
-        var tees = { {% for i in tees %} "{{ i.id }}" : ["{{ i.title|safe }}", `{{ i.desc|safe }}`, "{{ i.pic|safe }}", "{{ i.price }}", "{{ i.nick|safe }}", "{{ i.colors|safe }}", "{{ i.sizes|safe }}", "{{ i.available }}"], {% endfor %} }
+        var tees = { {% for i in tees %} "{{ i.id }}" : ["{{ i.title|safe }}", `{{ i.desc|safe }}`, "{{ i.pic|safe }}", "{{ i.price }}", "{{ i.nick|safe }}", "{{ i.colors|safe }}", "{{ i.sizes|safe }}", "{{ i.available }}", "{{i.nick_price|safe}}"], {% endfor %} }
     console.log(tees)
     $("#modalheader").html(tees[info][0])
     var nick = "";
@@ -198,7 +201,7 @@
                 <form method="POST" action="/store/">
                     {% csrf_token %}
                 <p align="justify">` + tees[info][1] + `</p>
-                <p align="right" id="price"><b> ₹` + tees[info][3] + `</b></p>
+                <p align="right" id="price"> Price without nick: <b> ₹` + tees[info][3] + `</b></p>
                 ` + nick + colors + sizes + `    
                 <div class="input-field col s4 offset-s8">
                     <input id="quantity" name="quantity" type="text" class="validate">
@@ -231,7 +234,13 @@
             buyable = false;
         }
         else {
-            $("#money").text('Total Amount : ₹' + parseInt($('#quantity').val()) * tees[info][3])
+            
+            if($("#nick").val().length==0){
+                $("#money").text('Total Amount : ₹' + parseInt($('#quantity').val()) * tees[info][3])
+            }
+            else {
+                $("#money").text('Total Amount : ₹' + parseInt($('#quantity').val()) * tees[info][8])
+            }
             buyable = true;
         }
     });

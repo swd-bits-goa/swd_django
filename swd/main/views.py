@@ -1232,9 +1232,9 @@ def store(request):
                 qty = request.POST.get('quantity')
                 # Validation
                 message_error = ""
-                if teeno.nick == True:
-                    if nick == "":
-                        message_error = "No nick provided. Please provide a nick."
+                #if teeno.nick == True:
+                #    if nick == "":
+                #        message_error = "No nick provided. Please provide a nick."
                 if teeno.sizes and sizes not in teeno.sizes.split(','):
                     message_error = "Size doesn't match the database."
                 if teeno.colors and colors not in teeno.colors.split(','):
