@@ -993,10 +993,6 @@ def messbill(request):
             ws.write(row_num, col_num, columns[col_num][0], h2_font_style)
             ws.col(col_num).width = columns[col_num][1]
 
-        # messbill = MessBill.objects.latest()
-        # amount = messbill.amount
-        # rebate = messbill.rebate
-        
         with open(settings.CONSTANTS_LOCATION, 'r') as fp:
             data = json.load(fp)
         amount = float(data['mess-amount'])
@@ -1009,33 +1005,54 @@ def messbill(request):
             mess=messOpt,
             monthYear__range=(start_date.replace(day=1), end_date.replace(day=1))
         )
+
         for k in values:
 
             obj = k.student
             leaves = Leave.objects.filter(student=obj)
             # Count no of days for which rebate is given
             noofdays = 0
+            # Count no of days for which full rebate is givem
+            num_vac_days = 0
+
             for leave in leaves:
                 if leave.approved == True:
                     if leave.dateTimeStart.date() >= start_date and leave.dateTimeStart.date() <= end_date and leave.dateTimeEnd.date() >= end_date:
-                        noofdays += abs(end_date -
+                        length = abs(end_date -
                                         leave.dateTimeStart.date()).days + 1
+                        if leave.comment == "Vacation":
+                            num_vac_days += length
+                        else:
+                            noofdays += length
                     elif leave.dateTimeEnd.date() >= start_date and leave.dateTimeEnd.date() <= end_date and leave.dateTimeStart.date() <= start_date:
-                        noofdays += abs(leave.dateTimeEnd.date() -
+                        length = abs(leave.dateTimeEnd.date() -
                                         start_date).days + 1
+                        if leave.comment == "Vacation":
+                            num_vac_days += length
+                        else:
+                            noofdays += length
                     elif leave.dateTimeStart.date() >= start_date and leave.dateTimeEnd.date() <= end_date:
-                        noofdays += abs(leave.dateTimeEnd.date() -
+                        length = abs(leave.dateTimeEnd.date() -
                                         leave.dateTimeStart.date()).days + 1
+                        if leave.comment == "Vacation":
+                            num_vac_days += length
+                        else:
+                            noofdays += length
                     elif leave.dateTimeStart.date() <= start_date and leave.dateTimeEnd.date() >= end_date:
-                        noofdays += abs(end_date - start_date).days + 1
+                        length = abs(end_date - start_date).days + 1
+                        if leave.comment == "Vacation":
+                            num_vac_days += length
+                        else:
+                            noofdays += length
+
             if request.POST.get('extype') is 'R':
-                finalamt = amount * days - rebate * noofdays
+                finalamt = amount * (days - num_vac_days) - rebate * noofdays
 
                 row = [
                     obj.name,
                     obj.bitsId,
                     amount * days,
-                    rebate * noofdays,
+                    rebate * noofdays + amount * num_vac_days,
                     finalamt
                 ]
 
@@ -1059,7 +1076,7 @@ def messbill(request):
                         obj.name,
                         obj.bitsId,
                         amount * days,
-                        rebate * noofdays,
+                        rebate * noofdays - amount * num_vac_days,
                         finalamt,
                         month.strftime("%B %y")
                     ]
@@ -1069,7 +1086,6 @@ def messbill(request):
                         ws.write(row_num, col_num, row[col_num], font_style)
             else:
                 messages.error(request, 'Invalid: extype={} found'.format(request.POST.get('extype')))
-
 
         wb.save(response)
         messages.success(request, "Export done. Download will automatically start.")
