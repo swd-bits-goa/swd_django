@@ -81,7 +81,8 @@ class Warden(models.Model):
     name = models.CharField(max_length=50, null=True, blank=True)
     chamber = models.CharField(max_length=15, null=True, blank=True)
     residence = models.CharField(max_length=10, null=True, blank=True)
-    phone = models.CharField(max_length=15, null=True, blank=True)
+    phone_off = models.CharField(max_length=15, null=True, blank=True)
+    phone_res = models.CharField(max_length=15, null=True, blank=True)
     email = models.EmailField(null=True, blank=True)
     hostel = models.CharField(max_length=5, choices=HOSTELS, null=True, blank=True)
 
@@ -93,6 +94,9 @@ class HostelSuperintendent(models.Model):
     name = models.CharField(max_length=50, null=True, blank=True)
     email = models.EmailField(null=True, blank=True)
     hostel = models.TextField(null=True, blank=True)
+    chamber = models.CharField(max_length=15, null=True, blank=True)
+    phone_off = models.CharField(max_length=15, null=True, blank=True)
+    phone_res = models.CharField(max_length=15, null=True, blank=True)
 
     def __str__(self):
         return self.hostel + ' ' + self.name + ' ' + self.email

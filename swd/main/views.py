@@ -722,7 +722,7 @@ def hostelsuperintendent(request):
     hostelsuperintendents = HostelSuperintendent.objects.filter(user=request.user)
     daypass = []
     for hostelsuperintendent in hostelsuperintendents:
-        for hostel in hostelsuperintendent.hostel.split(', '):
+        for hostel in hostelsuperintendent.hostel.split(','):
             daypass += DayPass.objects.filter(student__hostelps__hostel__icontains=hostel).order_by('approved', '-id')
     print(daypass)
     context = {
@@ -2230,7 +2230,8 @@ def add_wardens(request):
                     warden = Warden.objects.create(
                         user=user,
                         name=row[header['Name']].value,
-                        phone=row[header['Tel:(Off.)']].value,
+                        phone_off=row[header['Tel:(Off.)']].value,
+                        phone_res=row[header['Tel:(Res.)']].value,
                         email=emailID,
                         chamber=row[header['Chamber No.']].value,
                         hostel=row[header['Function']].value,
@@ -2261,7 +2262,7 @@ def add_superintendents(request):
                     messages.add_message(request,
                                         message_tag, 
                                         message_str)
-                    return render(request, "add_students.html", {'header': "Add new superintendent"})
+                    return render(request, "add_students.html", {'header': "Add new superintendents"})
 
             fd, tmp = tempfile.mkstemp()
             with os.fdopen(fd, 'wb') as out:
@@ -2282,9 +2283,8 @@ def add_superintendents(request):
                         idx = 0
                         continue
                     # create User model first then Student model
-                    emailID = row[header['Superintendent Email ID']].value
+                    emailID = row[header['Email:@goa.bits-pilani.ac.in']].value + "@goa.bits-pilani.ac.in"
                     username = emailID.split('@', 1)[0]
-                    
                     password = User.objects.make_random_password()
                     try:
                         user = User.objects.get(username=username)
@@ -2299,9 +2299,12 @@ def add_superintendents(request):
                     
                     si = HostelSuperintendent.objects.create(
                         user=user,
-                        name=row[header['name']].value,
+                        name=row[header['Name']].value,
+                        phone_off=row[header['Tel:(Off.)']].value,
+                        phone_res=row[header['Tel:(Res.)']].value,
                         email=emailID,
-                        hostel=row[header['hostel']].value,
+                        chamber=row[header['Chamber No.']].value,
+                        hostel=row[header['Hostels']].value,
                         )
                     count = count + 1
             message_str = str(count) + " new superintendents added."
@@ -2312,7 +2315,7 @@ def add_superintendents(request):
         messages.add_message(request,
                             message_tag, 
                             message_str)
-    return render(request, "add_students.html", {'header': "Add new wardens"})
+    return render(request, "add_students.html", {'header': "Add new superintendents"})
 
 @user_passes_test(lambda u: u.is_superuser)
 def update_hostel(request):
