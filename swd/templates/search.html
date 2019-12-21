@@ -79,6 +79,7 @@
                         <table class="centered striped">
                             <thead>
                                 <tr>
+                                    <th>Sr. No.</th>
                                     <th>Student ID</th>
                                     <th>Name</th>
                                     <th>Hostel</th>
@@ -89,6 +90,7 @@
                             <tbody>
                                 {% for i in students %}
                                 <tr>
+                                    <td>{{forloop.counter}}</td>
                                     <td>{{ i.bitsId }}</td>
                                     {% if permission == 1 %}
                                     <td><a href="/student/{{ i.id }}/">{{ i.name }}</a></td>
