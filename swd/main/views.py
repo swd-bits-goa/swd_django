@@ -2730,7 +2730,7 @@ def update_ps(request):
                     try:
                         student = Student.objects.filter(bitsId=row[header['studentID']].value)
                     except Exception:
-                        message_str + "student " + studentID + " not in database"
+                        message_str + "student " + row[header['studentID']].value + " not in database"
                     try:
                         hostel = HostelPS.objects.filter(student=student[0]).update(hostel=None, room=None, acadstudent=False, status=row[header['Status']].value, psStation=row[header['PS Station']].value)
                         count = count + 1
