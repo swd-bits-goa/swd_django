@@ -93,7 +93,9 @@ class HostelSuperintendent(models.Model):
     name = models.CharField(max_length=50, null=True, blank=True)
     email = models.EmailField(null=True, blank=True)
     hostel = models.TextField(null=True, blank=True)
-
+    chamber = models.CharField(max_length = 10, null=True, blank=True)
+    office_ph = models.CharField(max_length = 12, null = True, blank=True)
+    residence_ph = models.CharField(max_length = 12, null = True, blank=True)
     def __str__(self):
         return self.hostel + ' ' + self.name + ' ' + self.email
 
@@ -416,8 +418,8 @@ class Notice(models.Model):
 
 class Document(models.Model):
     title = models.CharField(max_length=100)
-    #file = models.ForeignKey(FileAdd, on_delete=models.CASCADE, null=True, blank=True)
-    link = models.CharField(max_length=50, blank=True, null=True)
+    file = models.ForeignKey(FileAdd, on_delete=models.CASCADE, null=True, blank=True)
+    #link = models.CharField(max_length=50, blank=True, null=True)
     def __str__(self):
         return self.title    
 class AntiRagging(models.Model):
