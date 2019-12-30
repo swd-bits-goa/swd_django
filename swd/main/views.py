@@ -35,6 +35,8 @@ import os
 import tempfile
 import json
 
+from calendar import monthrange
+
 
 def noPhD(func):
     def check(request, *args, **kwargs):
@@ -2746,3 +2748,57 @@ def update_ps(request):
                             message_tag, 
                             message_str)
     return render(request, "add_students.html", {'header': "Update PS/Thesis"})
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def export_mess_leave(request):
+    if request.POST:
+        month = int(request.POST["month"])
+        year = int(request.POST["year"])
+        mess = request.POST["mess"]
+
+        _, month_end_day = monthrange(year, month)
+        month_start_date = make_aware(datetime(year=year, month=month, day=1))
+        month_end_date = make_aware(datetime(year=year, month=month, day=month_end_day))
+
+        leave_within_month = \
+            Q(dateTimeStart__month__exact=month, dateTimeStart__year__exact=year) |\
+            Q(dateTimeEnd__month__exact=month, dateTimeEnd__year__exact=year)
+
+        leaves = Leave.objects.filter(leave_within_month,          # Leave is in that month
+            student__messoption__monthYear__month__exact=month,    # Was in that mess that month
+            student__messoption__monthYear__year__exact=year,
+            student__messoption__mess__exact=mess,
+            approved__exact=True)
+
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = 'attachment; filename="mess_leaves.xls"'
+
+        wb = xlwt.Workbook(encoding='utf-8')
+        ws = wb.add_sheet('Mess Leave Details')
+
+        font_style = xlwt.XFStyle()
+        font_style.font.bold = True
+
+        columns = ['ID', 'Name', 'Leave Start', 'Leave End', 'Number of days to bill']
+
+        for i, col_name in enumerate(columns):
+            ws.write(0, i, col_name, font_style)
+
+        font_style = xlwt.XFStyle()
+        for row_num, leave in enumerate(leaves, start=1):
+            bill_start = max(leave.dateTimeStart, month_start_date)
+            bill_end = min(leave.dateTimeEnd, month_end_date)
+            num_days = (bill_end - bill_start).days + 1
+
+            row_contents = [leave.student.bitsId, leave.student.name,
+                leave.dateTimeStart, leave.dateTimeEnd, num_days]
+
+            for col_num, content in enumerate(row_contents):
+                ws.write(row_num, col_num, str(content), font_style)
+
+        wb.save(response)
+        return response
+
+    return render(request, "export_mess_leave.html")
+
