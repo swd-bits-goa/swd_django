@@ -61,6 +61,7 @@ urlpatterns = [
 
     url(r'^admin/add_new_students/', views.add_new_students, name='add_new_students'),
     url(r'^admin/add_new_wardens/', views.add_wardens, name='add_wardens'),
+    url(r'^admin/add_new_superintendents/', views.add_superintendents, name='add_superintendents'),
     url(r'^admin/update_hostel/', views.update_hostel, name='add_hostels'),
     url(r'^admin/update_phone/', views.update_contact, name='add_phone'),
     url(r'^admin/update_parent_phone/', views.update_parent_contact, name='add_parentphone'),

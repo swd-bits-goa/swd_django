@@ -81,7 +81,8 @@ class Warden(models.Model):
     name = models.CharField(max_length=50, null=True, blank=True)
     chamber = models.CharField(max_length=15, null=True, blank=True)
     residence = models.CharField(max_length=10, null=True, blank=True)
-    phone = models.CharField(max_length=15, null=True, blank=True)
+    phone_off = models.CharField(max_length=15, null=True, blank=True)
+    phone_res = models.CharField(max_length=15, null=True, blank=True)
     email = models.EmailField(null=True, blank=True)
     hostel = models.CharField(max_length=5, choices=HOSTELS, null=True, blank=True)
 
@@ -93,9 +94,16 @@ class HostelSuperintendent(models.Model):
     name = models.CharField(max_length=50, null=True, blank=True)
     email = models.EmailField(null=True, blank=True)
     hostel = models.TextField(null=True, blank=True)
+<<<<<<< HEAD
     chamber = models.CharField(max_length = 10, null=True, blank=True)
     office_ph = models.CharField(max_length = 12, null = True, blank=True)
     residence_ph = models.CharField(max_length = 12, null = True, blank=True)
+=======
+    chamber = models.CharField(max_length=15, null=True, blank=True)
+    phone_off = models.CharField(max_length=15, null=True, blank=True)
+    phone_res = models.CharField(max_length=15, null=True, blank=True)
+
+>>>>>>> 2a3cece11c80242cda913bd49caa4c2f1f7e313b
     def __str__(self):
         return self.hostel + ' ' + self.name + ' ' + self.email
 

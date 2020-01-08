@@ -79,6 +79,9 @@ CORS_ORIGIN_ALLOW_ALL = True
 # during production need to set it to expire after some time
 JWT_VERIFY_EXPIRATION = False
 
+#SESSION_COOKIE_SECURE = True
+#SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -98,7 +101,7 @@ if PRODUCTION:
         )
 else:
     AUTHENTICATION_BACKENDS = (
-    	'main.auth_backend.LDAPAuthBackend',
+    	#'main.auth_backend.LDAPAuthBackend',
         'django.contrib.auth.backends.ModelBackend',
     )
 

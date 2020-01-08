@@ -722,7 +722,7 @@ def hostelsuperintendent(request):
     hostelsuperintendents = HostelSuperintendent.objects.filter(user=request.user)
     daypass = []
     for hostelsuperintendent in hostelsuperintendents:
-        for hostel in hostelsuperintendent.hostel.split(', '):
+        for hostel in hostelsuperintendent.hostel.split(','):
             daypass += DayPass.objects.filter(student__hostelps__hostel__icontains=hostel).order_by('approved', '-id')
     print(daypass)
     context = {
@@ -993,10 +993,6 @@ def messbill(request):
             ws.write(row_num, col_num, columns[col_num][0], h2_font_style)
             ws.col(col_num).width = columns[col_num][1]
 
-        # messbill = MessBill.objects.latest()
-        # amount = messbill.amount
-        # rebate = messbill.rebate
-        
         with open(settings.CONSTANTS_LOCATION, 'r') as fp:
             data = json.load(fp)
         amount = float(data['mess-amount'])
@@ -1009,33 +1005,54 @@ def messbill(request):
             mess=messOpt,
             monthYear__range=(start_date.replace(day=1), end_date.replace(day=1))
         )
+
         for k in values:
 
             obj = k.student
             leaves = Leave.objects.filter(student=obj)
             # Count no of days for which rebate is given
             noofdays = 0
+            # Count no of days for which full rebate is givem
+            num_vac_days = 0
+
             for leave in leaves:
                 if leave.approved == True:
                     if leave.dateTimeStart.date() >= start_date and leave.dateTimeStart.date() <= end_date and leave.dateTimeEnd.date() >= end_date:
-                        noofdays += abs(end_date -
+                        length = abs(end_date -
                                         leave.dateTimeStart.date()).days + 1
+                        if leave.comment == "Vacation":
+                            num_vac_days += length
+                        else:
+                            noofdays += length
                     elif leave.dateTimeEnd.date() >= start_date and leave.dateTimeEnd.date() <= end_date and leave.dateTimeStart.date() <= start_date:
-                        noofdays += abs(leave.dateTimeEnd.date() -
+                        length = abs(leave.dateTimeEnd.date() -
                                         start_date).days + 1
+                        if leave.comment == "Vacation":
+                            num_vac_days += length
+                        else:
+                            noofdays += length
                     elif leave.dateTimeStart.date() >= start_date and leave.dateTimeEnd.date() <= end_date:
-                        noofdays += abs(leave.dateTimeEnd.date() -
+                        length = abs(leave.dateTimeEnd.date() -
                                         leave.dateTimeStart.date()).days + 1
+                        if leave.comment == "Vacation":
+                            num_vac_days += length
+                        else:
+                            noofdays += length
                     elif leave.dateTimeStart.date() <= start_date and leave.dateTimeEnd.date() >= end_date:
-                        noofdays += abs(end_date - start_date).days + 1
+                        length = abs(end_date - start_date).days + 1
+                        if leave.comment == "Vacation":
+                            num_vac_days += length
+                        else:
+                            noofdays += length
+
             if request.POST.get('extype') is 'R':
-                finalamt = amount * days - rebate * noofdays
+                finalamt = amount * (days - num_vac_days) - rebate * noofdays
 
                 row = [
                     obj.name,
                     obj.bitsId,
                     amount * days,
-                    rebate * noofdays,
+                    rebate * noofdays + amount * num_vac_days,
                     finalamt
                 ]
 
@@ -1059,7 +1076,7 @@ def messbill(request):
                         obj.name,
                         obj.bitsId,
                         amount * days,
-                        rebate * noofdays,
+                        rebate * noofdays - amount * num_vac_days,
                         finalamt,
                         month.strftime("%B %y")
                     ]
@@ -1069,7 +1086,6 @@ def messbill(request):
                         ws.write(row_num, col_num, row[col_num], font_style)
             else:
                 messages.error(request, 'Invalid: extype={} found'.format(request.POST.get('extype')))
-
 
         wb.save(response)
         messages.success(request, "Export done. Download will automatically start.")
@@ -1431,7 +1447,7 @@ def search(request):
         hostel = request.GET.get('hostel')
         room = request.GET.get('room')
 
-        students = Student.objects.filter(Q(name__icontains=name) & Q(bitsId__icontains=bitsId) & Q(bitsId__contains=branch) & Q(hostelps__hostel__contains=hostel) & Q(hostelps__room__contains=room))[:50]
+        students = Student.objects.filter(Q(name__icontains=name) & Q(bitsId__icontains=bitsId) & Q(bitsId__contains=branch) & Q(hostelps__hostel__contains=hostel) & Q(hostelps__room__contains=room))
 
         searchstr = {}
 
@@ -1470,7 +1486,7 @@ def search_no_login(request):
         hostel = request.GET.get('hostel')
         room = request.GET.get('room')
 
-        students = Student.objects.filter(Q(name__contains=name) & Q(bitsId__contains=bitsId) & Q(bitsId__contains=branch) & Q(hostelps__hostel__contains=hostel) & Q(hostelps__room__contains=room))[:50]
+        students = Student.objects.filter(Q(name__icontains=name) & Q(bitsId__contains=bitsId) & Q(bitsId__contains=branch) & Q(hostelps__hostel__contains=hostel) & Q(hostelps__room__contains=room))
 
         searchstr = {}
 
@@ -2230,7 +2246,8 @@ def add_wardens(request):
                     warden = Warden.objects.create(
                         user=user,
                         name=row[header['Name']].value,
-                        phone=row[header['Tel:(Off.)']].value,
+                        phone_off=row[header['Tel:(Off.)']].value,
+                        phone_res=row[header['Tel:(Res.)']].value,
                         email=emailID,
                         chamber=row[header['Chamber No.']].value,
                         hostel=row[header['Function']].value,
@@ -2261,7 +2278,7 @@ def add_superintendents(request):
                     messages.add_message(request,
                                         message_tag, 
                                         message_str)
-                    return render(request, "add_students.html", {'header': "Add new superintendent"})
+                    return render(request, "add_students.html", {'header': "Add new superintendents"})
 
             fd, tmp = tempfile.mkstemp()
             with os.fdopen(fd, 'wb') as out:
@@ -2282,9 +2299,12 @@ def add_superintendents(request):
                         idx = 0
                         continue
                     # create User model first then Student model
+<<<<<<< HEAD
                     emailID = row[header['Email']].value + '@goa.bits-pilani.ac.in'
+=======
+                    emailID = row[header['Email:@goa.bits-pilani.ac.in']].value + "@goa.bits-pilani.ac.in"
+>>>>>>> 2a3cece11c80242cda913bd49caa4c2f1f7e313b
                     username = emailID.split('@', 1)[0]
-                    
                     password = User.objects.make_random_password()
                     try:
                         user = User.objects.get(username=username)
@@ -2300,11 +2320,19 @@ def add_superintendents(request):
                     si = HostelSuperintendent.objects.create(
                         user=user,
                         name=row[header['Name']].value,
+<<<<<<< HEAD
                         email=emailID,
                         hostel=row[header['Hostels']].value,
                         chamber = row[header['Chamber No.']].value,
                         office_ph = str(row[header['Tel:(Off.)']].value),
                         residence_ph = str(row[header['Tel:(Res.)']].value),
+=======
+                        phone_off=row[header['Tel:(Off.)']].value,
+                        phone_res=row[header['Tel:(Res.)']].value,
+                        email=emailID,
+                        chamber=row[header['Chamber No.']].value,
+                        hostel=row[header['Hostels']].value,
+>>>>>>> 2a3cece11c80242cda913bd49caa4c2f1f7e313b
                         )
                     count = count + 1
             message_str = str(count) + " new superintendents added."
@@ -2315,7 +2343,7 @@ def add_superintendents(request):
         messages.add_message(request,
                             message_tag, 
                             message_str)
-    return render(request, "add_students.html", {'header': "Add new wardens"})
+    return render(request, "add_students.html", {'header': "Add new superintendents"})
 
 @user_passes_test(lambda u: u.is_superuser)
 def update_hostel(request):
@@ -2714,7 +2742,7 @@ def update_ps(request):
                     try:
                         student = Student.objects.filter(bitsId=row[header['studentID']].value)
                     except Exception:
-                        message_str + "student " + studentID + " not in database"
+                        message_str + "student " + row[header['studentID']].value + " not in database"
                     try:
                         hostel = HostelPS.objects.filter(student=student[0]).update(hostel=None, room=None, acadstudent=False, status=row[header['Status']].value, psStation=row[header['PS Station']].value)
                         count = count + 1
