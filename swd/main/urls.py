@@ -54,6 +54,7 @@ urlpatterns = [
     url(r'^import_dues_from_sheet/', views.import_dues_from_sheet, name='import_dues_from_sheet'),
     url(r'^publish_dues/', views.publish_dues, name='publish_dues'),
     url(r'^admin/edit_constants/', views.edit_constants, name='edit_constants'),
+    url(r'^mess_leave_dashboard/', views.export_mess_leave, name="export_mess_leave"),
 
     url(r'address_dashboard/', views.address_approval_dashboard, name='address_approval_dashboard'),
 
