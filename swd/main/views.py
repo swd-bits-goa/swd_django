@@ -2301,6 +2301,7 @@ def add_superintendents(request):
                         idx = 0
                         continue
                     # create User model first then Student model
+                    
                     emailID = row[header['Email:@goa.bits-pilani.ac.in']].value + "@goa.bits-pilani.ac.in"
                     username = emailID.split('@', 1)[0]
                     password = User.objects.make_random_password()
@@ -2318,11 +2319,11 @@ def add_superintendents(request):
                     si = HostelSuperintendent.objects.create(
                         user=user,
                         name=row[header['Name']].value,
+                        hostel=row[header['Hostels']].value,
+                        chamber = row[header['Chamber No.']].value,
                         phone_off=row[header['Tel:(Off.)']].value,
                         phone_res=row[header['Tel:(Res.)']].value,
                         email=emailID,
-                        chamber=row[header['Chamber No.']].value,
-                        hostel=row[header['Hostels']].value,
                         )
                     count = count + 1
             message_str = str(count) + " new superintendents added."
