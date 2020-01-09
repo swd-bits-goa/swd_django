@@ -94,16 +94,13 @@ class HostelSuperintendent(models.Model):
     name = models.CharField(max_length=50, null=True, blank=True)
     email = models.EmailField(null=True, blank=True)
     hostel = models.TextField(null=True, blank=True)
-<<<<<<< HEAD
     chamber = models.CharField(max_length = 10, null=True, blank=True)
     office_ph = models.CharField(max_length = 12, null = True, blank=True)
     residence_ph = models.CharField(max_length = 12, null = True, blank=True)
-=======
     chamber = models.CharField(max_length=15, null=True, blank=True)
     phone_off = models.CharField(max_length=15, null=True, blank=True)
     phone_res = models.CharField(max_length=15, null=True, blank=True)
 
->>>>>>> 2a3cece11c80242cda913bd49caa4c2f1f7e313b
     def __str__(self):
         return self.hostel + ' ' + self.name + ' ' + self.email
 
@@ -162,7 +159,7 @@ class HostelPS(models.Model):
     student = models.OneToOneField('Student', on_delete = models.CASCADE, related_name='hostelps')
     acadstudent = models.BooleanField()
     status = models.CharField(max_length=10, choices=STUDENT_STATUS)
-    psStation = models.CharField(max_length=100, null=True, blank=True)
+    psStation = models.TextField(null=True, blank=True)
     hostel = models.TextField(null=True, blank=True)
     room = models.CharField(max_length = 7, null=True, blank=True)
 
