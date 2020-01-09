@@ -68,4 +68,5 @@ urlpatterns = [
     url(r'^admin/update_parent_phone/', views.update_parent_contact, name='add_parentphone'),
     url(r'^admin/update_ids/', views.update_ids, name='update_ids'),
     url(r'^admin/update_ps/', views.update_ps, name='update_ps'),
+    url(r'^admin/update_address/', views.update_address, name='update_address'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

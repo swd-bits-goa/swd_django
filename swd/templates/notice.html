@@ -5,6 +5,7 @@
 
     <div class="row">
       <div class="col s12 m12">
+        {% comment %}
         {% if not student_filled_vac %}
         <p>
           <div class="card" style="padding:16px;">
@@ -19,7 +20,7 @@
             </div>
           </div>
           {% endif %}
-
+          {% endcomment %}
           {% for notice in queryset %}
           <p>
             <div class="card" style="padding:16px;">

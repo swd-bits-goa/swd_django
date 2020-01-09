@@ -98,7 +98,7 @@
                                     <td>{{ i.name }}</td>
                                     {% endif %}
                                     <td>{{ i.hostelps.hostel }}</td>
-                                    <td>{{ i.hostelps.room }}</td>
+                                    <td>{{ i.hostelps.room|floatformat }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>

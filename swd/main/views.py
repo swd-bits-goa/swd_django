@@ -1568,14 +1568,14 @@ def documents(request):
             context = {
                             'option1' : 'wardenbase.html',
                             'warden' : warden,
-                            'queryset' : Document.objects.all(),
+                            'queryset' : Document.objects.all().order_by('-pk'),
             }
         elif is_hostelsuperintendent(request.user):
             hostelsuperintendent = HostelSuperintendent.objects.get(user=request.user)
             context = {
                             'option1' : 'superintendentbase.html',
                             'hostelsuperintendent' : hostelsuperintendent,
-                            'queryset' : Document.objects.all(),
+                            'queryset' : Document.objects.all().order_by('-pk'),
             }
         else:
             student = Student.objects.get(user=request.user)
@@ -1623,7 +1623,7 @@ def documents(request):
             context = {
                             'option1' : 'base.html',
                             'student' : student,
-                            'queryset' : Document.objects.all(),
+                            'queryset' : Document.objects.all().order_by('-pk'),
                             'option': option,
                             'mess': mess,
                             'balance': balance,
@@ -2801,4 +2801,56 @@ def export_mess_leave(request):
         return response
 
     return render(request, "export_mess_leave.html")
+
+def update_address(request):
+    message_str = ''
+    message_tag = messages.INFO
+    if request.POST:
+        if request.FILES:
+            # Read Excel File into a temp file
+            xl_file = request.FILES['xl_file']
+            extension = xl_file.name.rsplit('.', 1)[1]
+            if ('xls' != extension):
+                if ('xlsx' != extension):
+                    messages.error(request, "Please upload .xls or .xlsx file only")
+                    messages.add_message(request,
+                                        message_tag, 
+                                        message_str)
+                    return render(request, "add_students.html", {'header': "Update Address"})
+
+            fd, tmp = tempfile.mkstemp()
+            with os.fdopen(fd, 'wb') as out:
+                out.write(xl_file.read())
+            workbook = xlrd.open_workbook(tmp)
+
+            count = 0
+            idx = 1
+            header = {}
+            for sheet in workbook.sheets():
+                for row in sheet.get_rows():
+                    if idx == 1:
+                        col_no = 0
+                        for cell in row:
+                            # Store the column names in dictionary
+                            header[str(cell.value)] = col_no
+                            col_no = col_no + 1
+                        idx = 0
+                        continue
+                    # create User model first then Student model
+                    try:
+                        student = Student.objects.get(bitsId=row[header['studentID']].value)
+                        student.address = row[header['address']].value
+                        student.save()
+                    except Exception:
+                        message_str + "student " + row[header['studentID']].value + " not in database"
+                    
+            message_str = str(count) + " Updated Address"
+        else:
+            message_str = "No File Uploaded."
+
+    if message_str is not '':
+        messages.add_message(request,
+                            message_tag, 
+                            message_str)
+    return render(request, "add_students.html", {'header': "Update Address"})
 
