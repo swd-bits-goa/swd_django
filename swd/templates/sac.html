@@ -1,5 +1,5 @@
 {% extends 'indexbase.html' %} {% block content %}
-
+{% load static %}
       
 <div class="card">  	
 	<div class="card content">	
@@ -22,6 +22,11 @@
 	Saturday:  <b>6:00am to 9:00am & 4:30pm to 9:30pm </b><br/>
 	Sunday and Selected Institute Holidays: <b>9:30am to 1:00pm & 4:00pm to 8:00pm</b>
 	Institute Holidays : <b>OFF </b></p>
+	</div>
+	<div class="card content" style="padding: 10px; text-align: center;">
+		<img src="{% static 'img/Badminton_hall.jpg' %}" height="300" width="450" style="padding-right: 0px">
+		<img src="{% static 'img/TableTennisHall.jpg' %}" height="300" width="450">
+		<img src="{% static 'img/Gym-Equipments.jpg' %}" height="300" width="450">
 	</div>
 	<div class="card content">
 		<p align="center" style="font-size:16px; font-family:Arial, Helvetica, sans-serif; color:#000066"> <b>INDOOR SPORTS FACILITIES</b></p>
