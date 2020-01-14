@@ -134,6 +134,7 @@ class Student(models.Model):
     parentName = models.CharField(max_length=50, blank=True, null=True)
     parentPhone = models.CharField(max_length=20, blank=True, null=True)
     parentEmail = models.CharField(max_length=50, blank=True, null=True)
+    bank_account_no = models.CharField(max_length=30, blank=True, null=True)
 
     def nophd(self):
         return re.match(r"^20\d{2}PHX[PF]\d{3,4}G$", self.bitsId, flags=re.IGNORECASE)
