@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+rom django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseForbidden
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -2376,7 +2376,7 @@ def update_hostel(request):
                         continue
                     # create User model first then Student model
                     try:
-                        student = Student.objects.get(bitsId=row[header['studentID']].value)
+                        student = Student.objects.filter(bitsId=row[header['studentID']].value)[:1]
                         #print(student)
                     except Student.DoesNotExist:
                         message_str = row[header['studentID']].value + " does not exist in database \n"
@@ -2390,7 +2390,7 @@ def update_hostel(request):
                         hostel = HostelPS.objects.get(student=student)
                         hostel.acadstudent=True
                         hostel.hostel = row[header['Hostel']].value
-                        hostel.room = str(int(row[header['Room']].value))
+                        hostel.room = str(row[header['Room']].value)
                         hostel.psStation = ""
                         hostel.status = "Student"
                         hostel.save()
@@ -2524,6 +2524,7 @@ def update_parent_contact(request):
 
 @user_passes_test(lambda u: u.is_superuser)
 def upload_latecomer(request):
+    #from datetime import datetime
     message_str = ''
     message_tag = messages.INFO
     if request.POST:
@@ -2561,12 +2562,12 @@ def upload_latecomer(request):
 
                     try:
                         s = Student.objects.filter(bitsId=row[header['studentID']].value)
-                        date = datetime.strptime(row[header['date']].value, '%d-%b-%y').strftime('%Y-%m-%d')
-                        time = datetime.strptime(row[header['time']].value, '%H:%M')
-                        datetime = datetime.combine(date, time)
+                        d = datetime.strptime(str(row[header['date']].value), '%d/%m/%Y').strftime('%Y-%m-%d')
+                        t = datetime.strptime(str(row[header['time']].value), '%H:%M:%S').strftime('%H:%M')
+                        dt = datetime.combine(d, t)
                         LateComer.objects.create(
                             student = s,
-                            datetime = datetime
+                            dateTime = dt
                             )
                         count = count + 1
                     except Student.DoesNotExist:
@@ -2619,16 +2620,14 @@ def upload_disco(request):
                         continue
                     # create User model first then Student model
                     try:
-                        s = Student.objects.filter(bitsId = row[header['studentID']].value)
-                        dateOfViolation = datetime.strptime(row[header['Date of violation']].value, '%d/%m/%Y').strftime('%Y-%m-%d')
-                        date = datetime.strptime(row[header['Date']].value, '%d/%m/%Y').strftime('%Y-%m-%d')
+                        s = Student.objects.get(bitsId = row[header['studentID']].value)
+                        dateOfViolation = datetime.strptime(row[header['dov']].value, '%d/%m/%Y').strftime('%Y-%m-%d')
 
                         disco = Disco.objects.create(
                             student = s,
                             dateOfViolation = dateOfViolation,
                             subject = str(row[header['studentID']].value),
                             action = str(row[header['action']].value),
-                            date = date
                             )
                         count = count + 1
                     except Student.DoesNotExist:

@@ -140,8 +140,8 @@
 					<td id="contact1">{{ w.hostel }}</td>
 					<td id="contact1">{{ w.email }}</td>
 					<td id="contact1">{{ w.chamber }}</td>
-					<td id="contact1">{{ w.phone_off }}</td>
-					<td id="contact1">{{ w.phone_res }}</td>
+					<td id="contact1">{{ w.phone_off|floatformat }}</td>
+					<td id="contact1">{{ w.phone_res|floatformat }}</td>
 				</tr>
 				{% endfor %}
 			     

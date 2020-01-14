@@ -70,4 +70,6 @@ urlpatterns = [
     url(r'^admin/update_ps/', views.update_ps, name='update_ps'),
     url(r'^admin/update_address/', views.update_address, name='update_address'),
     url(r'^admin/update_bank/', views.update_bank_account, name='update_bank'),
+    url(r'^admin/upload_latecomer/', views.upload_latecomer, name='update_latecomer'),
+    url(r'^admin/upload_disco/', views.upload_disco, name='update_disco'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
