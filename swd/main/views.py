@@ -2251,8 +2251,8 @@ def add_wardens(request):
                     warden = Warden.objects.create(
                         user=user,
                         name=row[header['Name']].value,
-                        phone_off=row[header['Tel:(Off.)']].value,
-                        phone_res=row[header['Tel:(Res.)']].value,
+                        phone_off=str(int(row[header['Tel:(Off.)']].value)),
+                        phone_res=str(int(row[header['Tel:(Res.)']].value)),
                         email=emailID,
                         chamber=row[header['Chamber No.']].value,
                         hostel=row[header['Function']].value,
