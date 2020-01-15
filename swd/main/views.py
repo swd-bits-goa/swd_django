@@ -1,4 +1,4 @@
-rom django.shortcuts import render, redirect
+from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseForbidden
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -2561,13 +2561,12 @@ def upload_latecomer(request):
                     # create User model first then Student model
 
                     try:
-                        s = Student.objects.filter(bitsId=row[header['studentID']].value)
-                        d = datetime.strptime(str(row[header['date']].value), '%d/%m/%Y').strftime('%Y-%m-%d')
-                        t = datetime.strptime(str(row[header['time']].value), '%H:%M:%S').strftime('%H:%M')
-                        dt = datetime.combine(d, t)
+                        s = Student.objects.filter(bitsId=row[header['studentID']].value).first()
+                        excel_date = row[header['date']].value
+                        d = datetime(*xlrd.xldate_as_tuple(excel_date, 0))
                         LateComer.objects.create(
                             student = s,
-                            dateTime = dt
+                            dateTime = d
                             )
                         count = count + 1
                     except Student.DoesNotExist:
@@ -2621,12 +2620,15 @@ def upload_disco(request):
                     # create User model first then Student model
                     try:
                         s = Student.objects.get(bitsId = row[header['studentID']].value)
-                        dateOfViolation = datetime.strptime(row[header['dov']].value, '%d/%m/%Y').strftime('%Y-%m-%d')
+                        if row[header['dov']].value: 
+                            dateOfViolation = datetime.strptime(row[header['dov']].value, '%d/%m/%Y').strftime('%Y-%m-%d')
+                        else:
+                            dateOfViolation = datetime.strptime("2004-01-01", '%Y-%m-%d')
 
                         disco = Disco.objects.create(
                             student = s,
                             dateOfViolation = dateOfViolation,
-                            subject = str(row[header['studentID']].value),
+                            subject = str(row[header['case']].value),
                             action = str(row[header['action']].value),
                             )
                         count = count + 1

@@ -278,10 +278,9 @@ class InOut(models.Model):
 
 class Disco(models.Model):
     student = models.ForeignKey('Student', on_delete = models.CASCADE)
-    dateOfViolation = models.DateField()
+    dateOfViolation = models.DateField(blank = True, null = True)
     subject = models.TextField()
     action = models.TextField()
-    date = models.DateField()
 
     def __str__(self):
         return self.student.bitsId + ' (' + self.student.name + ')'
