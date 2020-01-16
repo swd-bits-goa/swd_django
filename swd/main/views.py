@@ -22,7 +22,7 @@ from django.contrib.auth.models import User
 from calendar import monthrange
 from dateutil import rrule
 from datetime import datetime
-
+from django.db import IntegrityError
 from django.db.models import Q
 from .models import BRANCH, HOSTELS
 
@@ -2561,18 +2561,21 @@ def upload_latecomer(request):
                     # create User model first then Student model
 
                     try:
-                        s = Student.objects.filter(bitsId=row[header['studentID']].value).first()
+                        bitsId = row[header['studentID']].value
+                        if not bitsId.endswith("G"):
+                            bitsId = bitsId + "G"
+                        s = Student.objects.filter(bitsId=bitsId).last()
                         excel_date = row[header['date']].value
                         d = datetime(*xlrd.xldate_as_tuple(excel_date, 0))
-                        LateComer.objects.create(
+                        
+                        count = count + 1
+                    except IntegrityError:
+                        message_str + "ID number: " + row[header['studentID']].value+ " does not exist\n"
+                    LateComer.objects.create(
                             student = s,
                             dateTime = d
-                            )
-                        count = count + 1
-                    except Student.DoesNotExist:
-                        message_str + "ID number: " + row[header['studentID']].value+ " does not exist\n"
-                    
-            message_str = str(count) + " Latecomers added"
+                            )    
+                message_str = str(count) + " Latecomers added"
         else:
             message_str = "No File Uploaded."
 
@@ -2619,20 +2622,21 @@ def upload_disco(request):
                         continue
                     # create User model first then Student model
                     try:
-                        s = Student.objects.get(bitsId = row[header['studentID']].value)
-                        if row[header['dov']].value: 
-                            dateOfViolation = datetime.strptime(row[header['dov']].value, '%d/%m/%Y').strftime('%Y-%m-%d')
-                        else:
-                            dateOfViolation = datetime.strptime("2004-01-01", '%Y-%m-%d')
+                        s = Student.objects.get(bitsId = row[header['studentID']].value)    
+		        #if row[header['dov']].value: 
+                        #    excel_date = row[header['dov']].value
+                        #    dov = datetime(*xlrd.xldate_as_tuple(excel_date, 0))
+                        #else:
+                        #dov = datetime.strptime('2004-01-01', '%Y-%m-%d')
 
                         disco = Disco.objects.create(
                             student = s,
-                            dateOfViolation = dateOfViolation,
+                            #dateOfViolation = dov,
                             subject = str(row[header['case']].value),
                             action = str(row[header['action']].value),
                             )
                         count = count + 1
-                    except Student.DoesNotExist:
+                    except Exception:
                         message_str + "ID number: " + row[header['studentID']].value+ " does not exist\n"
                     
             message_str = str(count) + " Discos added"
