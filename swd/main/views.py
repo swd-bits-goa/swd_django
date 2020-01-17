@@ -928,6 +928,8 @@ def daypass(request):
                 email_to=[HostelSuperintendent.objects.get(hostel__icontains=HostelPS.objects.get(student=student).hostel).email]
             else:
                 email_to=["swdbitstest@gmail.com"]
+                #print("hello")
+                #print(HostelSuperintendent.objects.get(hostel__icontains=HostelPS.objects.get(student=student).hostel).email)
                                                                                    # For testing
             mailObj=DayPass.objects.latest('id')
             mail_subject="New Daypass ID: "+ str(mailObj.id)
@@ -2386,19 +2388,28 @@ def update_hostel(request):
                             message_str)
                         continue
                     try:
-                        print(student)
                         hostel = HostelPS.objects.get(student=student)
-                        hostel.acadstudent=True
-                        hostel.hostel = row[header['Hostel']].value
-                        hostel.room = str(row[header['Room']].value)
+                        new_hostel = row[header['Hostel']].value
+                        if new_hostel == 'Graduate' or new_hostel == 'Faculty' or new_hostel == 'Part Time' or new_hostel == 'Permanent Withdrawal' or new_hostel == 'Temporary Withdrawal' or new_hostel == 'Registration Cancelled' or new_hostel == 'Withdrawal':
+                            hostel.acadstudent=False
+                            hostel.status = new_hostel
+                        else:
+                            hostel.acadstudent=True
+                            hostel.status = "Student"
+                        hostel.hostel = new_hostel
+                        if row[header['Room']].value:
+                            try:
+                                hostel.room = str(int(row[header['Room']].value))
+                            except Exception:
+                                hostel.room = str(row[header['Room']].value)
+                        else:
+                            hostel.room = ''
                         hostel.psStation = ""
-                        hostel.status = "Student"
+                        
                         hostel.save()
                         count = count + 1
                     except HostelPS.DoesNotExist:
                         HostelPS.objects.create(student=student, hostel=row[header['Hostel']].value, room=str(row[header['Room']].value), acadstudent=True, status="Student", psStation="")
-                        #message_str = row[header['studentID']].value + " failed to update \n"
-                        #print("create")
                         count = count + 1
                     if message_str is not '':
                         messages.add_message(request,
