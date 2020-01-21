@@ -2378,7 +2378,7 @@ def update_hostel(request):
                         continue
                     # create User model first then Student model
                     try:
-                        student = Student.objects.filter(bitsId=row[header['studentID']].value)[:1]
+                        student = Student.objects.filter(bitsId=row[header['studentID']].value).first()
                         #print(student)
                     except Student.DoesNotExist:
                         message_str = row[header['studentID']].value + " does not exist in database \n"
