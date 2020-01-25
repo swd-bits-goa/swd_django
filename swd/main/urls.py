@@ -72,4 +72,5 @@ urlpatterns = [
     url(r'^admin/update_bank/', views.update_bank_account, name='update_bank'),
     url(r'^admin/upload_latecomer/', views.upload_latecomer, name='update_latecomer'),
     url(r'^admin/upload_disco/', views.upload_disco, name='update_disco'),
+    url(r'^leave_export/', views.leave_export, name='leave_export'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

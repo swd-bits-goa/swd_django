@@ -2939,4 +2939,50 @@ def update_bank_account(request):
                             message_str)
     return render(request, "add_students.html", {'header': "Update Bank account"})
 
+@user_passes_test(lambda u: u.is_superuser)
+def leave_export(request):
+    from datetime import time
+    t = time(0,0)
+    t1 = time(23,59)
+    
+    if request.POST:
+        d = datetime.strptime(request.POST.get('date'), '%d %B, %Y').date()
+        print(d)
+        approved = Leave.objects.filter(approved__exact=True, dateTimeStart__lte=datetime.combine(d,t), dateTimeEnd__gte=datetime.combine(d,t1))
 
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = 'attachment; filename='+ "Leaves.xlsx"
+        wb = xlwt.Workbook(encoding='utf-8')
+        ws = wb.add_sheet("leaves")
+
+        heading_style = xlwt.easyxf('font: bold on, height 280; align: wrap on, vert centre, horiz center')
+        h2_font_style = xlwt.easyxf('font: bold on')
+        font_style = xlwt.easyxf('align: wrap on')
+
+        
+        columns = [
+            (u"studentID", 6000),
+            (u"Name", 6000),
+           ]
+
+        row_num = 0
+
+
+        for col_num in range(len(columns)):
+            ws.write(row_num, col_num, columns[col_num][0], h2_font_style)
+            ws.col(col_num).width = columns[col_num][1]
+
+        for i in approved:
+            print(i)
+            obj = i.student
+            row = [
+                obj.bitsId,
+                obj.name,
+            ]
+            row_num += 1
+            for col_num in range(len(row)):
+                ws.write(row_num, col_num, row[col_num], font_style)
+        wb.save(response)
+        messages.success(request, "Export done. Download will automatically start.")
+        return response
+    return render(request, "leave_export.html", {})

@@ -16,11 +16,12 @@
                                 <label for="name">Name</label>  
                             </div>
                             <div class="input-field col s3 ">
-                                <input name="date" id="date" type="date">
-                                <label for="date">Date</label>
+                                <input id="date" name="date" type="date" class="datepicker">
+                                <label for="start_date">Date</label>
+                                
                             </div>
-                            <div>
-                            <input type="submit" value="Search" class="waves-effect waves-light btn" />
+                            <div style="padding-top: 25px;">
+                            <input type="submit" value="Search" class="waves-effect waves-light btn"  />
                             </div>
                     </div>
                 </form>
@@ -221,6 +222,25 @@
         </div>
         <br><br>
     </div>
+
+    <script src="{% static 'js/jquery.js' %}"></script>
+    <script src="{% static 'js/materialize.js' %}"></script>
+    <script src="{% static 'js/init.js' %}"></script>
+    <style>
+        .clickable {
+            cursor: pointer;
+        }
+    </style>
+    <script>
+        $('.datepicker').pickadate({
+                selectMonths: true, // Creates a dropdown to control month
+                selectYears: 15, // Creates a dropdown of 15 years to control year,
+                today: 'Today',
+                clear: 'Clear',
+                close: 'Ok',
+                closeOnSelect: false // Close upon selecting a date,
+            });
+    </script>
 
 {% endblock %}
 

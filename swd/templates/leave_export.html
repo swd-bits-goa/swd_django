@@ -1,0 +1,88 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=1024">
+    <title>SWD BITS Goa</title>
+
+    <!-- CSS  -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="{% static 'css/materialize.css' %}" type="text/css" rel="stylesheet" media="screen,projection" />
+    <link href="{% static 'css/style.css' %}" type="text/css" rel="stylesheet" media="screen,projection" />
+</head>
+
+<body>
+    <nav class="nav-extended">
+        <div class="nav-wrapper">
+            <a href="#" class="brand-logo">&nbsp;Student Welfare Division</a>
+            <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
+            <ul id="nav-mobile" class="right hide-on-med-and-down">
+                <li class=""><a href="/profile" class="valign-wrapper"><img class="circle profileImg" src="{% static 'img/profile-swd.jpg' %}">&nbsp;{{ warden.name|title }}</a></li>
+                <li><a href="/logout">Logout</a></li>
+            </ul>
+            <ul class="side-nav" id="mobile-demo">
+                <li><a href="/profile" class="valign-wrapper"><img class="circle profileImg" src="{% static 'img/profile-swd.jpg' %}">&nbsp;{{ warden.name|title }}</a></li>
+                <li><a href="/logout">Logout</a></li>
+            </ul>
+            <style>
+                .profileImg {
+                    max-width: 35px;
+                    height: auto
+                }
+            </style>
+        </div>
+    </nav>
+    <div class="section no-pad-bot" id="index-banner">
+    </div>
+
+    <div>
+        <div class="container">
+            <div class="section">
+                <div class="col s6 l6">
+                    <div class="card">
+                        <div class="card-content">
+                            <span class="card-title">Export Leave</span>
+                            <form method="POST">
+                                {% csrf_token %}
+                                <div class="row">
+                                    <div class="input-field col s6">
+                                        <input id="start_date" name="date" type="text" class="datepicker">
+                                        <label for="start_date">Date</label>
+                                    </div>
+                                    <div >
+                                    <div class="col s6 left-align">
+                                        <button class="btn btn-block bg-green waves-effect" type="submit">DOWNLOAD</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<!--  Scripts-->
+    <script src="{% static 'js/jquery.js' %}"></script>
+    <script src="{% static 'js/materialize.js' %}"></script>
+    <script src="{% static 'js/init.js' %}"></script>
+    <style>
+        .clickable {
+            cursor: pointer;
+        }
+    </style>
+    <script>
+        $('.datepicker').pickadate({
+                selectMonths: true, // Creates a dropdown to control month
+                selectYears: 15, // Creates a dropdown of 15 years to control year,
+                today: 'Today',
+                clear: 'Clear',
+                close: 'Ok',
+                closeOnSelect: false // Close upon selecting a date,
+            });
+    </script>
+
+</body>
+
+</html>
