@@ -2951,7 +2951,7 @@ def leave_export(request):
         approved = Leave.objects.filter(approved__exact=True, dateTimeStart__lte=datetime.combine(d,t), dateTimeEnd__gte=datetime.combine(d,t1))
 
         response = HttpResponse(content_type='application/ms-excel')
-        response['Content-Disposition'] = 'attachment; filename='+ "Leaves.xlsx"
+        response['Content-Disposition'] = 'attachment; filename='+ "Leaves.xls"
         wb = xlwt.Workbook(encoding='utf-8')
         ws = wb.add_sheet("leaves")
 
