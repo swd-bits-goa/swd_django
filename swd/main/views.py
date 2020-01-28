@@ -2948,7 +2948,7 @@ def leave_export(request):
     if request.POST:
         d = datetime.strptime(request.POST.get('date'), '%d %B, %Y').date()
         print(d)
-        approved = Leave.objects.filter(approved__exact=True, dateTimeStart__lte=datetime.combine(d,t), dateTimeEnd__gte=datetime.combine(d,t1))
+        approved = Leave.objects.filter(approved__exact=True, dateTimeStart__gte=datetime.combine(d,t), dateTimeEnd__lte=datetime.combine(d,t1))
 
         response = HttpResponse(content_type='application/ms-excel')
         response['Content-Disposition'] = 'attachment; filename='+ "Leaves.xls"
