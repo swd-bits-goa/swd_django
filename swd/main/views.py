@@ -2942,14 +2942,10 @@ def update_bank_account(request):
 @user_passes_test(lambda u: u.is_superuser)
 def leave_export(request):
     from datetime import time
-    t = time(0,0)
-    t1 = time(23,59)
     
     if request.POST:
         d = datetime.strptime(request.POST.get('date'), '%d %B, %Y').date()
-        print(d)
-        approved = Leave.objects.filter(approved__exact=True, dateTimeStart__gte=datetime.combine(d,t), dateTimeEnd__lte=datetime.combine(d,t1))
-
+        approved = Leave.objects.filter(approved__exact=True, dateTimeStart__date__lte=d, dateTimeEnd__date__gte=d)
         response = HttpResponse(content_type='application/ms-excel')
         response['Content-Disposition'] = 'attachment; filename='+ "Leaves.xls"
         wb = xlwt.Workbook(encoding='utf-8')
