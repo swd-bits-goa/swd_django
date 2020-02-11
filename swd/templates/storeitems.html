@@ -235,11 +235,11 @@
         }
         else {
             
-            if($("#nick").val().length==0){
-                $("#money").text('Total Amount : ₹' + parseInt($('#quantity').val()) * tees[info][3])
+            if((tees[info][4] == "True") && $("#nick").val().length!=0){
+                $("#money").text('Total Amount : ₹' + parseInt($('#quantity').val()) * tees[info][8])
             }
             else {
-                $("#money").text('Total Amount : ₹' + parseInt($('#quantity').val()) * tees[info][8])
+                $("#money").text('Total Amount : ₹' + parseInt($('#quantity').val()) * tees[info][3])
             }
             buyable = true;
         }
