@@ -1,119 +1,116 @@
 {% extends option %} {% block content %}
 
-  <div class="container">
+<div class="container">
     <div class="section">
 
-      <!--   Icon Section   -->
-  <div class="row">
-    <div class="col s12 m12">
-  
-            <div class="card-content">
-                <div class="icon-block">
-                    <h2 class="center light-blue-text"><i class="material-icons">search</i></h2>
-                </div>
-                <h5 class="center">Search Students</h5>
-                <form method="GET">
-                    {% csrf_token %}
-                    <div class="row">
-                        <div class="input-field col s10 offset-s1">
-                            <input name="name" id="name" type="text" class="validate">
-                            <label for="name">Name</label>  
+        <!--   Icon Section   -->
+        <div class="row">
+            <div class="col s12 m12">
+
+                <div class="card-content">
+                    <br>
+                    <h5 class="center">Search Students</h5>
+                    <form method="GET">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="input-field col s10 offset-s1">
+                                <input name="name" id="name" type="text" class="validate">
+                                <label for="name">Name</label>
+                            </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="input-field col s5 offset-s1">
-                            <input name="bitsId" id="bitsId" type="text" class="validate">
-                            <label for="bitsId">BITS ID</label>
-                        </div>
-                        <div class="input-field col s5">
-                            <select name="branch" id="branch">
-                                <option value="" selected>Not Selected</option>
-                                {% for key, value in branches.items %}
-                                <option value="{{ key }}">{{ value }}</option>
-                                {% endfor %}
-                            </select>
-                            <label>Branch</label>
-                        </div>
-                        <!-- <div class="input-field col s3">
+                        <div class="row">
+                            <div class="input-field col s5 offset-s1">
+                                <input name="bitsId" id="bitsId" type="text" class="validate">
+                                <label for="bitsId">BITS ID</label>
+                            </div>
+                            <div class="input-field col s5">
+                                <select name="branch" id="branch">
+                                    <option value="" selected>Not Selected</option>
+                                    {% for key, value in branches.items %}
+                                    <option value="{{ key }}">{{ value }}</option>
+                                    {% endfor %}
+                                </select>
+                                <label>Branch</label>
+                            </div>
+                            <!-- <div class="input-field col s3">
                             <input name="branch" id="branch" type="text" class="validate">
                             <label for="branch">Branch</label>
                         </div> -->
-                    </div>
-                    
-                    <div class="row">
-                        <div class="input-field col s10 offset-s1">
-                            <select name="hostel" id="hostel">
-                                <option value="" selected>Not Selected</option>
-                                {% for i in hostels %}
-                                    <option value="{{ i }}">{{ i }}</option>
-                                {% endfor %}
-                            </select>
-                            <label>Hostel</label>
                         </div>
-                        <div class="input-field col s5 offset-s1">
-                            <input name="room" id="room" type="text" class="validate">
-                            <label for="room">Room</label>
-                        </div>
-                    </div>
-                    <div class="center">
-                        <input type="submit" value="Search" class="waves-effect waves-light btn" />
-                    </div>
-                </form>
-                <div class="row">
 
-                </div>
-                {% if searchstr %}
-                <div class="row">
-                    <div class="col s8 offset-s2" style="border: 1px solid #aaa; padding:8px;">
-                        {% for key, value in searchstr.items %}
+                        <div class="row">
+                            <div class="input-field col s10 offset-s1">
+                                <select name="hostel" id="hostel">
+                                    <option value="" selected>Not Selected</option>
+                                    {% for i in hostels %}
+                                    <option value="{{ i }}">{{ i }}</option>
+                                    {% endfor %}
+                                </select>
+                                <label>Hostel</label>
+                            </div>
+                            <div class="input-field col s5 offset-s1">
+                                <input name="room" id="room" type="text" class="validate">
+                                <label for="room">Room</label>
+                            </div>
+                        </div>
+                        <div class="center">
+                            <input type="submit" value="Search" class="waves-effect waves-light btn desert-yellow " />
+                        </div>
+                    </form>
+                    <div class="row">
+
+                    </div>
+                    {% if searchstr %}
+                    <div class="row">
+                        <div class="col s8 offset-s2" style="border: 1px solid #aaa; padding:8px;">
+                            {% for key, value in searchstr.items %}
                             <div class="col s12">
                                 <b>{{ key }} : </b> {{ value }}
                             </div>
-                        {% endfor %}
-                    </div>
-                </div>
-                {% endif %}
-                {% if students %}
-                <div class="row">
-                    <div class="col s12 m8 offset-m2">
-                        <table class="centered striped">
-                            <thead>
-                                <tr>
-                                    <th>Sr. No.</th>
-                                    <th>Student ID</th>
-                                    <th>Name</th>
-                                    <th>Hostel</th>
-                                    <th>Room</th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-                                {% for i in students %}
-                                <tr>
-                                    <td>{{forloop.counter}}</td>
-                                    <td>{{ i.bitsId }}</td>
-                                    {% if permission == 1 %}
-                                    <td><a href="/student/{{ i.id }}/">{{ i.name }}</a></td>
-                                    {% else %}
-                                    <td>{{ i.name }}</td>
-                                    {% endif %}
-                                    <td>{{ i.hostelps.hostel }}</td>
-                                    <td>{{ i.hostelps.room }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                            {% endfor %}
                         </div>
-                </div>
-                {% endif %}
                     </div>
-         
+                    {% endif %}
+                    {% if students %}
+                    <div class="row">
+                        <div class="col s12 m8 offset-m2">
+                            <table class="centered striped">
+                                <thead>
+                                    <tr>
+                                        <th>Sr. No.</th>
+                                        <th>Student ID</th>
+                                        <th>Name</th>
+                                        <th>Hostel</th>
+                                        <th>Room</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    {% for i in students %}
+                                    <tr>
+                                        <td>{{forloop.counter}}</td>
+                                        <td>{{ i.bitsId }}</td>
+                                        {% if permission == 1 %}
+                                        <td><a href="/student/{{ i.id }}/">{{ i.name }}</a></td>
+                                        {% else %}
+                                        <td>{{ i.name }}</td>
+                                        {% endif %}
+                                        <td>{{ i.hostelps.hostel }}</td>
+                                        <td>{{ i.hostelps.room }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
             </div>
         </div>
     </div>
 
-    </div>
-    <br><br>
-  </div>
+</div>
+<br><br>
+</div>
 {% endblock %}
-

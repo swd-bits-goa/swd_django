@@ -5,70 +5,92 @@
 <div class="backdrop-container">
   <img id="back-swd" src="{% static 'img/swd-back.png' %}" width="100%">
   <div class="card login-box desktop">
-      <h5 style="color:#F46036">Sign In</h5>
-      <form id="sign_in" method="POST" action="login/">
+    <h5 style="color:#F46036">Sign In</h5>
+    <form id="sign_in" method="POST" action="login/">
       {% csrf_token %}
-     <div class="input-field" id="username" >
-         <input  type="text" class="validate" name="username" autocomplete='username' autocorrect="off" autocapitalize="none">
-         <label for="username">Username</label>
-     </div>
+      <div class="input-field" id="username">
+        <input type="text" class="validate" name="username" autocomplete='username' autocorrect="off"
+          autocapitalize="none">
+        <label for="username">Username</label>
+      </div>
 
-     <div class="input-field" id="password">
-       <input  type="password" class="validate valid" name="password" autocomplete="current-password">
-       <label for="password">Password</label>
-     </div>
+      <div class="input-field" id="password">
+        <input type="password" class="validate valid" name="password" autocomplete="current-password">
+        <label for="password">Password</label>
+      </div>
 
-     <button type="submit" class="waves-effect waves-light btn desert-yellow" id="loginbtn"><span class="deep-green">Login</span></button>
+      <button type="submit" class="waves-effect waves-light btn desert-yellow" id="loginbtn"><span
+          class="deep-green">Login</span></button>
 
-   </form>
-   <br>
-   {% if messages %} {% for message in messages %}
-   <span class="badge fresh-orange" data-badge-caption="{{ message }}!"></span>
-   {% endfor %} {% endif %}</div>
+    </form>
+    <br>
+    {% if messages %} {% for message in messages %}
+    <span class="badge fresh-orange" data-badge-caption="{{ message }}!"></span>
+    {% endfor %} {% endif %}
+  </div>
 </div>
 
-  <div class="container-fluid">
-  
-    <div class="section">
-        <div class="row">
-            <div class="col s12 m6 desktop">
+<div class="container-fluid">
 
-                    <h4 style="color:#074F57">About</h4>
-                    <p style="justify-content: center;">The Student Welfare Division at BITS Pilani, K.K. Birla Goa Campus shall always strive to provide the most conducive environment to bring out the best out of every student. It is our endeavor to do anything and everything possible to make the student's stay in the campus the most memorable one. 
-                      <br><br>
-                        Our division cares for every student and shall always look into their needs that may arise from time to time.</p>
-            
-            </div>
-            <div class="col s12 m6">
-                <h4 style="color:#F46036">Notices</h4>
-                {% include 'notice.html' %} 
-            </div>
-        </div>
-      
+  <div class="section">
+    <div class="row">
+      <div class="col s12 m6 desktop">
 
-  <style>
-    img{
-      object-fit: cover;
-    }
-    body {
-      opacity: 1;filter: alpha(opacity=.9);
-      background-attachment: fixed;
-      background-repeat: no-repeat;
-      height: 100px;
-      background-position: center;
-      background-size: cover;
-    }
-    .backdrop-container{
-    position: relative;
-    }
-    .login-box{
-      position: absolute;
-      top: 16px;
-      right: 20px;
-      width: 460px;
-      padding: 14px;
-    }
-    
-  </style>
-{% endblock %}
+        <h4 style="color:#074F57">About</h4>
+        <p style="justify-content: center;">The Student Welfare Division at BITS Pilani, K.K. Birla Goa Campus shall
+          always strive to provide the most conducive environment to bring out the best out of every student. It is our
+          endeavor to do anything and everything possible to make the student's stay in the campus the most memorable
+          one.
+          <br><br>
+          Our division cares for every student and shall always look into their needs that may arise from time to time.
+        </p>
+        <br>
+        Other activities of the Division include:
+        <ul>
+          <li>• Collection of fees</li>
+          <li>• Disbursal of Merit Scholarships and MCN Scholarships</li>
+          <li>• Coordinating for various Fests organized by students</li>
+          <li>• Maintenance of Individual students account related to Mess Advance</li>
+          <li>• Hostel accommodation to students and leave related issues</li>
+          <li>• Issue of Receipts, ID Cards, bonafide Certificates & No Objection Cetificated</li>
+          <li>• Monitoring the Student Activity Center</li>
+          <li>• Processing of Medical Insurance claims</li>
+          <br>
+          <br><br>
+          <img src="{% static 'img/bits_img.jpg' %}" width="500px">
+      </div>
+      <div class="col s12 m6">
+        <h4 style="color:#F46036">Notices</h4>
+        {% include 'notice.html' %}
+      </div>
+    </div>
 
+
+    <style>
+      img {
+        object-fit: cover;
+      }
+
+      body {
+        opacity: 1;
+        filter: alpha(opacity=.9);
+        background-attachment: fixed;
+        background-repeat: no-repeat;
+        height: 100px;
+        background-position: center;
+        background-size: cover;
+      }
+
+      .backdrop-container {
+        position: relative;
+      }
+
+      .login-box {
+        position: absolute;
+        top: 16px;
+        right: 20px;
+        width: 460px;
+        padding: 14px;
+      }
+    </style>
+    {% endblock %}

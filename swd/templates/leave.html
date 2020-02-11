@@ -15,9 +15,9 @@
                             {% csrf_token %}
                             <div class="col-md-12">
                                 {% for field in form %}
-                                  <div class="input-field col s12">
+                                <div class="input-field col s12">
                                     {{ field }} {{ field.label_tag }}
-                                  </div>
+                                </div>
                                 {% endfor %}
                             </div>
                             <div class="col-xs-4">
@@ -25,39 +25,40 @@
                             </div>
                         </form>
                         {% elif option1 == 1 %}
-                            <p>Leave Successfully applied. Please wait for approval</p>
-                            <p>Leave applied from {{ dateStart }}({{ timeStart }}) to {{ dateEnd }}({{ timeEnd }})</p>
+                        <p>Leave Successfully applied. Please wait for approval</p>
+                        <p>Leave applied from {{ dateStart }}({{ timeStart }}) to {{ dateEnd }}({{ timeEnd }})</p>
                         {% else %}
-                            {% if form.errors %}
-                                {% for error in form.non_field_errors %}
-                                    <div class="red-text alert alert-danger">
-                                        <strong>{{ error|escape }}</strong>
-                                    </div>
-                                {% endfor %}
-                            {% endif %}
-                            <div class=red-text>
+                        {% if form.errors %}
+                        {% for error in form.non_field_errors %}
+                        <div class="red-text alert alert-danger">
+                            <strong>{{ error|escape }}</strong>
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+                        <div class=red-text>
                             <p>There was a problem with form submission. Please refill.</p>
-                            <h1></h1></div>
-                            <form method="POST">
-                                {% csrf_token %}
-                                <div class="col-md-12">
-                                    {% for field in form %}
-                                        {% if form.errors %}
-                                        {% for error in field.errors %}
-                                            <div class="red-text alert alert-danger">
-                                                <strong>{{ error|escape }}</strong>
-                                            </div>
-                                        {% endfor %}
-                                        {% endif %}
-                                        <div class="input-field col s12">
-                                            {{ field }} {{ field.label_tag }}
-                                        </div>
-                                    {% endfor %}
+                            <h1></h1>
+                        </div>
+                        <form method="POST">
+                            {% csrf_token %}
+                            <div class="col-md-12">
+                                {% for field in form %}
+                                {% if form.errors %}
+                                {% for error in field.errors %}
+                                <div class="red-text alert alert-danger">
+                                    <strong>{{ error|escape }}</strong>
                                 </div>
-                                <div class="col-xs-4">
-                                    <button class="btn btn-block bg-green waves-effect" type="submit">SUBMIT</button>
+                                {% endfor %}
+                                {% endif %}
+                                <div class="input-field col s12">
+                                    {{ field }} {{ field.label_tag }}
                                 </div>
-                            </form>
+                                {% endfor %}
+                            </div>
+                            <div class="col-xs-4">
+                                <button class="btn btn-block bg-green waves-effect" type="submit">SUBMIT</button>
+                            </div>
+                        </form>
                         {% endif %}
                     </div>
                 </div>
@@ -80,12 +81,16 @@
                                 {% for leave in leaves %}
                                 <tr>
                                     <td class="center-align">{{ leave.id }}</td>
-                                    <td class="center-align">{{ leave.dateTimeStart|date:"d/M/y" }} --- {{ leave.dateTimeEnd|date:"d/M/y" }}</td>
+                                    <td class="center-align">{{ leave.dateTimeStart|date:"d/M/y" }} ---
+                                        {{ leave.dateTimeEnd|date:"d/M/y" }}</td>
                                     <td class="center-align badge-container">
                                         {% if leave.approved == 1%}
-                                        <span class="new badge green comm" data-badge-caption="Approved"></span> {% elif leave.disapproved == 1 %}
-                                        <span class="new badge red comm" data-badge-caption="Not Approved"></span> {% else %}
-                                        <span class="new badge blue comm" data-badge-caption="In Process"></span> {% endif %}
+                                        <span class="new badge green comm" data-badge-caption="Approved"></span>
+                                        {% elif leave.disapproved == 1 %}
+                                        <span class="new badge red comm" data-badge-caption="Not Approved"></span>
+                                        {% else %}
+                                        <span class="new badge blue comm" data-badge-caption="In Process"></span>
+                                        {% endif %}
                                     </td>
                                     <td class="center-align">{{ leave.comment }}</td>
                                 </tr>
@@ -103,25 +108,26 @@
 </div>
 
 <script>
-// Patch fix for datepicker
-// Frontend devs -> please fix this issue asap. This is a temp patch.
-// Mehul Mohan
-document.querySelectorAll('input.mask').forEach(node => {
-	const maskedDiv = document.createElement('div')
-	maskedDiv.onclick = () => { setTimeout(() => { console.log('clicked'); node.click() }, 50) }
-	maskedDiv.setAttribute('style', 'position:absolute;top:0;left:0;width:100%;height:100%;')
-	node.parentNode.classList.add('masked-parent-field')
-	node.parentNode.appendChild(maskedDiv)
-})
+    // Patch fix for datepicker
+    // Frontend devs -> please fix this issue asap. This is a temp patch.
+    // Mehul Mohan
+    document.querySelectorAll('input.mask').forEach(node => {
+        const maskedDiv = document.createElement('div')
+        maskedDiv.onclick = () => { setTimeout(() => { console.log('clicked'); node.click() }, 50) }
+        maskedDiv.setAttribute('style', 'position:absolute;top:0;left:0;width:100%;height:100%;')
+        node.parentNode.classList.add('masked-parent-field')
+        node.parentNode.appendChild(maskedDiv)
+    })
 </script>
 
 <style>
-  .comm {
-    width:100px;
-  }
-  .badge-container {
-      width: 35%;
-      padding-right:9%;
-  }
+    .comm {
+        width: 100px;
+    }
+
+    .badge-container {
+        width: 35%;
+        padding-right: 9%;
+    }
 </style>
 {% endblock %}

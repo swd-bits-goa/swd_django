@@ -1,116 +1,141 @@
 {% extends 'indexbase.html' %} {% block content %}
 
 <div class="container" style="line-height: 1">
-  <span class="heading" >Council for Student Affairs<br>{{ year }} - {{ year|add:"1" }}</span>
+  <p align="center" style="font-size:36px; color:#000066"><b>Council for Student Affairs<br>{{ year }} -
+      {{ year|add:"1" }}</b></p>
   <div class="row">
     {% for person in csa %}
     <div class="column">
-     
-    <p>
+
+      <p>
         <img class="circle img-csa" src="/media/{{ person.pic }}">
       </p>
-        <div class="csa">
-          <span class="post-title">{{ person.title }}</span>
-          <div class="divider"></div>
-          <span class="title">{{ person.student.name }}<br>{{ person.student.bitsId }}</span><br>
-          <span class="phone">{{ person.student.phone|floatformat }}</span><br>
-          <span class="mail"><a href="mailto:{{ person.email }}">{{ person.email }}</a></span>
-        </div>
+      <div class="csa">
+        <span class="post-title">{{ person.title }}</span>
+        <div class="divider"></div>
+        <span class="title">{{ person.student.name }}<br></span>
+        <span class="id">{{ person.student.bitsId }}</span><br>
+        <span class="phone">{{ person.student.phone|floatformat }}</span><br>
+        <span class="mail"><a href="mailto:{{ person.email }}">{{ person.email }}</a></span>
       </div>
- 
+    </div>
+
     {% endfor %}
   </div>
 </div>
 <style>
-  .img-csa{
-    width:190px;
+  .img-csa {
+    width: 190px;
   }
-.column {
+
+  .column {
     float: left;
     width: 50%;
     margin-bottom: 16px;
     padding: 0 8px;
-}
+  }
 
-@media screen and (max-width: 650px) {
-.column {
-        width: 100%;
-        display: block;
+  @media screen and (max-width: 650px) {
+    .column {
+      width: 100%;
+      display: block;
     }
-}
-.container {
+  }
+
+  .container {
     padding: 0 16px;
-}
-.container::after, .row::after {
+  }
+
+  .container::after,
+  .row::after {
     content: "";
     clear: both;
     display: table;
-}
-.title {
-    color: black;
-    font-size: 25px;
-    font-style: italic;
-}
-.img-csa{
-	float: left;
-	padding: 0 16px;
-}
-.heading{
-  font-size: 37px; color: #F46036;
-}
-.post-title{
-  font-size: 30px;
-  font-weight: bold;
-  color: #074F57;
-}
-.divider {
-  height: 7px;
-  width: 48px;
-  background-color: #FFBE57;
-}
-.phone {
-  font-size: 20px;
-  font-style: italic;
-  color: black;
-}
-.mail a{
-  font-size: 20px;
-  font-style: italic;
-  color: black;
-}
-@media screen and (max-width: 800px) {
-  .heading{
-    font-size: 20px;
-    top: 80px;
   }
-  .img-csa {
-    width: 84px;
-    padding: 0;
-    float: left;
-  }
-  .csa{
-    float: right;
-  }
-  .post-title{
-  font-size: 16px;
-}
-.divider {
-  height: 3px;
-  width: 21px;
-}
-.phone {
-  font-size: 10px;
-}
-.mail a{
-  font-size: 10px;
-}
-.title{
-  font-size: 13px;
-}
-.column{
-  padding: 0;
-} 
-}
 
+  .title {
+    color: black;
+    font-size: 22px;
+  }
+
+  .id {
+    color: black;
+    font-size: 18px;
+  }
+
+  .img-csa {
+    float: left;
+    padding: 0 16px;
+  }
+
+  .heading {
+    font-size: 37px;
+    color: #F46036;
+  }
+
+  .post-title {
+    font-size: 30px;
+    font-weight: bold;
+    color: #074F57;
+  }
+
+  .divider {
+    height: 7px;
+    width: 48px;
+    background-color: #FFBE57;
+  }
+
+  .phone {
+    font-size: 18px;
+    color: #000000;
+  }
+
+  .mail a {
+    font-size: 18px;
+    font-style: italic;
+    color: black;
+  }
+
+  @media screen and (max-width: 800px) {
+    .heading {
+      font-size: 20px;
+      top: 80px;
+    }
+
+    .img-csa {
+      width: 84px;
+      padding: 0;
+      float: left;
+    }
+
+    .csa {
+      float: right;
+    }
+
+    .post-title {
+      font-size: 16px;
+    }
+
+    .divider {
+      height: 3px;
+      width: 21px;
+    }
+
+    .phone {
+      font-size: 10px;
+    }
+
+    .mail a {
+      font-size: 10px;
+    }
+
+    .title {
+      font-size: 13px;
+    }
+
+    .column {
+      padding: 0;
+    }
+  }
 </style>
 {% endblock %}
