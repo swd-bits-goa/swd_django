@@ -54,6 +54,8 @@ def index(request):
             return redirect('/warden')
         if HostelSuperintendent.objects.filter(user=request.user):
             return redirect('/hostelsuperintendent')
+        if Security.objects.filter(user=request.user):
+            return redirect('/dash_security')
         return redirect('dashboard')
     else:
         notice_list = Notice.objects.all().order_by('-id')
@@ -284,6 +286,8 @@ def loginform(request):
             return redirect('/warden')
         if HostelSuperintendent.objects.filter(user=request.user):
             return redirect('/hostelsuperintendent')
+        if Security.objects.filter(user=request.user):
+            return redirect('/dash_security')
         return redirect('dashboard')
 
     if request.POST:
@@ -298,6 +302,8 @@ def loginform(request):
                 return redirect('/warden')
             if HostelSuperintendent.objects.filter(user=request.user):
                 return redirect('/hostelsuperintendent')
+            if Security.objects.filter(user=request.user):
+                return redirect('/dash_security')
             return redirect('dashboard')
         else:
             messages.add_message(request, messages.INFO,  "Incorrect username or password", extra_tags='red')
@@ -692,6 +698,9 @@ def is_warden(user):
 
 def is_hostelsuperintendent(user):
      return False if not HostelSuperintendent.objects.filter(user=user) else True
+
+def is_security(user):
+    return False if not Security.objects.filter(user=user) else True
 
 @login_required
 @user_passes_test(is_warden)
@@ -1984,18 +1993,16 @@ def edit_constants(request):
         messages.success(request, "constants.json updated")
     return render(request, "constants.html", {"initial": data_json})
 
-
+@user_passes_test(is_security)
 def dash_security(request):
     from datetime import time
     t = time(0,0)
     t1 = time(23,59)
     d = date.today()
-    #
     approved = Leave.objects.filter(approved__exact=True, dateTimeStart__gte=datetime.combine(d,t), dateTimeStart__lte=datetime.combine(d,t1))
-
     context = {'leaves' : approved}
-
     return render(request, "dash_security.html", context)
+
 
 @user_passes_test(lambda u: u.is_superuser)
 

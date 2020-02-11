@@ -555,3 +555,5 @@ class AddressChangeRequest(models.Model):
         self.student.save()
         self.save()
 
+class Security(models.Model):
+    user = models.OneToOneField(User, on_delete= models.CASCADE)

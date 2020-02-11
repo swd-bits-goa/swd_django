@@ -32,7 +32,8 @@ models = [
     AntiRagging,
     DueCategory,
     DuesPublished,
-    VacationDatesFill]
+    VacationDatesFill,
+    Security]
 
 
 class HostelPSAdmin(admin.ModelAdmin):
