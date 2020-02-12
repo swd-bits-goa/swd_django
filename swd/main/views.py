@@ -2663,8 +2663,11 @@ def upload_disco(request):
                             messages.add_message(request,
                             message_tag, 
                             message_str)   
-                    except Exception:
-                        message_str + "ID number: " + row[header['studentID']].value+ " does not exist\n"
+                    except Exception as e:
+                        message_str = str(e)
+                        messages.add_message(request,
+                        message_tag, 
+                        message_str)
                     
             message_str = str(count) + " Discos added"
         else:
