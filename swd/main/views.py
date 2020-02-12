@@ -1741,7 +1741,7 @@ def mess_exp(request):
         ids = []
         for i in range(len(messopted)):
             ids.append(messopted[i].student.bitsId)
-        grad_ps = HostelPS.objects.filter(Q(status__exact="Graduate") | Q(status__exact="PS2"))
+        grad_ps = HostelPS.objects.filter(Q(status__exact="Graduate") | Q(room="") | Q(room="0") | Q(room="0.0") | Q(student__bitsId__contains="PHX") | Q(acadstudent=False))
         for i in range(len(grad_ps)):
             ids.append(grad_ps[i].student.bitsId)
 

@@ -104,7 +104,7 @@ class ItemBuyAdmin(ExportActionModelAdmin,admin.ModelAdmin):
 @admin.register(MessOption)
 class MessOptionAdmin(ExportActionModelAdmin,admin.ModelAdmin):
     resource_class = MessOptionResource
-    search_fields = ['mess','monthYear']
+    search_fields = ['mess','monthYear', 'student__bitsId']
 
 @admin.register(Leave)
 class LeaveAdmin(admin.ModelAdmin):
