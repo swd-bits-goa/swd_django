@@ -3021,7 +3021,7 @@ def hostel_export(request):
                     ws.write(row_num, col_num, row[col_num], font_style)
             wb.save(response)
             messages.success(request, "Export done. Download will automatically start.")
-            return response
+        return response
     return render(request, "mess_export.html", {})
 
 
