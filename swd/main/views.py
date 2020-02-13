@@ -2643,31 +2643,31 @@ def upload_disco(request):
                         idx = 0
                         continue
                     # create User model first then Student model
-                    try:
-                        s = Student.objects.filter(bitsId = row[header['studentID']].value).last()
-                        if s is not None:
-                            if row[header['dov']].value: 
-                                excel_date = row[header['dov']].value
-                                dov = datetime(*xlrd.xldate_as_tuple(excel_date, 0))
-                            else:
-                                dov = datetime.strptime('2004-01-01', '%Y-%m-%d')
-                            disco = Disco.objects.create(
-                            student = s,
-                            dateOfViolation = dov,
-                            subject = str(row[header['case']].value),
-                            action = str(row[header['action']].value),
-                            )
-                            count = count + 1
+                    #try:
+                    s = Student.objects.filter(bitsId = row[header['studentID']].value).last()
+                    if s is not None:
+                        if row[header['dov']].value: 
+                            excel_date = row[header['dov']].value
+                            dov = datetime(*xlrd.xldate_as_tuple(excel_date, 0))
                         else:
-                            message_str = message_str + "ID number: " + row[header['studentID']].value+ " does not exist\n"
-                            messages.add_message(request,
-                            message_tag, 
-                            message_str)   
-                    except Exception as e:
-                        message_str = str(e)
+                            dov = datetime.strptime('2004-01-01', '%Y-%m-%d')
+                        disco = Disco.objects.create(
+                        student = s,
+                        dateOfViolation = dov,
+                        subject = str(row[header['case']].value),
+                        action = str(row[header['action']].value),
+                        )
+                        count = count + 1
+                    else:
+                        message_str = message_str + "ID number: " + row[header['studentID']].value+ " does not exist\n"
                         messages.add_message(request,
                         message_tag, 
-                        message_str)
+                        message_str)   
+                    #except Exception as e:
+                        #message_str = str(e)
+                        #messages.add_message(request,
+                        #message_tag, 
+                        #message_str)
                     
             message_str = str(count) + " Discos added"
         else:
