@@ -3047,14 +3047,14 @@ def leave_import(request):
                     except Exception:
                         message_str + "student " + row[header['loginID']].value + " not in database"
                     try:
-                        rev_sdate = datetime.datetime.strptime(sdate, '%d/%m/%Y')
-                        rev_stime = datetime.datetime.strptime(stime, '%H:%M').time()
-                        sdatetime = datetime.datetime.combine(rev_sdate, rev_stime)
-                        rev_edate= datetime.datetime.strptime(edate, '%d/%m/%Y')
-                        rev_etime = datetime.datetime.strptime(etime, '%H:%M').time()
+                        rev_sdate = datetime.strptime(sdate, '%d/%m/%Y')
+                        rev_stime = datetime.strptime(stime, '%H:%M').time()
+                        sdatetime = datetime.combine(rev_sdate, rev_stime)
+                        rev_edate=  datetime.strptime(edate, '%d/%m/%Y')
+                        rev_etime = datetime.strptime(etime, '%H:%M').time()
                     except:
-                        rev_etime = datetime.datetime.strptime(etime, '%I:%M:%S %p').time()
-                    edatetime = datetime.datetime.combine(rev_edate, rev_etime)
+                        rev_etime = datetime.strptime(etime, '%I:%M:%S %p').time()
+                    edatetime = datetime.combine(rev_edate, rev_etime)
                     try:
                         warden = Warden.objects.get(user__username=approved_by)
                     except:
