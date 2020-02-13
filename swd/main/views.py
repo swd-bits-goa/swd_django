@@ -1741,7 +1741,7 @@ def mess_exp(request):
         ids = []
         for i in range(len(messopted)):
             ids.append(messopted[i].student.bitsId)
-        grad_ps = HostelPS.objects.filter(Q(status__exact="Graduate") | Q(room="") | Q(room="0") | Q(room="0.0") | Q(student__bitsId__contains="PH") | Q(acadstudent=False) | Q(room=None)
+        grad_ps = HostelPS.objects.filter(Q(status__exact="Graduate") | Q(room="") | Q(room="0") | Q(room="0.0") | Q(student__bitsId__contains="PH") | Q(acadstudent=False) | Q(room=None))
         for i in range(len(grad_ps)):
             ids.append(grad_ps[i].student.bitsId)
 
@@ -2994,36 +2994,7 @@ def leave_export(request):
     return render(request, "leave_export.html", {})
 
 def hostel_export(request):
-    if request.POST:
-        query = HostelPS.objects.all().exclude(room=None)
-        columns = [
-                (u"studentID", 6000),
-                (u"Hostel", 6000),
-                (u"Room", 6000),
-               ]
-
-            row_num = 0
-
-
-            for col_num in range(len(columns)):
-                ws.write(row_num, col_num, columns[col_num][0], h2_font_style)
-                ws.col(col_num).width = columns[col_num][1]
-
-            for i in query:
-                obj = i.student
-                row = [
-                    obj.bitsId,
-                    i.hostel,
-                    i.room
-                ]
-                row_num += 1
-                for col_num in range(len(row)):
-                    ws.write(row_num, col_num, row[col_num], font_style)
-            wb.save(response)
-            messages.success(request, "Export done. Download will automatically start.")
-            return response
-        return render(request, "mess_export.html", {})
-
+    query = HostelPS.objects.all().exclude(room=None)
 
 def leave_import(request):
     message_str = ''
