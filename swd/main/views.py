@@ -2992,3 +2992,95 @@ def leave_export(request):
         messages.success(request, "Export done. Download will automatically start.")
         return response
     return render(request, "leave_export.html", {})
+
+def hostel_export(request):
+    query = HostelPS.objects.all().exclude(room=None)
+
+def leave_import(request):
+    message_str = ''
+    message_tag = messages.INFO
+    if request.POST:
+        if request.FILES:
+            # Read Excel File into a temp file
+            xl_file = request.FILES['xl_file']
+            extension = xl_file.name.rsplit('.', 1)[1]
+            if ('xls' != extension):
+                if ('xlsx' != extension):
+                    messages.error(request, "Please upload .xls or .xlsx file only")
+                    messages.add_message(request,
+                                        message_tag, 
+                                        message_str)
+                    return render(request, "add_students.html", {'header': "Update PS/Thesis"})
+
+            fd, tmp = tempfile.mkstemp()
+            with os.fdopen(fd, 'wb') as out:
+                out.write(xl_file.read())
+            workbook = xlrd.open_workbook(tmp)
+
+            count = 0
+            idx = 1
+            header = {}
+            for sheet in workbook.sheets():
+                for row in sheet.get_rows():
+                    if idx == 1:
+                        col_no = 0
+                        for cell in row:
+                            # Store the column names in dictionary
+                            header[str(cell.value)] = col_no
+                            col_no = col_no + 1
+                        idx = 0
+                        continue
+                    # create User model first then Student model
+                    try:
+                        student = Student.objects.get(user__username=row[header['loginID']].value)
+                        sdate = row[header['sdate']].value
+                        stime = row[header['stime']].value
+                        edate = row[header['edate']].value
+                        etime = row[header['etime']].value
+                        reason = row[header['reason']].value
+                        approved_by = row[header['approved_by']].value
+                        warden_approv = row[header['warden_approv']].value
+                        addr = row[header['addr']].value
+                        ph = row[header['ph']].value
+                        comment = row[header['comment']].value
+                        consent = row[header['consent']].value
+                    except Exception:
+                        message_str + "student " + row[header['loginID']].value + " not in database"
+                    try:
+                        rev_sdate = datetime.datetime.strptime(sdate, '%d/%m/%Y')
+                        rev_stime = datetime.datetime.strptime(stime, '%H:%M').time()
+                        sdatetime = datetime.datetime.combine(rev_sdate, rev_stime)
+                        rev_edate= datetime.datetime.strptime(edate, '%d/%m/%Y')
+                        rev_etime = datetime.datetime.strptime(etime, '%H:%M').time()
+                    except:
+                        rev_etime = datetime.datetime.strptime(etime, '%I:%M:%S %p').time()
+                    edatetime = datetime.datetime.combine(rev_edate, rev_etime)
+                    try:
+                        warden = Warden.objects.get(user__username=approved_by)
+                    except:
+                        warden = User.objects.get(user__username='chiefwarden')
+                    if warden_approv == 'disapprov':
+                        approved=False
+                        inprocess=False
+                        disapproved=True
+                    elif warden_approv == 'YES':
+                        approved=True
+                        inprocess=False
+                        disapproved=False
+                    else:
+                        approved=False
+                        inprocess=True
+                        disapproved=False
+                    Leave.objects.create(student=student, dateTimeStart=make_aware(sdatetime), dateTimeEnd=make_aware(edatetime), reason=reason, consent=consent, corrAddress=addr, corrPhone=ph, approvedBy=warden, approved=approved, disapproved=disapproved, inprocess=inprocess, comment=comment)
+                    except Exception:
+                        message_str + "update failed for " + row[header['loginID']].value
+                    
+            message_str = str(count) + " Leave imported"
+        else:
+            message_str = "No File Uploaded."
+
+    if message_str is not '':
+        messages.add_message(request,
+                            message_tag, 
+                            message_str)
+    return render(request, "add_students.html", {'header': "Leave Import"})
