@@ -3002,25 +3002,25 @@ def hostel_export(request):
                 (u"Room", 6000),
                ]
 
-            row_num = 0
+        row_num = 0
 
 
-            for col_num in range(len(columns)):
-                ws.write(row_num, col_num, columns[col_num][0], h2_font_style)
-                ws.col(col_num).width = columns[col_num][1]
+        for col_num in range(len(columns)):
+            ws.write(row_num, col_num, columns[col_num][0], h2_font_style)
+            ws.col(col_num).width = columns[col_num][1]
 
-            for i in query:
-                obj = i.student
-                row = [
-                    obj.bitsId,
-                    i.hostel,
-                    i.room
-                ]
-                row_num += 1
-                for col_num in range(len(row)):
-                    ws.write(row_num, col_num, row[col_num], font_style)
-            wb.save(response)
-            messages.success(request, "Export done. Download will automatically start.")
+        for i in query:
+            obj = i.student
+            row = [
+                obj.bitsId,
+                i.hostel,
+                i.room
+            ]
+            row_num += 1
+            for col_num in range(len(row)):
+                ws.write(row_num, col_num, row[col_num], font_style)
+        wb.save(response)
+        messages.success(request, "Export done. Download will automatically start.")
         return response
     return render(request, "mess_export.html", {})
 
