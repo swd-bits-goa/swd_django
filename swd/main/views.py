@@ -3047,7 +3047,7 @@ def leave_import(request):
                     except Exception:
                         message_str + "student " + row[header['loginID']].value + " not in database"
                     rev_sdate = datetime(*xlrd.xldate_as_tuple(sdate, 0)).date()
-                    rev_stime = datetime(*xlrd.xldate_as_tuple(time, 0)).time()
+                    rev_stime = datetime(*xlrd.xldate_as_tuple(stime, 0)).time()
                     sdatetime = datetime.combine(rev_sdate, rev_stime)
                     rev_edate=  datetime(*xlrd.xldate_as_tuple(edate, 0)).date()
                     rev_etime = datetime(*xlrd.xldate_as_tuple(sdate, 0)).time()
