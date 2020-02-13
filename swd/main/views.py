@@ -3053,7 +3053,7 @@ def leave_import(request):
                         rev_edate=  datetime(*xlrd.xldate_as_tuple(edate, 0))
                         rev_etime = datetime(*xlrd.xldate_as_tuple(sdate, 0)).time()
                     except:
-                        rev_etime = datetime.strptime(str(etime), '%I:%M:%S %p').time()
+                        rev_etime = datetime(*xlrd.xldate_as_tuple(sdate, 0)).time()
                     edatetime = datetime.combine(rev_edate, rev_etime)
                     try:
                         warden = Warden.objects.get(user__username=approved_by)
