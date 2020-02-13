@@ -3072,8 +3072,7 @@ def leave_import(request):
                         inprocess=True
                         disapproved=False
                     Leave.objects.create(student=student, dateTimeStart=make_aware(sdatetime), dateTimeEnd=make_aware(edatetime), reason=reason, consent=consent, corrAddress=addr, corrPhone=ph, approvedBy=warden, approved=approved, disapproved=disapproved, inprocess=inprocess, comment=comment)
-                    except Exception:
-                        message_str + "update failed for " + row[header['loginID']].value
+                    
                     
             message_str = str(count) + " Leave imported"
         else:
