@@ -74,4 +74,5 @@ urlpatterns = [
     url(r'^admin/upload_disco/', views.upload_disco, name='update_disco'),
     url(r'^leave_export/', views.leave_export, name='leave_export'),
     url(r'^leave_import/', views.leave_import, name='leave_import'),
+    url(r'^hostel_export/', views.hostel_export, name='hostel_export'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
