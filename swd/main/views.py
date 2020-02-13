@@ -2994,7 +2994,36 @@ def leave_export(request):
     return render(request, "leave_export.html", {})
 
 def hostel_export(request):
-    query = HostelPS.objects.all().exclude(room=None)
+    if request.POST:
+        query = HostelPS.objects.all().exclude(room=None)
+        columns = [
+                (u"studentID", 6000),
+                (u"Hostel", 6000),
+                (u"Room", 6000),
+               ]
+
+            row_num = 0
+
+
+            for col_num in range(len(columns)):
+                ws.write(row_num, col_num, columns[col_num][0], h2_font_style)
+                ws.col(col_num).width = columns[col_num][1]
+
+            for i in query:
+                obj = i.student
+                row = [
+                    obj.bitsId,
+                    i.hostel,
+                    i.room
+                ]
+                row_num += 1
+                for col_num in range(len(row)):
+                    ws.write(row_num, col_num, row[col_num], font_style)
+            wb.save(response)
+            messages.success(request, "Export done. Download will automatically start.")
+            return response
+    return render(request, "mess_export.html", {})
+
 
 def leave_import(request):
     message_str = ''
