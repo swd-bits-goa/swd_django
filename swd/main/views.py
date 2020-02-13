@@ -2995,6 +2995,20 @@ def leave_export(request):
 
 def hostel_export(request):
     if request.POST:
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = 'attachment; filename='+ 'hostel export.xls'
+        wb = xlwt.Workbook(encoding='utf-8')
+        ws = wb.add_sheet("hostel")
+
+        heading_style = xlwt.easyxf('font: bold on, height 280; align: wrap on, vert centre, horiz center')
+        h2_font_style = xlwt.easyxf('font: bold on')
+        font_style = xlwt.easyxf('align: wrap on')
+
+        # This function is not documented but given in examples of repo
+        #     here: https://github.com/python-excel/xlwt/blob/master/examples/merged.py
+        # Prototype:
+        #     sheet.write_merge(row1, row2, col1, col2, 'text', fontStyle)
+        
         query = HostelPS.objects.all().exclude(room=None)
         columns = [
                 (u"studentID", 6000),
