@@ -3046,14 +3046,11 @@ def leave_import(request):
                         consent = row[header['consent']].value
                     except Exception:
                         message_str + "student " + row[header['loginID']].value + " not in database"
-                    try:
-                        rev_sdate = datetime(*xlrd.xldate_as_tuple(sdate, 0))
-                        rev_stime = datetime(*xlrd.xldate_as_tuple(time, 0)).time()
-                        sdatetime = datetime.combine(rev_sdate, rev_stime)
-                        rev_edate=  datetime(*xlrd.xldate_as_tuple(edate, 0))
-                        rev_etime = datetime(*xlrd.xldate_as_tuple(sdate, 0)).time()
-                    except:
-                        rev_etime = datetime(*xlrd.xldate_as_tuple(sdate, 0)).time()
+                    rev_sdate = datetime(*xlrd.xldate_as_tuple(sdate, 0)).date()
+                    rev_stime = datetime(*xlrd.xldate_as_tuple(time, 0)).time()
+                    sdatetime = datetime.combine(rev_sdate, rev_stime)
+                    rev_edate=  datetime(*xlrd.xldate_as_tuple(edate, 0)).date()
+                    rev_etime = datetime(*xlrd.xldate_as_tuple(sdate, 0)).time()
                     edatetime = datetime.combine(rev_edate, rev_etime)
                     try:
                         warden = Warden.objects.get(user__username=approved_by)
