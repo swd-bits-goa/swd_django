@@ -3057,7 +3057,7 @@ def leave_import(request):
                     try:
                         warden = Warden.objects.get(user__username=approved_by)
                     except:
-                        warden = User.objects.get(user__username='chiefwarden')
+                        warden = None
                     if warden_approv == 'disapprov':
                         approved=False
                         inprocess=False
