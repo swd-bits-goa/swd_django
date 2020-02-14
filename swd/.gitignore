@@ -21,3 +21,5 @@ studentimg
 venv/
 media/
 ProfilePictures/
+swd/config.py
+swd/settings.py
