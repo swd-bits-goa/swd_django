@@ -9,23 +9,25 @@
                 <div class="col s6 l12">
                     <div class="card">
                         <div class="card-content">
-                            <span class="card-title">Approved Leaves</span>
+                            <span class="card-title">Approved Daypasses</span>
                             <table class="bordered highlight">
                                 <thead>
                                     <tr>
-                                        <th>Leave No.</th>
+                                        <th>DayPass No.</th>
                                         <th>Name</th>
                                         <th>ID</th>
-                                        <th>Departure Time</th>
+                                        <th>Date Applied</th>
+                                        <th>Out time</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {% for leave in leaves %}
-                                    <tr class="clickable" data-id="{{ leave.id }}">
-                                        <td>{{ leave.id }}</td>
-                                        <td>{{ leave.student.name }}</td>
-                                        <td>{{ leave.student.bitsId }}</td>
-                                        <td>{{ leave.dateTimeStart|time:"H:i" }}</td>
+                                    {% for daypass in daypasses %}
+                                    <tr class="clickable" data-id="{{ daypass.id }}">
+                                        <td>{{ daypass.id }}</td>
+                                        <td>{{ daypass.student.name }}</td>
+                                        <td>{{ daypass.student.bitsId }}</td>
+                                        <td>{{ daypass.dateTime|date:"d/M/y" }}</td>
+                                        <td>{{ daypass.dateTime|time}}</td>    
                                     </tr>
                                     {% endfor %}
                                 </tbody>
