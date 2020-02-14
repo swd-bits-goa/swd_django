@@ -1541,6 +1541,9 @@ def csa(request):
     }
     return render(request,"csa.html",context)
 
+def migration(request):
+    return render(request,"migration.html",{})    
+
 def sac(request):
     return render(request,"sac.html",{})
     
