@@ -45,7 +45,6 @@ urlpatterns = [
     url(r'^sac/',views.sac, name='sac'),
     url(r'^latecomer/', views.latecomer, name="latecomer"),
     url(r'^contact/',views.contact, name='contact'),
-    url(r'^dash_security/',views.dash_security, name='security_dash_base'),
     url(r'^developers/', views.developers, name="developers"),
     url(r'^mess-forgot/',views.mess_import, name='forgot'),
     url(r'^mess_exp/',views.mess_exp, name='mess_exp'),
@@ -75,7 +74,7 @@ urlpatterns = [
     url(r'^leave_export/', views.leave_export, name='leave_export'),
     url(r'^leave_import/', views.leave_import, name='leave_import'),
     url(r'^hostel_export/', views.hostel_export, name='hostel_export'),
-    url(r'^daypasses_security/', views.hostel_export, name='daypasses_security'),
-    url(r'^security_leaves/', views.hostel_export, name='dash_security'),
+    url(r'^daypasses_security/', views.dash_security_daypass, name='daypasses_security'),
+    url(r'^security_leaves/', views.dash_security_leaves, name='dash_security'),
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -55,7 +55,7 @@ def index(request):
         if HostelSuperintendent.objects.filter(user=request.user):
             return redirect('/hostelsuperintendent')
         if Security.objects.filter(user=request.user):
-            return redirect('/dash_security')
+            return redirect('/security_leaves')
         return redirect('dashboard')
     else:
         notice_list = Notice.objects.all().order_by('-id')
@@ -287,7 +287,7 @@ def loginform(request):
         if HostelSuperintendent.objects.filter(user=request.user):
             return redirect('/hostelsuperintendent')
         if Security.objects.filter(user=request.user):
-            return redirect('/dash_security')
+            return redirect('/security_leaves')
         return redirect('dashboard')
 
     if request.POST:
@@ -303,7 +303,7 @@ def loginform(request):
             if HostelSuperintendent.objects.filter(user=request.user):
                 return redirect('/hostelsuperintendent')
             if Security.objects.filter(user=request.user):
-                return redirect('/dash_security')
+                return redirect('/security_leaves')
             return redirect('dashboard')
         else:
             messages.add_message(request, messages.INFO,  "Incorrect username or password", extra_tags='red')
@@ -2001,7 +2001,7 @@ def dash_security_leaves(request):
     d = date.today()
     approved_leaves = Leave.objects.filter(approved__exact=True, dateTimeStart__gte=datetime.combine(d,t), dateTimeStart__lte=datetime.combine(d,t1))
     context = {'leaves' : approved_leaves}
-    return render(request, "security_leaves.html", context)
+    return render(request, "dash_security.html", context)
 
 
 @user_passes_test(is_security)
@@ -2012,7 +2012,7 @@ def dash_security_daypass(request):
     d = date.today()
     approved_daypass = DayPass.objects.filter(approved__exact=True, dateTime__date__exact=datetime.today().date())
     context = {'daypasses' : approved_daypass}
-    return render(request, "daypass_security.html", context)
+    return render(request, "daypasses_security.html", context)
 
 
 @user_passes_test(lambda u: u.is_superuser)

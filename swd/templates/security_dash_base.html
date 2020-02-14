@@ -19,25 +19,18 @@
             <a href="#" class="brand-logo">&nbsp;Student Welfare Division</a>
             <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
             <ul id="nav-mobile" class="right hide-on-med-and-down">
-                <li class=""><a href="/profile" class="valign-wrapper"><img class="circle profileImg" src="{% static 'img/profile-swd.jpg' %}">&nbsp;{{ hostelsuperintendent.name|title }}</a></li>
                 <li><a href="/logout">Logout</a></li>
             </ul>
             <ul class="side-nav" id="mobile-demo">
-                <li><a href="/profile" class="valign-wrapper"><img class="circle profileImg" src="{% static 'img/profile-swd.jpg' %}">&nbsp;{{ hostelsuperintendent.name|title }}</a></li>
                 <li><a href="/logout">Logout</a></li>
             </ul>
-            <style>
-                .profileImg {
-                    max-width: 35px;
-                    height: auto
-                }
-            </style>
         </div>
             <div class="nav-content">
              <ul class="tabs tabs-transparent">
                 {% load main_extras %}
+                                <li class="tab"><a href="/security_leaves" class="{% active_page request 'security_leaves' %}" target="_self">Leaves</a></li>
+
                 <li class="tab"><a href="/daypasses_security" class="{% active_page request 'daypasses_security' %}" target="_self">Day Pass</a></li>
-                <li class="tab"><a href="/security_leaves" class="{% active_page request 'security_leaves' %}" target="_self">Leaves</a></li>
             </ul>
         </div>
     </nav>
