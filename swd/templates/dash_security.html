@@ -17,6 +17,8 @@
                                         <th>Name</th>
                                         <th>ID</th>
                                         <th>Departure Time</th>
+                                        <th>Arrival Date</th>
+                                        <th>Arrival Time</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -26,6 +28,8 @@
                                         <td>{{ leave.student.name }}</td>
                                         <td>{{ leave.student.bitsId }}</td>
                                         <td>{{ leave.dateTimeStart|time:"H:i" }}</td>
+                                        <td>{{ leave.dateTimeEnd|date:"d/m/Y" }}</td>
+                                        <td>{{ leave.dateTimeEnd|time:"H:i" }}</td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>
