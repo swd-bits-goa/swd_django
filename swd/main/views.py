@@ -1994,14 +1994,25 @@ def edit_constants(request):
     return render(request, "constants.html", {"initial": data_json})
 
 @user_passes_test(is_security)
-def dash_security(request):
+def dash_security_leaves(request):
     from datetime import time
     t = time(0,0)
     t1 = time(23,59)
     d = date.today()
-    approved = Leave.objects.filter(approved__exact=True, dateTimeStart__gte=datetime.combine(d,t), dateTimeStart__lte=datetime.combine(d,t1))
-    context = {'leaves' : approved}
-    return render(request, "dash_security.html", context)
+    approved_leaves = Leave.objects.filter(approved__exact=True, dateTimeStart__gte=datetime.combine(d,t), dateTimeStart__lte=datetime.combine(d,t1))
+    context = {'leaves' : approved_leaves}
+    return render(request, "security_leaves.html", context)
+
+
+@user_passes_test(is_security)
+def dash_security_daypass(request):
+    from datetime import time
+    t = time(0,0)
+    t1 = time(23,59)
+    d = date.today()
+    approved_daypass = DayPass.objects.filter(approved__exact=True, dateTime__date__exact=datetime.today().date())
+    context = {'daypasses' : approved_daypass}
+    return render(request, "daypass_security.html", context)
 
 
 @user_passes_test(lambda u: u.is_superuser)
