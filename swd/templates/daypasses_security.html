@@ -18,6 +18,7 @@
                                         <th>ID</th>
                                         <th>Date Applied</th>
                                         <th>Out time</th>
+                                        <th>In time</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -27,7 +28,8 @@
                                         <td>{{ daypass.student.name }}</td>
                                         <td>{{ daypass.student.bitsId }}</td>
                                         <td>{{ daypass.dateTime|date:"d/M/y" }}</td>
-                                        <td>{{ daypass.dateTime|time}}</td>    
+                                        <td>{{ daypass.dateTime|time}}</td>   
+                                        <td>{{ daypass.inTime|time}}</td>   
                                     </tr>
                                     {% endfor %}
                                 </tbody>
