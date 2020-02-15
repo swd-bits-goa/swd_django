@@ -1555,7 +1555,7 @@ def contact(request):
 
 def studentDetails(request,id=None):
     if request.user.is_authenticated:
-        if is_warden(request.user) or is_hostelsuperintendent(request.user) or request.user.is_superuser:
+        if is_warden(request.user) or is_hostelsuperintendent(request.user) or request.user.is_staff:
             student = Student.objects.get(id=id)
             res=HostelPS.objects.get(student__id=id)
             disco=Disco.objects.filter(student__id=id)
