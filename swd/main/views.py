@@ -1385,7 +1385,7 @@ def search(request):
             'option' :option,
             'hostelsuperintendent':hostelsuperintendent,
         }
-    elif request.user.is_superuser:
+    elif request.user.is_staff:
         perm=1
         context = {
             'hostels' : [i[0] for i in HOSTELS],
