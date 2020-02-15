@@ -25,39 +25,39 @@
                             </div>
                         </form>
                         {% elif option1 == 1 %}
-                            <p>Daypass Successfully applied for {{ date }}. Please wait for approval.</p>
+                        <p>Daypass Successfully applied for {{ date }}. Please wait for approval.</p>
                         {% else %}
-                            {% if form.errors %}
-                                {% for error in form.non_field_errors %}
-                                    <div class="red-text alert alert-danger">
-                                        <strong>{{ error|escape }}</strong>
-                                    </div>
+                        {% if form.errors %}
+                        {% for error in form.non_field_errors %}
+                        <div class="red-text alert alert-danger">
+                            <strong>{{ error|escape }}</strong>
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+                        <div class=red-text>
+                            <p>There was a problem with form submission. Please refill.</p>
+                            <h1></h1>
+                        </div>
+                        <form method="POST">
+                            {% csrf_token %}
+                            <div class="col-md-12">
+                                {% for field in form %}
+                                {% if form.errors %}
+                                {% for error in field.errors %}
+                                <div class="red-text alert alert-danger">
+                                    <strong>{{ error|escape }}</strong>
+                                </div>
                                 {% endfor %}
-                            {% endif %}
-                            <div class=red-text>
-                                <p>There was a problem with form submission. Please refill.</p>
-                                <h1></h1>
+                                {% endif %}
+                                <div class="input-field col s12">
+                                    {{ field }} {{ field.label_tag }}
+                                </div>
+                                {% endfor %}
                             </div>
-                            <form method="POST">
-                                {% csrf_token %}
-                                <div class="col-md-12">
-                                    {% for field in form %}
-                                        {% if form.errors %}
-                                        {% for error in field.errors %}
-                                            <div class="red-text alert alert-danger">
-                                                <strong>{{ error|escape }}</strong>
-                                            </div>
-                                        {% endfor %}
-                                        {% endif %}
-                                    <div class="input-field col s12">
-                                        {{ field }} {{ field.label_tag }}
-                                    </div>
-                                {% endfor %}
-                                </div>
-                                <div class="col-xs-4">
-                                    <button class="btn btn-block bg-green waves-effect" type="submit">SUBMIT</button>
-                                </div>
-                            </form>
+                            <div class="col-xs-4">
+                                <button class="btn btn-block bg-green waves-effect" type="submit">SUBMIT</button>
+                            </div>
+                        </form>
                         {% endif %}
                     </div>
                 </div>
@@ -83,9 +83,12 @@
                                     <td>{{ daypass_o.dateTime|date:"d/M/y" }}</td>
                                     <td class="center-align badge-container">
                                         {% if daypass_o.approved == 1%}
-                                        <span class="new badge green comm" data-badge-caption="Approved"></span> {% elif daypass_o.disapproved == 1 %}
-                                        <span class="new badge red comm" data-badge-caption="Not Approved"></span> {% else %}
-                                        <span class="new badge blue comm" data-badge-caption="In Process"></span> {% endif %}
+                                        <span class="new badge green comm" data-badge-caption="Approved"></span>
+                                        {% elif daypass_o.disapproved == 1 %}
+                                        <span class="new badge red comm" data-badge-caption="Not Approved"></span>
+                                        {% else %}
+                                        <span class="new badge blue comm" data-badge-caption="In Process"></span>
+                                        {% endif %}
                                     </td>
                                     <td>{{ daypass_o.comment }}</td>
                                 </tr>
@@ -95,8 +98,6 @@
                     </div>
                 </div>
             </div>
-
-
         </div>
     </div>
     <br><br>
@@ -114,12 +115,13 @@
     })
 </script>
 <style>
-  .comm {
-    width:100px;
-  }
-  .badge-container {
-      width: 34%;
-      padding-right:15%;
-  }
+    .comm {
+        width: 100px;
+    }
+
+    .badge-container {
+        width: 34%;
+        padding-right: 15%;
+    }
 </style>
 {% endblock %}
