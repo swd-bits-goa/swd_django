@@ -681,7 +681,7 @@ def certificates(request):
 
     return render(request, "certificates.html", dict(context, **bonafideContext))
 
-@user_passes_test(lambda u: u.is_superuser)
+@user_passes_test(lambda u: u.is_staff)
 def printBonafide(request,id=None):
     instance = Bonafide.objects.get(id=id)
     context = {
