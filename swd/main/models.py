@@ -224,7 +224,7 @@ class Bonafide(models.Model):
      
         res=HostelPS.objects.get(student=self.student)
         date_admit_year = res.student.admit.strftime('%Y')
-        if date_admit_year<=2015:
+        if (date_admit_year<=2015):
             branch = BRANCH15[firstDeg]
             if secondDeg != 'PS' and firstDeg != 'H1' and firstDeg != 'PH':
                 branch = branch +' and '+ BRANCH15[secondDeg]  
