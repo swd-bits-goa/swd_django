@@ -30,14 +30,27 @@ BRANCH = {
     'A4': 'B.E. Mechanical Engineering',
     'A7': 'B.E. Computer Science',
     'A8': 'B.E. Electronics and Instrumentation Engineering',
-    'B1': 'MSc. Biology',
-    'B2': 'MSc. Chemistry',
-    'B3': 'MSc. Economics',
-    'B4': 'MSc. Mathematics',
-    'B5': 'MSc.  Physics',
+    'B1': 'M.Sc. Biology',
+    'B2': 'M.Sc. Chemistry',
+    'B3': 'M.Sc. Economics',
+    'B4': 'M.Sc. Mathematics',
+    'B5': 'M.Sc.  Physics',
     'AA': 'B.E. Electronics and Communication Engineering',
     'PH': 'PhD.',
     'H1': 'M.E. Computer Science',
+}
+
+ME = {
+    'H101':'M.E. Chemical',
+    'H103':'M.E. Computer Science',
+    'H112':'M.E. Software Systems',
+    'H123':'M.E. Microelectronics',
+    'H129':'M.E. biotechnology',
+    'H140':'M.E. Embedded Systems',
+    'H141':'M.E. Design Engineering',
+    'H106':'M.E. Mechanical',
+    'H151':'M.E. Sanitation Science, Technology and Management',
+    'H152':'M.Phil. In Liberal Studies',
 }
 
 YEARNAMES = {
@@ -209,6 +222,9 @@ class Bonafide(models.Model):
         branch = BRANCH[firstDeg]
         if secondDeg != 'PS' and firstDeg != 'H1' and firstDeg != 'PH':
             branch = branch +' and '+ BRANCH[secondDeg]  
+        if firstDeg == 'H1':
+            branch = ME[self.student.bitsId[4:8]]
+
         yearNum=self.reqDate.year-int(self.student.bitsId[0:4]) + 1
         if(self.reqDate.month <5):
             yearNum=yearNum-1
@@ -221,9 +237,9 @@ class Bonafide(models.Model):
             year = today.year
         reason = self.otherReason if self.reason.lower()=='other' else self.reason
         if(res.status == "Student"):
-            return '''&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This is to certify that <i>''' + gender + self.student.name.title() + '''</i>, ID No. <i>''' + self.student.bitsId + '''</i> is a bonafide student of '''+ yearName + ''' year class. ''' + pronoun+  ''' was admitted to the institute on ''' + str(date_admit) + ''', for pursuing the <i>'''+ branch + '''</i> programme of studies. ''' +pronoun+'''is residing in the Hostel <i>'''+res.hostel+'''-'''+res.room+'''</i> of this institute. Date of joining the current academic session is 1 August '''+str(year)+'''.<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This certificate is issued for the purpose of applying for ''' + reason + '''.'''
+            return '''&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This is to certify that <i style="font-family: Monotype Corsiva">''' + gender + self.student.name.upper() + '''</i>, ID No. <i style="font-family: Monotype Corsiva">''' + self.student.bitsId + '''</i> is a bonafide student of '''+ yearName + ''' year class. ''' + pronoun+  ''' was admitted to the institute on ''' + str(date_admit) + ''', for pursuing the <i style="font-family: Monotype Corsiva">'''+ branch + '''</i> programme of studies. ''' +pronoun+'''is residing in the Hostel <i style="font-family: Monotype Corsiva">'''+res.hostel+'''-'''+res.room+'''</i> of this institute. Date of joining the current academic session is 1 August '''+str(year)+'''.<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This certificate is issued for the purpose of applying for ''' + reason + '''.'''
         elif(res.status == "Thesis" or res.status == "PS2"):
-            return '''&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This is to certify that <i>''' + gender + self.student.name.title() + '''</i>, ID No. <i>''' + self.student.bitsId + '''</i> is a bonafide student of '''+ yearName + ''' year class. ''' + pronoun +''' was admitted to the Institute on ''' + str(date_admit) + ''', for pursuing the <i>'''+ branch +'''</i> programme of studies. '''+ pronoun+ ''' is pursuing <i>''' + res.status + '''</i> at <i>'''+ res.psStation +'''</i> as a part of the academic requirement of BITS-Pilani, Deemed University.<br>This certificate is issued for the purpose of applying for ''' + reason + '''.'''
+            return '''&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This is to certify that <i>''' + gender + self.student.name.upper() + '''</i>, ID No. <i>''' + self.student.bitsId + '''</i> is a bonafide student of '''+ yearName + ''' year class. ''' + pronoun +''' was admitted to the Institute on ''' + str(date_admit) + ''', for pursuing the <i>'''+ branch +'''</i> programme of studies. '''+ pronoun+ ''' is pursuing <i>''' + res.status + '''</i> at <i>'''+ res.psStation +'''</i> as a part of the academic requirement of BITS-Pilani, Deemed University.<br>This certificate is issued for the purpose of applying for ''' + reason + '''.'''
 
     def save(self, *args, **kwargs):
         self.text = self.createText()
