@@ -1,65 +1,72 @@
 {%load staticfiles %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<title>Bonafide Certificate</title>
-<style type="text/css" media="print">
-@page {
-    size: auto;   
-    margin: 0; 
-}
-</style>
-<style>
-div.container3 {
-  height: 10;
-  position: relative 
-  }
-
-div.container3 p {
-   margin: 0;
-   position: absolute;
-   top: 50%;
-   transform: translate(0, -50%) } 
-    body {
-    height: 842px;
-    width: 555px;
-    margin-left: auto;
-    margin-right: auto;
+  <title>Bonafide Certificate</title>
+  <style type="text/css" media="print">
+    @page {
+      size: auto;
+      margin: 0;
     }
-#letterhead{
-  line-height:0.1;
-  padding-top: 60px;
-}
-#footer{
-  position:absolute;
-  bottom: 0;
-  padding-bottom:40px; 
-  width: 595px;
-    margin-left: auto;
-    margin-right: auto;
-}
+  </style>
+  <style>
+    div.container3 {
+      height: 10;
+      position: relative
+    }
 
-</style> 
-<div id="letterhead">
-  <img src="{% static 'img/bonafide_header.png' %}" width=595px>
-</div>
+    div.container3 p {
+      margin: 0;
+      position: absolute;
+      top: 50%;
+      transform: translate(0, -50%)
+    }
+
+    body {
+      height: 842px;
+      width: 555px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    #letterhead {
+      line-height: 0.1;
+      padding-top: 60px;
+    }
+
+    #footer {
+      position: absolute;
+      bottom: 0;
+      padding-bottom: 40px;
+      width: 595px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  </style>
+  <div id="letterhead">
+    <img src="{% static 'img/bonafide_header.png' %}" width=595px>
+  </div>
 </head>
+
 <body bgcolor="white">
-<div id="content" >
+  <div id="content">
     <div class="top">
-        <h3 class="ref" align="left">Ref. No: SWD/CERT/{{ id }}<span style="float:right;">Date:{{ date|date:"d-F-Y"  }}</span></h3>
+      <h3 class="ref" align="left">Ref. No: SWD/CERT/{{ id }}<span
+          style="float:right;">Date: {{ date|date:"d-F-Y"  }}</span></h3>
     </div>
     <h2 align="center" style="padding-top: 30px">CERTIFICATE</h1>
-    <p line-height =200% style="font-size: 20px; line-height: 2; text-align: justify;">
-      {{ text | safe}} 
-    </p>
-    <br><br><br>
-    <p>
-    <span style="float:right; font-size: 20px">(Dr. C.K Ramesha)</span>
-    </p>
-</div>
-<div id="footer">
-  <img src="{% static 'img/bonafide_footer.png' %}"  width=595px >
-</div>  
+      <p line-height=200% style="font-size: 20px; line-height: 2; text-align: justify;">
+        {{ text | safe}}
+      </p>
+      <br><br><br>
+      <p>
+        <span style="float:right; font-size: 20px">(Dr. C.K Ramesha)</span>
+      </p>
+  </div>
+  <div id="footer">
+    <img src="{% static 'img/bonafide_footer.png' %}" width=595px>
+  </div>
 </body>
+
 </html>
