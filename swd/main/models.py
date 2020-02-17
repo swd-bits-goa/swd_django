@@ -24,6 +24,23 @@ BONAFIDE_REASON_CHOICES = (
     ('Other', 'Other'))
 
 BRANCH = {
+    'A1': 'B.E. Chemical Engineering',
+    'A3': 'B.E. Electrical and Electronics Engineering',
+    'A4': 'B.E. Mechanical Engineering',
+    'A7': 'B.E. Computer Science',
+    'A8': 'B.E. Electronics and Instrumentation Engineering',
+    'B1': 'MSc. Biology',
+    'B2': 'MSc. Chemistry',
+    'B3': 'MSc. Economics',
+    'B4': 'MSc. Mathematics',
+    'B5': 'MSc.  Physics',
+    'AA': 'B.E. Electronics and Communication Engineering',
+    'PH': 'PhD.',
+    'H1': 'M.E. Computer Science',
+
+}
+
+BRANCH15 = {
     'A1': 'B.E.(Hons) Chemical Engineering',
     'A3': 'B.E.(Hons) Electrical and Electronics Engineering',
     'A4': 'B.E.(Hons) Mechanical Engineering',
@@ -204,10 +221,18 @@ class Bonafide(models.Model):
         pronoun = "He " if gender=="Mr. " else "She "
         firstDeg=self.student.bitsId[4:6]
         secondDeg=self.student.bitsId[6:8]
-        branch = BRANCH[firstDeg]
+     
         res=HostelPS.objects.get(student=self.student)
-        if secondDeg != 'PS' and firstDeg != 'H1' and firstDeg != 'PH':
-            branch = branch +' and '+ BRANCH[secondDeg]
+        date_admit_year = res.student.admit.strftime('%Y')
+        if date_admit_year<=2015:
+            branch = BRANCH15[firstDeg]
+            if secondDeg != 'PS' and firstDeg != 'H1' and firstDeg != 'PH':
+                branch = branch +' and '+ BRANCH15[secondDeg]  
+        else :
+            branch = BRANCH[firstDeg]
+            if secondDeg != 'PS' and firstDeg != 'H1' and firstDeg != 'PH':
+                branch = branch +' and '+ BRANCH[secondDeg]  
+
         yearNum=self.reqDate.year-int(self.student.bitsId[0:4]) + 1
         if(self.reqDate.month <5):
             yearNum=yearNum-1
