@@ -3007,6 +3007,7 @@ def leave_export(request):
         return response
     return render(request, "leave_export.html", {})
 
+@user_passes_test(lambda u: u.is_superuser)
 def hostel_export(request):
     if request.POST:
         response = HttpResponse(content_type='application/ms-excel')
@@ -3052,7 +3053,7 @@ def hostel_export(request):
         return response
     return render(request, "mess_export.html", {})
 
-
+@user_passes_test(lambda u: u.is_superuser)
 def leave_import(request):
     message_str = ''
     message_tag = messages.INFO
@@ -3067,7 +3068,7 @@ def leave_import(request):
                     messages.add_message(request,
                                         message_tag, 
                                         message_str)
-                    return render(request, "add_students.html", {'header': "Update PS/Thesis"})
+                    return render(request, "add_students.html", {'header': "Leave import"})
 
             fd, tmp = tempfile.mkstemp()
             with os.fdopen(fd, 'wb') as out:
@@ -3087,7 +3088,6 @@ def leave_import(request):
                             col_no = col_no + 1
                         idx = 0
                         continue
-                    # create User model first then Student model
                     try:
                         student = Student.objects.get(user__username=row[header['loginID']].value)
                         sdate = row[header['sdate']].value
@@ -3139,3 +3139,111 @@ def leave_import(request):
                             message_tag, 
                             message_str)
     return render(request, "add_students.html", {'header': "Leave Import"})
+
+@user_passes_test(lambda u: u.is_superuser)
+def leave_diff(request):
+    message_str = ''
+    message_tag = messages.INFO
+    if request.POST:
+        if request.FILES:
+            # Read Excel File into a temp file
+            xl_file = request.FILES['xl_file']
+            extension = xl_file.name.rsplit('.', 1)[1]
+            if ('xls' != extension):
+                if ('xlsx' != extension):
+                    messages.error(request, "Please upload .xls or .xlsx file only")
+                    messages.add_message(request,
+                                        message_tag, 
+                                        message_str)
+                    return render(request, "add_students.html", {'header': "Update PS/Thesis"})
+
+            fd, tmp = tempfile.mkstemp()
+            with os.fdopen(fd, 'wb') as out:
+                out.write(xl_file.read())
+            workbook = xlrd.open_workbook(tmp)
+
+            response = HttpResponse(content_type='application/ms-excel')
+            response['Content-Disposition'] = 'attachment; filename='+ 'hostel export.xls'
+            wb = xlwt.Workbook(encoding='utf-8')
+            ws = wb.add_sheet("hostel")
+
+            heading_style = xlwt.easyxf('font: bold on, height 280; align: wrap on, vert centre, horiz center')
+            h2_font_style = xlwt.easyxf('font: bold on')
+            font_style = xlwt.easyxf('align: wrap on')
+            
+            columns = [
+                    (u"loginID", 6000),
+                    (u"sdate", 6000),
+                    (u"stime", 6000),
+                    (u"edate", 6000),
+                    (u"etime", 6000),
+                    (u"reason", 6000),
+                    (u"approved_by", 6000),
+                    (u"warden_approv", 6000),
+                    (u"addr", 6000),
+                    (u"ph", 6000),
+                    (u"comment", 6000),
+                    (u"consent", 6000),
+                   ]
+
+            row_num = 0
+
+            for col_num in range(len(columns)):
+                ws.write(row_num, col_num, columns[col_num][0], h2_font_style)
+                ws.col(col_num).width = columns[col_num][1]
+
+
+            count = 0
+            idx = 1
+            header = {}
+            for sheet in workbook.sheets():
+                for row in sheet.get_rows():
+                    if idx == 1:
+                        col_no = 0
+                        for cell in row:
+                            # Store the column names in dictionary
+                            header[str(cell.value)] = col_no
+                            col_no = col_no + 1
+                        idx = 0
+                        continue
+
+                    loginID = row[header['loginID']].value
+                    student = Student.objects.get(user__username = loginID)
+
+                    try:
+                        sdate = row[header['sdate']].value
+                        stime = row[header['stime']].value
+                        edate = row[header['edate']].value
+                        etime = row[header['etime']].value
+                        rev_sdate = datetime(*xlrd.xldate_as_tuple(sdate, 0)).date()
+                        rev_stime = datetime(*xlrd.xldate_as_tuple(sdate+stime, 0)).time()
+                        sdatetime = datetime.combine(rev_sdate, rev_stime)
+                        rev_edate=  datetime(*xlrd.xldate_as_tuple(edate, 0)).date()
+                        rev_etime = datetime(*xlrd.xldate_as_tuple(edate+etime, 0)).time()
+                        edatetime = datetime.combine(rev_edate, rev_etime)
+                        Leave.objects.get(student = student, dateTimeStart = sdatetime, dateTimeEnd= edatetime)
+                    except Leave.DoesNotExist:
+                        print("Exception caught")
+                        row = [
+                            row[header['loginID']].value,
+                            row[header['sdate']].value,
+                            row[header['stime']].value,
+                            row[header['edate']].value,
+                            row[header['etime']].value,
+                            row[header['reason']].value,
+                            row[header['approved_by']].value,
+                            row[header['warden_approv']].value,
+                            row[header['addr']].value,
+                            row[header['ph']].value,
+                            row[header['comment']].value,
+                            row[header['consent']].value,
+                        ]
+                        row_num += 1
+                        for col_num in range(len(row)):
+                            ws.write(row_num, col_num, row[col_num], font_style)
+
+
+            wb.save(response)
+            messages.success(request, "Export done. Download will automatically start.")
+            return response
+    return render(request, "add_students.html", {'header': "Leave Missing Export"})                    

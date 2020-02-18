@@ -15,8 +15,10 @@
                                     <tr>
                                         <th>DayPass No.</th>
                                         <th>Name (ID)</th>
-                                        <th>Date Applied</th>
+                                        <td>Hostel - Room</td> 
+                                        <th>Out Date</th>
                                         <th>Out time</th>
+                                        <th>In time</th>
                                         <th>Approval Status</th>
                                     </tr>
                                 </thead>
@@ -25,8 +27,10 @@
                                     <tr class="clickable" onclick="daypassclick(this)" data-id="{{ daypass.id }}">
                                         <td>{{ daypass.id }}</td>
                                         <td>{{ daypass.student.name }} | {{ daypass.student.bitsId }}</td>
+                                        <td>{{ daypass.student.hostelps.hostel }} - {{ daypass.student.hostelps.room }}</td>
                                         <td>{{ daypass.dateTime|date:"d/M/y" }}</td>
-                                        <td>{{ daypass.dateTime|time}}</td>                                     
+                                        <td>{{ daypass.dateTime|time}}</td>
+                                        <td>{{ daypass.inTime|time}}</td>                                     
                                         <td>{% if daypass.approved == 1 %}Approved{% elif daypass.disapproved == 1 %}Disapproved{% else %}In Process{% endif %}</td>
                                     </tr>
                                     {% endfor %}

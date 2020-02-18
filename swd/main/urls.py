@@ -77,5 +77,5 @@ urlpatterns = [
     url(r'^hostel_export/', views.hostel_export, name='hostel_export'),
     url(r'^daypasses_security/', views.dash_security_daypass, name='daypasses_security'),
     url(r'^security_leaves/', views.dash_security_leaves, name='dash_security'),
-
+    url(r'^leave_diff/', views.leave_diff, name='leave_diff'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
