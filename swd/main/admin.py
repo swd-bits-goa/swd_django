@@ -16,7 +16,6 @@ models = [
     Staff,
     DayScholar,
     CSA,
-    DayPass,
     LateComer,
     InOut,
     MessOptionOpen,
@@ -39,6 +38,10 @@ class HostelPSAdmin(admin.ModelAdmin):
     search_fields = ['student__name', 'student__bitsId']
 
 class DiscoAdmin(admin.ModelAdmin):
+    search_fields = ['student__bitsId', 'student__name']
+
+@admin.register(DayPass)
+class DayPassAdmin(admin.ModelAdmin):
     search_fields = ['student__bitsId', 'student__name']
 
 @admin.register(Bonafide)
