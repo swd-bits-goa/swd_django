@@ -1465,7 +1465,8 @@ def search(request):
             Q(bitsId__contains=branch) &
             (Q(hostelps__hostel__contains=hostel) &
             Q(hostelps__room__contains=room) |
-            Q(hostelps__psStation__contains=''))
+            Q(hostelps__psStation__contains='') |
+            Q(bitsId__icontains='PH'))
         )
 
         searchstr = {}
