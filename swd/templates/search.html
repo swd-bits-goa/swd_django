@@ -2,7 +2,6 @@
 
 <div class="container">
     <div class="section">
-
         <!--   Icon Section   -->
         <div class="row">
             <div class="col s12 m12">
@@ -11,7 +10,6 @@
                     <br>
                     <h5 class="center">Search Students</h5>
                     <form method="GET">
-                        {% csrf_token %}
                         <div class="row">
                             <div class="input-field col s10 offset-s1">
                                 <input name="name" id="name" type="text" class="validate">
@@ -32,10 +30,6 @@
                                 </select>
                                 <label>Branch</label>
                             </div>
-                            <!-- <div class="input-field col s3">
-                            <input name="branch" id="branch" type="text" class="validate">
-                            <label for="branch">Branch</label>
-                        </div> -->
                         </div>
 
                         <div class="row">
@@ -80,8 +74,7 @@
                                         <th>Sr. No.</th>
                                         <th>Student ID</th>
                                         <th>Name</th>
-                                        <th>Hostel</th>
-                                        <th>Room</th>
+                                        <th colspan=2>Hostel / Room or PS</th>
                                     </tr>
                                 </thead>
 
@@ -91,12 +84,26 @@
                                         <td>{{forloop.counter}}</td>
                                         <td>{{ i.bitsId }}</td>
                                         {% if permission == 1 %}
-                                        <td><a href="/student/{{ i.id }}/">{{ i.name }}</a></td>
+                                            <td><a href="/student/{{ i.id }}/">{{ i.name }}</a></td>
                                         {% else %}
-                                        <td>{{ i.name }}</td>
+                                            <td>{{ i.name }}</td>
                                         {% endif %}
-                                        <td>{{ i.hostelps.hostel }}</td>
-                                        <td>{{ i.hostelps.room }}</td>
+                                        {% if i.hostelps.hostel %}
+                                            {% if i.hostelps.room %}
+                                                {% comment %} REGULAR STUDENT {% endcomment %}
+                                                <td>{{ i.hostelps.hostel }}</td>
+                                                <td>{{ i.hostelps.room }}</td>
+                                            {% else %}
+                                                {% comment %} DAY SCHOLARS {% endcomment %}
+                                                <td colspan=2>{{ i.hostelps.hostel }}</td>
+                                            {% endif %}
+                                        {% elif i.hostelps.psStation %}
+                                            {% comment %} PS-2 STUDENTS {% endcomment %}
+                                            <td colspan=2>{{ i.hostelps.psStation }}</td>
+                                        {% else %}
+                                            {% comment %} THESIS STUDENTS {% endcomment %}
+                                            <td colspan=2>{{ i.hostelps.status }}</td>
+                                        {% endif %}
                                     </tr>
                                     {% endfor %}
                                 </tbody>
