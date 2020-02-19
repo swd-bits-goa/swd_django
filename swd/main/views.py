@@ -1460,7 +1460,14 @@ def search(request):
         hostel = request.GET.get('hostel')
         room = request.GET.get('room')
 
-        students = Student.objects.filter(Q(name__icontains=name) & Q(bitsId__icontains=bitsId) & Q(bitsId__contains=branch) & Q(hostelps__hostel__contains=hostel) & Q(hostelps__room__contains=room))
+        students = Student.objects.filter(
+            Q(name__icontains=name) & 
+            Q(bitsId__icontains=bitsId) & 
+            Q(bitsId__contains=branch) &    
+            (Q(hostelps__hostel__contains=hostel) & 
+            Q(hostelps__room__contains=room) |
+            Q(hostelps__psStation__contains=''))
+        )
 
         searchstr = {}
 
@@ -1499,8 +1506,15 @@ def search_no_login(request):
         hostel = request.GET.get('hostel')
         room = request.GET.get('room')
 
-        students = Student.objects.filter(Q(name__icontains=name) & Q(bitsId__contains=bitsId) & Q(bitsId__contains=branch) & Q(hostelps__hostel__contains=hostel) & Q(hostelps__room__contains=room))
-
+        students = Student.objects.filter(
+            Q(name__icontains=name) & 
+            Q(bitsId__icontains=bitsId) & 
+            Q(bitsId__contains=branch) &    
+            (Q(hostelps__hostel__contains=hostel) & 
+            Q(hostelps__room__contains=room) |
+            Q(hostelps__psStation__contains=''))
+        )
+        
         searchstr = {}
 
         if name is not "":

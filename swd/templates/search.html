@@ -2,7 +2,6 @@
 
 <div class="container">
     <div class="section">
-
         <!--   Icon Section   -->
         <div class="row">
             <div class="col s12 m12">
@@ -32,10 +31,6 @@
                                 </select>
                                 <label>Branch</label>
                             </div>
-                            <!-- <div class="input-field col s3">
-                            <input name="branch" id="branch" type="text" class="validate">
-                            <label for="branch">Branch</label>
-                        </div> -->
                         </div>
 
                         <div class="row">
@@ -80,8 +75,7 @@
                                         <th>Sr. No.</th>
                                         <th>Student ID</th>
                                         <th>Name</th>
-                                        <th>Hostel</th>
-                                        <th>Room</th>
+                                        <th colspan=2>Hostel Room / PS</th>
                                     </tr>
                                 </thead>
 
@@ -95,8 +89,12 @@
                                         {% else %}
                                         <td>{{ i.name }}</td>
                                         {% endif %}
+                                        {% if i.hostelps.room %}
                                         <td>{{ i.hostelps.hostel }}</td>
                                         <td>{{ i.hostelps.room }}</td>
+                                        {% elif i.hostelps.psStation %}
+                                        <td colspan=2>{{ i.hostelps.psStation }}</td>
+                                        {% endif %}
                                     </tr>
                                     {% endfor %}
                                 </tbody>
