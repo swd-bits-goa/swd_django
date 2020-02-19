@@ -35,6 +35,7 @@
                                         <th>Leave No.</th>
                                         <th>Name (ID)</th>
                                         <th>Duration</th>
+                                        <th>Room number</th>
                                         <th>Approval Status</th>
                                     </tr>
                                 </thead>
@@ -44,6 +45,7 @@
                                         <td>{{ leave.id }}</td>
                                         <td>{{ leave.student.name }} | {{ leave.student.bitsId }}</td>
                                         <td>{{ leave.dateTimeStart|date:"d/M/y" }} to {{ leave.dateTimeEnd|date:"d/M/y" }}</td>
+                                        <td>{{ leave.student.hostelps.room }}</td>
                                         <td>{% if leave.approved == 1 %}Approved{% elif leave.disapproved == 1 %}Disapproved{% else %}In Process{% endif %}</td>
                                     </tr>
                                     {% endfor %}
