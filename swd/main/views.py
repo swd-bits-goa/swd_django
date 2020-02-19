@@ -1442,7 +1442,7 @@ def search(request):
            'branches' : BRANCH,
            'permission': perm,
            'option' :option,
-           'student' :student ,
+           'student' :student,
            'leaves': leaves,
            'option': option,
            'mess': mess,
@@ -1451,7 +1451,6 @@ def search(request):
            'balance': balance
         }
 
-      
     postContext = {}
     if request.GET:
         name = request.GET.get('name')
@@ -1460,7 +1459,15 @@ def search(request):
         hostel = request.GET.get('hostel')
         room = request.GET.get('room')
 
-        students = Student.objects.filter(Q(name__icontains=name) & Q(bitsId__icontains=bitsId) & Q(bitsId__contains=branch) & Q(hostelps__hostel__contains=hostel) & Q(hostelps__room__contains=room))
+        students = Student.objects.filter(
+            Q(name__icontains=name) &
+            Q(bitsId__icontains=bitsId) &
+            Q(bitsId__contains=branch) &
+            (Q(hostelps__hostel__contains=hostel) &
+            Q(hostelps__room__contains=room) |
+            Q(hostelps__psStation__contains='') |
+            Q(bitsId__icontains='PH'))
+        )
 
         searchstr = {}
 
@@ -1499,8 +1506,16 @@ def search_no_login(request):
         hostel = request.GET.get('hostel')
         room = request.GET.get('room')
 
-        students = Student.objects.filter(Q(name__icontains=name) & Q(bitsId__contains=bitsId) & Q(bitsId__contains=branch) & Q(hostelps__hostel__contains=hostel) & Q(hostelps__room__contains=room))
-
+        students = Student.objects.filter(
+            Q(name__icontains=name) &
+            Q(bitsId__icontains=bitsId) &
+            Q(bitsId__contains=branch) &
+            (Q(hostelps__hostel__contains=hostel) &
+            Q(hostelps__room__contains=room) |
+            Q(hostelps__psStation__contains='') |
+            Q(bitsId__icontains='PH'))
+        )
+        
         searchstr = {}
 
         if name is not "":
