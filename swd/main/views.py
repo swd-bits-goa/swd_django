@@ -2963,7 +2963,7 @@ def update_bank_account(request):
                             message_str)
     return render(request, "add_students.html", {'header': "Update Bank account"})
 
-@user_passes_test(lambda u: u.is_superuser)
+@user_passes_test(lambda u: u.is_staff)
 def leave_export(request):
     from datetime import time
     
