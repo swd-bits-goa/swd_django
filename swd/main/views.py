@@ -2983,6 +2983,8 @@ def leave_export(request):
         columns = [
             (u"studentID", 6000),
             (u"Name", 6000),
+            (u"Start Date", 6000),
+            (u"End Date", 6000),
            ]
 
         row_num = 0
@@ -2998,6 +3000,8 @@ def leave_export(request):
             row = [
                 obj.bitsId,
                 obj.name,
+                str(i.dateTimeStart.date()),
+                str(i.dateTimeEnd.date()),
             ]
             row_num += 1
             for col_num in range(len(row)):
