@@ -1854,7 +1854,7 @@ def import_dues_from_sheet(request):
                         amount = float(row[i].value)
 
                         # Don't add the due if it's zero
-                        if amount == 0: continue
+                        
 
                         # Check if the due already exists with same student
                         #   and same category, then overwrite that due object
@@ -1869,6 +1869,7 @@ def import_dues_from_sheet(request):
                             due.amount = amount
                             due.save()
                         except Due.DoesNotExist as e:
+                            if amount == 0: continue
                             Due.objects.create(student=student,
                                                amount=amount,
                                                due_category=category,
