@@ -1888,9 +1888,6 @@ def import_dues_from_sheet(request):
                     for i, category in enumerate(categories, start=2):
                         amount = float(row[i].value)
 
-                        # Don't add the due if it's zero
-                        
-
                         # Check if the due already exists with same student
                         #   and same category, then overwrite that due object
                         #   instead of making new ones.
@@ -1901,10 +1898,17 @@ def import_dues_from_sheet(request):
                             due = Due.objects.get(student=student,
                                                  due_category=category,
                                                  description=category.name)
-                            due.amount = amount
-                            due.save()
+
+                            if amount == 0 or due.amount == 0:
+                                # Delete the old record if it exists
+                                due.delete()
+                            else:
+                                # Update the old record if it exists
+                                due.amount = amount
+                                due.save()
                         except Due.DoesNotExist as e:
                             if amount == 0: continue
+
                             Due.objects.create(student=student,
                                                amount=amount,
                                                due_category=category,
