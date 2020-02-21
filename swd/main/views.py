@@ -1458,6 +1458,16 @@ def search(request):
         branch = request.GET.get('branch')
         hostel = request.GET.get('hostel')
         room = request.GET.get('room')
+        if (all(not d for d in [name, bitsId, branch, hostel, room])):
+            # Checks if at least one of the fields is non-empty.
+            messages.error(request, "Please fill at least one field.")
+            context['errors'] = ["Please fill at least one field."]
+            if request.user.is_authenticated and \
+                not is_warden(request.user) and \
+                not is_hostelsuperintendent(request.user):
+                return render(request, "search_logged_in.html", dict(context, **postContext))
+            else:
+                return render(request, "search.html", dict(context, **postContext))
         students = Student.objects.filter(
             Q(name__icontains=name) &
             Q(bitsId__icontains=bitsId) &
@@ -1489,6 +1499,10 @@ def search(request):
             'students' : students,
             'searchstr' : searchstr
         }
+
+        if students.count() == 0:
+            messages.error(request, "No student found with these details.")
+            context['errors'] = ["No student found with these details."]
     
     if request.user.is_authenticated and not is_warden(request.user) and not is_hostelsuperintendent(request.user):
         return render(request, "search_logged_in.html", dict(context, **postContext))
@@ -1508,6 +1522,16 @@ def search_no_login(request):
         branch = request.GET.get('branch')
         hostel = request.GET.get('hostel')
         room = request.GET.get('room')
+        if (all(not d for d in [name, bitsId, branch, hostel, room])):
+            # Checks if at least one of the fields is non-empty.
+            messages.error(request, "Please fill at least one field.")
+            context['errors'] = ["Please fill at least one field."]
+            if request.user.is_authenticated and \
+                not is_warden(request.user) and \
+                not is_hostelsuperintendent(request.user):
+                return render(request, "search_logged_in.html", dict(context, **postContext))
+            else:
+                return render(request, "search.html", dict(context, **postContext))
         students = Student.objects.filter(
             Q(name__icontains=name) &
             Q(bitsId__icontains=bitsId) &
@@ -1539,6 +1563,11 @@ def search_no_login(request):
             'students' : students,
             'searchstr' : searchstr
         }
+
+        if students.count() == 0:
+            messages.error(request, "No student found with these details.")
+            context['errors'] = ["No student found with these details."]
+
     return render(request, "search.html", dict(context, **postContext))
 
 def notice(request):
