@@ -735,7 +735,6 @@ def hostelsuperintendent(request):
     for hostelsuperintendent in hostelsuperintendents:
         for hostel in hostelsuperintendent.hostel.split(','):
             daypass += DayPass.objects.filter(student__hostelps__hostel__icontains=hostel).order_by('approved', '-id')
-    print(daypass)
     context = {
         'option':1,
         'hostelsuperintendent': hostelsuperintendent,
@@ -2981,11 +2980,9 @@ def update_bank_account(request):
 
 @user_passes_test(lambda u: u.is_staff)
 def leave_export(request):
-    from datetime import time
-    
     if request.POST:
         d = datetime.strptime(request.POST.get('date'), '%d %B, %Y').date()
-        approved = Leave.objects.filter(approved__exact=True, dateTimeStart__date__lte=d, dateTimeEnd__date__gte=d)
+        approved = Leave.objects.filter(approved__exact=True, dateTimeStart__date__exact=d)
         response = HttpResponse(content_type='application/ms-excel')
         response['Content-Disposition'] = 'attachment; filename='+ "Leaves.xls"
         wb = xlwt.Workbook(encoding='utf-8')

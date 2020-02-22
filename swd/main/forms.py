@@ -30,6 +30,10 @@ class LeaveForm(forms.ModelForm):
             self.add_error('dateStart', "Departure cannot be before the present date and time")
         if((date_time_start-datetime.now()).days>30):
             self.add_error('dateStart', "Can apply for leaves within a month only.")
+        if (dateStart - datetime.now().date()).days <= 1:
+            self.add_error('dateStart', "Cannot apply for leave one day before departure. Contact warden for immediate leave approval")
+        if (dateStart - dateEnd).days == 0:
+            self.add_error('dateStart', "Start date and end date cannot be the same. Apply for a day pass instead")
         return cleaned_data
 
     class Meta:
@@ -72,6 +76,8 @@ class DayPassForm(forms.ModelForm):
             self.add_error('date', "Daypass cannot be issued before the present date and time")
         if (date_time_start-datetime.now()).days>2:
             self.add_error('date', "Can apply for daypass within 2 days")
+        if intime < time:
+            self.add_error('intime', "In-time cannot be before out-time")
         return cleaned_data
 
     class Meta:

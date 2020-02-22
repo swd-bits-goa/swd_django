@@ -31,7 +31,7 @@
                                         <td>{{ daypass.dateTime|date:"d/M/y" }}</td>
                                         <td>{{ daypass.dateTime|time}}</td>
                                         <td>{{ daypass.inTime|time}}</td>                                     
-                                        <td>{% if daypass.approved == 1 %}Approved{% elif daypass.disapproved == 1 %}Disapproved{% else %}In Process{% endif %}</td>
+                                        <td>{% if daypass.approved == 1 %}Approved by {{ daypass.approvedBy.name }}{% elif daypass.disapproved == 1 %}Disapproved by {{ daypass.approvedBy.name }}{% else %}In Process{% endif %}</td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>
