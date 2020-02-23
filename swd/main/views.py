@@ -765,10 +765,10 @@ def wardenleaveapprove(request, leave):
         comment = request.POST.get('comment')
         mail_message={}
         if config.EMAIL_PROD:
-            email_to = [leave.student.email]
+            email_to = [str(leave.student.user.username) + "@goa.bits-pilani.ac.in"]
         else:
             email_to = ["spammailashad@gmail.com"]
-            email_to = [leave.student.email]
+            print(str(leave.student.user.username) + "@goa.bits-pilani.ac.in")
         mail_subject="Leave Status - "
         mail_message=leave.student.name+",\n"
 
@@ -814,12 +814,11 @@ def hostelsuperintendentdaypassapprove(request, daypass):
     }
     if request.POST:
         approved = request.POST.getlist('group1')
-        print(approved)
         comment = request.POST.get('comment')
 
         mail_message={}
         if config.EMAIL_PROD:
-            email_to = [daypass.student.email]
+            email_to = [str(daypass.student.user.username) + "@goa.bits-pilani.ac.in"]
         else:
             email_to = ["swdbitstest@gmail.com"]
         mail_subject="Daypass Status - "
@@ -3277,7 +3276,7 @@ def leave_diff(request):
                         rev_edate=  datetime(*xlrd.xldate_as_tuple(edate, 0)).date()
                         rev_etime = datetime(*xlrd.xldate_as_tuple(edate+etime, 0)).time()
                         edatetime = datetime.combine(rev_edate, rev_etime)
-                        Leave.objects.get(student = student, dateTimeStart = sdatetime, dateTimeEnd= edatetime)
+                        Leave.objects.get(student = student, dateTimeStart__date__exact = rev_sdate, dateTimeEnd__date__exact = rev_edate)
                     except Leave.DoesNotExist:
                         print("Exception caught")
                         row = [
