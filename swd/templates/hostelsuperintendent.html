@@ -91,27 +91,38 @@
                                     <div class="col s6">
                                         {{ daypasss.corrAddress }}
                                     </div>
+                                    {% if daypasss.student.profile_picture %}
+                                    <div class="col s3 offset-s8">
+                                        <div class="card">
+                                            <div class="card-content">
+                                                <div>
+                                                    <img style="width:100%" src="/media/{{ daypasss.student.profile_picture }}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endif %}
                                 </div>
                                 <form method="POST">
                                     {% csrf_token %}
                                     <div style="background-color:#eee; padding:15px;">
                                     <div class="row">
                                         <div class="input-field col s12">
-                                            <textarea id="comment" name="comment" class="materialize-textarea">{{ daypass.comment }}</textarea>
+                                            <textarea id="comment" name="comment" class="materialize-textarea">{{ daypasss.comment }}</textarea>
                                             <label for="comment">Comments</label>
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col s4">
-                                            <input name="group1" type="radio" class="with-gap" id="daypass-approve" value="1" {% if daypass.approved == True %} checked="checked" {% endif %}/>
+                                            <input name="group1" type="radio" class="with-gap" id="daypass-approve" value="1" {% if daypasss.approved == True %} checked="checked" {% endif %}/>
                                             <label for="daypass-approve">Approve</label>
                                         </div>
                                         <div class="col s4">
-                                            <input name="group1" type="radio" class="with-gap" id="daypass-disapprove" value="2" {% if daypass.disapproved == True %} checked="checked" {% endif %}/>
+                                            <input name="group1" type="radio" class="with-gap" id="daypass-disapprove" value="2" {% if daypasss.disapproved == True %} checked="checked" {% endif %}/>
                                             <label for="daypass-disapprove">Disapprove</label>
                                         </div>
                                         <div class="col s4">
-                                            <input name="group1" type="radio" class="with-gap" id="daypass-process" value="3" {% if daypass.inprocess == True %} checked="checked" {% endif %}/>
+                                            <input name="group1" type="radio" class="with-gap" id="daypass-process" value="3" {% if daypasss.inprocess == True %} checked="checked" {% endif %}/>
                                             <label for="daypass-process">In Process</label>
                                         </div>
                                     </div>
