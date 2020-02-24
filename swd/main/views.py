@@ -1470,14 +1470,21 @@ def search(request):
             Q(name__icontains=name) &
             Q(bitsId__icontains=bitsId) &
             Q(bitsId__contains=branch) &
-            (
+            ((
                 Q(hostelps__hostel__contains=hostel) &
-                Q(hostelps__room__contains=room)
+                Q(hostelps__room__contains=room) &
+                Q(hostelps__psStation='')
             ) |
             (
                 Q(hostelps__psStation__contains='') &
-                Q(hostelps__room='')
-            )
+                Q(hostelps__room='') &
+                Q(hostelps__hostel='')
+            ) |
+            (
+                Q(hostelps__hostel='Graduate') &
+                Q(hostelps__room='') &
+                Q(hostelps__psStation='')
+            ))
         )
 
         searchstr = {}
@@ -1534,14 +1541,21 @@ def search_no_login(request):
             Q(name__icontains=name) &
             Q(bitsId__icontains=bitsId) &
             Q(bitsId__contains=branch) &
-            (
+            ((
                 Q(hostelps__hostel__contains=hostel) &
-                Q(hostelps__room__contains=room)
+                Q(hostelps__room__contains=room) &
+                Q(hostelps__psStation='')
             ) |
             (
                 Q(hostelps__psStation__contains='') &
-                Q(hostelps__room='')
-            )
+                Q(hostelps__room='') &
+                Q(hostelps__hostel='')
+            ) |
+            (
+                Q(hostelps__hostel='Graduate') &
+                Q(hostelps__room='') &
+                Q(hostelps__psStation='')
+            ))
         )
         
         searchstr = {}
