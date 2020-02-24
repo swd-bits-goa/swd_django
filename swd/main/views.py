@@ -735,6 +735,7 @@ def hostelsuperintendent(request):
     for hostelsuperintendent in hostelsuperintendents:
         for hostel in hostelsuperintendent.hostel.split(','):
             daypass += DayPass.objects.filter(student__hostelps__hostel__icontains=hostel).order_by('approved', '-id')
+    daypass.order_by('approved')
     context = {
         'option':1,
         'hostelsuperintendent': hostelsuperintendent,
@@ -1466,6 +1467,7 @@ def search(request):
                 return render(request, "search_logged_in.html", dict(context, **postContext))
             else:
                 return render(request, "search.html", dict(context, **postContext))
+        print(request.GET)
         students = Student.objects.filter(
             Q(name__icontains=name) &
             Q(bitsId__icontains=bitsId) &
@@ -1473,17 +1475,16 @@ def search(request):
             ((
                 Q(hostelps__hostel__contains=hostel) &
                 Q(hostelps__room__contains=room) &
-                Q(hostelps__psStation='')
+                Q(hostelps__status='Student')
             ) |
             (
-                Q(hostelps__psStation__contains='') &
-                Q(hostelps__room='') &
-                Q(hostelps__hostel='')
+                Q(hostelps__status='PS2') &
+                Q(hostelps__room=room)
             ) |
             (
-                Q(hostelps__hostel='Graduate') &
-                Q(hostelps__room='') &
-                Q(hostelps__psStation='')
+                Q(hostelps__status='Graduate') 
+                
+                
             ))
         )
 
@@ -1544,17 +1545,19 @@ def search_no_login(request):
             ((
                 Q(hostelps__hostel__contains=hostel) &
                 Q(hostelps__room__contains=room) &
-                Q(hostelps__psStation='')
+                Q(hostelps__status='Student')
             ) |
             (
-                Q(hostelps__psStation__contains='') &
-                Q(hostelps__room='') &
-                Q(hostelps__hostel='')
+                Q(hostelps__status='PS2') &
+                Q(hostelps__room=room) &
+                Q(hostelps__hostel=hostel)
+                
             ) |
             (
-                Q(hostelps__hostel='Graduate') &
-                Q(hostelps__room='') &
-                Q(hostelps__psStation='')
+                Q(hostelps__status='Graduate') &
+                Q(hostelps__room=room) &
+                Q(hostelps__hostel=hostel)
+                
             ))
         )
         
