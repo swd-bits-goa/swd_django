@@ -15,7 +15,7 @@ import os
 from .config import PRODUCTION, DB_NAME, DB_PASSWORD, DB_USER
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 from tools.dev_info import SECRET_KEY
 from tools.dev_info import EMAIL_HOST_PASSWORD
@@ -38,7 +38,7 @@ else:
     ALLOWED_HOSTS = []
 
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'swdstatus@gmail.com'
+EMAIL_HOST_USER = 'noreply@goa.bits-pilani.ac.in'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
