@@ -730,12 +730,9 @@ def warden(request):
 @login_required
 @user_passes_test(is_hostelsuperintendent)
 def hostelsuperintendent(request):
-    hostelsuperintendents = HostelSuperintendent.objects.filter(user=request.user)
-    daypass = []
-    for hostelsuperintendent in hostelsuperintendents:
-        for hostel in hostelsuperintendent.hostel.split(','):
-            daypass += DayPass.objects.filter(student__hostelps__hostel__icontains=hostel).order_by('approved', '-id')
-    daypass.order_by('approved')
+    hostelsuperintendent = HostelSuperintendent.objects.get(user=request.user)
+    daypass = DayPass.objects.all().order_by('approved', '-id')
+    
     context = {
         'option':1,
         'hostelsuperintendent': hostelsuperintendent,
@@ -1476,15 +1473,6 @@ def search(request):
                 Q(hostelps__hostel__contains=hostel) &
                 Q(hostelps__room__contains=room) &
                 Q(hostelps__status='Student')
-            ) |
-            (
-                Q(hostelps__status='PS2') &
-                Q(hostelps__room=room)
-            ) |
-            (
-                Q(hostelps__status='Graduate') 
-                
-                
             ))
         )
 
@@ -1546,18 +1534,6 @@ def search_no_login(request):
                 Q(hostelps__hostel__contains=hostel) &
                 Q(hostelps__room__contains=room) &
                 Q(hostelps__status='Student')
-            ) |
-            (
-                Q(hostelps__status='PS2') &
-                Q(hostelps__room=room) &
-                Q(hostelps__hostel=hostel)
-                
-            ) |
-            (
-                Q(hostelps__status='Graduate') &
-                Q(hostelps__room=room) &
-                Q(hostelps__hostel=hostel)
-                
             ))
         )
         
