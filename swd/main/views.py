@@ -3256,7 +3256,20 @@ def leave_diff(request):
                         rev_edate=  datetime(*xlrd.xldate_as_tuple(edate, 0)).date()
                         rev_etime = datetime(*xlrd.xldate_as_tuple(edate+etime, 0)).time()
                         edatetime = datetime.combine(rev_edate, rev_etime)
-                        Leave.objects.get(student = student, dateTimeStart__date = rev_sdate)
+                        warden_approv = row[header['warden_approv']].value
+                        if warden_approv == 'disapprov':
+                            approved=False
+                            inprocess=False
+                            disapproved=True
+                        elif warden_approv == 'YES':
+                            approved=True
+                            inprocess=False
+                            disapproved=False
+                        else:
+                            approved=False
+                            inprocess=True
+                            disapproved=False
+                        Leave.objects.get(student = student, dateTimeStart__date = rev_sdate, approved=approved, disapproved=disapproved, inprocess=inprocess)
                     except Leave.DoesNotExist:
                         print("Exception caught")
                         row = [
