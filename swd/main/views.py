@@ -3269,7 +3269,7 @@ def leave_diff(request):
                             approved=False
                             inprocess=True
                             disapproved=False
-                        Leave.objects.get(student = student, dateTimeStart__date = rev_sdate, approved=approved, disapproved=disapproved, inprocess=inprocess)
+                        Leave.objects.get(student = student, dateTimeStart__date = rev_sdate, approved=approved)
                     except Leave.DoesNotExist:
                         print("Exception caught")
                         row = [
