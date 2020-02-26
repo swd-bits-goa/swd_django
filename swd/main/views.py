@@ -928,19 +928,6 @@ def daypass(request):
             daypassform.student = student
             daypassform.inTime = make_aware(inTime)
             daypassform.save()
-
-            if config.EMAIL_PROD:
-                email_to=[HostelSuperintendent.objects.get(hostel__icontains=HostelPS.objects.get(student=student).hostel).email]
-            else:
-                email_to=["swdbitstest@gmail.com"]
-                #print("hello")
-                #print(HostelSuperintendent.objects.get(hostel__icontains=HostelPS.objects.get(student=student).hostel).email)
-                                                                                   # For testing
-            mailObj=DayPass.objects.latest('id')
-            mail_subject="New Daypass ID: "+ str(mailObj.id)
-            mail_message="Daypass Application applied by "+ mailObj.student.name +" with id: " + str(mailObj.id) + ".\n"
-            #send_mail(mail_subject,mail_message,settings.EMAIL_HOST_USER,email_to,fail_silently=False)
-
             context = {
                 'option1': 1,
                 'date': request.POST.get('date'),
