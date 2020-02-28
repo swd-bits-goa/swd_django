@@ -731,7 +731,7 @@ def warden(request):
 @user_passes_test(is_hostelsuperintendent)
 def hostelsuperintendent(request):
     hostelsuperintendent = HostelSuperintendent.objects.get(user=request.user)
-    daypass = DayPass.objects.all().order_by('-inprocess')
+    daypass = DayPass.objects.all().order_by('-inprocess', '-id')
     
     context = {
         'option':1,
@@ -1239,6 +1239,8 @@ def store(request):
             query=TeeBuy.objects.filter(student=student,tee=teeno)
             try:
                 nick = request.POST.get('nick')
+                if nick == None:
+                    nick = ''
                 sizes = request.POST.get('sizes')
                 colors = request.POST.get('colors')
                 qty = request.POST.get('quantity')
