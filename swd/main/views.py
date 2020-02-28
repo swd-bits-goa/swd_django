@@ -1239,6 +1239,8 @@ def store(request):
             query=TeeBuy.objects.filter(student=student,tee=teeno)
             try:
                 nick = request.POST.get('nick')
+                if nick == None:
+                    nick = ''
                 sizes = request.POST.get('sizes')
                 colors = request.POST.get('colors')
                 qty = request.POST.get('quantity')
