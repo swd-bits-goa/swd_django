@@ -2,7 +2,7 @@ from django import forms
 from .models import MessOption, Leave, Bonafide, DayPass
 from django.forms.widgets import TextInput, Textarea
 from django.utils.translation import ugettext_lazy as _
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 class MessForm(forms.ModelForm):
     class Meta:
@@ -30,7 +30,7 @@ class LeaveForm(forms.ModelForm):
             self.add_error('dateStart', "Departure cannot be before the present date and time")
         if((date_time_start-datetime.now()).days>30):
             self.add_error('dateStart', "Can apply for leaves within a month only.")
-        if (dateStart - datetime.now().date()).days <= 1:
+        if (date_time_start - datetime.now()) <= timedelta(hours=12):
             self.add_error('dateStart', "Cannot apply for leave one day before departure. Contact warden for immediate leave approval")
         if (dateStart - dateEnd).days == 0:
             self.add_error('dateStart', "Start date and end date cannot be the same. Apply for a day pass instead")
