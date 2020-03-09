@@ -731,7 +731,7 @@ def warden(request):
 @user_passes_test(is_hostelsuperintendent)
 def hostelsuperintendent(request):
     hostelsuperintendent = HostelSuperintendent.objects.get(user=request.user)
-    daypass = DayPass.objects.all().order_by('-inprocess', '-id')
+    daypass = DayPass.objects.all().order_by('-inprocess', '-dateTime')
     
     context = {
         'option':1,
