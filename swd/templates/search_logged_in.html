@@ -71,6 +71,17 @@
                         </div>
                     </div>
                     {% endif %}
+                    {% if errors %}
+                    <div class="row">
+                        <div class="col s8 offset-s2" style="border: 1px solid #aaa; padding:8px; color:red;">
+                            {% for error in errors %}
+                            <div class="col s12">
+                                {{ error }}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
                     {% if students %}
                     <div class="row">
                         <div class="col s12 m10">
