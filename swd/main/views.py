@@ -1746,9 +1746,14 @@ def mess_import(request):
                     # Format : Name | Bits ID | MESS
                     bid = str(i[1].value)
                     s = Student.objects.get(bitsId=bid)
-                    month = date.today().month +1
+                    month = date.today().month
                     my = datetime(date.today().year, month, 1)
-                    messop = MessOption.objects.create(student = s, monthYear = my, mess = str(i[2].value))
+                    try:
+                        messop = MessOption.objects.get(student=s, monthYear= my)
+                        messop.mess = str(i[2].value)
+                        messop.save()
+                    except MessOption.DoesNotExist as e:
+                        messop = MessOption.objects.create(student = s, monthYear = my, mess = str(i[2].value))
                     no_of_mess_option_added += 1
 
     context = {'added': no_of_mess_option_added}
