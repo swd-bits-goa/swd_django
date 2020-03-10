@@ -327,9 +327,19 @@ def messoption(request):
     bonafides = Bonafide.objects.filter(student=student, reqDate__gte=date.today() - timedelta(days=7))
     messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
     messopen = messopen.exclude(dateOpen__gt=date.today())
+    errors = []
 
     if messopen:
         messoption = MessOption.objects.filter(monthYear=messopen[0].monthYear, student=student)
+    else:
+        messopen_new = MessOptionOpen.objects.all().last()
+        try:
+            messoption = MessOption.objects.filter(monthYear=messopen_new.monthYear, student=student)
+            print(messoption)
+        except MessOption.DoesNotExist:
+            pass
+        
+
 
     # dues
     try:
@@ -379,9 +389,19 @@ def messoption(request):
             'leaves': leaves,
             'bonafides': bonafides,
             'daypasss': daypasss,}
-    else:
+    elif messoption:
         context = {
             'option': 2,
+            'student': student,
+            'leaves': leaves,
+            'balance': balance,
+            'bonafides': bonafides,
+            'daypasss': daypasss,
+            'mess': messoption[0],
+            }
+    else:
+        context = {
+            'option': 3,
             'student': student,
             'leaves': leaves,
             'balance': balance,
@@ -391,7 +411,7 @@ def messoption(request):
     
     vacations = VacationDatesFill.objects.filter(
         dateClose__gte=date.today(), dateOpen__lte=date.today())
-    errors = []
+    
     if vacations:
         vacation_open = vacations[0]
         student_vacation = Leave.objects.filter(
