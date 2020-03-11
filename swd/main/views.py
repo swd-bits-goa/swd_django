@@ -2659,10 +2659,13 @@ def upload_latecomer(request):
                         s = Student.objects.filter(bitsId=bitsId).last()
                         if s is not None:
                             excel_date = row[header['date']].value
-                            d = datetime(*xlrd.xldate_as_tuple(excel_date, 0))
+                            d = datetime(*xlrd.xldate_as_tuple(excel_date, 0)).date()
+                            excel_time = row[header['time']].value
+                            t = datetime(*xlrd.xldate_as_tuple(excel_date + excel_time, 0)).time()
+                            d_t = datetime.combine(d, t)
                             LateComer.objects.create(
                                 student = s,
-                                dateTime = d
+                                dateTime = d_t
                                 )
                             count = count + 1
                         else:
