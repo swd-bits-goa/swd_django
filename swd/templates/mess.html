@@ -71,8 +71,10 @@
                                     <span class="deep-green">Edit</span>
                                 </button>
                             </a>
+                        {% elif option == 2 %}
+                        <p>You have filled this period's mess as <b> Dining Hall {{mess.mess}}</b></p>
                         {% else %}
-                        <p>Sorry, the period for filling the mess options are over. Your mess will be alloted randomly</p>
+                         <p> Sorry the mess filling period is over. Your mess will be alloted randomly and displayed here</p>
                         {% endif %}
                     </div>
                 </div>

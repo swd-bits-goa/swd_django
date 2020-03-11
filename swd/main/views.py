@@ -327,9 +327,19 @@ def messoption(request):
     bonafides = Bonafide.objects.filter(student=student, reqDate__gte=date.today() - timedelta(days=7))
     messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
     messopen = messopen.exclude(dateOpen__gt=date.today())
+    errors = []
 
     if messopen:
         messoption = MessOption.objects.filter(monthYear=messopen[0].monthYear, student=student)
+    else:
+        messopen_new = MessOptionOpen.objects.all().last()
+        try:
+            messoption = MessOption.objects.filter(monthYear=messopen_new.monthYear, student=student)
+            print(messoption)
+        except MessOption.DoesNotExist:
+            pass
+        
+
 
     # dues
     try:
@@ -379,9 +389,19 @@ def messoption(request):
             'leaves': leaves,
             'bonafides': bonafides,
             'daypasss': daypasss,}
-    else:
+    elif messoption:
         context = {
             'option': 2,
+            'student': student,
+            'leaves': leaves,
+            'balance': balance,
+            'bonafides': bonafides,
+            'daypasss': daypasss,
+            'mess': messoption[0],
+            }
+    else:
+        context = {
+            'option': 3,
             'student': student,
             'leaves': leaves,
             'balance': balance,
@@ -391,7 +411,7 @@ def messoption(request):
     
     vacations = VacationDatesFill.objects.filter(
         dateClose__gte=date.today(), dateOpen__lte=date.today())
-    errors = []
+    
     if vacations:
         vacation_open = vacations[0]
         student_vacation = Leave.objects.filter(
@@ -577,6 +597,7 @@ def leave(request):
 
 
 @login_required
+@noPhD
 def certificates(request):
     student = Student.objects.get(user=request.user)
     leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
@@ -854,6 +875,7 @@ def hostelsuperintendentdaypassapprove(request, daypass):
 
 
 @login_required
+@noPhD
 def daypass(request):
     student = Student.objects.get(user=request.user)
     leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
@@ -1746,9 +1768,14 @@ def mess_import(request):
                     # Format : Name | Bits ID | MESS
                     bid = str(i[1].value)
                     s = Student.objects.get(bitsId=bid)
-                    month = date.today().month +1
+                    month = date.today().month
                     my = datetime(date.today().year, month, 1)
-                    messop = MessOption.objects.create(student = s, monthYear = my, mess = str(i[2].value))
+                    try:
+                        messop = MessOption.objects.get(student=s, monthYear= my)
+                        messop.mess = str(i[2].value)
+                        messop.save()
+                    except MessOption.DoesNotExist as e:
+                        messop = MessOption.objects.create(student = s, monthYear = my, mess = str(i[2].value))
                     no_of_mess_option_added += 1
 
     context = {'added': no_of_mess_option_added}
