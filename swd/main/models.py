@@ -207,7 +207,7 @@ class MessOption(models.Model):
 class Bonafide(models.Model):
     student = models.ForeignKey('Student', on_delete = models.CASCADE)
     reason = models.CharField(max_length=20, choices=BONAFIDE_REASON_CHOICES)
-    otherReason = models.TextField(blank=True)
+    otherReason = models.TextField(null=True, blank=True)
     reqDate = models.DateField()
     printed = models.BooleanField(default=0, blank=True)
     text = models.TextField(default='', blank=True)
