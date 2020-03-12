@@ -963,7 +963,7 @@ def daypass(request):
             print(form.errors)
     return render(request, "daypass.html", dict(context, **daypassContext))
 
-@user_passes_test(lambda u: u.is_superuser)
+@user_passes_test(lambda u: u.is_staff)
 def messbill(request):
     # Exports Mess Bill dues in an excel file
     # template: messbill.html
@@ -2870,7 +2870,7 @@ def update_ps(request):
     return render(request, "add_students.html", {'header': "Update PS/Thesis"})
 
 
-@user_passes_test(lambda u: u.is_superuser)
+@user_passes_test(lambda u: u.is_staff)
 def export_mess_leave(request):
     if request.POST:
         month = int(request.POST["month"])
