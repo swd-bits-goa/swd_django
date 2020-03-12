@@ -1768,7 +1768,7 @@ def mess_import(request):
                     # Format : Name | Bits ID | MESS
                     bid = str(i[1].value)
                     s = Student.objects.get(bitsId=bid)
-                    month = date.today().month
+                    month = date.today().month + 1
                     my = datetime(date.today().year, month, 1)
                     try:
                         messop = MessOption.objects.get(student=s, monthYear= my)
