@@ -3345,11 +3345,15 @@ def get_corr_address(request):
         # Prototype:
         #     sheet.write_merge(row1, row2, col1, col2, 'text', fontStyle)
         ds = datetime(year=2020, month=3, day=1)
+        #ds = ds.strftime('%Y-%m-%d')
         de = datetime(year=2020, month=3, day=15)
-        query = Leave.objects.filter(dateTimeStart__date = ds, dateTimeEnd__date = de, approved = True)
+        #de = de.strftime('%Y-%m-%d')
+        print(ds)
+        query = Leave.objects.filter(dateTimeStart__date__gte = ds, dateTimeEnd__date__lte = de ,approved = True)
         columns = [
                 (u"studentID", 6000),
                 (u"Name", 6000),
+                (u"Corr address", 6000),
                 (u"start date", 6000),
                 (u"end date", 6000),
                 
@@ -3367,8 +3371,9 @@ def get_corr_address(request):
             row = [
                 obj.bitsId,
                 obj.name,
-                i.dateTimeStart,
-                i.dateTimeEnd,
+                i.corrAddress,
+                i.dateTimeStart.replace(tzinfo=None).strftime('%d-%m-%Y'),
+                i.dateTimeEnd.replace(tzinfo=None).strftime('%d-%m-%Y'),
             ]
             row_num += 1
             for col_num in range(len(row)):
