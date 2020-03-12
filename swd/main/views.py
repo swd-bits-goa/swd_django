@@ -3326,4 +3326,54 @@ def leave_diff(request):
             wb.save(response)
             messages.success(request, "Export done. Download will automatically start.")
             return response
-    return render(request, "add_students.html", {'header': "Leave Missing Export"})                    
+    return render(request, "add_students.html", {'header': "Leave Missing Export"})    
+
+@user_passes_test(lambda u: u.is_superuser)
+def get_corr_address(request):
+    if request.POST:
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = 'attachment; filename='+ 'hostel export.xls'
+        wb = xlwt.Workbook(encoding='utf-8')
+        ws = wb.add_sheet("hostel")
+
+        heading_style = xlwt.easyxf('font: bold on, height 280; align: wrap on, vert centre, horiz center')
+        h2_font_style = xlwt.easyxf('font: bold on')
+        font_style = xlwt.easyxf('align: wrap on')
+
+        # This function is not documented but given in examples of repo
+        #     here: https://github.com/python-excel/xlwt/blob/master/examples/merged.py
+        # Prototype:
+        #     sheet.write_merge(row1, row2, col1, col2, 'text', fontStyle)
+        ds = datetime(year=2020, month=3, day=1)
+        de = datetime(year=2020, month=3, day=15)
+        query = Leave.objects.filter(dateTimeStart__date = ds, dateTimeEnd__date = de, approved = True)
+        columns = [
+                (u"studentID", 6000),
+                (u"Name", 6000),
+                (u"start date", 6000),
+                (u"end date", 6000),
+                
+               ]
+
+        row_num = 0
+
+
+        for col_num in range(len(columns)):
+            ws.write(row_num, col_num, columns[col_num][0], h2_font_style)
+            ws.col(col_num).width = columns[col_num][1]
+
+        for i in query:
+            obj = i.student
+            row = [
+                obj.bitsId,
+                obj.name,
+                i.dateTimeStart,
+                i.dateTimeEnd,
+            ]
+            row_num += 1
+            for col_num in range(len(row)):
+                ws.write(row_num, col_num, row[col_num], font_style)
+        wb.save(response)
+        messages.success(request, "Export done. Download will automatically start.")
+        return response
+    return render(request, "add_students.html", {})

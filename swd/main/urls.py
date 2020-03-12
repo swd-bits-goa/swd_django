@@ -78,4 +78,6 @@ urlpatterns = [
     url(r'^daypasses_security/', views.dash_security_daypass, name='daypasses_security'),
     url(r'^security_leaves/', views.dash_security_leaves, name='dash_security'),
     url(r'^leave_diff/', views.leave_diff, name='leave_diff'),
+    url(r'^admin/get_cor_add', views.get_corr_address, name='get_corr_address'),
+
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
