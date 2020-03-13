@@ -1569,17 +1569,36 @@ def search_no_login(request):
                 return render(request, "search_logged_in.html", dict(context, **postContext))
             else:
                 return render(request, "search.html", dict(context, **postContext))
-        students = Student.objects.filter(
-            Q(name__icontains=name) &
-            Q(bitsId__icontains=bitsId) &
-            Q(bitsId__contains=branch) &
-            ((
-                Q(hostelps__hostel__contains=hostel) &
-                Q(hostelps__room__contains=room) &
-                Q(hostelps__status='Student')
-            ))
-        )
-        
+        if room=='':
+            room1=None
+        else:
+            room1=room
+        if hostel=='':
+            hostel1=None
+        else:
+            hostel1=hostel
+        students = Student.objects.filter( 
+                Q(name__icontains=name) & 
+                Q(bitsId__icontains=bitsId) &
+                Q(bitsId__contains=branch) & 
+                (
+                ((
+                    Q(hostelps__status='PS2') &
+                    Q(hostelps__room=room1) &
+                    Q(hostelps__hostel=hostel1)
+                )) |
+                ((
+                    Q(hostelps__status='Graduate') &
+                    Q(hostelps__room=room1) &
+                    Q(hostelps__hostel=hostel1)
+                )) |
+                ((
+                    Q(hostelps__status='Student') &
+                    Q(hostelps__room__contains=room) &
+                    Q(hostelps__hostel__contains=hostel)
+                ))
+                )
+                )  
         searchstr = {}
 
         if name is not "":
