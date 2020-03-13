@@ -25,9 +25,11 @@
             Mess Option is closed
             {% endif %}
     </div>
+    {% if student.hostelps.room %}
     <div class="leave quick-1 back-green" >
             Your current SWD Balance is Rs.<i> {{ balance|floatformat:2 }}</i>
     </div>
+    {% endif %}
     {% for leave in leaves|slice:":1" %}
     <div class="leave quick-1 back-green" > 
         {% if leave.approved == 1%}
