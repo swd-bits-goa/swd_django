@@ -1515,7 +1515,12 @@ def search(request):
                     Q(hostelps__status='Student') &
                     Q(hostelps__room__contains=room) &
                     Q(hostelps__hostel__contains=hostel)
-                ))
+                ))|
+                ((
+                    Q(hostelps__status='Thesis') &
+                    Q(hostelps__room=room1) &
+                    Q(hostelps__hostel=hostel1)
+                )) |
                 )
                 )  
 
