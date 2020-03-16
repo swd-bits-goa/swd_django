@@ -1520,7 +1520,7 @@ def search(request):
                     Q(hostelps__status='Thesis') &
                     Q(hostelps__room=room1) &
                     Q(hostelps__hostel=hostel1)
-                )) |
+                ))
                 )
                 )  
 
