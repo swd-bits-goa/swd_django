@@ -132,7 +132,7 @@
                                                  Correspondence Phone:
                                             </div>
                                             <div class="col s6">
-                                                {{ leave.corrPhone }}
+                                                {{ leave.corrPhone | floatformat}}
                                             </div>
                                         </div>
                                         <div class="row">
@@ -140,7 +140,7 @@
                                                 Parent Phone number:
                                             </div>
                                             <div class="col s6">
-                                                {{ leave.student.parentPhone }}
+                                                {{ leave.student.parentPhone | floatformat }}
                                             </div>
                                         </div>
                                         <div class="row">
