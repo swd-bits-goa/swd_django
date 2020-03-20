@@ -268,14 +268,14 @@ class Leave(models.Model):
 class DayPass(models.Model):
     def document_path(instance, filename):
         ext = filename.split('.')[-1]
-        tempname = (SALT+instance.student.bitsId+filename).encode('utf-8')
-        return 'documents/%y/%m/%d/{}.{}'.format(
+        tempname = (SALT+instance.student.bitsId+str(datetime)).encode('utf-8')
+        return 'documents/{}.{}'.format(
             hashlib.md5(tempname).hexdigest(), ext)
 
     student = models.ForeignKey('Student', on_delete = models.CASCADE)
     reason = models.TextField()
-    dateTime = models.DateTimeField(null=True)
-    inTime = models.DateTimeField(null=True)
+    dateTime = models.DateTimeField(null=True, blank=False)
+    inTime = models.DateTimeField(null=True, blank=False)
     corrAddress = models.TextField()
     approvedBy = models.ForeignKey('HostelSuperintendent', blank=True, null=True, on_delete="PROTECT")
     approved = models.BooleanField(default=0, blank=True)

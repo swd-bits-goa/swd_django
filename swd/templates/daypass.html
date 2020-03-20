@@ -1,5 +1,6 @@
-{% extends 'base.html' %} {% block content %}
-
+{% extends 'base.html' %}
+{% load materializecss %}
+{% block content %}
 <div>
     <div class="section">
 
@@ -14,24 +15,8 @@
                         <form method="POST" enctype="multipart/form-data">
                             {% csrf_token %}
                             <div class="col-md-12">
-                                {% for field in form %}
-                                <div class="row">
-                                <div class="input-field col s12">
-                                    {{ field }} {{ field.label_tag }}
-                                </div>
-                                <div>
-                                {% endfor %}
-                                {% comment %} <div class="input-field col s12">
-                                    <div class="file-field input-field">
-                                        <div class="btn">
-                                            <span>Upload Supporting Document</span>
-                                            <input type="file" name="document" id="id_document" required="">
-                                        </div>
-                                        <div class="file-path-wrapper">
-                                            <input class="file-path validate" type="text">
-                                        </div>
-                                    </div>
-                                </div> {% endcomment %}
+                                {{ form|materializecss:'s12 m12' }}
+                            </div>
                             <div class="col-xs-4">
                                 <button class="btn btn-block desert-yellow waves-effect" type="submit">SUBMIT</button>
                             </div>
@@ -52,32 +37,7 @@
                             <form method="POST" enctype="multipart/form-data">
                                 {% csrf_token %}
                                 <div class="col-md-12">
-                                    {% for field in form %}
-                                        {% if form.errors %}
-                                        {% for error in field.errors %}
-                                            <div class="red-text alert alert-danger">
-                                                <strong>{{ error|escape }}</strong>
-                                            </div>
-                                        {% endfor %}
-                                        {% endif %}
-                                    <div class="row">
-                                    <div class="input-field col s12">
-                                        {{ field }} {{ field.label_tag }}
-                                    </div>
-                                    <div class="row">
-                                    {% endfor %}
-
-                                    {% comment %} <div class="input-field col s12">
-                                        <div class="file-field input-field">
-                                            <div class="btn">
-                                                <span>Upload Supporting Document</span>
-                                                <input type="file" name="document" id="id_document" required="">
-                                            </div>
-                                            <div class="file-path-wrapper">
-                                                <input class="file-path validate" type="text">
-                                            </div>
-                                        </div>
-                                    </div> {% endcomment %}
+                                    {{ form|materializecss:'s12 m12' }}
                                 </div>
                                 <div class="col-xs-4">
                                     <button class="btn btn-block bg-green waves-effect" type="submit">SUBMIT</button>
