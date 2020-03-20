@@ -66,7 +66,7 @@ class DayPassForm(forms.ModelForm):
     date = forms.CharField(label='Date', widget=forms.TextInput(attrs={'class': 'datepicker'}))
     time = forms.CharField(label='Out Time', widget=forms.TextInput(attrs={'class': 'timepicker'}))
     intime = forms.CharField(label='In Time', widget=forms.TextInput(attrs={'class': 'timepicker'}))
-    document = forms.FileField(label=_("Any Supporting Document"))
+    document = forms.FileField(label=_("Any Supporting Document"), required=False)
     def clean(self):
         cleaned_data = super(DayPassForm, self).clean()
         date = datetime.strptime(cleaned_data['date'], '%d %B, %Y').date()
