@@ -953,7 +953,6 @@ def daypass(request):
             context = {
                 'option1': 1,
                 'date': request.POST.get('date'),
-
             }
         else:
             context = {

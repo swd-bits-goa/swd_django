@@ -82,8 +82,8 @@ class DayPassForm(forms.ModelForm):
 
     class Meta:
         model = DayPass
-        exclude = ['student', 'approvedBy',
-                    'approved', 'comment', 'disapproved', 'inprocess', 'dateTime','inTime']
+        exclude = ['student', 'approvedBy', 'approved', 'comment',
+                   'disapproved', 'inprocess', 'dateTime','inTime']
         widgets = {
             'reason': forms.Textarea(attrs={'class': 'materialize-textarea'}),
             'corrAddress': forms.Textarea(attrs={'class': 'materialize-textarea validate'}),

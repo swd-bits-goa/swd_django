@@ -11,21 +11,33 @@
                         <span class="card-title">Apply for Daypass</span>
                         {% if option1 == 0 %}
                         Students should apply for day pass 1 day prior.
-                        <form method="POST">
+                        <form method="POST" enctype="multipart/form-data">
                             {% csrf_token %}
                             <div class="col-md-12">
                                 {% for field in form %}
+                                <div class="row">
                                 <div class="input-field col s12">
                                     {{ field }} {{ field.label_tag }}
                                 </div>
+                                <div>
                                 {% endfor %}
-                            </div>
+                                {% comment %} <div class="input-field col s12">
+                                    <div class="file-field input-field">
+                                        <div class="btn">
+                                            <span>Upload Supporting Document</span>
+                                            <input type="file" name="document" id="id_document" required="">
+                                        </div>
+                                        <div class="file-path-wrapper">
+                                            <input class="file-path validate" type="text">
+                                        </div>
+                                    </div>
+                                </div> {% endcomment %}
                             <div class="col-xs-4">
                                 <button class="btn btn-block desert-yellow waves-effect" type="submit">SUBMIT</button>
                             </div>
                         </form>
                         {% elif option1 == 1 %}
-                            <p>Daypass Successfully applied for {{ date }}. Please wait for approval.</p>
+                        Daypass Successfully applied for {{ date }}. Please wait for approval.
                         {% else %}
                             {% if form.errors %}
                                 {% for error in form.non_field_errors %}
@@ -34,11 +46,10 @@
                                     </div>
                                 {% endfor %}
                             {% endif %}
-                            <div class=red-text>
+                            <div class="red-text">
                                 <p>There was a problem with form submission. Please refill.</p>
-                                <h1></h1>
                             </div>
-                            <form method="POST">
+                            <form method="POST" enctype="multipart/form-data">
                                 {% csrf_token %}
                                 <div class="col-md-12">
                                     {% for field in form %}
@@ -49,10 +60,24 @@
                                             </div>
                                         {% endfor %}
                                         {% endif %}
+                                    <div class="row">
                                     <div class="input-field col s12">
                                         {{ field }} {{ field.label_tag }}
                                     </div>
-                                {% endfor %}
+                                    <div class="row">
+                                    {% endfor %}
+
+                                    {% comment %} <div class="input-field col s12">
+                                        <div class="file-field input-field">
+                                            <div class="btn">
+                                                <span>Upload Supporting Document</span>
+                                                <input type="file" name="document" id="id_document" required="">
+                                            </div>
+                                            <div class="file-path-wrapper">
+                                                <input class="file-path validate" type="text">
+                                            </div>
+                                        </div>
+                                    </div> {% endcomment %}
                                 </div>
                                 <div class="col-xs-4">
                                     <button class="btn btn-block bg-green waves-effect" type="submit">SUBMIT</button>

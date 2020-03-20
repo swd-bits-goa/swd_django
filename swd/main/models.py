@@ -266,6 +266,12 @@ class Leave(models.Model):
         return self.student.bitsId + ' '+ self.student.name + ' ' + str(self.id)
 
 class DayPass(models.Model):
+    def document_path(instance, filename):
+        ext = filename.split('.')[-1]
+        tempname = (SALT+instance.student.bitsId+filename).encode('utf-8')
+        return 'documents/%y/%m/%d/{}.{}'.format(
+            hashlib.md5(tempname).hexdigest(), ext)
+
     student = models.ForeignKey('Student', on_delete = models.CASCADE)
     reason = models.TextField()
     dateTime = models.DateTimeField(null=True)
@@ -276,6 +282,7 @@ class DayPass(models.Model):
     disapproved = models.BooleanField(default=0, blank=True)
     inprocess = models.BooleanField(default=1, blank=True)
     comment = models.TextField()
+    document = models.FileField(upload_to=document_path, default=None)
 
     def __str__(self):
         return self.student.bitsId + ' (' + self.student.name + ')'
