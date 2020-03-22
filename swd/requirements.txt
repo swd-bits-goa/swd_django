@@ -23,7 +23,7 @@ MarkupPy==1.14
 mlpack==3.2.3
 odfpy==1.4.0
 openpyxl==3.0.0
-Pillow==5.2.0
+Pillow==6.2.0
 promise==2.1
 psycopg2==2.8.4
 PyJWT==1.5.3
