@@ -86,6 +86,19 @@
 
                                 <div class="row">
                                     <div class="col s4">
+                                        Supporting Document (if any):
+                                    </div>
+                                    <div class="col s6">
+                                    {% if daypasss.document %}
+                                        <a href="{{ daypasss.document.url }}">View Here</a>
+                                    </div>
+                                    {% else %}
+                                        None Uploaded
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col s4">
                                         Address:
                                     </div>
                                     <div class="col s6">

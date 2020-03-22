@@ -66,6 +66,7 @@ class DayPassForm(forms.ModelForm):
     date = forms.CharField(label='Date', widget=forms.TextInput(attrs={'class': 'datepicker'}))
     time = forms.CharField(label='Out Time', widget=forms.TextInput(attrs={'class': 'timepicker'}))
     intime = forms.CharField(label='In Time', widget=forms.TextInput(attrs={'class': 'timepicker'}))
+    document = forms.FileField(label=_("Any Supporting Document"), required=False)
     def clean(self):
         cleaned_data = super(DayPassForm, self).clean()
         date = datetime.strptime(cleaned_data['date'], '%d %B, %Y').date()
@@ -82,14 +83,9 @@ class DayPassForm(forms.ModelForm):
 
     class Meta:
         model = DayPass
-        exclude = ['student', 'approvedBy',
-                    'approved', 'comment', 'disapproved', 'inprocess', 'dateTime','inTime']
-        widgets = {
-            'reason': forms.Textarea(attrs={'class': 'materialize-textarea'}),
-            'corrAddress': forms.Textarea(attrs={'class': 'materialize-textarea validate'}),
-        }
+        exclude = ['student', 'approvedBy', 'approved', 'comment',
+                   'disapproved', 'inprocess', 'dateTime','inTime']
         labels = {
             'corrAddress': _(" Location you're visiting "),
-            
         }
         
