@@ -59,6 +59,10 @@ YEARNAMES = {
      3: 'third',
      4: 'forth',
      5: 'fifth',
+     6: 'sixth',
+     7: 'seventh',
+     8: 'eighth',
+     9: 'ninth',
 }
 
 STUDENT_STATUS = (
@@ -226,7 +230,7 @@ class Bonafide(models.Model):
             branch = ME[self.student.bitsId[4:8]]
 
         yearNum=self.reqDate.year-int(self.student.bitsId[0:4]) + 1
-        if(self.reqDate.month <5):
+        if(self.reqDate.month <8):
             yearNum=yearNum-1
         yearName=YEARNAMES[yearNum]
         date_admit = res.student.admit.strftime('%d/%m/%Y')
