@@ -1,5 +1,6 @@
-{% extends 'base.html' %} {% block content %}
-
+{% extends 'base.html' %}
+{% load materializecss %}
+{% block content %}
 <div>
     <div class="section">
 
@@ -11,21 +12,17 @@
                         <span class="card-title">Apply for Daypass</span>
                         {% if option1 == 0 %}
                         Students should apply for day pass 1 day prior.
-                        <form method="POST">
+                        <form method="POST" enctype="multipart/form-data">
                             {% csrf_token %}
                             <div class="col-md-12">
-                                {% for field in form %}
-                                <div class="input-field col s12">
-                                    {{ field }} {{ field.label_tag }}
-                                </div>
-                                {% endfor %}
+                                {{ form|materializecss:'s12 m12' }}
                             </div>
                             <div class="col-xs-4">
                                 <button class="btn btn-block desert-yellow waves-effect" type="submit">SUBMIT</button>
                             </div>
                         </form>
                         {% elif option1 == 1 %}
-                            <p>Daypass Successfully applied for {{ date }}. Please wait for approval.</p>
+                        Daypass Successfully applied for {{ date }}. Please wait for approval.
                         {% else %}
                             {% if form.errors %}
                                 {% for error in form.non_field_errors %}
@@ -34,25 +31,13 @@
                                     </div>
                                 {% endfor %}
                             {% endif %}
-                            <div class=red-text>
+                            <div class="red-text">
                                 <p>There was a problem with form submission. Please refill.</p>
-                                <h1></h1>
                             </div>
-                            <form method="POST">
+                            <form method="POST" enctype="multipart/form-data">
                                 {% csrf_token %}
                                 <div class="col-md-12">
-                                    {% for field in form %}
-                                        {% if form.errors %}
-                                        {% for error in field.errors %}
-                                            <div class="red-text alert alert-danger">
-                                                <strong>{{ error|escape }}</strong>
-                                            </div>
-                                        {% endfor %}
-                                        {% endif %}
-                                    <div class="input-field col s12">
-                                        {{ field }} {{ field.label_tag }}
-                                    </div>
-                                {% endfor %}
+                                    {{ form|materializecss:'s12 m12' }}
                                 </div>
                                 <div class="col-xs-4">
                                     <button class="btn btn-block bg-green waves-effect" type="submit">SUBMIT</button>

@@ -59,6 +59,10 @@ YEARNAMES = {
      3: 'third',
      4: 'forth',
      5: 'fifth',
+     6: 'sixth',
+     7: 'seventh',
+     8: 'eighth',
+     9: 'ninth',
 }
 
 STUDENT_STATUS = (
@@ -226,7 +230,7 @@ class Bonafide(models.Model):
             branch = ME[self.student.bitsId[4:8]]
 
         yearNum=self.reqDate.year-int(self.student.bitsId[0:4]) + 1
-        if(self.reqDate.month <5):
+        if(self.reqDate.month <8):
             yearNum=yearNum-1
         yearName=YEARNAMES[yearNum]
         date_admit = res.student.admit.strftime('%d/%m/%Y')
@@ -266,16 +270,23 @@ class Leave(models.Model):
         return self.student.bitsId + ' '+ self.student.name + ' ' + str(self.id)
 
 class DayPass(models.Model):
+    def document_path(instance, filename):
+        ext = filename.split('.')[-1]
+        tempname = (SALT+instance.student.bitsId+str(datetime)).encode('utf-8')
+        return 'documents/{}.{}'.format(
+            hashlib.md5(tempname).hexdigest(), ext)
+
     student = models.ForeignKey('Student', on_delete = models.CASCADE)
     reason = models.TextField()
-    dateTime = models.DateTimeField(null=True)
-    inTime = models.DateTimeField(null=True)
+    dateTime = models.DateTimeField(null=True, blank=False)
+    inTime = models.DateTimeField(null=True, blank=False)
     corrAddress = models.TextField()
     approvedBy = models.ForeignKey('HostelSuperintendent', blank=True, null=True, on_delete="PROTECT")
     approved = models.BooleanField(default=0, blank=True)
     disapproved = models.BooleanField(default=0, blank=True)
     inprocess = models.BooleanField(default=1, blank=True)
     comment = models.TextField()
+    document = models.FileField(upload_to=document_path, default=None)
 
     def __str__(self):
         return self.student.bitsId + ' (' + self.student.name + ')'

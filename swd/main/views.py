@@ -938,7 +938,7 @@ def daypass(request):
     }
 
     if request.POST:
-        form = DayPassForm(request.POST)
+        form = DayPassForm(request.POST, request.FILES)
         if form.is_valid():
             daypassform = form.save(commit=False)
             date1 = datetime.strptime(request.POST.get('date'), '%d %B, %Y').date()
@@ -953,14 +953,12 @@ def daypass(request):
             context = {
                 'option1': 1,
                 'date': request.POST.get('date'),
-
             }
         else:
             context = {
                 'option1': 2,
                 'form': form
             }
-            print(form.errors)
     return render(request, "daypass.html", dict(context, **daypassContext))
 
 @user_passes_test(lambda u: u.is_staff)
