@@ -62,7 +62,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'braces',
     'import_export',
-    'materializecssform',
+    #'materializecss',
 ]
 
 REST_FRAMEWORK = {

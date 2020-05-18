@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load materializecss %}
+{% comment %}{% load materializecss %}{% endcomment %}
 {% block content %}
 <div>
     <div class="section">
@@ -15,7 +15,11 @@
                         <form method="POST" enctype="multipart/form-data">
                             {% csrf_token %}
                             <div class="col-md-12">
-                                {{ form|materializecss:'s12 m12' }}
+                                {% for field in form %}
+                                 <div class="input-field col s12">
+                                     {{ field }} {{ field.label_tag }}
+                                 </div>
+                                 {% endfor %}
                             </div>
                             <div class="col-xs-4">
                                 <button class="btn btn-block desert-yellow waves-effect" type="submit">SUBMIT</button>
@@ -37,7 +41,18 @@
                             <form method="POST" enctype="multipart/form-data">
                                 {% csrf_token %}
                                 <div class="col-md-12">
-                                    {{ form|materializecss:'s12 m12' }}
+                                    {% for field in form %}
+                                         {% if form.errors %}
+                                         {% for error in field.errors %}
+                                             <div class="red-text alert alert-danger">
+                                                 <strong>{{ error|escape }}</strong>
+                                             </div>
+                                         {% endfor %}
+                                         {% endif %}
+                                     <div class="input-field col s12">
+                                         {{ field }} {{ field.label_tag }}
+                                     </div>
+                                 {% endfor %}
                                 </div>
                                 <div class="col-xs-4">
                                     <button class="btn btn-block bg-green waves-effect" type="submit">SUBMIT</button>
