@@ -286,7 +286,7 @@ class DayPass(models.Model):
     disapproved = models.BooleanField(default=0, blank=True)
     inprocess = models.BooleanField(default=1, blank=True)
     comment = models.TextField()
-    document = models.FileField(upload_to=document_path, default=None)
+    document = models.FileField(upload_to=document_path, null=True, blank=True)
 
     def __str__(self):
         return self.student.bitsId + ' (' + self.student.name + ')'
