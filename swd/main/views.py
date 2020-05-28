@@ -77,19 +77,6 @@ def index(request):
 def login_success(request):
     return HttpResponse("Success!")
 
-# @login_required
-# def studentimg(request):
-#     url = Student.objects.get(user=request.user).profile_picture
-#     print(url)
-#     ext = url.name.split('.')[-1]
-
-#     try:
-#         with open(url.name, "rb") as f:
-#             return HttpResponse(f.read(), content_type="image/"+ext)
-#     except IOError:
-#         with open("assets/img/profile-swd.jpg", "rb") as f:
-#             return HttpResponse(f.read(), content_type="image/jpg")
-
 @login_required
 def dashboard(request):
     student = Student.objects.get(user=request.user)
@@ -3436,3 +3423,35 @@ def get_corr_address(request):
         messages.success(request, "Export done. Download will automatically start.")
         return response
     return render(request, "add_students.html", {})
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def upload_profile_pictures(request):
+    if request.POST:
+        if request.FILES:
+            error_files = []
+            successfull = 0
+            for filex in request.FILES.getlist('folder'):
+                file_name, file_ext = filex.name.split('.')
+                file_name = file_name.upper()
+                try:
+                    student = Student.objects.get(bitsId=file_name)
+                    student.profile_picture.save(
+                        file_name, filex
+                    )
+                    successfull += 1
+                except Student.DoesNotExist:
+                    error_files.append(file_name.lower())
+            
+            if len(error_files):
+                messages.error(
+                    request,
+                    str(len(error_files)) + " IDs did not match: " + \
+                        ", ".join(error_files))
+            if (successfull):
+                messages.success(request, str(successfull) + " IDs updated.")
+        else:
+            messages.error(
+                request, "No folder selected. Please select at least one.")
+       
+    return render(request, "upload_profile_pictures.html", {})
