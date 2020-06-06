@@ -118,7 +118,14 @@ def dashboard(request):
     for other in otherdues:
         if other is not None:
             total_amount += other.amount
-    balance = float(22000) - float(total_amount)
+    
+    with open(settings.CONSTANTS_LOCATION, 'r') as fp:
+        data = json.load(fp)
+    if student.nophd():
+        main_amt = data['phd-swd-advance']
+    else:
+        main_amt = data['swd-advance']
+    balance = float(main_amt) - float(total_amount)
 
     #mess
     messopen = MessOptionOpen.objects.filter(dateClose__gte=datetime.today())
@@ -205,7 +212,14 @@ def profile(request):
         for other in otherdues:
             if other is not None:
                 total_amount += other.amount
-        balance = float(22000) - float(total_amount)
+        
+        with open(settings.CONSTANTS_LOCATION, 'r') as fp:
+            data = json.load(fp)
+        if student.nophd():
+            main_amt = data['phd-swd-advance']
+        else:
+            main_amt = data['swd-advance']
+        balance = float(main_amt) - float(total_amount)
 
         #mess
         messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
@@ -349,7 +363,14 @@ def messoption(request):
     for other in otherdues:
         if other is not None:
             total_amount += other.amount
-    balance = float(22000) - float(total_amount)
+    
+    with open(settings.CONSTANTS_LOCATION, 'r') as fp:
+        data = json.load(fp)
+    if student.nophd():
+        main_amt = data['phd-swd-advance']
+    else:
+        main_amt = data['swd-advance']
+    balance = float(main_amt) - float(total_amount)
 
     edit = 0
 
@@ -496,7 +517,14 @@ def leave(request):
     for other in otherdues:
         if other is not None:
             total_amount += other.amount
-    balance = float(22000) - float(total_amount)
+    
+    with open(settings.CONSTANTS_LOCATION, 'r') as fp:
+        data = json.load(fp)
+    if student.nophd():
+        main_amt = data['phd-swd-advance']
+    else:
+        main_amt = data['swd-advance']
+    balance = float(main_amt) - float(total_amount)
 
     form = LeaveForm()
     context = {
@@ -612,7 +640,14 @@ def certificates(request):
     for other in otherdues:
         if other is not None:
             total_amount += other.amount
-    balance = float(22000) - float(total_amount)
+    
+    with open(settings.CONSTANTS_LOCATION, 'r') as fp:
+        data = json.load(fp)
+    if student.nophd():
+        main_amt = data['phd-swd-advance']
+    else:
+        main_amt = data['swd-advance']
+    balance = float(main_amt) - float(total_amount)
 
     #mess
     messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
@@ -905,7 +940,14 @@ def daypass(request):
     for other in otherdues:
         if other is not None:
             total_amount += other.amount
-    balance = float(22000) - float(total_amount)
+    
+    with open(settings.CONSTANTS_LOCATION, 'r') as fp:
+        data = json.load(fp)
+    if student.nophd():
+        main_amt = data['phd-swd-advance']
+    else:
+        main_amt = data['swd-advance']
+    balance = float(main_amt) - float(total_amount)
 
     form = DayPassForm()
     context = {
@@ -1191,7 +1233,14 @@ def store(request):
     for other in otherdues:
         if other is not None:
             total_amount += other.amount
-    balance = float(22000) - float(total_amount)
+    
+    with open(settings.CONSTANTS_LOCATION, 'r') as fp:
+        data = json.load(fp)
+    if student.nophd():
+        main_amt = data['phd-swd-advance']
+    else:
+        main_amt = data['swd-advance']
+    balance = float(main_amt) - float(total_amount)
 
     #mess
     messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
@@ -1327,7 +1376,14 @@ def dues(request):
         data = json.load(fp)
     swd_adv = float(data['swd-advance'])
     balance = swd_adv - float(total_amount)
-    balance = float(22000) - float(total_amount)
+    
+    with open(settings.CONSTANTS_LOCATION, 'r') as fp:
+        data = json.load(fp)
+    if student.nophd():
+        main_amt = data['phd-swd-advance']
+    else:
+        main_amt = data['swd-advance']
+    balance = float(main_amt) - float(total_amount)
 
     context = {
         'student': student,
@@ -1340,6 +1396,7 @@ def dues(request):
         'leaves': leaves,
         'bonafides': bonafides,
         'daypasss': daypasss,
+        'advance_amount': main_amt,
     }
 
     return render(request, "dues.html", context)
@@ -1427,7 +1484,14 @@ def search(request):
         for other in otherdues:
             if other is not None:
                 total_amount += other.amount
-        balance = float(22000) - float(total_amount)
+        
+        with open(settings.CONSTANTS_LOCATION, 'r') as fp:
+            data = json.load(fp)
+        if student.nophd():
+            main_amt = data['phd-swd-advance']
+        else:
+            main_amt = data['swd-advance']
+        balance = float(main_amt) - float(total_amount)
 
         context = {
            'hostels' : [i[0] for i in HOSTELS],
@@ -1714,7 +1778,15 @@ def documents(request):
             for other in otherdues:
                 if other is not None:
                     total_amount += other.amount
-            balance = float(22000) - float(total_amount)
+            
+            with open(settings.CONSTANTS_LOCATION, 'r') as fp:
+                data = json.load(fp)
+            if student.nophd():
+                main_amt = data['phd-swd-advance']
+            else:
+                main_amt = data['swd-advance']
+            balance = float(main_amt) - float(total_amount)
+            
             #mess
             messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
             messopen = messopen.exclude(dateOpen__gt=date.today())
@@ -2000,7 +2072,14 @@ def developers(request):
             for other in otherdues:
                 if other is not None:
                     total_amount += other.amount
-            balance = float(22000) - float(total_amount)
+            
+            with open(settings.CONSTANTS_LOCATION, 'r') as fp:
+                data = json.load(fp)
+            if student.nophd():
+                main_amt = data['phd-swd-advance']
+            else:
+                main_amt = data['swd-advance']
+            balance = float(main_amt) - float(total_amount)
 
             #mess
             messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
