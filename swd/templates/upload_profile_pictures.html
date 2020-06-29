@@ -1,0 +1,27 @@
+{% extends "admin/base_site.html" %}
+
+{% load static %}
+
+{% block title %}
+Upload Profile Pictures | Admin
+{% endblock title %}
+
+{% block extrahead %}
+	<script src="{% static 'js/jquery.js' %}"></script>
+{% endblock extrahead %}
+
+
+{% block content %}
+<div class="container">
+	<h2>Select Profile Pictures Folder</h2>
+
+	<form enctype="multipart/form-data" method="post" id="upload_profile_pictures">
+		{% csrf_token %}
+		<fieldset class="module form-elements initialized selected">
+			<input type="file" name="folder" id="folder" webkitdirectory mozdirectory msdirectory odirectory directory multiple="multiple"/>
+		</fieldset>
+		<div class="submit-row">
+			<input class="default" type="submit" value="Upload" name="_upload" id="_upload">
+		</div>
+	</form>
+{% endblock %}
