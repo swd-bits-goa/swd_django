@@ -11,15 +11,19 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
 import os
+from django.core.management.utils import get_random_secret_key
 
 from .config import PRODUCTION, DB_NAME, DB_PASSWORD, DB_USER
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-from tools.dev_info import SECRET_KEY
-from tools.dev_info import EMAIL_HOST_PASSWORD
-# production = True if "PROD" in os.environ and os.environ.get("PROD") == "True" else False
+try:
+    from tools.dev_info import SECRET_KEY
+    from tools.dev_info import EMAIL_HOST_PASSWORD
+except ModuleNotFoundError:
+    SECRET_KEY = get_random_secret_key()
+    print("Using random dummy secret key, dev_info.py not found")
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -28,9 +32,6 @@ CSRF_TRUSTED_ORIGINS = ['newswd.bits-goa.ac.in', 'swd.bits-goa.ac.in']
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-
 
 if PRODUCTION:
     ALLOWED_HOSTS = ['10.10.10.121', 'newswd.bits-goa.ac.in', 'swd.bits-goa.ac.in']
@@ -62,7 +63,6 @@ INSTALLED_APPS = [
     'corsheaders',
     'braces',
     'import_export',
-    #'materializecss',
 ]
 
 REST_FRAMEWORK = {
