@@ -2,11 +2,15 @@ from django.db import models
 from django.contrib.auth.models import User
 import os
 import hashlib
-from tools.dev_info import SALT_IMG as SALT
 import re
 from django.utils import timezone
 from datetime import datetime
 from datetime import date
+
+try:
+    from tools.dev_info import SALT_IMG as SALT
+except ModuleNotFoundError:
+    SALT = '1234567890'
 
 MESS_CHOICES = (
     ('A','Dining Hall A'),
