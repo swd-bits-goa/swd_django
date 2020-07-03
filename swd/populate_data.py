@@ -21,6 +21,7 @@ hostel_choices = ['AH1', 'AH2', 'AH3', 'AH4', 'AH5', 'AH6', 'AH7', 'AH8', 'AH9',
                   'DH1', 'DH2', 'DH3', 'DH4']
 mess_choices = ['A', 'C', 'D']
 bonafide_choices = ['Bank Loan', 'Passport']
+status_choices = ['Student', 'Thesis', 'PS2', 'Graduate']
 bDay_start = datetime.datetime(1998, 1, 1)
 bDay_end = datetime.datetime(2001, 1, 1)
 
@@ -63,6 +64,8 @@ def fake_cgpa():
     cgpa = float(random.randrange(0, 1000)) / 100
     return cgpa
 
+def fake_status():
+    return random.choice(status_choices)
 
 def fake_bitsID(username):
     year = username[1:5]
@@ -93,17 +96,19 @@ def create_super_user():
 
 def create_student(i):
     try:
+        fake_id = fake_bitsID if random.random() < 0.6 else fake_phd
+        prefix = 'f' if fake_id == fake_bitsID else 'p'
         (mUser, created1) = User.objects.get_or_create(
-            username='f' + str(i),
+            username=prefix + str(i),
             first_name='Student' + str(i),
-            email='f' + str(i) +"@goa.bits-pilani.ac.in")
+            email=prefix + str(i) +"@goa.bits-pilani.ac.in")
         mUser.set_password('password')
         mUser.save()
-        fake_id = fake_bitsID if random.random() < 0.6 else fake_phd
+        
         if created1:
             mStudent = Student(
                 user=mUser,
-                name='Student' + str(i),
+                name='Student ' + str(i),
                 bitsId=fake_id(mUser.username),
                 phone=fake_number_generator(),
                 gender=fake_gender(),
@@ -126,12 +131,33 @@ def create_student(i):
 
 def create_hostel(i, student):
     try:
+        stat = fake_status()
+        hostel = ''
+        room = ''
+        psstation = ''
+        acadstudent= False
+        if stat == 'Student':
+            hostel = fake_hostel()
+            room = fake_number_generator(3,1)
+            acadstudent = True
+        elif stat == 'Thesis':
+            hostel = ''
+            room = ''
+            psstation = 'thesis station here'
+        elif stat == 'PS2':
+            hostel = ''
+            room = ''
+            psstation = 'ps station here'
+        elif stat == 'Graduate':
+            hostel = 'Graduate'
+
         mHostel = HostelPS(
             student=student,
-            acadstudent=True,
-            status='Student',
-            hostel=fake_hostel(),
-            room=fake_number_generator(3, 1),
+            acadstudent=acadstudent,
+            status=stat,
+            psStation = psstation,
+            hostel=hostel,
+            room=room,
         )
         mHostel.save()
         return True
@@ -292,9 +318,10 @@ if __name__ == '__main__':
     i = 0
     for student in students_list:
         hostel = HostelPS.objects.get(student=student)
-        warden = Warden.objects.get(hostel=hostel.hostel)
-        leave_success &= create_leave(i, student, warden)
-        i += 1
+        if hostel.hostel in hostel_choices:
+            warden = Warden.objects.get(hostel=hostel.hostel)
+            leave_success &= create_leave(i, student, warden)
+            i += 1
     if leave_success:
         print(str(i) + " Leaves created.")
 

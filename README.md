@@ -31,6 +31,11 @@ $ pip install -r requirements.txt
 ```
 #### Database
 * db.sqlite3 is the database for this repository, you can delete that if you want to start with a fresh database and follow: (But not required and can skip this step)
+
+### Shifting to development
+* Go to swd/config.py and change ```PRODUCTION``` and ```EMAIL_PROD``` to ```False```
+* While committing any changes, make sure to change ```PRODUCTION``` and ```EMAIL_PROD``` variable to ```True``` again
+
 ```
 $ python manage.py migrate
 ```
@@ -38,19 +43,27 @@ $ python manage.py migrate
 ```
 $ python manage.py createsuperuser
 ```
+
+### Populate the database
+* To generate dummy data for the website, use the following script
+```
+$ python populate_data.py
+```
+* this will create a super user with username as ```admim``` and password as ```password```
+
+### Running the development server
+
 * Run the server and access at localhost:8000
 ```
 $ python manage.py runserver
 ```
 
-## Importing Data
+### Logging in
+* To login as a student use the format as username: f20180001 or p20180001 and password: passoword
+* To login as admin, username: admin and password: password
+
 
 **Important:** This requires the `dev_info.py` to be present in `tools` folder. Please contact the maintainers if you don't have it.
-
-To import data, there are a set of scripts created. On accessing the urls mentioned in [swd/swd/urls.py#L52-L58](https://github.com/swd-bits-goa/swd_django/blob/master/swd/swd/urls.py#L52), the data will get imported from `dev_info.py`. 
-- Example: To create users - [localhost:8000/create-users/](localhost:8000/create-users/)
-
-Please be patient as there are ~9000 records to be inserted. You don't necessarily need to use all the data. Scripts are designed to handle failures, so no worries :). If you need more data, just hit the url again.
 
 ---
 ## Contributing

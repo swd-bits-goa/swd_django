@@ -244,6 +244,8 @@ class Bonafide(models.Model):
             return '''&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This is to certify that <i style="font-family: Monotype Corsiva">''' + gender + self.student.name.upper() + '''</i>, ID No. <i style="font-family: Monotype Corsiva">''' + self.student.bitsId + '''</i> is a bonafide student of '''+ yearName + ''' year class. ''' + pronoun+  ''' was admitted to the institute on ''' + str(date_admit) + ''', for pursuing the <i style="font-family: Monotype Corsiva">'''+ branch + '''</i> programme of studies. ''' +pronoun+'''is residing in the Hostel <i style="font-family: Monotype Corsiva">'''+res.hostel+'''-'''+res.room+'''</i> of this institute. Date of joining the current academic session is 1 August '''+str(year)+'''.<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This certificate is issued for the purpose of applying for ''' + reason + '''.'''
         elif(res.status == "Thesis" or res.status == "PS2"):
             return '''&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This is to certify that <i>''' + gender + self.student.name.upper() + '''</i>, ID No. <i>''' + self.student.bitsId + '''</i> is a bonafide student of '''+ yearName + ''' year class. ''' + pronoun +''' was admitted to the Institute on ''' + str(date_admit) + ''', for pursuing the <i>'''+ branch +'''</i> programme of studies. '''+ pronoun+ ''' is pursuing <i>''' + res.status + '''</i> at <i>'''+ res.psStation +'''</i> as a part of the academic requirement of BITS-Pilani, Deemed University.<br>This certificate is issued for the purpose of applying for ''' + reason + '''.'''
+        else:
+            return 'Bonafide is invalid for Graduate students'
 
     def save(self, *args, **kwargs):
         self.text = self.createText()
