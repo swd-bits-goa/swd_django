@@ -1,6 +1,6 @@
 from django import forms
 from .models import MessOption, Leave, Bonafide, DayPass
-from django.forms.widgets import TextInput, Textarea
+from django.forms.widgets import TextInput, Textarea, FileInput
 from django.utils.translation import ugettext_lazy as _
 from datetime import date, datetime, timedelta
 
@@ -54,7 +54,9 @@ class BonafideForm(forms.ModelForm):
     class Meta:
         model = Bonafide
         fields = ['reason', 'otherReason']
-
+        widgets = {
+            'otherReason': forms.Textarea(attrs={'class': 'materialize-textarea'}),
+            }
         labels = {
             'otherReason': _('Please mention if other reason'),
         }
@@ -66,7 +68,7 @@ class DayPassForm(forms.ModelForm):
     date = forms.CharField(label='Date', widget=forms.TextInput(attrs={'class': 'datepicker'}))
     time = forms.CharField(label='Out Time', widget=forms.TextInput(attrs={'class': 'timepicker'}))
     intime = forms.CharField(label='In Time', widget=forms.TextInput(attrs={'class': 'timepicker'}))
-    document = forms.FileField(label=_("Any Supporting Document"), required=False)
+    document = forms.FileField(label="Any Supporting Document", required=False, widget=forms.FileInput(attrs={'class': 'file-field input-field'}))
     def clean(self):
         cleaned_data = super(DayPassForm, self).clean()
         date = datetime.strptime(cleaned_data['date'], '%d %B, %Y').date()
@@ -85,7 +87,13 @@ class DayPassForm(forms.ModelForm):
         model = DayPass
         exclude = ['student', 'approvedBy', 'approved', 'comment',
                    'disapproved', 'inprocess', 'dateTime','inTime']
+        widgets = {
+            'reason': forms.Textarea(attrs={'class': 'materialize-textarea'}),
+            'corrAddress': forms.Textarea(attrs={'class': 'materialize-textarea validate'}),
+            'document': forms.FileInput(attrs={'class': 'file-field input-field'}),
+        }
         labels = {
             'corrAddress': _(" Location you're visiting "),
+            'document': _("Any Supporting Document"),
         }
         

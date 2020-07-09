@@ -33,7 +33,6 @@ urlpatterns = [
     url(r'^dues/', views.dues, name="dues"),
     url(r'^documents/', views.documents, name="documents"),
     url(r'^search/', views.search, name="search"),
-    url(r'^search1/', views.search_no_login, name="search_no_login"),
     url(r'^student/(?P<id>\d+)/$',views.studentDetails, name="studentDetails"),
     url(r'^messbill/', views.messbill, name='messbill'),
     url(r'^import_mess_bill/', views.import_mess_bill, name='import_mess_bill'),
