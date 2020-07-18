@@ -1,1 +1,7 @@
-{"mess-amount": "120", "mess-rebate": "90", "swd-advance": "22000"}
+{
+    "mess-amount": "120",
+    "mess-rebate": "90",
+    "swd-advance": "22000",
+    "phd-swd-advance": "10000"
+}
+

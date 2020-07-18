@@ -111,10 +111,12 @@
                                             {% endif %}
                                         {% elif i.hostelps.psStation %}
                                             {% comment %} PS-2 STUDENTS {% endcomment %}
-                                            <td colspan=2>{{ i.hostelps.psStation }}</td>
-                                        {% else %}
-                                            {% comment %} THESIS STUDENTS {% endcomment %}
-                                            <td colspan=2>{{ i.hostelps.status }}</td>
+                                            {% if i.hostelps.status == 'PS2' %}
+                                                <td colspan=2>PS2: {{ i.hostelps.psStation }}</td>
+                                            {% else %}
+                                                {% comment %} THESIS STUDENTS {% endcomment %}
+                                                <td colspan=2>Thesis: {{ i.hostelps.psStation }}</td>
+                                            {% endif %}
                                         {% endif %}
                                     </tr>
                                     {% endfor %}

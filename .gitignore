@@ -3,3 +3,4 @@
 *.sublime-workspace
 .DS_Store
 swd/.DS_Store
+.vscode/

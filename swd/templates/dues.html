@@ -7,7 +7,7 @@
         <li class="collection-item">
             <div class="blue-text">
                 Advance
-                <a href="#!" class="secondary-content blue-text">Rs. 22,000.00</a>
+                <a href="#!" class="secondary-content blue-text">Rs. {{ advance_amount|floatformat:2 }}</a>
             </div>
         </li>
             {% for due in dues %}

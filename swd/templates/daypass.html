@@ -1,6 +1,5 @@
-{% extends 'base.html' %}
-{% comment %}{% load materializecss %}{% endcomment %}
-{% block content %}
+{% extends 'base.html' %} {% block content %}
+
 <div>
     <div class="section">
 
@@ -12,21 +11,26 @@
                         <span class="card-title">Apply for Daypass</span>
                         {% if option1 == 0 %}
                         Students should apply for day pass 1 day prior.
-                        <form method="POST" enctype="multipart/form-data">
+                        <form method="POST">
                             {% csrf_token %}
                             <div class="col-md-12">
                                 {% for field in form %}
-                                 <div class="input-field col s12">
-                                     {{ field }} {{ field.label_tag }}
-                                 </div>
-                                 {% endfor %}
+                                <div class="input-field col s12">
+                                    {{ field.label_tag }}
+                                    
+                                </div>
+                                <div class="input-field col s12">
+                                    {{ field }}
+                                </div>
+
+                                {% endfor %}
                             </div>
                             <div class="col-xs-4">
                                 <button class="btn btn-block desert-yellow waves-effect" type="submit">SUBMIT</button>
                             </div>
                         </form>
                         {% elif option1 == 1 %}
-                        Daypass Successfully applied for {{ date }}. Please wait for approval.
+                            <p>Daypass Successfully applied for {{ date }}. Please wait for approval.</p>
                         {% else %}
                             {% if form.errors %}
                                 {% for error in form.non_field_errors %}
@@ -35,24 +39,25 @@
                                     </div>
                                 {% endfor %}
                             {% endif %}
-                            <div class="red-text">
+                            <div class=red-text>
                                 <p>There was a problem with form submission. Please refill.</p>
+                                <h1></h1>
                             </div>
-                            <form method="POST" enctype="multipart/form-data">
+                            <form method="POST">
                                 {% csrf_token %}
                                 <div class="col-md-12">
                                     {% for field in form %}
-                                         {% if form.errors %}
-                                         {% for error in field.errors %}
-                                             <div class="red-text alert alert-danger">
-                                                 <strong>{{ error|escape }}</strong>
-                                             </div>
-                                         {% endfor %}
-                                         {% endif %}
-                                     <div class="input-field col s12">
-                                         {{ field }} {{ field.label_tag }}
-                                     </div>
-                                 {% endfor %}
+                                        {% if form.errors %}
+                                        {% for error in field.errors %}
+                                            <div class="red-text alert alert-danger">
+                                                <strong>{{ error|escape }}</strong>
+                                            </div>
+                                        {% endfor %}
+                                        {% endif %}
+                                    <div class="input-field col s12">
+                                        {{ field }} {{ field.label_tag }}
+                                    </div>
+                                {% endfor %}
                                 </div>
                                 <div class="col-xs-4">
                                     <button class="btn btn-block bg-green waves-effect" type="submit">SUBMIT</button>
@@ -101,18 +106,6 @@
     </div>
     <br><br>
 </div>
-<script>
-    // Patch fix for datepicker
-    // Frontend devs -> please fix this issue asap. This is a temp patch.
-    // Mehul Mohan
-    document.querySelectorAll('input.mask').forEach(node => {
-        const maskedDiv = document.createElement('div')
-        maskedDiv.onclick = () => { setTimeout(() => { console.log('clicked'); node.click() }, 50) }
-        maskedDiv.setAttribute('style', 'position:absolute;top:0;left:0;width:100%;height:100%;')
-        node.parentNode.classList.add('masked-parent-field')
-        node.parentNode.appendChild(maskedDiv)
-    })
-</script>
 <style>
   .comm {
     width:100px;

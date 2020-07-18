@@ -77,19 +77,6 @@ def index(request):
 def login_success(request):
     return HttpResponse("Success!")
 
-# @login_required
-# def studentimg(request):
-#     url = Student.objects.get(user=request.user).profile_picture
-#     print(url)
-#     ext = url.name.split('.')[-1]
-
-#     try:
-#         with open(url.name, "rb") as f:
-#             return HttpResponse(f.read(), content_type="image/"+ext)
-#     except IOError:
-#         with open("assets/img/profile-swd.jpg", "rb") as f:
-#             return HttpResponse(f.read(), content_type="image/jpg")
-
 @login_required
 def dashboard(request):
     student = Student.objects.get(user=request.user)
@@ -131,7 +118,14 @@ def dashboard(request):
     for other in otherdues:
         if other is not None:
             total_amount += other.amount
-    balance = float(22000) - float(total_amount)
+    
+    with open(settings.CONSTANTS_LOCATION, 'r') as fp:
+        data = json.load(fp)
+    if student.nophd():
+        main_amt = data['phd-swd-advance']
+    else:
+        main_amt = data['swd-advance']
+    balance = float(main_amt) - float(total_amount)
 
     #mess
     messopen = MessOptionOpen.objects.filter(dateClose__gte=datetime.today())
@@ -218,7 +212,14 @@ def profile(request):
         for other in otherdues:
             if other is not None:
                 total_amount += other.amount
-        balance = float(22000) - float(total_amount)
+        
+        with open(settings.CONSTANTS_LOCATION, 'r') as fp:
+            data = json.load(fp)
+        if student.nophd():
+            main_amt = data['phd-swd-advance']
+        else:
+            main_amt = data['swd-advance']
+        balance = float(main_amt) - float(total_amount)
 
         #mess
         messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
@@ -362,7 +363,14 @@ def messoption(request):
     for other in otherdues:
         if other is not None:
             total_amount += other.amount
-    balance = float(22000) - float(total_amount)
+    
+    with open(settings.CONSTANTS_LOCATION, 'r') as fp:
+        data = json.load(fp)
+    if student.nophd():
+        main_amt = data['phd-swd-advance']
+    else:
+        main_amt = data['swd-advance']
+    balance = float(main_amt) - float(total_amount)
 
     edit = 0
 
@@ -509,7 +517,14 @@ def leave(request):
     for other in otherdues:
         if other is not None:
             total_amount += other.amount
-    balance = float(22000) - float(total_amount)
+    
+    with open(settings.CONSTANTS_LOCATION, 'r') as fp:
+        data = json.load(fp)
+    if student.nophd():
+        main_amt = data['phd-swd-advance']
+    else:
+        main_amt = data['swd-advance']
+    balance = float(main_amt) - float(total_amount)
 
     form = LeaveForm()
     context = {
@@ -580,6 +595,7 @@ def leave(request):
                 'dateEnd': request.POST.get('dateEnd'),
                 'timeStart': request.POST.get('timeStart'),
                 'timeEnd': request.POST.get('timeEnd'),
+                'student': student
             }
         else:
             context = {
@@ -590,7 +606,8 @@ def leave(request):
                 'balance' : balance,
                 'daypasss': daypasss,
                 'option1': 2,
-                'form': form
+                'form': form,
+                'student': student
             }
             print(form.errors)
     return render(request, "leave.html", dict(context, **leaveContext))
@@ -625,7 +642,14 @@ def certificates(request):
     for other in otherdues:
         if other is not None:
             total_amount += other.amount
-    balance = float(22000) - float(total_amount)
+    
+    with open(settings.CONSTANTS_LOCATION, 'r') as fp:
+        data = json.load(fp)
+    if student.nophd():
+        main_amt = data['phd-swd-advance']
+    else:
+        main_amt = data['swd-advance']
+    balance = float(main_amt) - float(total_amount)
 
     #mess
     messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
@@ -918,7 +942,14 @@ def daypass(request):
     for other in otherdues:
         if other is not None:
             total_amount += other.amount
-    balance = float(22000) - float(total_amount)
+    
+    with open(settings.CONSTANTS_LOCATION, 'r') as fp:
+        data = json.load(fp)
+    if student.nophd():
+        main_amt = data['phd-swd-advance']
+    else:
+        main_amt = data['swd-advance']
+    balance = float(main_amt) - float(total_amount)
 
     form = DayPassForm()
     context = {
@@ -953,11 +984,13 @@ def daypass(request):
             context = {
                 'option1': 1,
                 'date': request.POST.get('date'),
+                'student': student
             }
         else:
             context = {
                 'option1': 2,
-                'form': form
+                'form': form,
+                'student': student,
             }
     return render(request, "daypass.html", dict(context, **daypassContext))
 
@@ -1204,7 +1237,14 @@ def store(request):
     for other in otherdues:
         if other is not None:
             total_amount += other.amount
-    balance = float(22000) - float(total_amount)
+    
+    with open(settings.CONSTANTS_LOCATION, 'r') as fp:
+        data = json.load(fp)
+    if student.nophd():
+        main_amt = data['phd-swd-advance']
+    else:
+        main_amt = data['swd-advance']
+    balance = float(main_amt) - float(total_amount)
 
     #mess
     messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
@@ -1340,7 +1380,14 @@ def dues(request):
         data = json.load(fp)
     swd_adv = float(data['swd-advance'])
     balance = swd_adv - float(total_amount)
-    balance = float(22000) - float(total_amount)
+    
+    with open(settings.CONSTANTS_LOCATION, 'r') as fp:
+        data = json.load(fp)
+    if student.nophd():
+        main_amt = data['phd-swd-advance']
+    else:
+        main_amt = data['swd-advance']
+    balance = float(main_amt) - float(total_amount)
 
     context = {
         'student': student,
@@ -1353,6 +1400,7 @@ def dues(request):
         'leaves': leaves,
         'bonafides': bonafides,
         'daypasss': daypasss,
+        'advance_amount': main_amt,
     }
 
     return render(request, "dues.html", context)
@@ -1440,7 +1488,14 @@ def search(request):
         for other in otherdues:
             if other is not None:
                 total_amount += other.amount
-        balance = float(22000) - float(total_amount)
+        
+        with open(settings.CONSTANTS_LOCATION, 'r') as fp:
+            data = json.load(fp)
+        if student.nophd():
+            main_amt = data['phd-swd-advance']
+        else:
+            main_amt = data['swd-advance']
+        balance = float(main_amt) - float(total_amount)
 
         context = {
            'hostels' : [i[0] for i in HOSTELS],
@@ -1473,55 +1528,7 @@ def search(request):
                 return render(request, "search_logged_in.html", dict(context, **postContext))
             else:
                 return render(request, "search.html", dict(context, **postContext))
-        #print(request.GET)
-        '''
-        students = Student.objects.filter(
-            Q(name__icontains=name) &
-            Q(bitsId__icontains=bitsId) &
-            Q(bitsId__contains=branch) &
-            ((
-                Q(hostelps__hostel__contains=hostel) &
-                Q(hostelps__room__contains=room) &
-                Q(hostelps__status='Student')
-            ))
-        )
-        '''
-        if room=='':
-            room1=None
-        else:
-            room1=room
-        if hostel=='':
-            hostel1=None
-        else:
-            hostel1=hostel
-        students = Student.objects.filter( 
-                Q(name__icontains=name) & 
-                Q(bitsId__icontains=bitsId) &
-                Q(bitsId__contains=branch) & 
-                (
-                ((
-                    Q(hostelps__status='PS2') &
-                    Q(hostelps__room=room1) &
-                    Q(hostelps__hostel=hostel1)
-                )) |
-                ((
-                    Q(hostelps__status='Graduate') &
-                    Q(hostelps__room=room1) &
-                    Q(hostelps__hostel=hostel1)
-                )) |
-                ((
-                    Q(hostelps__status='Student') &
-                    Q(hostelps__room__contains=room) &
-                    Q(hostelps__hostel__contains=hostel)
-                ))|
-                ((
-                    Q(hostelps__status='Thesis') &
-                    Q(hostelps__room=room1) &
-                    Q(hostelps__hostel=hostel1)
-                ))
-                )
-                )  
-
+        students = Student.objects.filter(Q(name__icontains=name) & Q(bitsId__icontains=bitsId) & Q(bitsId__contains=branch) & Q(hostelps__hostel__contains=hostel) & Q(hostelps__room__contains=room))
         searchstr = {}
 
         if name is not "":
@@ -1549,82 +1556,7 @@ def search(request):
     else:
         return render(request, "search.html", dict(context, **postContext))
 
-def search_no_login(request):
-    context = {
-        'hostels' : [i[0] for i in HOSTELS],
-        'branches' : BRANCH,
-        'option': 'indexbase.html'
-    }
-    postContext = {}
-    if request.GET:
-        name = request.GET.get('name')
-        bitsId = request.GET.get('bitsId')
-        branch = request.GET.get('branch')
-        hostel = request.GET.get('hostel')
-        room = request.GET.get('room')
-        if (all(not d for d in [name, bitsId, branch, hostel, room])):
-            # Checks if at least one of the fields is non-empty.
-            messages.error(request, "Please fill at least one field.")
-            context['errors'] = ["Please fill at least one field."]
-            if request.user.is_authenticated and \
-                not is_warden(request.user) and \
-                not is_hostelsuperintendent(request.user):
-                return render(request, "search_logged_in.html", dict(context, **postContext))
-            else:
-                return render(request, "search.html", dict(context, **postContext))
-        if room=='':
-            room1=None
-        else:
-            room1=room
-        if hostel=='':
-            hostel1=None
-        else:
-            hostel1=hostel
-        students = Student.objects.filter( 
-                Q(name__icontains=name) & 
-                Q(bitsId__icontains=bitsId) &
-                Q(bitsId__contains=branch) & 
-                (
-                ((
-                    Q(hostelps__status='PS2') &
-                    Q(hostelps__room=room1) &
-                    Q(hostelps__hostel=hostel1)
-                )) |
-                ((
-                    Q(hostelps__status='Graduate') &
-                    Q(hostelps__room=room1) &
-                    Q(hostelps__hostel=hostel1)
-                )) |
-                ((
-                    Q(hostelps__status='Student') &
-                    Q(hostelps__room__contains=room) &
-                    Q(hostelps__hostel__contains=hostel)
-                ))
-                )
-                )  
-        searchstr = {}
 
-        if name is not "":
-            searchstr['Name'] = name
-        if bitsId is not "":
-            searchstr['BITS ID'] = bitsId
-        if branch is not "":
-            searchstr['Branch'] = branch
-        if hostel is not "":
-            searchstr['Hostel'] = hostel
-        if room is not "":
-            searchstr['Room'] = room
-            
-        postContext = {
-            'students' : students,
-            'searchstr' : searchstr
-        }
-
-        if students.count() == 0:
-            messages.error(request, "No student found with these details.")
-            context['errors'] = ["No student found with these details."]
-
-    return render(request, "search.html", dict(context, **postContext))
 
 def notice(request):
     context = {
@@ -1727,7 +1659,15 @@ def documents(request):
             for other in otherdues:
                 if other is not None:
                     total_amount += other.amount
-            balance = float(22000) - float(total_amount)
+            
+            with open(settings.CONSTANTS_LOCATION, 'r') as fp:
+                data = json.load(fp)
+            if student.nophd():
+                main_amt = data['phd-swd-advance']
+            else:
+                main_amt = data['swd-advance']
+            balance = float(main_amt) - float(total_amount)
+            
             #mess
             messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
             messopen = messopen.exclude(dateOpen__gt=date.today())
@@ -2013,7 +1953,14 @@ def developers(request):
             for other in otherdues:
                 if other is not None:
                     total_amount += other.amount
-            balance = float(22000) - float(total_amount)
+            
+            with open(settings.CONSTANTS_LOCATION, 'r') as fp:
+                data = json.load(fp)
+            if student.nophd():
+                main_amt = data['phd-swd-advance']
+            else:
+                main_amt = data['swd-advance']
+            balance = float(main_amt) - float(total_amount)
 
             #mess
             messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
@@ -2546,7 +2493,23 @@ def update_hostel(request):
                         hostel.save()
                         count = count + 1
                     except HostelPS.DoesNotExist:
-                        HostelPS.objects.create(student=student, hostel=row[header['Hostel']].value, room=str(row[header['Room']].value), acadstudent=True, status="Student", psStation="")
+                        acadstudent = True
+                        status = ''
+                        new_hostel = row[header['Hostel']].value
+                        if new_hostel == 'Graduate' or new_hostel == 'Faculty' or new_hostel == 'Part Time' or new_hostel == 'Permanent Withdrawal' or new_hostel == 'Temporary Withdrawal' or new_hostel == 'Registration Cancelled' or new_hostel == 'Withdrawal':
+                            acadstudent=False
+                            status = new_hostel
+                        else:
+                            acadstudent=True
+                            status = "Student"
+                        if row[header['Room']].value:
+                            try:
+                                room = str(int(row[header['Room']].value))
+                            except Exception:
+                                room = str(row[header['Room']].value)
+                        else:
+                            room = ''
+                        HostelPS.objects.create(student=student, hostel=new_hostel, room=room, acadstudent=acadstudent, status=status, psStation="")
                         count = count + 1
                     if message_str is not '':
                         messages.add_message(request,
@@ -2908,10 +2871,10 @@ def update_ps(request):
                     except Exception:
                         message_str + "student " + row[header['studentID']].value + " not in database"
                     try:
-                        hostel = HostelPS.objects.filter(student=student[0]).update(hostel=None, room=None, acadstudent=False, status=row[header['Status']].value, psStation=row[header['PS Station']].value)
+                        hostel = HostelPS.objects.filter(student=student[0]).update(hostel='', room='', acadstudent=False, status=row[header['Status']].value, psStation=row[header['PS Station']].value)
                         count = count + 1
                     except Exception:
-                        message_str + "update failed for " + studentID
+                        message_str + "update failed for " + row[header['studentID']].value
                     
             message_str = str(count) + " Updated PS/Thesis"
         else:
@@ -3436,3 +3399,35 @@ def get_corr_address(request):
         messages.success(request, "Export done. Download will automatically start.")
         return response
     return render(request, "add_students.html", {})
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def upload_profile_pictures(request):
+    if request.POST:
+        if request.FILES:
+            error_files = []
+            successfull = 0
+            for filex in request.FILES.getlist('folder'):
+                file_name, file_ext = filex.name.split('.')
+                file_name = file_name.upper()
+                try:
+                    student = Student.objects.get(bitsId=file_name)
+                    student.profile_picture.save(
+                        file_name, filex
+                    )
+                    successfull += 1
+                except Student.DoesNotExist:
+                    error_files.append(file_name.lower())
+            
+            if len(error_files):
+                messages.error(
+                    request,
+                    str(len(error_files)) + " IDs did not match: " + \
+                        ", ".join(error_files))
+            if (successfull):
+                messages.success(request, str(successfull) + " IDs updated.")
+        else:
+            messages.error(
+                request, "No folder selected. Please select at least one.")
+       
+    return render(request, "upload_profile_pictures.html", {})
