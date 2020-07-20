@@ -25,7 +25,7 @@ On Windows:
 ```bash
 $ python -m venv swd
 $ cd swd
-$ swd\Scripts\activate
+$ .\Scripts\activate
 ```
 
 #### Forking and Dependencies
