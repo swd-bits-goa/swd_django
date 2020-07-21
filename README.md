@@ -25,7 +25,7 @@ On Windows:
 ```bash
 $ python -m venv swd
 $ cd swd
-$ swd\Scripts\activate
+$ Scripts\activate
 ```
 
 #### Forking and Dependencies
@@ -34,7 +34,7 @@ Fork the repository and clone it.
 
 ```bash
 $ git clone https://github.com/YOUR_USERNAME/swd_django src
-$ cd src/swd
+$ cd swd_django/swd
 $ pip install -r requirements.txt
 ```
 #### Database
