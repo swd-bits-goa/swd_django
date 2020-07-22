@@ -69,7 +69,7 @@ $ python manage.py createsuperuser
 $ python populate_data.py
 ```
 
-* this will create a super user with username as ```admim``` and password as ```password```
+* this will create a super user with username as ```admin``` and password as ```password```
 
 ### Running the development server
 
@@ -81,7 +81,7 @@ $ python manage.py runserver
 
 ### Logging in
 
-* To login as a student use the format as username: f20180001 or p20180001 and password: passoword
+* To login as a student use the format as username: f20180001 or p20180001 and password: password
 * To login as admin, username: admin and password: password
 
 **Important:** This requires the `dev_info.py` to be present in `tools` folder. Please contact the maintainers if you don't have it.
