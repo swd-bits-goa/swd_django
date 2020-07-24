@@ -6,7 +6,7 @@ django.setup()
 
 from django.contrib.auth.models import User
 from django.conf import settings
-from main.models import Student, Leave, MessOption, Bonafide, Warden, HostelPS, Security, HostelSuperintendent
+from main.models import Student, Leave, MessOption, Bonafide, Warden, HostelPS, CSA, Security, HostelSuperintendent
 from django.utils import timezone
 
 import random
@@ -248,6 +248,20 @@ def create_warden(i):
         print("Exception raised in creating warden " + str(i) + ": " + str(e))
     return False
 
+def create_csa(i, student):
+    try:
+        mcsa = CSA(
+            student=student,
+            title='President',
+            email='prez@goa.bits-pilani.ac.in',
+            pic = '2017A4PS0590_bsKDJSY.jpg',
+            priority = i + 1
+        )
+        mcsa.save()
+        return True
+    except Exception as e:
+        print("Exception raised in creating csa member " + str(i) + ": " + str(e))
+    return False
 
 def create_security(i):
     try:
@@ -293,7 +307,6 @@ def create_hostelsuperintendent(i):
         print("Exception raised in creating hostel superintendent " + str(i) + ": " + str(e))
     return False
 
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--id_start', type=int, default=20180001,
@@ -319,6 +332,7 @@ if __name__ == '__main__':
     Student.objects.all().delete()
     Warden.objects.all().delete()
     User.objects.all().delete()
+    CSA.objects.all().delete()
     Security.objects.all().delete()
     HostelSuperintendent.objects.all().delete()
 
@@ -374,6 +388,16 @@ if __name__ == '__main__':
     if leave_success:
         print(str(i) + " Leaves created.")
 
+
+    csa_success = True
+    i = 0
+    for student in students_list:
+        if i<5:
+            csa_success &= create_csa(i, student)
+            i += 1
+    if csa_success:
+        print(str(i) + " Csa Members created.")
+        
     security_success = True
     for i in range(10):
         security_success &= create_security(i)
