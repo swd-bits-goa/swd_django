@@ -6,7 +6,7 @@ django.setup()
 
 from django.contrib.auth.models import User
 from django.conf import settings
-from main.models import Student, Leave, MessOption, Bonafide, Warden, HostelPS, CSA
+from main.models import Student, Leave, MessOption, Bonafide, Warden, HostelPS, CSA, Security, HostelSuperintendent
 from django.utils import timezone
 
 import random
@@ -64,8 +64,10 @@ def fake_cgpa():
     cgpa = float(random.randrange(0, 1000)) / 100
     return cgpa
 
+
 def fake_status():
     return random.choice(status_choices)
+
 
 def fake_bitsID(username):
     year = username[1:5]
@@ -221,7 +223,6 @@ def create_leave(i, student, warden):
     return False
 
 
-
 def create_warden(i):
     try:
         (mUser, created1) = User.objects.get_or_create(
@@ -262,6 +263,50 @@ def create_csa(i, student):
         print("Exception raised in creating csa member " + str(i) + ": " + str(e))
     return False
 
+def create_security(i):
+    try:
+        (mUser, created1) = User.objects.get_or_create(
+            username='security' + str(i),
+            first_name='security' + str(i),
+            email='security' + str(i) +"@goa.bits-pilani.ac.in")
+        mUser.set_password('password')
+        mUser.save()
+        if created1:
+            mSecurity = Security(
+                user=mUser,
+            )
+            mSecurity.save()
+            return True
+    except Exception as e:
+        print("Exception raised in creating security " + str(i) + ": " + str(e))
+    return False
+
+
+def create_hostelsuperintendent(i):
+    try:
+        (mUser, created1) = User.objects.get_or_create(
+            username='superintendent' + str(i),
+            first_name='superintendent' + str(i),
+            email='superintendent' + str(i) +"@goa.bits-pilani.ac.in")
+        mUser.set_password('password')
+        mUser.save()
+        if created1:
+            mHostelSuperintendent = HostelSuperintendent(
+                user=mUser,
+                name=mUser.first_name, 
+                email=mUser.email,               
+                hostel=hostel_choices[4*i]+", "+hostel_choices[4*i+1]+", "+hostel_choices[4*i+2]+", "+hostel_choices[4*i+3],
+                chamber='BX12',
+                phone_off=fake_number_generator(),
+                phone_res=fake_number_generator(),
+               
+            )
+            mHostelSuperintendent.save()
+            return True
+    except Exception as e:
+        print("Exception raised in creating hostel superintendent " + str(i) + ": " + str(e))
+    return False
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--id_start', type=int, default=20180001,
@@ -288,6 +333,8 @@ if __name__ == '__main__':
     Warden.objects.all().delete()
     User.objects.all().delete()
     CSA.objects.all().delete()
+    Security.objects.all().delete()
+    HostelSuperintendent.objects.all().delete()
 
     print("Generating the fake data now....")
     
@@ -303,7 +350,7 @@ if __name__ == '__main__':
     for i in range(len(hostel_choices)):
         warden_success &= create_warden(i)
     if warden_success:
-        print(str(i) + " Wardens created.")
+        print(str(i+1) + " Wardens created.")
 
     hostel_success = True
     students_list = Student.objects.all()
@@ -341,6 +388,7 @@ if __name__ == '__main__':
     if leave_success:
         print(str(i) + " Leaves created.")
 
+
     csa_success = True
     i = 0
     for student in students_list:
@@ -349,6 +397,18 @@ if __name__ == '__main__':
             i += 1
     if csa_success:
         print(str(i) + " Csa Members created.")
+        
+    security_success = True
+    for i in range(10):
+        security_success &= create_security(i)
+    if security_success:
+        print(str(i+1) + " Security created.")
+
+    hostelsuperintendent_success = True
+    for i in range(5):
+        hostelsuperintendent_success &= create_hostelsuperintendent(i)
+    if hostelsuperintendent_success:
+        print(str(i+1) + " Hostel Superintendents created.")
 
 
     print("Data Population Completed")
