@@ -22,8 +22,8 @@ class LeaveForm(forms.ModelForm):
         dateEnd = datetime.strptime(cleaned_data['dateEnd'], '%d %B, %Y').date()
         timeStart = datetime.strptime(cleaned_data['timeStart'], '%H:%M').time()
         date_time_start = datetime.combine(dateStart, timeStart)
-        if (len(cleaned_data['phone_number']) > 10):
-            self.add_error('phone_number', "Phone No. can't be longer than 15 numbers")
+        if (len(cleaned_data['phone_number']) != 10):
+            self.add_error('phone_number', "Contact No. must have 10 digits")
         if (dateStart > dateEnd):
             self.add_error('dateEnd', "Arrival cannot be before Departure")
         if (datetime.now() >= date_time_start):
