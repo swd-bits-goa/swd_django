@@ -82,6 +82,9 @@ $ python manage.py runserver
 ### Logging in
 
 * To login as a student use the format as username: f20180001 or p20180001 and password: password
+* To login as a warden use the format as username: **warden0**, **warden1**, **warden2**, etc. and password: **password**
+* To login as a hostel superintendent use the format as username: **superintendent0**, **superintendent1**, etc. and password: **password**
+* To login as a security guard use the format as username: **security0**, **security1**, etc. and password: **password**
 * To login as admin, username: admin and password: password
 
 **Important:** This requires the `dev_info.py` to be present in `tools` folder. Please contact the maintainers if you don't have it.
