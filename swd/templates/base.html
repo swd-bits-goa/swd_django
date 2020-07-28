@@ -43,13 +43,13 @@
         <div class="nav-wrapper" style="margin-bottom: 5px;">
                 <a href="/#" class="brand-logo"><img id="swd" src="{% static 'img/swd.png' %}"></a>
             <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
-            <ul id="nav-mobile" class="right hide-on-med-and-down">
+            <ul id="nav-mobile" class="right custom-mobile">
                 <li><a href="{% url 'csa' %}">CSA</a></li>
                 <li><a href="{% url 'sac' %}">SAC</a></li>
                 <li><a href="{% url 'swd' %}">Services</a></li>
                 <li><a href="{% url 'contact' %}">Contact Us</a></li>
-                <li class=""><a href="{% url 'profile' %}" class="valign-wrapper"><img class="circle profileImg" src="/media/{{ student.profile_picture }}">&nbsp;{{ student.name|title }}</a></li>
-                <li><a href="{% url 'logout' %}">Logout</a></li>
+                <li><a href="{% url 'profile' %}" class="valign-wrapper hide-on-med-and-down"><img class="circle profileImg" src="/media/{{ student.profile_picture }}">&nbsp;{{ student.name|title }}</a></li>
+                <li><a href="{% url 'logout' %}" class="hide-on-med-and-down">Logout</a></li>
             </ul>
             <ul class="side-nav" id="mobile-demo">
                     <div class="container-fluid" style="margin-top:10px">
@@ -87,6 +87,15 @@
                 .profileImg {
                     max-width: 35px;
                     height:auto
+                }
+                .custom-mobile {
+                    display: flex;
+                    min-width: fit-content;
+                }
+                @media screen and (max-width: 800px) {
+                    .custom-mobile{
+                        margin-top: 3.5rem;
+                    }
                 }
             </style>
         </div>
