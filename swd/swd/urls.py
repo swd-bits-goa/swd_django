@@ -49,6 +49,7 @@ urlpatterns = [
 
 
     url(r'^', include('main.urls')),
+    url(r'^', include('gate_security.urls')),
 
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
