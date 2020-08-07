@@ -56,6 +56,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'webpack_loader',
     'main',
+    'gate_security',
+    'mcn',
     'tools',
     'schema',
     'graphene_django',
