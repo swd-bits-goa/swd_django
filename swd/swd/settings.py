@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'webpack_loader',
     'main',
     'gate_security',
+    'mcn',
     'tools',
     'schema',
     'graphene_django',
