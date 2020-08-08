@@ -1,0 +1,72 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=1024">
+    <title>SWD BITS Goa</title>
+
+    <!-- CSS  -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="{% static 'css/materialize.css' %}" type="text/css" rel="stylesheet" media="screen,projection" />
+    <link href="{% static 'css/style.css' %}" type="text/css" rel="stylesheet" media="screen,projection" />
+</head>
+
+<body>
+    <nav class="nav-extended">
+        <div class="nav-wrapper">
+            <a href="#" class="brand-logo"><img id="swd" src="{% static 'img/swd.png' %}"></a>
+            <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
+            <ul id="nav-mobile" class="right hide-on-med-and-down">
+                <li><a href="/logout">Logout</a></li>
+            </ul>
+            <ul class="side-nav" id="mobile-demo">
+                <li><a href="/logout">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+
+    <div class="container">
+        <div class="row valign-wrapper" id="bodyWrap">
+          <div class="col s1">
+
+          </div>
+          <div class="col s10">
+                  <span class="card-title fresh-orange"><h4>Student</h4></span>
+                  <br>
+                <form id="sign_in" method="POST">
+                   {% csrf_token %}
+                  <div class="input-field" id="username" >
+                      <input  type="text" class="validate" name="username" autocomplete='username' autocorrect="off" autocapitalize="none">
+                      <label for="username">BITS ID</label>
+                  </div>
+
+                  <button type="submit" class="waves-effect waves-light btn desert-yellow" id="loginbtn"><span class="deep-green">Submit</span></button>
+
+                </form>
+                <br>
+        </div>
+      </div>
+    </div>
+
+
+{% block content %}
+{% endblock %} 
+
+  <!--  Scripts-->
+    <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script src="{% static 'js/materialize.js' %}"></script>
+    <script src="{% static 'js/init.js' %}"></script>
+    <style>
+    #bodyWrap {
+        height:90vh;
+    }
+    .clickable {
+        cursor: pointer;
+    }
+    </style>
+</body>
+
+</html>
