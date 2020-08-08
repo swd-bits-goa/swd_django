@@ -1,0 +1,53 @@
+{% extends 'gate_security.html' %}
+{% load staticfiles %}
+{% block content %}
+
+    <div class="container">
+        <div class="row valign-wrapper" id="bodyWrap1">
+          <div class="col s1">
+
+          </div>
+          <div class="col s10">
+                  <span class="card-title fresh-orange"><h4>Student Details</h4></span>
+                  <br>
+
+                  <div class="container-fluid" style="margin-top: 10px;">
+                    <div class="row" style="position: relative;">
+                        <div class="col sm-2">
+                                <a href="/profile" class="valign-wrapper">
+                                    <img style="max-width:180px" class="circle profileImg" src="/media/2017A4PS0590_bsKDJSY.jpg">
+                                </a>
+                        </div>
+                        <div class="col sm-10" style="line-height:50px; position: relative;
+                        transform: translate(20%, 20%);">
+                                {{ student.name }} Dummy name<br>
+                                {{ student.bitsId }} Dummy ID<br>
+                                Dummy Phone Number
+                        </div>
+                        <div class="col sm-10" style="line-height:50px; position: relative; transform: translate(20%, 20%); text-align:end">
+                                <br>Dummy active leaves <button type="submit" class="waves-effect waves-light btn desert-yellow" id="loginbtn"><span class="deep-green">Activate</span></button>
+                                <br>
+                                Dummy active daypasses <button type="submit" class="waves-effect waves-light btn desert-yellow" id="loginbtn"><span class="deep-green">Activate</span></button>
+                        </div>
+                        <div class="col s10" style="line-height:50px; position: relative; transform: translate(20%, 20%);">
+                          <br><button type="submit" class="waves-effect waves-light btn desert-yellow" id="loginbtn"><span class="deep-green">In-Out</span></button>
+                        </div>
+                    </div>
+                </div>
+                
+                <br>
+        </div>
+      </div>
+    </div>
+
+<style>
+  #bodyWrap {
+      display: none;
+  }
+  #bodyWrap1 {
+    height: 80vh;
+  }
+  </style>
+
+{% endblock %} 
+
