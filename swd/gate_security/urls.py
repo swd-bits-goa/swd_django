@@ -9,6 +9,8 @@ from . import views
 
 urlpatterns = [
     
+
 url(r'^gate_security/', views.gate_security, name='gate_security'),
 url(r'^gate_student/', views.gate_student, name='gate_student')
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
