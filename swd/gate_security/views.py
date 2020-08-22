@@ -1,6 +1,5 @@
 from django.shortcuts import render
-from .models import SecurityLeave
-from main.models import *
+from main.models import Leave, DayPass
 
 
 # Create your views here.
