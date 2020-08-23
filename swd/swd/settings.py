@@ -219,3 +219,7 @@ LOGIN_URL = '/login'
 # STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 20000
+
+# MAX LIMIT OF DOCUMENT UPLOAD in MCN Applicaiton
+
+MAX_MCN_UPLOAD_SIZE = '1048576' # 1 MB : Use bytes

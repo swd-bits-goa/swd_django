@@ -84,6 +84,17 @@ def submit_mcn(request):
     # =================== SUBMISSION ===================
 
     currentDate = datetime.now()
+    yr1 = currentDate.year
+    yr2 = yr1
+    if currentDate.month < 6:
+        # Even Semester
+        yr2 -= 1
+        yr1 -= 2
+    else:
+        # Odd Semester
+        yr1 -= 1
+    context['itr_year'] = str(yr1) + "-" + str(yr2 % 100)
+
     mcn_period = MCNApplicationPeriod.objects.filter(Open__lte=currentDate, Close__gte=currentDate).last()
     context['mcn_period'] = mcn_period
 
@@ -134,6 +145,12 @@ def submit_mcn(request):
                     msg_txt = "Invalid uploaded document type of {}".format(doc.name)
                     msg_txt += ", it should be one of "
                     msg_txt += ', '.join(supported_exts)
+                    context['errors'].append(msg_txt)
+
+                if doc.size > settings.MAX_MCN_UPLOAD_SIZE:
+                    msg_txt = "Uploaded document {}".format(doc.name)
+                    msg_txt += " should be of less than "
+                    msg_txt += str(settings.MAX_MCN_UPLOAD_SIZE) + " bytes."
                     context['errors'].append(msg_txt)
 
         if len(context['errors']):

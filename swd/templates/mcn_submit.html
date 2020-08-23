@@ -45,9 +45,14 @@
                         </div>
                         </div>
 
+                        <div class="green-text">
+                            Note: Maximum upload size <b>1 MB</b> of type jpg, jpeg, png or pdf. If your file does not comply, compress it to the appropriate format and size.<br>
+                            Note: Only <b>{{ itr_year }} ITR</b> Documents will be accepted for non-agricultural income sources.
+                        </div>
+
                         <div class="file-field input-field">
                         <div class="btn">
-                            <span>Father's Income Proof</span>
+                            <span>Father's ITR {{ itr_year }}</span>
                             <input type="file" name="FathersIncomeDoc" id="FathersIncomeDoc">
                         </div>
                         <div class="file-path-wrapper">
@@ -57,7 +62,7 @@
 
                         <div class="file-field input-field">
                         <div class="btn">
-                            <span>Mother's Income Proof</span>
+                            <span>Mother's ITR {{ itr_year }}</span>
                             <input type="file" name="MothersIncomeDoc" id="MothersIncomeDoc">
                         </div>
                         <div class="file-path-wrapper">
@@ -66,7 +71,7 @@
                         </div>
 
                         <div class="center">
-                        OR
+                        OR if agricultural income
                         </div>
 
                         <div class="file-field input-field">
@@ -97,7 +102,7 @@
                     </form>
                     {% endif %}
                 {% else %}
-                    Application Portal is not Open. Come back later or contact SWD for specific queries.
+                    Application Portal is not open. Come back later or contact SWD for specific queries.
                 {% endif %}
             </div>
         </div>
