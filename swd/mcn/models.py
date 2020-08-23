@@ -52,7 +52,8 @@ class MCNApplication(models.Model):
         upload_to=document_path, null=True, blank=True)
     BankPassbook = models.FileField(
         upload_to=document_path, null=True, blank=True)
-    approved = models.BooleanField("Application Approved", default=False)
+    approved = models.BooleanField("Approve Application", default=False)
+    rejected = models.BooleanField("Reject Application", default=False)
 
     def __str__(self):
         return self.student.name + ': ' + self.DateTimeSubmitted.strftime('%Y-%m-%d')

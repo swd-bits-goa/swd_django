@@ -10,5 +10,6 @@ class MCNApplicationAdmin(admin.ModelAdmin):
     list_display = (
         'student',
         'ApplicationPeriod',
-        'approved'
+        'approved',
+        'rejected'
     )
