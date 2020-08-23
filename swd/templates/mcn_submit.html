@@ -6,7 +6,7 @@
         <div class="card">
             <div class="card-content">
                 <span class="card-title">
-                    Apply Merit-Cum-Needs Application : {{ mcn_period.Name }}
+                    Apply Merit-cum-Needs Application : {{ mcn_period.Name }}
                 </span>
                 {% if mcn_period %}
                     {% if already_submitted %}
@@ -36,18 +36,18 @@
 
                         <div class="row">
                         <div class="input-field col s6">
-                        <label for="FathersIncome">Enter Father's Income in INR</label>
+                        <label for="FathersIncome">Father's Income in INR</label>
                         <input type="number" name="FathersIncome" id="FathersIncome" />
                         </div>
                         <div class="input-field col s6">
-                        <label for="MothersIncome">Enter Mother's Income in INR</label>
+                        <label for="MothersIncome">Mother's Income in INR</label>
                         <input type="number" name="MothersIncome" id="MothersIncome" />
                         </div>
                         </div>
 
-                        <div class="green-text">
-                            Note: Maximum upload size <b>1 MB</b> of type jpg, jpeg, png or pdf. If your file does not comply, compress it to the appropriate format and size.<br>
-                            Note: Only <b>{{ itr_year }} ITR</b> Documents will be accepted for non-agricultural income sources.
+                        <div>
+                            <b class="red-text">Note:</b> Maximum upload size <b>10 MB</b> of type jpg, jpeg, png or pdf. If your file does not comply, compress it to the appropriate format and size.<br>
+                            <b class="red-text">Note:</b> Only <b>{{ itr_year }} ITR</b> Documents will be accepted as a proof for non-agricultural income sources.
                         </div>
 
                         <div class="file-field input-field">
