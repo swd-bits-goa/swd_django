@@ -1,0 +1,41 @@
+{% extends 'base.html' %} {% block content %}
+
+<div class="">
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="input-field">
+      <label for="DateTimeSubmitted">Submission Time</label>
+      <input type="datetime" name="DateTimeSubmitted" id="DateTimeSubmitted" />
+    </div>
+    <div class="input-field">
+      <label for="FathersIncome">Father's Income</label>
+      <input type="number" name="FathersIncome" id="FathersIncome" />
+    </div>
+    <div class="input-field">
+      <label for="MothersIncome">Mother's Income</label>
+      <input type="number" name="MothersIncome" id="MothersIncome" />
+    </div>
+    <div class="input-field">
+      <label for="FathersIncomeDoc">Upload Father's Income Document</label>
+      <input type="file" name="FathersIncomeDoc" id="FathersIncomeDoc" />
+    </div>
+    <div class="input-field">
+      <label for="MothersIncomeDoc">Upload Mother's Income Document</label>
+      <input type="file" name="MothersIncomeDoc" id="MothersIncomeDoc" />
+    </div>
+    <div class="input-field">
+      <label for="TehsildarCertificate">Upload Tehsildar's Certificate</label>
+      <input
+        type="file"
+        name="TehsildarCertificate"
+        id="TehsildarCertificate"
+      />
+    </div>
+    <div class="input-field">
+      <label for="BankPassbook">Upload Bank Passbook's Image </label>
+      <input type="file" name="BankPassbook" id="BankPassbook" />
+    </div>
+  </form>
+</div>
+
+{% endblock %}

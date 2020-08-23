@@ -10,11 +10,14 @@ except ModuleNotFoundError:
 
 
 class MCNApplicationPeriod(models.Model):
+    """
+    Stores time period when MCN Application portals were opened and closed.
+    """
     Open = models.DateTimeField()
     Close = models.DateTimeField()
 
     def __str__(self):
-        pass
+        return self.Open.strftime('%Y-%m-%d') + '-' + self.Close.strftime('%Y-%m-%d')
 
     class Meta:
         verbose_name = 'MCN Application Period'
@@ -22,20 +25,23 @@ class MCNApplicationPeriod(models.Model):
 
 
 class MCNApplication(models.Model):
+    """
+    Stores MCN Application of a single student with the documents.
+    """
+
     def document_path(instance, filename):
         ext = filename.split('.')[-1]
-        tempname = (SALT+instance.student.bitsId+str(datetime)).encode('utf-8')
+        tempname = (SALT+instance.student.bitsId +
+                    str(datetime.now())).encode('utf-8')
         return 'MCN/{}.{}'.format(
             hashlib.md5(tempname).hexdigest(), ext)
 
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     ApplicationPeriod = models.ForeignKey(
         MCNApplicationPeriod, on_delete=models.CASCADE)
-    Filled = models.DateTimeField(blank=True)
+    DateTimeSubmitted = models.DateTimeField(blank=True)
     FathersIncome = models.IntegerField()
     MothersIncome = models.IntegerField()
-    ApplicationForm = models.FileField(
-        upload_to=document_path, null=True, blank=True)
     FathersIncomeDoc = models.FileField(
         upload_to=document_path, null=True, blank=True)
     MothersIncomeDoc = models.FileField(
@@ -46,7 +52,7 @@ class MCNApplication(models.Model):
         upload_to=document_path, null=True, blank=True)
 
     def __str__(self):
-        pass
+        return self.student.name + ' ' + (datetime.now()).strftime('%Y-%m-%d')
 
     class Meta:
         verbose_name = 'MCN Application'
