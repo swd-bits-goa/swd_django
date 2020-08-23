@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container">
+    <div class="section">
+        <div class="card">
+            <div class="card-content">
+                <span class="card-title">
+                    Apply Merit-Cum-Needs Application : {{ mcn_period.Name }}
+                </span>
+                {% if mcn_period %}
+                    {% if already_submitted %}
+                    <div class="green-text">
+                        You have already submitted the application on {{ already_submitted.DateTimeSubmitted }}. Contact SWD if any issues.
+                    </div>
+                    {% elif success %}
+                    <div class="green-text">
+                        Your application successfully submitted for review. Contact SWD if any issues.
+                    </div>
+                    {% else %}
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div>
+                            Deadline for filling is <span class="red-text">{{ mcn_period.Close }}</span>
+                        </div>
+
+                        {% if errors %}
+                        <div class="red-text">
+                            <ul>
+                                {% for error in errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+
+                        <div class="row">
+                        <div class="input-field col s6">
+                        <label for="FathersIncome">Enter Father's Income in INR</label>
+                        <input type="number" name="FathersIncome" id="FathersIncome" />
+                        </div>
+                        <div class="input-field col s6">
+                        <label for="MothersIncome">Enter Mother's Income in INR</label>
+                        <input type="number" name="MothersIncome" id="MothersIncome" />
+                        </div>
+                        </div>
+
+                        <div class="file-field input-field">
+                        <div class="btn">
+                            <span>Father's Income Proof</span>
+                            <input type="file" name="FathersIncomeDoc" id="FathersIncomeDoc">
+                        </div>
+                        <div class="file-path-wrapper">
+                            <input class="file-path validate" type="text">
+                        </div>
+                        </div>
+
+                        <div class="file-field input-field">
+                        <div class="btn">
+                            <span>Mother's Income Proof</span>
+                            <input type="file" name="MothersIncomeDoc" id="MothersIncomeDoc">
+                        </div>
+                        <div class="file-path-wrapper">
+                            <input class="file-path validate" type="text">
+                        </div>
+                        </div>
+
+                        <div class="center">
+                        OR
+                        </div>
+
+                        <div class="file-field input-field">
+                        <div class="btn">
+                            <span>Tehsildar's Certificate</span>
+                            <input type="file" name="TehsildarCertificate" id="TehsildarCertificate">
+                        </div>
+                        <div class="file-path-wrapper">
+                            <input class="file-path validate" type="text">
+                        </div>
+                        </div>
+
+                        <div class="file-field input-field">
+                        <div class="btn">
+                            <span>Bank Passbook</span>
+                            <input type="file" name="BankPassbook" id="BankPassbook">
+                        </div>
+                        <div class="file-path-wrapper">
+                            <input class="file-path validate" type="text">
+                        </div>
+                        </div>
+
+                        <center>
+                        <button class="btn waves-effect waves-light teal" type="submit" name="action">Submit
+                            <i class="material-icons right">send</i>
+                        </button>
+                        </center>
+                    </form>
+                    {% endif %}
+                {% else %}
+                    Application Portal is not Open. Come back later or contact SWD for specific queries.
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
