@@ -1,8 +1,11 @@
 import json
+import xlwt
 from datetime import datetime, date, timedelta
-from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
+
+from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils.timezone import make_aware
+from django.http import HttpResponse
 
 from swd import settings
 from .models import MCNApplication, MCNApplicationPeriod
@@ -170,3 +173,42 @@ def submit_mcn(request):
         context['success'] = True
 
     return render(request, "mcn_submit.html", context)
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def export_mcn_approved(request, mcn_period_pk, approved=True):
+    mcn_period = get_object_or_404(MCNApplicationPeriod, pk=mcn_period_pk)
+    mcn_applications = MCNApplication.objects.filter(
+        ApplicationPeriod=mcn_period, approved=approved, rejected=(not approved))
+    
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename="mcn_export.xls"'
+    wb = xlwt.Workbook(encoding='utf-8')
+    ws = wb.add_sheet('MCN Applications')
+
+    heading_style = xlwt.easyxf('font: bold on, height 280; align: wrap on, vert centre, horiz center')
+    h2_font_style = xlwt.easyxf('font: bold on')
+    font_style = xlwt.easyxf('align: wrap on')
+    
+    ws.write_merge(0, 0, 0, 6, "MCN Applications: {}".format(mcn_period.Name), heading_style)
+    ws.write(1, 0, "Student ID", h2_font_style)
+    ws.write(1, 1, "Student Name", h2_font_style)
+    ws.write(1, 2, "Fathers Income", h2_font_style)
+    ws.write(1, 3, "Mothers Income", h2_font_style)
+    ws.write(1, 4, "Gross Income", h2_font_style)
+    ws.write(1, 5, "Status", h2_font_style)
+
+    for idx, application in enumerate(mcn_applications):
+        student = application.student
+        ws.write(2 + idx, 0, student.bitsId, font_style)
+        ws.write(2 + idx, 1, student.name, font_style)
+        x = application.FathersIncome
+        y = application.MothersIncome
+        ws.write(2 + idx, 2, x, font_style)
+        ws.write(2 + idx, 3, y, font_style)
+        ws.write(2 + idx, 4, x + y, font_style)
+        status = "Approved" if approved else "Rejected"
+        ws.write(2 + idx, 5, status, font_style)
+    
+    wb.save(response)
+    return response
