@@ -34,6 +34,10 @@
                         </div>
                         {% endif %}
 
+                        <div class="input-field">
+                        <label for="FathersName">Father's Name</label>
+                        <input type="text" name="FathersName" id="FathersName" disabled value="{{ user.student.parentName }}"/>
+
                         <div class="row">
                         <div class="input-field col s6">
                         <label for="FathersIncome">Father's Income in INR</label>

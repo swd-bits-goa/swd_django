@@ -176,10 +176,20 @@ def submit_mcn(request):
 
 
 @user_passes_test(lambda u: u.is_superuser)
-def export_mcn_approved(request, mcn_period_pk, approved=True):
+def export_mcn_approved(request, mcn_period_pk, filter_criteria):
     mcn_period = get_object_or_404(MCNApplicationPeriod, pk=mcn_period_pk)
-    mcn_applications = MCNApplication.objects.filter(
-        ApplicationPeriod=mcn_period, approved=approved, rejected=(not approved))
+
+    if filter_criteria == 'approved':
+        mcn_applications = MCNApplication.objects.filter(
+            ApplicationPeriod=mcn_period, approved=True, rejected=False)
+    elif filter_criteria == 'rejected':
+        mcn_applications = MCNApplication.objects.filter(
+            ApplicationPeriod=mcn_period, approved=False, rejected=True)
+    elif filter_criteria == 'all':
+        mcn_applications = MCNApplication.objects.filter(
+            ApplicationPeriod=mcn_period)
+    else:
+        return HttpResponse(request, 'Invalid Request')
     
     response = HttpResponse(content_type='application/ms-excel')
     response['Content-Disposition'] = 'attachment; filename="mcn_export.xls"'
@@ -190,25 +200,49 @@ def export_mcn_approved(request, mcn_period_pk, approved=True):
     h2_font_style = xlwt.easyxf('font: bold on')
     font_style = xlwt.easyxf('align: wrap on')
     
-    ws.write_merge(0, 0, 0, 6, "MCN Applications: {}".format(mcn_period.Name), heading_style)
+    ws.write_merge(0, 0, 0, 6, "{} MCN Applications: {}".format(
+        filter_criteria, mcn_period.Name), heading_style)
     ws.write(1, 0, "Student ID", h2_font_style)
     ws.write(1, 1, "Student Name", h2_font_style)
-    ws.write(1, 2, "Fathers Income", h2_font_style)
-    ws.write(1, 3, "Mothers Income", h2_font_style)
-    ws.write(1, 4, "Gross Income", h2_font_style)
-    ws.write(1, 5, "Status", h2_font_style)
+    ws.write(1, 2, "Fathers Name", h2_font_style)
+    ws.write(1, 3, "Fathers Income", h2_font_style)
+    ws.write(1, 4, "Mothers Name", h2_font_style)
+    ws.write(1, 5, "Mothers Income", h2_font_style)
+    ws.write(1, 6, "Gross Income", h2_font_style)
+    ws.write(1, 7, "Status", h2_font_style)
+    ws.write(1, 8, "Fathers Income Doc", h2_font_style)
+    ws.write(1, 9, "Mothers Income Doc", h2_font_style)
+    ws.write(1, 10, "Tehsildar Certificate", h2_font_style)
+    ws.write(1, 11, "Bank Passbook", h2_font_style)
 
     for idx, application in enumerate(mcn_applications):
         student = application.student
         ws.write(2 + idx, 0, student.bitsId, font_style)
         ws.write(2 + idx, 1, student.name, font_style)
+        ws.write(2 + idx, 2, student.parentName, font_style)
         x = application.FathersIncome
+        ws.write(2 + idx, 3, x, font_style)
+        
+        # TODO: Add mothers name in database
+        ws.write(2 + idx, 4, 'MotherName', font_style)
         y = application.MothersIncome
-        ws.write(2 + idx, 2, x, font_style)
-        ws.write(2 + idx, 3, y, font_style)
-        ws.write(2 + idx, 4, x + y, font_style)
-        status = "Approved" if approved else "Rejected"
-        ws.write(2 + idx, 5, status, font_style)
+        ws.write(2 + idx, 5, y, font_style)
+        ws.write(2 + idx, 6, x + y, font_style)
+        if application.approved:
+            status = 'Approved'
+        elif application.rejected:
+            status = 'Rejected'
+        else:
+            status = ''
+        ws.write(2 + idx, 7, status, font_style)
+        for docdx, doc in enumerate([application.FathersIncomeDoc, application.MothersIncomeDoc,
+                            application.TehsildarCertificate, application.BankPassbook]):
+            try:
+                url = xlwt.Formula('HYPERLINK("%s";"Link")' % request.build_absolute_uri(doc.url))
+            except ValueError:
+                # Raised when doc not uploaded
+                url = 'None'
+            ws.write(2 + idx, 8 + docdx, url, font_style)
     
     wb.save(response)
     return response

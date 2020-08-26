@@ -15,8 +15,9 @@ class MCNApplicationPeriodAdmin(admin.ModelAdmin):
 
     def actions_html(self, obj):
         return format_html(
-            '<button class="button" type="button" onclick="window.location.href=\'/admin/export_mcn/{pk}\'">Approved</button>'
-            '<button class="button" type="button" onclick="window.location.href=\'/admin/export_mcn/{pk}/0\'">Rejected</button>', pk=obj.pk)
+            '<button class="button" type="button" onclick="window.location.href=\'/admin/export_mcn/{pk}/approved\'">Approved</button>'
+            '<button class="button" type="button" onclick="window.location.href=\'/admin/export_mcn/{pk}/rejected\'">Rejected</button>'
+            '<button class="button" type="button" onclick="window.location.href=\'/admin/export_mcn/{pk}/all\'">All</button>', pk=obj.pk)
     actions_html.allow_tags = True
     actions_html.short_description = "Export to Excel"
 
