@@ -15,6 +15,9 @@ def gate_security(request):
             if username in leave.student.bitsId:
                 student = leave.student
                 found_leave = True
+                if '1' in 'activate1':
+                    leave.activated = True
+                    leave.save()
                 context = {
                     'student': student,
                     'leave': leave,
@@ -24,6 +27,9 @@ def gate_security(request):
             if username in daypass.student.bitsId:
                 student = daypass.student
                 found_daypass = True
+                if '2' in 'activate2':
+                    daypass.activated = True
+                    daypass.save()
                 context = {
                     'student': student,
                     'daypass': daypass,
