@@ -69,6 +69,19 @@ nav .button-collapse i{
   background-color: #FFBE57;
 }
 
+.side-nav .collapsible-header {
+  padding: 0 32px;
+}
+
+.side-nav .collapsible-body {
+  background-color: #1C5960;
+}
+
+.side-nav a{
+  padding: 0 40px;
+  color: white;
+}
+
 .tabs.tabs-transparent {
   background-color: #074F57;
   color: white;
