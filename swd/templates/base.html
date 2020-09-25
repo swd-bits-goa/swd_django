@@ -44,10 +44,10 @@
                 <a href="/#" class="brand-logo"><img id="swd" src="{% static 'img/swd.png' %}"></a>
             <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
             <ul id="nav-mobile" class="right custom-mobile">
-                <li><a href="{% url 'csa' %}">CSA</a></li>
+                <!-- <li><a href="{% url 'csa' %}">CSA</a></li>
                 <li><a href="{% url 'sac' %}">SAC</a></li>
                 <li><a href="{% url 'swd' %}">Services</a></li>
-                <li><a href="{% url 'contact' %}">Contact Us</a></li>
+                <li><a href="{% url 'contact' %}">Contact Us</a></li> -->
                 <li><a href="{% url 'profile' %}" class="valign-wrapper hide-on-med-and-down"><img class="circle profileImg" src="/media/{{ student.profile_picture }}">&nbsp;{{ student.name|title }}</a></li>
                 <li><a href="{% url 'logout' %}" class="hide-on-med-and-down">Logout</a></li>
             </ul>
@@ -71,7 +71,7 @@
 
 
                 {%if student %}
-                <li class="tab"><a href="/dashboard" target="_self">Dashboard</a></li>
+                <li class="tab"><a href="/dashboard" target="_self">Home</a></li>
                     <ul class="collapsible" data-collapsible="expandable">
                         <li>
                             <div class="collapsible-header tab">My account</div>
@@ -81,7 +81,7 @@
                                 <div><a href="#" target="_self">Events</a></div>
                                 <div class="tab"><a href="/dues" target="_self">Dues</a></div>
                                 {% if not student.nophd %}<div class="tab"><a href="/certificates" target="_self">Certificates</a></div>{% endif %}
-                                 {% if not student.nophd %}<div class="tab"><a href="/daypass" target="_self">Daypass</a></div>{% endif %}
+                                 <!-- {% if not student.nophd %}<div class="tab"><a href="/daypass" target="_self">Daypass</a></div>{% endif %} -->
                                 <div><a href="/logout">Logout</a></div>
                             </div>
                         </li>

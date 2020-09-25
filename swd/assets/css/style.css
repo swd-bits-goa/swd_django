@@ -69,16 +69,33 @@ nav .button-collapse i{
   background-color: #FFBE57;
 }
 
+.side-nav li:checked + label {
+  background-color: #FFBE57;
+}
+
+.side-nav li:target {
+  background-color: #FFBE57;
+}
+
 .side-nav .collapsible-header {
   padding: 0 32px;
 }
 
-.side-nav .collapsible-body {
-  background-color: #1C5960;
+.side-nav .collapsible-header .active {
+  background-color: #FFBE57;
+}
+
+.side-nav .collapsible-body > div{
+  background-color: #063f46;
+  border-top: 2px solid #1C5960;
+}
+
+.side-nav .collapsible-body > div >hr{
+  background-color: #063f46;
 }
 
 .side-nav a{
-  padding: 0 40px;
+  padding: 0 60px;
   color: white;
 }
 
