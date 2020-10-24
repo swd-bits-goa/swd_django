@@ -34,29 +34,37 @@
                         </div>
                         {% endif %}
 
-                        <div class="input-field">
-                        <label for="FathersName">Father's Name</label>
-                        <input type="text" name="FathersName" id="FathersName" disabled value="{{ user.student.parentName }}"/>
+                        <div class="row s12">
+                            <div class="input-field">
+                            <label for="FathersName">Father's Name</label>
+                            <input type="text" name="FathersName" id="FathersName" disabled value="{{ user.student.parentName }}"/>
+                        </div>
+                        
+                        <div class="row s12 col">
+                            <label for="MothersName">Mother's Name</label>
+                            <input type="text" name="MothersName" id="MothersName" />
+                        </div>
+                        
 
                         <div class="row">
                         <div class="input-field col s6">
-                        <label for="FathersIncome">Father's Income in INR</label>
+                        <label for="FathersIncome">Father's gross total income in INR</label>
                         <input type="number" name="FathersIncome" id="FathersIncome" />
                         </div>
                         <div class="input-field col s6">
-                        <label for="MothersIncome">Mother's Income in INR</label>
+                        <label for="MothersIncome">Mother's gross total income in INR</label>
                         <input type="number" name="MothersIncome" id="MothersIncome" />
                         </div>
                         </div>
 
                         <div>
-                            <b class="red-text">Note:</b> Maximum upload size <b>10 MB</b> of type jpg, jpeg, png or pdf. If your file does not comply, compress it to the appropriate format and size.<br>
-                            <b class="red-text">Note:</b> Only <b>{{ itr_year }} ITR</b> Documents will be accepted as a proof for non-agricultural income sources.
+                            <b class="red-text">Note:</b> Maximum upload size <b>10 MB</b> of type pdf only will be accepted. If your file does not comply, compress it to the appropriate format and size.<br>
+                            <b class="red-text">Note: Only ITR for <b>Assessment Year {{ itr_year }}</b> will be accepted as a proof for non-agricultural income sources
                         </div>
 
                         <div class="file-field input-field">
                         <div class="btn">
-                            <span>Father's ITR {{ itr_year }}</span>
+                            <span>Upload Father's ITR {{ itr_year }}</span>
                             <input type="file" name="FathersIncomeDoc" id="FathersIncomeDoc">
                         </div>
                         <div class="file-path-wrapper">
@@ -66,7 +74,7 @@
 
                         <div class="file-field input-field">
                         <div class="btn">
-                            <span>Mother's ITR {{ itr_year }}</span>
+                            <span>Upload Mother's ITR {{ itr_year }}</span>
                             <input type="file" name="MothersIncomeDoc" id="MothersIncomeDoc">
                         </div>
                         <div class="file-path-wrapper">
@@ -80,7 +88,7 @@
 
                         <div class="file-field input-field">
                         <div class="btn">
-                            <span>Tehsildar's Certificate</span>
+                            <span>Upload Tehsildar's Certificate</span>
                             <input type="file" name="TehsildarCertificate" id="TehsildarCertificate">
                         </div>
                         <div class="file-path-wrapper">
@@ -90,7 +98,7 @@
 
                         <div class="file-field input-field">
                         <div class="btn">
-                            <span>Bank Passbook</span>
+                            <span>Upload Bank Passbook</span>
                             <input type="file" name="BankPassbook" id="BankPassbook">
                         </div>
                         <div class="file-path-wrapper">

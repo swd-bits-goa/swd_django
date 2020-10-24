@@ -110,7 +110,7 @@ def submit_mcn(request):
 
         MothersIncome = request.POST['MothersIncome']
         MothersIncome = 0 if MothersIncome is '' else int(MothersIncome)
-
+        MothersName = request.POST['MothersName']
         FathersIncomeDoc = request.FILES.get('FathersIncomeDoc', None)
         MothersIncomeDoc = request.FILES.get('MothersIncomeDoc', None)
         
@@ -118,6 +118,10 @@ def submit_mcn(request):
         BankPassbook = request.FILES.get('BankPassbook', None)
 
         tehsil = ((TehsildarCertificate) or (BankPassbook))
+
+        if MothersName == '' and MothersIncomeDoc is not None:
+            context['errors'].append("Please enter mother's name")
+            return render(request, "mcn_submit.html", context)
 
         if FathersIncome == 0 and MothersIncome == 0:
             context['errors'].append("Please enter income of earning parent.")
@@ -139,7 +143,7 @@ def submit_mcn(request):
                 context['errors'].append(doc_error_str)
                 return render(request, "mcn_submit.html", context)
 
-        supported_exts = ['pdf', 'jpg', 'jpeg', 'png']
+        supported_exts = ['pdf']
 
         for doc in [MothersIncomeDoc, FathersIncomeDoc, TehsildarCertificate, BankPassbook]:
             if doc is not None:
@@ -167,7 +171,8 @@ def submit_mcn(request):
             MothersIncome=MothersIncome,
             MothersIncomeDoc=MothersIncomeDoc,
             TehsildarCertificate=TehsildarCertificate,
-            BankPassbook=BankPassbook
+            BankPassbook=BankPassbook,
+            MothersName=MothersName
             )
 
         context['success'] = True
