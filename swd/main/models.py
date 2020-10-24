@@ -452,9 +452,11 @@ class Notice(models.Model):
     date = models.DateField(editable=False) 
     title = models.CharField(max_length=100)
     desc = models.TextField()
-    file = models.ForeignKey(FileAdd, on_delete=models.CASCADE, null=True)
+    file = models.ForeignKey(FileAdd, on_delete=models.CASCADE, null=True, blank=True)
+
     def __str__(self):
         return self.desc
+    
     def save(self, *args, **kwargs):
         self.date = timezone.now()
         super().save(*args, **kwargs)
