@@ -180,7 +180,7 @@ def submit_mcn(request):
     return render(request, "mcn_submit.html", context)
 
 
-@user_passes_test(lambda u: u.is_superuser)
+@user_passes_test(lambda u: u.is_staff)
 def export_mcn_approved(request, mcn_period_pk, filter_criteria):
     mcn_period = get_object_or_404(MCNApplicationPeriod, pk=mcn_period_pk)
 
