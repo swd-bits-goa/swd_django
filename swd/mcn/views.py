@@ -96,7 +96,7 @@ def submit_mcn(request):
     else:
         # Odd Semester
         yr1 -= 1
-    context['itr_year'] = str(yr1) + "-" + str(yr2 % 100)
+    context['itr_year'] = str(yr1+1) + "-" + str((yr2+1) % 100)
 
     mcn_period = MCNApplicationPeriod.objects.filter(Open__lte=currentDate, Close__gte=currentDate).last()
     context['mcn_period'] = mcn_period
