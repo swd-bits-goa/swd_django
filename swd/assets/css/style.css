@@ -62,41 +62,21 @@ nav .button-collapse i{
 }
 
 .side-nav li {
-  margin: 8px;
+  margin-bottom: 4px;
+  margin-left: 0px;
+  margin-right: 0px;
   background-color: #1C5960;
 }
 .side-nav li:hover {
   background-color: #FFBE57;
 }
 
-.side-nav li:checked + label {
+.side-nav li:focus {
   background-color: #FFBE57;
 }
 
 .side-nav li:target {
   background-color: #FFBE57;
-}
-
-.side-nav .collapsible-header {
-  padding: 0 32px;
-}
-
-.side-nav .collapsible-header .active {
-  background-color: #FFBE57;
-}
-
-.side-nav .collapsible-body > div{
-  background-color: #063f46;
-  border-top: 2px solid #1C5960;
-}
-
-.side-nav .collapsible-body > div >hr{
-  background-color: #063f46;
-}
-
-.side-nav a{
-  padding: 0 60px;
-  color: white;
 }
 
 .tabs.tabs-transparent {
@@ -164,6 +144,27 @@ nav .button-collapse i{
   right: 0px;
 }
 
+.tab-inner > a {
+  padding: 0 48px !important;
+  background-color: #05393f;
+}
+
+.tab-inner:hover > a {
+  background-color: #FFBE57;
+}
+
+.active1 {
+  background-color: #FFBE57 !important;
+  color: #074F57 !important;
+  font-weight: 700 !important;
+}
+
+.active2 {
+  background-color: #05393f !important;
+  border-right: solid 10px #FFBE57;
+  color: white  !important;
+}
+
 @media screen and (max-width: 800px) {
   .desktop{
     display: none;
@@ -183,5 +184,3 @@ nav .button-collapse i{
   }
 
 }
-
-
