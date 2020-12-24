@@ -271,6 +271,7 @@ class Leave(models.Model):
     disapproved = models.BooleanField(default=0, blank=True)
     inprocess = models.BooleanField(default=1, blank=True)
     comment = models.TextField(default='', blank=True)
+    activated = models.BooleanField(default='False', blank=True)
 
     def __str__(self):
         return self.student.bitsId + ' '+ self.student.name + ' ' + str(self.id)
@@ -293,6 +294,7 @@ class DayPass(models.Model):
     inprocess = models.BooleanField(default=1, blank=True)
     comment = models.TextField()
     document = models.FileField(upload_to=document_path, null=True, blank=True)
+    activated = models.BooleanField(default='False', blank=True)
 
     def __str__(self):
         return self.student.bitsId + ' (' + self.student.name + ')'

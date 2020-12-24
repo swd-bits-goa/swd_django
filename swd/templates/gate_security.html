@@ -46,7 +46,7 @@
                 </form>
                 <br>
         </div>
-
+            {% if student %}
         <div class="col s10">
                 <span class="card-title fresh-orange"><h4>Student Details</h4></span>
                 <br>
@@ -60,23 +60,30 @@
                       </div>
                       <div class="col sm-10" style="line-height:50px; position: relative;
                       transform: translate(20%, 20%);">
-                              {{ student.name }} Dummy name<br>
-                              {{ student.bitsId }} Dummy ID<br>
-                              Dummy Phone Number
+                              {{ student.name }}<br>
+                              {{ student.bitsId }}<br>
+                              {{ student.phone }}
                       </div>
                       <div class="col sm-10" style="line-height:50px; position: relative; transform: translate(20%, 20%); text-align:end">
-                              <br>Dummy active leaves <button type="submit" class="waves-effect waves-light btn desert-yellow" id="loginbtn"><span class="deep-green">Activate</span></button>
+                      {% if found_leave %}
+                              <br>Click to activate Leave<button name="activate1" value='1' type="submit" class="waves-effect waves-light btn desert-yellow" id="loginbtn"><span class="deep-green">Activate</span></button>
+                          {% endif %}
                               <br>
-                              Dummy active daypasses <button type="submit" class="waves-effect waves-light btn desert-yellow" id="loginbtn"><span class="deep-green">Activate</span></button>
+                      {% if found_daypass %}
+                              Click to activate DayPass<button name="activate2" value='2' type="submit" class="waves-effect waves-light btn desert-yellow" id="loginbtn"><span class="deep-green">Activate</span></button>
+                          {% endif %}
                       </div>
                       <div class="col s10" style="line-height:50px; position: relative; transform: translate(20%, 20%);">
                         <br><button type="submit" class="waves-effect waves-light btn desert-yellow" id="loginbtn"><span class="deep-green">In-Out</span></button>
+                          <a href="{% url 'gate_security' %}">Look for other student</a>
                       </div>
+            {% endif %}
                   </div>
               </div>
               
               <br>
       </div>
+        </form>
       </div>
     </div>
 
