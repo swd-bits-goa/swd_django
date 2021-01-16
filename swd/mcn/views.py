@@ -96,7 +96,7 @@ def submit_mcn(request):
     else:
         # Odd Semester
         yr1 -= 1
-    context['itr_year'] = str(yr1) + "-" + str(yr2 % 100)
+    context['itr_year'] = str(yr1+1) + "-" + str((yr2+1) % 100)
 
     mcn_period = MCNApplicationPeriod.objects.filter(Open__lte=currentDate, Close__gte=currentDate).last()
     context['mcn_period'] = mcn_period
@@ -110,7 +110,7 @@ def submit_mcn(request):
 
         MothersIncome = request.POST['MothersIncome']
         MothersIncome = 0 if MothersIncome is '' else int(MothersIncome)
-
+        MothersName = request.POST['MothersName']
         FathersIncomeDoc = request.FILES.get('FathersIncomeDoc', None)
         MothersIncomeDoc = request.FILES.get('MothersIncomeDoc', None)
         
@@ -118,6 +118,10 @@ def submit_mcn(request):
         BankPassbook = request.FILES.get('BankPassbook', None)
 
         tehsil = ((TehsildarCertificate) or (BankPassbook))
+
+        if MothersName == '' and MothersIncomeDoc is not None:
+            context['errors'].append("Please enter mother's name")
+            return render(request, "mcn_submit.html", context)
 
         if FathersIncome == 0 and MothersIncome == 0:
             context['errors'].append("Please enter income of earning parent.")
@@ -139,7 +143,7 @@ def submit_mcn(request):
                 context['errors'].append(doc_error_str)
                 return render(request, "mcn_submit.html", context)
 
-        supported_exts = ['pdf', 'jpg', 'jpeg', 'png']
+        supported_exts = ['pdf']
 
         for doc in [MothersIncomeDoc, FathersIncomeDoc, TehsildarCertificate, BankPassbook]:
             if doc is not None:
@@ -167,7 +171,8 @@ def submit_mcn(request):
             MothersIncome=MothersIncome,
             MothersIncomeDoc=MothersIncomeDoc,
             TehsildarCertificate=TehsildarCertificate,
-            BankPassbook=BankPassbook
+            BankPassbook=BankPassbook,
+            MothersName=MothersName
             )
 
         context['success'] = True
@@ -175,7 +180,7 @@ def submit_mcn(request):
     return render(request, "mcn_submit.html", context)
 
 
-@user_passes_test(lambda u: u.is_superuser)
+@user_passes_test(lambda u: u.is_staff)
 def export_mcn_approved(request, mcn_period_pk, filter_criteria):
     mcn_period = get_object_or_404(MCNApplicationPeriod, pk=mcn_period_pk)
 
