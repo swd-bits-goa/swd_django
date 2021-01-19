@@ -8,7 +8,7 @@
                 <span class="card-title">
                     Apply Merit-cum-Needs Application : {{ mcn_period.Name }}
                 </span>
-                {% if mcn_period %}
+                {% if mcn_period and user.student.bitsId|slice:"0:4" == "2020" %}
                     {% if already_submitted %}
                     <div class="green-text">
                         You have already submitted the application on {{ already_submitted.DateTimeSubmitted }}. Contact SWD if any issues.
