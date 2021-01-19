@@ -5,6 +5,7 @@
     <div class="section">
         <div class="card">
             <div class="card-content">
+                {% if user.student.bitsId|slice:"0:4" == "2020" %}
                 <span class="card-title">
                     Apply Merit-cum-Needs Application : {{ mcn_period.Name }}
                 </span>
