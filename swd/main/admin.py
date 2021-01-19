@@ -50,10 +50,13 @@ class BonafideAdmin(admin.ModelAdmin):
     list_display = (
         'id',
         'student',
+        'reason', 
         'reqDate',
         'printed',
+        'status',
         'bonafide_actions',
     )
+    list_filter = ('status',)
     def get_url(self, pk):
         url = '/bonafide/' + str(Bonafide.objects.get(pk=pk).id)
         return url

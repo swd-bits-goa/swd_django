@@ -679,9 +679,14 @@ def certificates(request):
         'bonafides': bonafides,
         'daypasss': daypasss,
     }
-    queryset=Bonafide.objects.filter(student=student);
+    queryset=Bonafide.objects.filter(student=student)
+    rejected = 0
+    for bonafide in queryset:
+        if bonafide.status=="Rejected":
+            rejected = 1
     bonafideContext = {
         'bonafides': queryset,
+        'rejected': rejected
     }
     sem_count=[0,0]
     for bonafide in queryset:
@@ -734,8 +739,9 @@ def printBonafide(request,id=None):
             "date"  :date.today(),
             "id"    :id
     }
-    instance.printed=True;
-    instance.save();
+    instance.printed=True
+    instance.status='Approved'
+    instance.save() 
     return render(request,"bonafidepage.html",context)
 
 def is_warden(user):
