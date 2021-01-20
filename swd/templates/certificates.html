@@ -14,7 +14,7 @@
                         <form method="POST">
                             {% csrf_token %}
                             <div class="col-md-12">
-                                {% for field in form %}
+                                {% for field in form %} 
                                 <div class="input-field col s12">
                                     {{ field }} {{ field.label_tag }}
                                 </div>
@@ -45,6 +45,9 @@
                                     <th class="center-align">Bonafide No.</th>
                                     <th class="center-align">Reason</th>
                                     <th class="center-align">Status</th>
+                                    {% if rejected == 1 %}
+                                    <th class="center-align">Comments</th>
+                                    {% endif %}
                                 </tr>
                             </thead>
                             <tbody>
@@ -52,13 +55,17 @@
                                 <tr>
                                     <td class="center-align">{{ bonafide.id }}</td>
                                     <td class="center-align reason-container">{% if bonafide.reason == 'Other' %} {{ bonafide.otherReason|default_if_none:"" }} {% else %} {{ bonafide.reason }} {% endif %}</td>
-                                    <td class="center-align badge-container">{% if bonafide.printed == 0 %}<span class="new badge red comm" data-badge-caption="Not Printed"></span>
-                                        {% else %}<span align="center" class="new badge green comm" data-badge-caption="Printed"></span> {% endif %}</td>
+                                    <td class="center-align badge-container">{% if bonafide.status == "Approved" %}<span class="new badge green comm" data-badge-caption="Printed"></span>
+                                        {% elif bonafide.status == "Pending" %}<span align="center" class="new badge blue comm" data-badge-caption="Pending"></span>
+                                        {% else %}<span align="center" class="new badge red comm" data-badge-caption="Rejected"></span> {% endif %}</td>
+                                    {% if rejected == 1 %}
+                                    <td class="center-align">{{ bonafide.rejectedReason }}</td>
+                                    {% endif %}
                                 </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
-                    </div>
+                    </div> 
                 </div>
             </div>
         </div>

@@ -40,9 +40,10 @@
     {% endfor %}
     {% for bonafide in bonafides|slice:":1" %}
     <div class="leave quick-1 back-green" >
-        {% if bonafide.printed == 1 %}
-        Your Bonafide certificate for <i>{{bonafide.reason}}</i> is printed. Please Collect from SWD Office {% else %}
-        Your Bonafide certificate for <i>{{bonafide.reason}}</i> is under process. {% endif %}
+        {% if bonafide.status == "Approved" %}
+        Your Bonafide certificate for <i>{{bonafide.reason}}</i> is printed. Please Collect from SWD Office {% elif bonafide.status == "Pending" %}
+        Your Bonafide certificate for <i>{{bonafide.reason}}</i> is under process. {% else %}
+        Your Bonafide certificate for <i>{{bonafide.reason}}</i> is rejected. {% endif %}
     </div>
     {% endfor %}
     {% for daypass in daypasss|slice:":1" %}
