@@ -12,4 +12,4 @@ for bonafide in bonafides:
     if(bonafide.printed==True):
         bonafide.status = 'Approved'
     bonafide.save()
-    print(bonafide.student, bonafide.printed, bonafide.status)
+    print(bonafide.student.bitsId, bonafide.printed, bonafide.status)
