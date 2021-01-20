@@ -9,6 +9,7 @@
                 <span class="card-title">
                     Apply Merit-cum-Needs Application : {{ mcn_period.Name }}
                 </span>
+                {% endif %}
                 {% if mcn_period and user.student.bitsId|slice:"0:4" == "2020" %}
                     {% if already_submitted %}
                     <div class="green-text">
