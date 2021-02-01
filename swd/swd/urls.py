@@ -19,7 +19,7 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.conf.urls.static import static
 from django.conf import settings
-from graphene_django.views import GraphQLView
+# from graphene_django.views import GraphQLView
 from schema.schema import schema
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
@@ -36,8 +36,8 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
 
 
-    url(r'^graphql', csrf_exempt(GraphQLView.as_view(graphiql=True, schema=schema))),
-    url(r'^gql', csrf_exempt(GraphQLView.as_view(batch=True, schema=schema))),
+    # url(r'^graphql', csrf_exempt(GraphQLView.as_view(graphiql=True, schema=schema))),
+    # url(r'^gql', csrf_exempt(GraphQLView.as_view(batch=True, schema=schema))),
 
 #    url(r'^login/', auth_views.login, {'template_name': 'admin/login.html'}),
 #    url(r'^logout/', auth_views.logout),
