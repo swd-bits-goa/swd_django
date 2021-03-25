@@ -28,7 +28,7 @@ psycopg2==2.8.4
 PyJWT==1.5.3
 python-dateutil==2.7.5
 pytz==2018.3
-PyYAML==5.1.2
+PyYAML==5.4
 requests==2.24.0
 Rx==1.6.1
 singledispatch==3.4.0.3
