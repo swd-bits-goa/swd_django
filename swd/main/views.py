@@ -13,9 +13,6 @@ from django.conf import settings
 from tools.utils import gen_random_datetime
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-import xlrd, xlwt
-
-from braces import views
 
 from django.contrib.auth.models import User
 
@@ -25,6 +22,8 @@ from datetime import datetime
 from django.db import IntegrityError
 from django.db.models import Q
 from .models import BRANCH, HOSTELS
+
+from .templatetags.main_extras import is_hostelsuperintendent, is_warden, is_security, get_base_template
 
 import swd.config as config
 
@@ -744,14 +743,6 @@ def printBonafide(request,id=None):
     instance.save() 
     return render(request,"bonafidepage.html",context)
 
-def is_warden(user):
-    return False if not Warden.objects.filter(user=user) else True
-
-def is_hostelsuperintendent(user):
-     return False if not HostelSuperintendent.objects.filter(user=user) else True
-
-def is_security(user):
-    return False if not Security.objects.filter(user=user) else True
 
 @login_required
 @user_passes_test(is_warden)
@@ -1555,7 +1546,7 @@ def search(request):
         if students.count() == 0:
             messages.error(request, "No student found with these details.")
             context['errors'] = ["No student found with these details."]
-    
+
     if request.user.is_authenticated and not is_warden(request.user) and not is_hostelsuperintendent(request.user):
         return render(request, "search_logged_in.html", dict(context, **postContext))
     else:
@@ -1597,6 +1588,7 @@ def contact(request):
     return render(request,"contact.html",context)
 
 def studentDetails(request,id=None):
+    option = get_base_template(request)
     if request.user.is_authenticated:
         if is_warden(request.user) or is_hostelsuperintendent(request.user) or request.user.is_staff:
             student = Student.objects.get(id=id)
@@ -1606,18 +1598,15 @@ def studentDetails(request,id=None):
                      'student'  :student,
                      'residence' :res,
                      'disco' : disco,
+                     'option': option
             }
             return render(request,"studentdetails.html",context)
         else:
             messages.error(request, "Unauthorised access. Contact Admin.")
-            return render(request, "home1.html", {})            
+            return redirect('search')            
     else:
         messages.error(request, "Login to gain access.")
         return redirect('login')
-#        context = {
-#        'queryset' : Notice.objects.all().order_by('-id')
-#        }
-#        return render(request, 'home1.html',context)
 
 
 @login_required

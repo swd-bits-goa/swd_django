@@ -1,5 +1,4 @@
-{% extends 'wardenbase.html' %}
-{% load staticfiles %}
+{% extends option %}
 
 {% block content %}
   <div class="container">
@@ -79,23 +78,4 @@
     </div>
   </div>
 
-  {%endblock%}
-
-  <style>
-
-  </style>
-
-  <!--  Scripts-->
-  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
-  <script src="{% static 'js/materialize.js' %}"></script>
-  <script src="{% static 'js/init.js' %}"></script>
-
-    <script>
-        $(document).ready(function () {
-            $('select').material_select();
-        });
-    </script>
-
-</body>
-
-</html>
+{%endblock%}
