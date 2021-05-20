@@ -1,39 +1,5 @@
 {% extends 'wardenbase.html' %}
 {% load staticfiles %}
-{% comment %}
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-  <meta name="viewport" content="width=1024">
-  <title>SWD BITS Goa</title>
-
-  <!-- CSS  -->
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-  <link href="{% static 'css/materialize.css' %}" type="text/css" rel="stylesheet" media="screen,projection" />
-  <link href="{% static 'css/style.css' %}" type="text/css" rel="stylesheet" media="screen,projection" />
-</head>
-
-<body>
-  <nav class="light-blue lighten-1" role="navigation">
-    <div class="nav-wrapper container"><a id="logo-container" href="/#" class="brand-logo">Student Welfare Division</a>
-      <ul class="right hide-on-med-and-down">
-        <li><a href="/notice">Notice</a></li>
-        <li><a href="/search">Search</a></li>
-        <li><a href="/login">Login</a></li>
-      </ul>
-
-      <ul id="nav-mobile" class="side-nav">
-        <li><a href="/notice">Notice</a></li>
-        <li><a href="/search">Search</a></li>
-        <li><a href="/login">Login</a></li>
-      </ul>
-      <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
-    </div>
-  </nav>
-  
-{% endcomment %}
 
 {% block content %}
   <div class="container">
@@ -74,7 +40,7 @@
                 </tr>
                 <tr>
                     <td>Phone</td>
-                    <td>{{ student.phone }}</td>
+                    <td>{{ student.phone|floatformat:"0" }}</td>
                 </tr>                
                 <tr>
                     <td>Address</td>
@@ -95,7 +61,7 @@
                 </tr>
                 <tr>
                     <td>Parent's phone</td>
-                    <td>{{ student.parentPhone }}</td>
+                    <td>{{ student.parentPhone|floatformat:"0" }}</td>
                 </tr>
                 <tr>
                     <td>Parent's email</td>
