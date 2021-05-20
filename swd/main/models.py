@@ -170,6 +170,19 @@ class Student(models.Model):
     def __str__(self):
         return self.bitsId + ' (' + self.name + ')'
 
+    def render_parentPhone(self):
+        if self.parentPhone:
+            s = self.parentPhone
+            for wild in ['/', ',']:
+                s = (s).split(wild)
+                if len(s) > 1:
+                    s = ' / '.join(s)
+                else:
+                    s = s[0]
+            return s
+        else:
+            return ''
+
     def change_cgpa(self, new_cg):
         if ((new_cg > 0.0) and (new_cg <= 10.0)):
             self.cgpa = new_cg
