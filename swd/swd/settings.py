@@ -16,7 +16,7 @@ from django.core.management.utils import get_random_secret_key
 from .config import PRODUCTION, DB_NAME, DB_PASSWORD, DB_USER
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 try:
     from tools.dev_info import SECRET_KEY

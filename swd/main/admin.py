@@ -94,6 +94,14 @@ class StudentAdmin(ExportActionModelAdmin):
     search_fields = ['name', 'bitsId', 'user__username']
     actions = [export_xls, add_new_students, ]
 
+def delete_students(modeladmin, request, queryset):
+    return redirect('delete_students')
+delete_students.description = u"Delete Students from Excel"
+
+class StudentAdmin(ExportActionModelAdmin):
+    search_fields = ['name', 'bitsId', 'user__username']
+    actions = [export_xls, delete_students, ]
+
 
 
 @admin.register(TeeBuy)
