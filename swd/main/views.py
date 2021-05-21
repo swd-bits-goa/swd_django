@@ -3496,8 +3496,6 @@ def delete_students(request):
                             username = 'h' + studentID[0:4] + studentID[8:11]
                         else:
                             username = 'f' + studentID[0:4] + studentID[8:11]
-                    print(username)
-                    password = User.objects.make_random_password()
                     
                     try:
                         user = User.objects.get(username=username)
@@ -3507,10 +3505,9 @@ def delete_students(request):
                         # student.delete()
                     
                     except User.DoesNotExist:
-                        # message_str += studentID + " failed"
-                        pass
+                        message_str += studentID + " failed\n"
                             
-            message_str = str(count) + " students deleted."
+            message_str += str(count) + " students deleted."
         else:
             message_str = "No File Uploaded."
 
