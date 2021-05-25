@@ -3436,3 +3436,83 @@ def upload_profile_pictures(request):
                 request, "No folder selected. Please select at least one.")
        
     return render(request, "upload_profile_pictures.html", {})
+
+@user_passes_test(lambda u: u.is_superuser)
+def delete_students(request):
+    """
+        Takes Excel Sheet as FILE input.
+        Deletes Students from the database.
+        The date fields expect a dd-Mon-yy value
+        For example: 07-Jan-97
+    """
+    message_str = ''
+    message_tag = messages.INFO
+    if request.POST:
+        if request.FILES:
+            # Read Excel File into a temp file
+            xl_file = request.FILES['xl_file']
+            extension = xl_file.name.rsplit('.', 1)[1]
+            if ('xls' != extension):
+                if ('xlsx' != extension):
+                    messages.error(request, "Please upload .xls or .xlsx file only")
+                    messages.add_message(request,
+                                        message_tag, 
+                                        message_str)
+                    return render(request, "del_students.html", {})
+
+            fd, tmp = tempfile.mkstemp()
+            with os.fdopen(fd, 'wb') as out:
+                out.write(xl_file.read())
+            workbook = xlrd.open_workbook(tmp)
+
+            count = 0
+            idx = 1
+            header = {}
+            for sheet in workbook.sheets():
+                for row in sheet.get_rows():
+                    if idx == 1:
+                        col_no = 0
+                        for cell in row:
+                            # Store the column names in dictionary
+                            header[str(cell.value)] = col_no
+                            col_no = col_no + 1
+                        idx = 0
+                        continue
+                    
+                    # create User model
+                    studentID = row[header['studentID']].value
+                    if len(studentID)==13:
+                        if studentID[4] == 'P':
+                            username = 'p' + studentID[0:4] + studentID[8:12]
+                        elif studentID[4] == 'H':
+                            username = 'h' + studentID[0:4] + studentID[8:12]
+                        else:
+                            username = 'f' + studentID[0:4] + studentID[8:12]
+
+                    else:
+                        if studentID[4] == 'P':
+                            username = 'p' + studentID[0:4] + studentID[8:11]
+                        elif studentID[4] == 'H':
+                            username = 'h' + studentID[0:4] + studentID[8:11]
+                        else:
+                            username = 'f' + studentID[0:4] + studentID[8:11]
+                    
+                    try:
+                        user = User.objects.get(username=username)
+                        user.delete()
+                        count = count + 1
+                        # student = Student.objects.get(bitsId=studentID)
+                        # student.delete()
+                    
+                    except User.DoesNotExist:
+                        message_str += studentID + " failed\n"
+                            
+            message_str += str(count) + " students deleted."
+        else:
+            message_str = "No File Uploaded."
+
+    if message_str is not '':
+        messages.add_message(request,
+                            message_tag, 
+                            message_str)
+    return render(request, "del_students.html", {'header': "Delete existing students from Database"})
