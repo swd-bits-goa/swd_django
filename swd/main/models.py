@@ -165,7 +165,7 @@ class Student(models.Model):
     bank_account_no = models.CharField(max_length=30, blank=True, null=True)
 
     def nophd(self):
-        return re.match(r"^20\d{2}PHX[PF]\d{3,4}G$", self.bitsId, flags=re.IGNORECASE)
+        return re.match(r"^20\d{2}(PHX[PF]|PH\d{2})\d{3,4}G$", self.bitsId, flags=re.IGNORECASE)
 
     def __str__(self):
         return self.bitsId + ' (' + self.name + ')'
