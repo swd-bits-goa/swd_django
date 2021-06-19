@@ -13,9 +13,6 @@ from django.conf import settings
 from tools.utils import gen_random_datetime
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-import xlrd, xlwt
-
-from braces import views
 
 from django.contrib.auth.models import User
 
@@ -25,6 +22,8 @@ from datetime import datetime
 from django.db import IntegrityError
 from django.db.models import Q
 from .models import BRANCH, HOSTELS
+
+from .templatetags.main_extras import is_hostelsuperintendent, is_warden, is_security, get_base_template
 
 import swd.config as config
 
@@ -744,14 +743,6 @@ def printBonafide(request,id=None):
     instance.save() 
     return render(request,"bonafidepage.html",context)
 
-def is_warden(user):
-    return False if not Warden.objects.filter(user=user) else True
-
-def is_hostelsuperintendent(user):
-     return False if not HostelSuperintendent.objects.filter(user=user) else True
-
-def is_security(user):
-    return False if not Security.objects.filter(user=user) else True
 
 @login_required
 @user_passes_test(is_warden)
@@ -1555,7 +1546,7 @@ def search(request):
         if students.count() == 0:
             messages.error(request, "No student found with these details.")
             context['errors'] = ["No student found with these details."]
-    
+
     if request.user.is_authenticated and not is_warden(request.user) and not is_hostelsuperintendent(request.user):
         return render(request, "search_logged_in.html", dict(context, **postContext))
     else:
@@ -1597,6 +1588,7 @@ def contact(request):
     return render(request,"contact.html",context)
 
 def studentDetails(request,id=None):
+    option = get_base_template(request)
     if request.user.is_authenticated:
         if is_warden(request.user) or is_hostelsuperintendent(request.user) or request.user.is_staff:
             student = Student.objects.get(id=id)
@@ -1606,18 +1598,15 @@ def studentDetails(request,id=None):
                      'student'  :student,
                      'residence' :res,
                      'disco' : disco,
+                     'option': option
             }
             return render(request,"studentdetails.html",context)
         else:
             messages.error(request, "Unauthorised access. Contact Admin.")
-            return render(request, "home1.html", {})            
+            return redirect('search')            
     else:
         messages.error(request, "Login to gain access.")
         return redirect('login')
-#        context = {
-#        'queryset' : Notice.objects.all().order_by('-id')
-#        }
-#        return render(request, 'home1.html',context)
 
 
 @login_required
@@ -3436,3 +3425,83 @@ def upload_profile_pictures(request):
                 request, "No folder selected. Please select at least one.")
        
     return render(request, "upload_profile_pictures.html", {})
+
+@user_passes_test(lambda u: u.is_superuser)
+def delete_students(request):
+    """
+        Takes Excel Sheet as FILE input.
+        Deletes Students from the database.
+        The date fields expect a dd-Mon-yy value
+        For example: 07-Jan-97
+    """
+    message_str = ''
+    message_tag = messages.INFO
+    if request.POST:
+        if request.FILES:
+            # Read Excel File into a temp file
+            xl_file = request.FILES['xl_file']
+            extension = xl_file.name.rsplit('.', 1)[1]
+            if ('xls' != extension):
+                if ('xlsx' != extension):
+                    messages.error(request, "Please upload .xls or .xlsx file only")
+                    messages.add_message(request,
+                                        message_tag, 
+                                        message_str)
+                    return render(request, "del_students.html", {})
+
+            fd, tmp = tempfile.mkstemp()
+            with os.fdopen(fd, 'wb') as out:
+                out.write(xl_file.read())
+            workbook = xlrd.open_workbook(tmp)
+
+            count = 0
+            idx = 1
+            header = {}
+            for sheet in workbook.sheets():
+                for row in sheet.get_rows():
+                    if idx == 1:
+                        col_no = 0
+                        for cell in row:
+                            # Store the column names in dictionary
+                            header[str(cell.value)] = col_no
+                            col_no = col_no + 1
+                        idx = 0
+                        continue
+                    
+                    # create User model
+                    studentID = row[header['studentID']].value
+                    if len(studentID)==13:
+                        if studentID[4] == 'P':
+                            username = 'p' + studentID[0:4] + studentID[8:12]
+                        elif studentID[4] == 'H':
+                            username = 'h' + studentID[0:4] + studentID[8:12]
+                        else:
+                            username = 'f' + studentID[0:4] + studentID[8:12]
+
+                    else:
+                        if studentID[4] == 'P':
+                            username = 'p' + studentID[0:4] + studentID[8:11]
+                        elif studentID[4] == 'H':
+                            username = 'h' + studentID[0:4] + studentID[8:11]
+                        else:
+                            username = 'f' + studentID[0:4] + studentID[8:11]
+                    
+                    try:
+                        user = User.objects.get(username=username)
+                        user.delete()
+                        count = count + 1
+                        # student = Student.objects.get(bitsId=studentID)
+                        # student.delete()
+                    
+                    except User.DoesNotExist:
+                        message_str += studentID + " failed\n"
+                            
+            message_str += str(count) + " students deleted."
+        else:
+            message_str = "No File Uploaded."
+
+    if message_str is not '':
+        messages.add_message(request,
+                            message_tag, 
+                            message_str)
+    return render(request, "del_students.html", {'header': "Delete existing students from Database"})
