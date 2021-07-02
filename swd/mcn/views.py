@@ -89,7 +89,7 @@ def submit_mcn(request):
     currentDate = datetime.now()
     yr1 = currentDate.year
     yr2 = yr1
-    if currentDate.month < 6:
+    if currentDate.month < 8:
         # Even Semester
         yr2 -= 1
         yr1 -= 2
