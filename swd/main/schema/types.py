@@ -3,6 +3,7 @@ from graphene_django.types import DjangoObjectType
 from django.contrib.auth.models import User
 from datetime import date, datetime
 from main.models import *
+from gate_security.models import *
 
 class UserType(DjangoObjectType):
     class Meta:

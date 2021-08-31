@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.shortcuts import redirect
 from main.models import *
+from gate_security.models import *
 from django.utils.html import format_html
 import urllib
 from django.http import HttpResponseRedirect, HttpResponse

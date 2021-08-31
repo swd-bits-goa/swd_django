@@ -11,5 +11,6 @@ urlpatterns = [
     
 
 url(r'^gate_security/', views.gate_security, name='gate_security'),
+url(r'^in_out/', views.in_out, name='in_out'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
