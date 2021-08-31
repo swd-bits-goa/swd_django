@@ -20,7 +20,7 @@ def gate_security(request):
         username = request.POST.get('username')
         place = request.POST.get('place')
         
-        inout = InOut.objects.filter(student__bitsId=username)
+        inout = InOut.objects.get(student__bitsId=username)
 
         if inout:
             if inout.inCampus==True:
@@ -36,8 +36,8 @@ def gate_security(request):
                 inout.outDateTime=null
                 inout.save()
 
-            leave = Leave.objects.filter(approved=True, leave__student__bitsId = username)
-            daypass = DayPass.objects.filter(approved=True, daypassses__student__bitsId = username)
+            leave = Leave.objects.get(approved=True, leave__student__bitsId = username)
+            daypass = DayPass.objects.get(approved=True, daypassses__student__bitsId = username)
 
             if leave:
                 student = leave.student

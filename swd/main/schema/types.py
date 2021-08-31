@@ -3,7 +3,6 @@ from graphene_django.types import DjangoObjectType
 from django.contrib.auth.models import User
 from datetime import date, datetime
 from main.models import *
-from gate_security.models import *
 
 class UserType(DjangoObjectType):
     class Meta:
@@ -70,9 +69,9 @@ class LateComerType(DjangoObjectType):
     class Meta:
         model = LateComer
 
-class InOutType(DjangoObjectType):
-    class Meta:
-        model = InOut
+# class InOutType(DjangoObjectType):
+#     class Meta:
+#         model = InOut
 
 class DiscoType(DjangoObjectType):
     class Meta:
