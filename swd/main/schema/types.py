@@ -69,10 +69,6 @@ class LateComerType(DjangoObjectType):
     class Meta:
         model = LateComer
 
-# class InOutType(DjangoObjectType):
-#     class Meta:
-#         model = InOut
-
 class DiscoType(DjangoObjectType):
     class Meta:
         model = Disco

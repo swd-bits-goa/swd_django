@@ -1,12 +1,13 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import *
+from main.models import Leave,DayPass
 from django.views.decorators.csrf import csrf_protect
 from django.conf import settings
 from django.contrib.auth.models import User
 from main.templatetags.main_extras import is_hostelsuperintendent, is_warden, is_security, get_base_template
 import swd.config as config
-import datetime
+from datetime import date, datetime, timedelta
 
 
 # Create your views here.
@@ -38,13 +39,16 @@ def gate_security(request):
 
             leave = Leave.objects.get(approved=True, leave__student__bitsId = username)
             daypass = DayPass.objects.get(approved=True, daypassses__student__bitsId = username)
+            leavetime = datetime.strptime(leave.get('dateTimeStart'), '%d %B, %Y').date()
 
-            if leave:
+            if leave and leavetime > date.today():
                 student = leave.student
                 found_leave = True
                 if '1' in 'activate1':
                     inout.onLeave = True
                     inout.save()
+                    leave.inprocess = True
+                    leave.save()
                 context = {
                     'student': student,
                     'leave': leave,
@@ -63,17 +67,38 @@ def gate_security(request):
                     'found_leave': found_leave
                 }
 
+        else:
+            #TO DO: error for invalid BITS ID using Django message framework
+            pass
+
     return render(request, "gate_security.html", {'header': "Enter students coming in or going out of campus"},context)
 
 # @user_passes_test(lambda u: u.is_superuser)
 def in_out(request):
 
-    inout = InOut.Objects.filter(inCampus = False)
+    inout = InOut.objects.filter(inCampus = False)
     context = {
-        'student': inout.student,
-        'outtime': inout.outDateTime,
-        'place': inout.place
+        'inout': inout,
     }
 
     return render(request, "all_in_out.html", {'header': "Check who all students are outside campus"},context)
+
+@user_passes_test(is_security)
+def dash_security_leaves(request):
+    t = time(0,0)
+    t1 = time(23,59)
+    d = date.today()
+    approved_leaves = Leave.objects.filter(approved__exact=True, dateTimeStart__gte=datetime.combine(d,t), dateTimeStart__lte=datetime.combine(d,t1))
+    context = {'leaves' : approved_leaves}
+    return render(request, "dash_security.html", context)
+
+
+@user_passes_test(is_security)
+def dash_security_daypass(request):
+    t = time(0,0)
+    t1 = time(23,59)
+    d = date.today()
+    approved_daypass = DayPass.objects.filter(approved__exact=True, dateTime__date__exact=datetime.today().date())
+    context = {'daypasses' : approved_daypass}
+    return render(request, "daypasses_security.html", context)
 
