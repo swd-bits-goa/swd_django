@@ -25,8 +25,8 @@
                                     <tr class="clickable" data-id="{{ out.id }}">
                                         <td>{{ out.student.name }}</td>
                                         <td>{{ out.student.bitsId }}</td>
-                                        <td>{{ out.dateTime|date:"d/M/y" }}</td>
-                                        <td>{{ out.dateTime|time}}</td>   
+                                        <td>{{ out.outDateTime|date:"d/M/y" }}</td>
+                                        <td>{{ out.outDateTime|time}}</td>   
                                         <td>{{ out.place}}</td>    
                                     </tr>
                                     {% endfor %}
