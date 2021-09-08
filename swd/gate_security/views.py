@@ -7,7 +7,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from main.templatetags.main_extras import is_hostelsuperintendent, is_warden, is_security, get_base_template
 import swd.config as config
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, time
 
 
 # Create your views here.
@@ -27,19 +27,25 @@ def gate_security(request):
             if inout.inCampus==True:
                 inout.place=place
                 inout.inCampus=False
-                inout.outDateTime = datetime.datetime.now()
-                inout.inDateTime=null
+                inout.outDateTime = datetime.now()
                 inout.save()
             else:
                 inout.place=place
                 inout.inCampus=True
-                inout.inDateTime = datetime.datetime.now()
-                inout.outDateTime=null
+                inout.inDateTime = datetime.now()
                 inout.save()
 
-            leave = Leave.objects.get(approved=True, leave__student__bitsId = username)
-            daypass = DayPass.objects.get(approved=True, daypassses__student__bitsId = username)
-            leavetime = datetime.strptime(leave.get('dateTimeStart'), '%d %B, %Y').date()
+            try:
+                daypass = DayPass.objects.get(approved=True, student__bitsId = username)
+            except:
+                daypass = None
+
+            try:
+                leave = Leave.objects.get(approved=True, student__bitsId = username)
+                leavetime = datetime.strptime(leave.get('dateTimeStart'), '%d %B, %Y').date()
+            except:
+                leave = None
+            
 
             if leave and leavetime > date.today():
                 student = leave.student

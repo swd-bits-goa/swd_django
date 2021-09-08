@@ -9,7 +9,7 @@ class InOut(models.Model):
     student = models.ForeignKey('main.Student', on_delete = models.CASCADE)
     place = models.CharField(max_length=20)
     outDateTime = models.DateTimeField(null=True)
-    inDateTime = models.DateTimeField(null=True)
+    inDateTime = models.DateTimeField(null=True, blank=True)
     inCampus = models.BooleanField(null=False, default=True)
     onLeave = models.BooleanField(null=False, default=False)
     onDaypass = models.BooleanField(null=False, default=False)
