@@ -1,86 +1,101 @@
-{% extends 'security_dash_base.html' %}
+{% extends 'security_dash_base.html' %} 
 
 {% block content %}
 
-<body>
-    
-    <div class="container">
-        <div class="row valign-wrapper" id="bodyWrap">
-          
-          <div class="col s10">
-                  <span class="card-title fresh-orange"><h4>Student</h4></span>
-                  <br>
-                <form id="sign_in" method="POST">
-                   {% csrf_token %}
-                  <div class="input-field" id="username" >
-                      <input  type="text" class="validate" name="username" autocomplete='username' autocorrect="off" autocapitalize="none">
-                      <label for="username">BITS ID</label>
-                  </div>
+<div class="container">
+	<div class="row valign-wrapper left" id="bodyWrap">
+		<div class="col s6">
+			<span class="card-title fresh-orange"><h4>Student</h4></span>
+			<br />
 
-                  <div class="input-field" id="username" >
-                    <input  type="text" class="validate" name="place" autocorrect="off" autocapitalize="none">
-                    <label for="Place">Place</label>
-                </div>
+			<form id="sign_in" method="POST">
+				{% csrf_token %}
+				<div class="input-field" id="username">
+					<input
+						type="text"
+						class="validate"
+						name="username"
+						autocomplete="username"
+						autocorrect="off"
+						autocapitalize="none"
+					/>
+					<label for="username">BITS ID</label>
+				</div>
 
-                  <button type="submit" class="waves-effect waves-light btn desert-yellow" id="loginbtn"><span class="deep-green">Submit</span></button>
+				<button
+					type="submit"
+					class="waves-effect waves-light btn desert-yellow"
+					id="loginbtn"
+				>
+					<span class="deep-green">Submit</span>
+				</button>
+			</form>
+			<br />
+		</div>
 
-                </form>
-                <br>
-        </div>
-            {% if student %}
+		{% if student %}
+		<div class="row valign-wrapper" id="bodyWrap">
 
-        <div class="col s10">
-                <span class="card-title fresh-orange"><h4>Student Details</h4></span>
-                <br>
+			<div class="container-fluid col s6">
+				<div class="row" style="position: relative">
+					<div class="col sm-2">
+						<a href="/profile" class="valign-wrapper">
+							<img
+								style="max-width: 180px"
+								class="circle profileImg"
+								src="/media/2017A4PS0590_bsKDJSY.jpg"
+							/>
+						</a>
+					</div>
 
-                <div class="container-fluid" style="margin-top: 10px;">
-                  <div class="row" style="position: relative;">
-                      <div class="col sm-2">
-                              <a href="/profile" class="valign-wrapper">
-                                  <img style="max-width:180px" class="circle profileImg" src="/media/2017A4PS0590_bsKDJSY.jpg">
-                              </a>
-                      </div>
-                      <div class="col sm-10" style="line-height:50px; position: relative;
-                      transform: translate(20%, 20%);">
-                              {{ student.name }}<br>
-                              {{ student.bitsId }}<br>
-                              {{ student.phone }}
-                      </div>
-                      <div class="col sm-10" style="line-height:50px; position: relative; transform: translate(20%, 20%); text-align:end">
+					<div class="col sm-10">
+						{{ student.name }}<br />
+						{{ student.bitsId }}<br />
+						{{ student.phone }}
+					</div>
 
-                      {% if found_leave %}
-                              <br>Click to activate Leave<button name="activate1" value='1' type="submit" class="waves-effect waves-light btn desert-yellow" id="loginbtn"><span class="deep-green">Activate</span></button>
-                          {% endif %}
-                              <br>
-                      {% if found_daypass %}
-                              Click to activate DayPass<button name="activate2" value='2' type="submit" class="waves-effect waves-light btn desert-yellow" id="loginbtn"><span class="deep-green">Activate</span></button>
-                          {% endif %}
-                      </div>
-                      <div class="col s10" style="line-height:50px; position: relative; transform: translate(20%, 20%);">
-                        <br><button type="submit" class="waves-effect waves-light btn desert-yellow" id="loginbtn"><span class="deep-green">In-Out</span></button>
-                          <a href="{% url 'gate_security' %}">Look for other student</a>
-                      </div>
-            {% endif %}
-                  </div>
-              </div>
-              
-              <br>
-      </div>
-        </form>
-      </div>
-    </div>
+					<div class="col sm-10">
+						{% if found_leave %}
+						<br />Click to activate Leave<button
+							name="activate1"
+							value="1"
+							type="submit"
+							class="waves-effect waves-light btn desert-yellow"
+							id="loginbtn"
+						>
+							<span class="deep-green">Activate</span>
+						</button>
+						{% endif %}
+						<br />
+						{% if found_daypass %} Click to activate DayPass<br /><button
+							name="activate2"
+							value="2"
+							type="submit"
+							class="waves-effect waves-light btn desert-yellow"
+							id="loginbtn"
+						>
+							<span class="deep-green">Activate</span>
+						</button>
+						{% endif %}
+					</div>
 
+					<div class="col s10">
+						<a href="{% url 'gate_security' %}">Look for other student</a>
+					</div>
+				</div>
+			</div>
+		</div>
+		{% endif %}
+	</div>
+</div>
 
-
-
-    <style>
-        #bodyWrap {
-            height:70vh;
-        }
-        .clickable {
-            cursor: pointer;
-        }
-        </style>
-</body>
+<style>
+	#bodyWrap {
+		height: 70vh;
+	}
+	.clickable {
+		cursor: pointer;
+	}
+</style>
 
 {% endblock %}

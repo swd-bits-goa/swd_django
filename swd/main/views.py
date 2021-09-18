@@ -54,7 +54,7 @@ def index(request):
         if HostelSuperintendent.objects.filter(user=request.user):
             return redirect('/hostelsuperintendent')
         if Security.objects.filter(user=request.user):
-            return redirect('/gate_security/security_leaves')
+            return redirect('dash_security_leaves')
         return redirect('dashboard')
     else:
         notice_list = Notice.objects.all().order_by('-id')
@@ -287,7 +287,7 @@ def loginform(request):
         if HostelSuperintendent.objects.filter(user=request.user):
             return redirect('/hostelsuperintendent')
         if Security.objects.filter(user=request.user):
-            return redirect('/gate_security/security_leaves')
+            return redirect('dash_security_leaves')
         return redirect('dashboard')
 
     if request.POST:
@@ -303,7 +303,7 @@ def loginform(request):
             if HostelSuperintendent.objects.filter(user=request.user):
                 return redirect('/hostelsuperintendent')
             if Security.objects.filter(user=request.user):
-                return redirect('/gate_security/security_leaves')
+                return redirect('dash_security_leaves')
             return redirect('dashboard')
         else:
             messages.add_message(request, messages.INFO,  "Incorrect username or password", extra_tags='red')
@@ -1564,7 +1564,10 @@ def antiragging(request):
     return render(request,"antiragging.html",{})
 
 def swd(request):
-    return render(request,"swd.html",{})
+    context = {
+        'hostels' : len(HOSTELS)
+    }
+    return render(request,"swd.html",context)
 
 def csa(request):
     y=1-(datetime.now().month-1)//6

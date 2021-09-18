@@ -18,10 +18,9 @@ def gate_security(request):
     found_leave = False
     found_daypass = False
     if request.POST:
-        username = request.POST.get('username')
-        place = request.POST.get('place')
-        
+        username = request.POST.get('username')        
         inout = InOut.objects.get(student__bitsId=username)
+        place='chicalim'
 
         if inout:
             if inout.inCampus==True:
@@ -72,12 +71,13 @@ def gate_security(request):
                     'found_daypass': found_daypass,
                     'found_leave': found_leave
                 }
+            return render(request, "gate_security.html", context)
 
         else:
             #TO DO: error for invalid BITS ID using Django message framework
             pass
 
-    return render(request, "gate_security.html", {'header': "Enter students coming in or going out of campus"},context)
+    return render(request, "gate_security.html", context)
 
 # @user_passes_test(lambda u: u.is_superuser)
 def in_out(request):
@@ -87,7 +87,7 @@ def in_out(request):
         'inout': inout,
     }
 
-    return render(request, "all_in_out.html", {'header': "Check who all students are outside campus"},context)
+    return render(request, "all_in_out.html",context)
 
 @user_passes_test(is_security)
 def dash_security_leaves(request):
