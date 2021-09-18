@@ -41,7 +41,7 @@ def gate_security(request):
                 daypass = None
 
             try:
-                leave = Leave.objects.get(approved=True, student__bitsId = username)
+                leave = Leave.objects.get(approved=True, student__bitsId = username)[-1]
                 leavetime = datetime.strptime(leave.get('dateTimeStart'), '%d %B, %Y').date()
             except:
                 leave = None

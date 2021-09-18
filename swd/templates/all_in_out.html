@@ -21,7 +21,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {% for out in in_out %}
+                                    {% for out in inout %}
                                     <tr class="clickable" data-id="{{ out.id }}">
                                         <td>{{ out.student.name }}</td>
                                         <td>{{ out.student.bitsId }}</td>
@@ -40,7 +40,4 @@
         </div>
     </div>
 
-</body>
-
-</html>
 {% endblock %}
