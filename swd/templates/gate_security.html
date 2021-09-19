@@ -30,9 +30,15 @@
 				</button>
 			</form>
 			<br />
+			{% if errors %}
+				{% for error in errors %}
+				<span>{{ error }}</span>
+				{% endfor %}
+			{% endif %}
 		</div>
+		
 
-		{% if student and not success %}
+		{% if student and not success and not errors %}
 		<div class="col s7" style="margin: auto">
 			<div class="container-fluid">
 				<div class="row">
@@ -76,10 +82,10 @@
 						<div class="col s10 push-s2">
 							{% if not inout.inCampus %}
 							<div class="center-align">
-								<span>Welcome back to campus!</span>
+								<span>Welcome to campus!</span>
 							</div>
 							{% endif %}
-							{% if leave and inout.inCampus %}
+							{% if leave and inout.inCampus or leave and not inout %}
 							<div>
 								<input type="checkbox" id="leave_check" name="leave_check" class="filled-in" />
 								<label for="leave_check">Activate Leave</label>
@@ -89,7 +95,7 @@
 							</div>
 							{% endif %}
 							<br />
-							{% if daypass and inout.inCampus %}
+							{% if daypass and inout.inCampus or daypass and not inout %}
 							<div>
 								<input type="checkbox" id="daypass_check" name="daypass_check" class="filled-in" />
 								<label for="daypass_check">Activate DayPass</label>

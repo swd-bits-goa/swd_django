@@ -15,11 +15,22 @@ from datetime import date, datetime, timedelta, time
 def gate_security(request):
 
     context = {}
+    errors = []
     if request.method == 'POST':
         if request.POST.get("form_type") == 'formOne':
             username = request.POST.get('username')
-            student = Student.objects.get(bitsId=username)
-            inout = InOut.objects.get(student__bitsId=username)
+            try:
+                student = Student.objects.get(bitsId=username)
+                errors = []
+            except:
+                student = None
+                errors.append("Please enter correct BITSID")
+
+            try:
+                inout = InOut.objects.get(student__bitsId=username)
+            except:
+                inout = None
+
             try:
                 t = time(0,0)
                 t1 = time(23,59)
@@ -41,6 +52,7 @@ def gate_security(request):
                 'leave': leave,
                 'daypass': daypass,
                 'inout': inout,
+                'errors': errors,
             }
             return render(request, "gate_security.html", context)
 
@@ -51,7 +63,10 @@ def gate_security(request):
             leave_check = request.POST.get('leave_check')
             daypass_check = request.POST.get('daypass_check')
 
-            inout = InOut.objects.get(student__bitsId=username)
+            try:
+                inout = InOut.objects.get(student__bitsId=username)
+            except:
+                inout = None
 
             t = time(0,0)
             t1 = time(23,59)
