@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import *
-from main.models import Leave,DayPass
+from main.models import Leave, DayPass, Student
 from django.views.decorators.csrf import csrf_protect
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -13,69 +13,90 @@ from datetime import date, datetime, timedelta, time
 # Create your views here.
 # @user_passes_test(lambda u: u.is_superuser)
 def gate_security(request):
-    
+
     context = {}
-    found_leave = False
-    found_daypass = False
-    if request.POST:
-        username = request.POST.get('username')        
-        inout = InOut.objects.get(student__bitsId=username)
-        place='chicalim'
-
-        if inout:
-            if inout.inCampus==True:
-                inout.place=place
-                inout.inCampus=False
-                inout.outDateTime = datetime.now()
-                inout.save()
-            else:
-                inout.place=place
-                inout.inCampus=True
-                inout.inDateTime = datetime.now()
-                inout.save()
-
+    if request.method == 'POST':
+        if request.POST.get("form_type") == 'formOne':
+            username = request.POST.get('username')
             try:
-                daypass = DayPass.objects.get(approved=True, student__bitsId = username)
+                t = time(0,0)
+                t1 = time(23,59)
+                d = date.today()
+                daypass = DayPass.objects.get(approved__exact=True, dateTime__date__exact=datetime.today().date(), student__bitsId = username)
             except:
                 daypass = None
 
             try:
-                leave = Leave.objects.get(approved=True, student__bitsId = username)[-1]
-                leavetime = datetime.strptime(leave.get('dateTimeStart'), '%d %B, %Y').date()
+                t = time(0,0)
+                t1 = time(23,59)
+                d = date.today()
+                leave = Leave.objects.get(dateTimeStart__gte=datetime.combine(d,t), dateTimeStart__lte=datetime.combine(d,t1), student__bitsId = username)
             except:
                 leave = None
-            
 
-            if leave and leavetime > date.today():
+            if leave or daypass:
                 student = leave.student
-                found_leave = True
-                if '1' in 'activate1':
-                    inout.onLeave = True
-                    inout.save()
-                    leave.inprocess = True
-                    leave.save()
                 context = {
                     'student': student,
                     'leave': leave,
-                    'found_leave': found_leave
-                }
-            if daypass:
-                student = daypass.student
-                found_daypass = True
-                if '2' in 'activate2':
-                    inout.daypass = True
-                    inout.save()
-                context = {
-                    'student': student,
                     'daypass': daypass,
-                    'found_daypass': found_daypass,
-                    'found_leave': found_leave
                 }
             return render(request, "gate_security.html", context)
 
-        else:
-            #TO DO: error for invalid BITS ID using Django message framework
-            pass
+        elif request.POST.get("form_type") == 'formTwo':
+            username = request.POST.get('bitsid')
+            student = Student.objects.get(bitsId=username)
+            place = request.POST.get('place')
+            leave_check = request.POST.get('leave_check')
+            daypass_check = request.POST.get('daypass_check')
+
+            inout = InOut.objects.get(student__bitsId=username)
+
+            if inout:
+                if inout.inCampus==True:
+                    inout.place=place
+                    inout.inCampus=False
+                    inout.outDateTime = datetime.now()
+                    inout.inDateTime = None
+                    inout.save()
+                else:
+                    inout.place=place
+                    inout.inCampus=True
+                    inout.inDateTime = datetime.now()
+                    inout.save()
+            else:
+                # inout = InOut(student=student, place=place, )
+                pass
+
+            if leave_check:
+
+                inout.onLeave = True
+                inout.save()
+
+                t = time(0,0)
+                t1 = time(23,59)
+                d = date.today()
+                leave = Leave.objects.get(dateTimeStart__gte=datetime.combine(d,t), dateTimeStart__lte=datetime.combine(d,t1), student__bitsId = username)
+
+                leave.inprocess = True
+                leave.save()
+
+            if daypass_check:
+                inout.daypass = True
+                inout.save()
+
+                t = time(0,0)
+                t1 = time(23,59)
+                d = date.today()
+                daypass = DayPass.objects.get(approved__exact=True, dateTime__date__exact=datetime.today().date(), student__bitsId = username)
+
+            context = {
+                'student': student,
+                'inout': inout,
+                'success': True,
+            }
+
+            return render(request, "gate_security.html", context)
 
     return render(request, "gate_security.html", context)
 
