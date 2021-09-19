@@ -74,7 +74,12 @@
 						</div>
 
 						<div class="col s10 push-s2">
-							{% if leave %}
+							{% if not inout.inCampus %}
+							<div class="center-align">
+								<span>Welcome back to campus!</span>
+							</div>
+							{% endif %}
+							{% if leave and inout.inCampus %}
 							<div>
 								<input type="checkbox" id="leave_check" name="leave_check" class="filled-in" />
 								<label for="leave_check">Activate Leave</label>
@@ -84,7 +89,7 @@
 							</div>
 							{% endif %}
 							<br />
-							{% if daypass %}
+							{% if daypass and inout.inCampus %}
 							<div>
 								<input type="checkbox" id="daypass_check" name="daypass_check" class="filled-in" />
 								<label for="daypass_check">Activate DayPass</label>

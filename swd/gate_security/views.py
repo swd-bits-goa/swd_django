@@ -18,6 +18,8 @@ def gate_security(request):
     if request.method == 'POST':
         if request.POST.get("form_type") == 'formOne':
             username = request.POST.get('username')
+            student = Student.objects.get(bitsId=username)
+            inout = InOut.objects.get(student__bitsId=username)
             try:
                 t = time(0,0)
                 t1 = time(23,59)
@@ -34,13 +36,12 @@ def gate_security(request):
             except:
                 leave = None
 
-            if leave or daypass:
-                student = leave.student
-                context = {
-                    'student': student,
-                    'leave': leave,
-                    'daypass': daypass,
-                }
+            context = {
+                'student': student,
+                'leave': leave,
+                'daypass': daypass,
+                'inout': inout,
+            }
             return render(request, "gate_security.html", context)
 
         elif request.POST.get("form_type") == 'formTwo':
@@ -52,6 +53,18 @@ def gate_security(request):
 
             inout = InOut.objects.get(student__bitsId=username)
 
+            t = time(0,0)
+            t1 = time(23,59)
+            d = date.today()
+            try:
+                leave = Leave.objects.get(dateTimeStart__gte=datetime.combine(d,t), dateTimeStart__lte=datetime.combine(d,t1), student__bitsId = username)
+            except:
+                leave = None
+            try:
+                daypass = DayPass.objects.get(approved__exact=True, dateTime__date__exact=datetime.today().date(), student__bitsId = username)
+            except:
+                daypass = None
+                
             if inout:
                 if inout.inCampus==True:
                     inout.place=place
@@ -59,36 +72,36 @@ def gate_security(request):
                     inout.outDateTime = datetime.now()
                     inout.inDateTime = None
                     inout.save()
+
+                    if leave_check:
+                        inout.onLeave = True
+                        inout.save()
+                        leave.inprocess = True
+                        leave.save()
+
+                    if daypass_check:
+                        inout.daypass = True
+                        inout.save()
+                        leave.inprocess = True
+                        leave.save()
+
                 else:
                     inout.place=place
                     inout.inCampus=True
                     inout.inDateTime = datetime.now()
+                    inout.outDateTime = None
+                    if inout.onLeave == True:
+                        inout.onLeave = False
+                        leave.inprocess = False
+                        leave.save()
+                    if inout.onDaypass == True:
+                        inout.onDaypass = False
+                        daypass.inprocess = False
+                        daypass.save()
                     inout.save()
             else:
                 # inout = InOut(student=student, place=place, )
                 pass
-
-            if leave_check:
-
-                inout.onLeave = True
-                inout.save()
-
-                t = time(0,0)
-                t1 = time(23,59)
-                d = date.today()
-                leave = Leave.objects.get(dateTimeStart__gte=datetime.combine(d,t), dateTimeStart__lte=datetime.combine(d,t1), student__bitsId = username)
-
-                leave.inprocess = True
-                leave.save()
-
-            if daypass_check:
-                inout.daypass = True
-                inout.save()
-
-                t = time(0,0)
-                t1 = time(23,59)
-                d = date.today()
-                daypass = DayPass.objects.get(approved__exact=True, dateTime__date__exact=datetime.today().date(), student__bitsId = username)
 
             context = {
                 'student': student,
