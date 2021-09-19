@@ -62,6 +62,7 @@ def gate_security(request):
             place = request.POST.get('place')
             leave_check = request.POST.get('leave_check')
             daypass_check = request.POST.get('daypass_check')
+            incampus_check = request.POST.get('incampus_check')
 
             try:
                 inout = InOut.objects.get(student__bitsId=username)
@@ -115,8 +116,41 @@ def gate_security(request):
                         daypass.save()
                     inout.save()
             else:
-                # inout = InOut(student=student, place=place, )
-                pass
+
+                inout = InOut(student=student, place=place, inDateTime=datetime.now(), outDateTime=datetime.now(), inCampus=False, onLeave=False, onDaypass=False)
+
+                if not incampus_check:
+                    inout.inCampus=False
+                    inout.outDateTime = datetime.now()
+                    inout.inDateTime = None
+                    inout.save()
+
+                    if leave_check:
+                        inout.onLeave = True
+                        inout.save()
+                        leave.inprocess = True
+                        leave.save()
+
+                    if daypass_check:
+                        inout.daypass = True
+                        inout.save()
+                        leave.inprocess = True
+                        leave.save()
+
+                else:
+                    inout.place=place
+                    inout.inCampus=True
+                    inout.inDateTime = datetime.now()
+                    inout.outDateTime = None
+                    if inout.onLeave == True:
+                        inout.onLeave = False
+                        leave.inprocess = False
+                        leave.save()
+                    if inout.onDaypass == True:
+                        inout.onDaypass = False
+                        daypass.inprocess = False
+                        daypass.save()
+                    inout.save()
 
             context = {
                 'student': student,

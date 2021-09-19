@@ -85,6 +85,14 @@
 								<span>Welcome to campus!</span>
 							</div>
 							{% endif %}
+
+							{% if not inout %}
+							<div>
+								<input type="checkbox" id="incampus_check" name="incampus_check" class="filled-in" />
+								<label for="incampus_check">Coming in campus?</label>
+							</div>
+							{% endif %}
+
 							{% if leave and inout.inCampus or leave and not inout %}
 							<div>
 								<input type="checkbox" id="leave_check" name="leave_check" class="filled-in" />
