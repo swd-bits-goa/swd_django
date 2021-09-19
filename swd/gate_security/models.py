@@ -7,7 +7,7 @@ from datetime import date
 
 class InOut(models.Model):
     student = models.ForeignKey('main.Student', on_delete = models.CASCADE)
-    place = models.CharField(max_length=20)
+    place = models.CharField(max_length=20, null=True, blank=True)
     outDateTime = models.DateTimeField(null=True)
     inDateTime = models.DateTimeField(null=True, blank=True)
     inCampus = models.BooleanField(null=False, default=True)

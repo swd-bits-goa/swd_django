@@ -48,15 +48,10 @@
 						<input type="hidden" name="bitsid" value="{{ student.bitsId }}" />
 						<div class="col s12 valign-wrapper">
 							<div class="col s6 push-s1">
-								<!-- <img
+								<img
 								style="max-width: 180px"
 								class="circle profileImg"
 								src="{{ student.profile_picture }}"
-							/> -->
-								<img
-									style="max-width: 120px"
-									class="circle profileImg responsive-img"
-									src="/media/2017A4PS0590_bsKDJSY.jpg"
 								/>
 							</div>
 
@@ -68,6 +63,7 @@
 							</div>
 						</div>
 
+						{% if inout.inCampus and inout %}
 						<div class="col s10 push-s2 input-field" id="place">
 							<input
 								type="text"
@@ -78,18 +74,33 @@
 							/>
 							<label for="place">Place</label>
 						</div>
+						{% endif %}
+
+						{% if not inout %}
+						<div class="col s10 push-s2 input-field" id="place">
+							<input
+								type="text"
+								class="validate"
+								name="place"
+								autocorrect="off"
+								autocapitalize="none"
+							/>
+							<label for="place">Place (Leave blank if coming in campus)</label>
+						</div>
+						{% endif %}
 
 						<div class="col s10 push-s2">
-							{% if not inout.inCampus %}
-							<div class="center-align">
-								<span>Welcome to campus!</span>
-							</div>
-							{% endif %}
 
 							{% if not inout %}
 							<div>
 								<input type="checkbox" id="incampus_check" name="incampus_check" class="filled-in" />
 								<label for="incampus_check">Coming in campus?</label>
+							</div>
+							{% endif %}
+
+							{% if not inout.inCampus and inout %}
+							<div class="center-align">
+								<span>Welcome to campus!</span>
 							</div>
 							{% endif %}
 
@@ -115,7 +126,6 @@
 						</div>
 
 						<div class="col s10 push-s2 center-align">
-							<br />
 							<button
 								type="submit"
 								class="waves-effect waves-light btn desert-yellow"
