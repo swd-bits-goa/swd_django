@@ -2301,13 +2301,14 @@ def add_wardens(request):
                     password = User.objects.make_random_password()
                     try:
                         user = User.objects.get(username=username)
-                        user.delete()
+                        user.email = emailID
+                        user.password = password
+                        user.save()
                     except User.DoesNotExist:
-                        pass
-                    user = User.objects.create_user(
-                        username=username,
-                        email=emailID,
-                        password=password)
+                        user = User.objects.create_user(
+                            username=username,
+                            email=emailID,
+                            password=password)
 
                     
                     warden = Warden.objects.create(
