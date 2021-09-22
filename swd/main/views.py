@@ -2195,13 +2195,14 @@ def add_new_students(request):
                     
                     try:
                         user = User.objects.get(username=username)
-                        user.delete()
+                        user.email='random@hello.com',
+                        user.password=password
+                        user.save()
                     except User.DoesNotExist:
-                        pass
-                    user = User.objects.create_user(
-                        username=username,
-                        email='random@hello.com',
-                        password=password)
+                        user = User.objects.create_user(
+                            username=username,
+                            email='random@hello.com',
+                            password=password)
 
                     # Date of Birth and Date of Admit
                     # These col values are expected to be in dd-Mon-yy format
