@@ -20,6 +20,7 @@
                                         <th>Departure Time</th>
                                         <th>Arrival Date</th>
                                         <th>Arrival Time</th>
+                                        <th>Claim Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -32,6 +33,11 @@
                                         <td>{{ leave.dateTimeStart|time:"H:i" }}</td>
                                         <td>{{ leave.dateTimeEnd|date:"d/m/Y" }}</td>
                                         <td>{{ leave.dateTimeEnd|time:"H:i" }}</td>
+                                        {% if leave.claimed %}
+                                            <td>Claimed</td>
+                                        {% else %}
+                                            <td>Not Claimed</td>
+                                        {% endif %}
                                     </tr>
                                     {% endfor %}
                                 </tbody>

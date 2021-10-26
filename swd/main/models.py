@@ -291,7 +291,8 @@ class Leave(models.Model):
     approvedBy = models.ForeignKey('Warden', blank=True, null=True, on_delete="PROTECT")
     approved = models.BooleanField(default=0, blank=True)
     disapproved = models.BooleanField(default=0, blank=True)
-    inprocess = models.BooleanField(default=1, blank=True)
+    inprocess = models.BooleanField(default=0, blank=True)
+    claimed = models.BooleanField(default=0, blank=True)
     comment = models.TextField(default='', blank=True)
 
     def __str__(self):
@@ -312,7 +313,8 @@ class DayPass(models.Model):
     approvedBy = models.ForeignKey('HostelSuperintendent', blank=True, null=True, on_delete="PROTECT")
     approved = models.BooleanField(default=0, blank=True)
     disapproved = models.BooleanField(default=0, blank=True)
-    inprocess = models.BooleanField(default=1, blank=True)
+    inprocess = models.BooleanField(default=0, blank=True)
+    claimed = models.BooleanField(default=0, blank=True)
     comment = models.TextField()
     document = models.FileField(upload_to=document_path, null=True, blank=True)
 

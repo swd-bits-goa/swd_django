@@ -35,7 +35,7 @@ def gate_security(request):
                 t = time(0,0)
                 t1 = time(23,59)
                 d = date.today()
-                daypass = DayPass.objects.get(approved__exact=True, dateTime__date__exact=datetime.today().date(), student__bitsId = username)
+                daypass = DayPass.objects.get(approved__exact=True, dateTime__date__exact=datetime.today().date(), student__bitsId = username, claimed = False)
             except:
                 daypass = None
 
@@ -43,7 +43,7 @@ def gate_security(request):
                 t = time(0,0)
                 t1 = time(23,59)
                 d = date.today()
-                leave = Leave.objects.get(dateTimeStart__gte=datetime.combine(d,t), dateTimeStart__lte=datetime.combine(d,t1), student__bitsId = username)
+                leave = Leave.objects.get(dateTimeStart__gte=datetime.combine(d,t), dateTimeStart__lte=datetime.combine(d,t1), student__bitsId = username, claimed = False)
             except:
                 leave = None
 
@@ -73,14 +73,27 @@ def gate_security(request):
             t1 = time(23,59)
             d = date.today()
             try:
-                leave = Leave.objects.get(dateTimeStart__gte=datetime.combine(d,t), dateTimeStart__lte=datetime.combine(d,t1), student__bitsId = username)
+                leave = Leave.objects.get(dateTimeStart__gte=datetime.combine(d,t), dateTimeStart__lte=datetime.combine(d,t1), student__bitsId = username, claimed = False)                  
             except:
                 leave = None
             try:
-                daypass = DayPass.objects.get(approved__exact=True, dateTime__date__exact=datetime.today().date(), student__bitsId = username)
+                if(leave == None):
+                    leave = Leave.objects.get(student__bitsId = username, inprocess = True)
+            except:
+                leave = None
+
+            
+            try:
+                daypass = DayPass.objects.get(approved__exact=True, dateTime__date__exact=datetime.today().date(), student__bitsId = username, claimed = False)
             except:
                 daypass = None
-                
+
+            try:
+                if(daypass == None):
+                    daypass = DayPass.objects.get(student__bitsId = username, inprocess = True)
+            except:
+                daypass = None
+
             if inout:
                 if inout.inCampus==True:
                     inout.place=place
@@ -96,10 +109,10 @@ def gate_security(request):
                         leave.save()
 
                     if daypass_check:
-                        inout.daypass = True
+                        inout.onDaypass = True
                         inout.save()
-                        leave.inprocess = True
-                        leave.save()
+                        daypass.inprocess = True
+                        daypass.save()
 
                 else:
                     inout.place=place
@@ -109,10 +122,12 @@ def gate_security(request):
                     if inout.onLeave == True:
                         inout.onLeave = False
                         leave.inprocess = False
+                        leave.claimed = True
                         leave.save()
                     if inout.onDaypass == True:
                         inout.onDaypass = False
                         daypass.inprocess = False
+                        daypass.claimed = True
                         daypass.save()
                     inout.save()
             else:
@@ -132,10 +147,10 @@ def gate_security(request):
                         leave.save()
 
                     if daypass_check:
-                        inout.daypass = True
+                        inout.onDaypass = True
                         inout.save()
-                        leave.inprocess = True
-                        leave.save()
+                        daypass.inprocess = True
+                        daypass.save()
 
                 else:
                     inout.place=place
@@ -145,10 +160,12 @@ def gate_security(request):
                     if inout.onLeave == True:
                         inout.onLeave = False
                         leave.inprocess = False
+                        leave.claimed = True
                         leave.save()
                     if inout.onDaypass == True:
                         inout.onDaypass = False
                         daypass.inprocess = False
+                        daypass.claimed = True
                         daypass.save()
                     inout.save()
 
@@ -162,22 +179,13 @@ def gate_security(request):
 
     return render(request, "gate_security.html", context)
 
-# @user_passes_test(lambda u: u.is_superuser)
-def in_out(request):
-
-    inout = InOut.objects.filter(inCampus = False)
-    context = {
-        'inout': inout,
-    }
-
-    return render(request, "all_in_out.html",context)
 
 @user_passes_test(is_security)
 def dash_security_leaves(request):
     t = time(0,0)
     t1 = time(23,59)
     d = date.today()
-    approved_leaves = Leave.objects.filter(approved__exact=True, dateTimeStart__gte=datetime.combine(d,t), dateTimeStart__lte=datetime.combine(d,t1))
+    approved_leaves = Leave.objects.filter(approved__exact=True, dateTimeStart__gte=datetime.combine(d,t), dateTimeStart__lte=datetime.combine(d,t1)).order_by('-dateTimeStart')
     context = {'leaves' : approved_leaves}
     return render(request, "dash_security.html", context)
 
@@ -187,7 +195,31 @@ def dash_security_daypass(request):
     t = time(0,0)
     t1 = time(23,59)
     d = date.today()
-    approved_daypass = DayPass.objects.filter(approved__exact=True, dateTime__date__exact=datetime.today().date())
+    approved_daypass = DayPass.objects.filter(approved__exact=True, dateTime__date__exact=datetime.today().date()).order_by('-dateTime')
     context = {'daypasses' : approved_daypass}
     return render(request, "daypasses_security.html", context)
 
+# @user_passes_test(lambda u: u.is_superuser)
+def in_out(request):
+    inout = InOut.objects.filter(inCampus = False, onLeave = False, onDaypass = False).order_by('-outDateTime')
+    context = {
+        'inout': inout,
+    }
+
+    return render(request, "all_in_out.html",context)
+
+@user_passes_test(is_security)
+def leave_out(request):
+    inout = InOut.objects.filter(inCampus = False, onLeave = True, onDaypass = False).order_by('-outDateTime')
+    context = {
+        'inout': inout,
+    }
+    return render(request, "leave_out.html",context)
+
+@user_passes_test(is_security)
+def daypass_out(request):
+    inout = InOut.objects.filter(inCampus = False, onLeave = False, onDaypass = True).order_by('-outDateTime')
+    context = {
+        'inout': inout,
+    }
+    return render(request, "daypass_out.html",context)

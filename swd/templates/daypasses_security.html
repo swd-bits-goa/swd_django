@@ -20,6 +20,7 @@
                                         <th>Out time</th>
                                         <th>In time</th>
                                         <th>Location</th>
+                                        <th>Claim Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -31,7 +32,12 @@
                                         <td>{{ daypass.dateTime|date:"d/M/y" }}</td>
                                         <td>{{ daypass.dateTime|time}}</td>   
                                         <td>{{ daypass.inTime|time}}</td>      
-                                        <td>{{ daypass.corrAddress}}</td>    
+                                        <td>{{ daypass.corrAddress}}</td>  
+                                        {% if daypass.claimed %}
+                                            <td>Claimed</td>
+                                        {% else %}
+                                            <td>Not Claimed</td>
+                                        {% endif %}
                                     </tr>
                                     {% endfor %}
                                 </tbody>
