@@ -54,7 +54,7 @@ def index(request):
         if HostelSuperintendent.objects.filter(user=request.user):
             return redirect('/hostelsuperintendent')
         if Security.objects.filter(user=request.user):
-            return redirect('/security_leaves')
+            return redirect('dash_security_leaves')
         return redirect('dashboard')
     else:
         notice_list = Notice.objects.all().order_by('-id')
@@ -287,7 +287,7 @@ def loginform(request):
         if HostelSuperintendent.objects.filter(user=request.user):
             return redirect('/hostelsuperintendent')
         if Security.objects.filter(user=request.user):
-            return redirect('/security_leaves')
+            return redirect('dash_security_leaves')
         return redirect('dashboard')
 
     if request.POST:
@@ -303,7 +303,7 @@ def loginform(request):
             if HostelSuperintendent.objects.filter(user=request.user):
                 return redirect('/hostelsuperintendent')
             if Security.objects.filter(user=request.user):
-                return redirect('/security_leaves')
+                return redirect('dash_security_leaves')
             return redirect('dashboard')
         else:
             messages.add_message(request, messages.INFO,  "Incorrect username or password", extra_tags='red')
@@ -1564,7 +1564,10 @@ def antiragging(request):
     return render(request,"antiragging.html",{})
 
 def swd(request):
-    return render(request,"swd.html",{})
+    context = {
+        'hostels' : len(HOSTELS)
+    }
+    return render(request,"swd.html",context)
 
 def csa(request):
     y=1-(datetime.now().month-1)//6
@@ -2053,27 +2056,6 @@ def edit_constants(request):
         messages.success(request, "constants.json updated")
     return render(request, "constants.html", {"initial": data_json})
 
-@user_passes_test(is_security)
-def dash_security_leaves(request):
-    from datetime import time
-    t = time(0,0)
-    t1 = time(23,59)
-    d = date.today()
-    approved_leaves = Leave.objects.filter(approved__exact=True, dateTimeStart__gte=datetime.combine(d,t), dateTimeStart__lte=datetime.combine(d,t1))
-    context = {'leaves' : approved_leaves}
-    return render(request, "dash_security.html", context)
-
-
-@user_passes_test(is_security)
-def dash_security_daypass(request):
-    from datetime import time
-    t = time(0,0)
-    t1 = time(23,59)
-    d = date.today()
-    approved_daypass = DayPass.objects.filter(approved__exact=True, dateTime__date__exact=datetime.today().date())
-    context = {'daypasses' : approved_daypass}
-    return render(request, "daypasses_security.html", context)
-
 
 @user_passes_test(lambda u: u.is_superuser)
 
@@ -2213,13 +2195,14 @@ def add_new_students(request):
                     
                     try:
                         user = User.objects.get(username=username)
-                        user.delete()
+                        user.email='random@hello.com',
+                        user.password=password
+                        user.save()
                     except User.DoesNotExist:
-                        pass
-                    user = User.objects.create_user(
-                        username=username,
-                        email='random@hello.com',
-                        password=password)
+                        user = User.objects.create_user(
+                            username=username,
+                            email='random@hello.com',
+                            password=password)
 
                     # Date of Birth and Date of Admit
                     # These col values are expected to be in dd-Mon-yy format
@@ -2319,13 +2302,14 @@ def add_wardens(request):
                     password = User.objects.make_random_password()
                     try:
                         user = User.objects.get(username=username)
-                        user.delete()
+                        user.email = emailID
+                        user.password = password
+                        user.save()
                     except User.DoesNotExist:
-                        pass
-                    user = User.objects.create_user(
-                        username=username,
-                        email=emailID,
-                        password=password)
+                        user = User.objects.create_user(
+                            username=username,
+                            email=emailID,
+                            password=password)
 
                     
                     warden = Warden.objects.create(

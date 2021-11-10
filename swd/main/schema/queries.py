@@ -101,12 +101,6 @@ class Query(object):
         username = graphene.String()
     )
 
-    all_in_outs = graphene.List(InOutType)
-    inout = graphene.Field(
-        InOutType,
-        id=graphene.Int(),
-        username = graphene.String()
-    )
 
     all_discos = graphene.List(DiscoType)
     disco = graphene.Field(
