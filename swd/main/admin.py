@@ -17,7 +17,6 @@ models = [
     DayScholar,
     CSA,
     LateComer,
-    InOut,
     MessOptionOpen,
     Transaction,
     MessBill,

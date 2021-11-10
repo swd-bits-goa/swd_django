@@ -1,101 +1,234 @@
-{% load staticfiles %}
-<!DOCTYPE html>
-<html lang="en">
+{% extends 'security_dash_base.html' %} {% block content %}
 
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <meta name="viewport" content="width=1024">
-    <title>SWD BITS Goa</title>
+<div class="container">
+	<div class="row valign-wrapper" id="bodyWrap">
+		<div class="col s5" style="margin: auto">
+			<span class="card-title fresh-orange"><h4>Student</h4></span>
+			<br />
 
-    <!-- CSS  -->
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link href="{% static 'css/materialize.css' %}" type="text/css" rel="stylesheet" media="screen,projection" />
-    <link href="{% static 'css/style.css' %}" type="text/css" rel="stylesheet" media="screen,projection" />
-</head>
+			<form id="sign_in" method="POST">
+				{% csrf_token %}
+				<input type="hidden" name="form_type" value="formOne" />
+				<div class="input-field" id="username">
+					<input
+						type="text"
+						class="validate"
+						name="username"
+						autocomplete="username"
+						autocorrect="off"
+						autocapitalize="none"
+					/>
+					<label for="username">BITS ID</label>
+				</div>
 
-<body>
-    <nav class="nav-extended">
-        <div class="nav-wrapper">
-            <a href="#" class="brand-logo"><img id="swd" src="{% static 'img/swd.png' %}"></a>
-            <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
-            <ul id="nav-mobile" class="right hide-on-med-and-down">
-                <li><a href="/logout">Logout</a></li>
-            </ul>
-            <ul class="side-nav" id="mobile-demo">
-                <li><a href="/logout">Logout</a></li>
-            </ul>
-        </div>
-    </nav>
+				<button
+					type="submit"
+					class="waves-effect waves-light btn desert-yellow"
+					id="loginbtn"
+				>
+					<span class="deep-green">Submit</span>
+				</button>
+			</form>
+			<br />
+			{% if errors %}
+				{% for error in errors %}
+				<span>{{ error }}</span>
+				{% endfor %}
+			{% endif %}
+		</div>
+		
 
+		{% if student and not success and not errors %}
+		<div class="col s7" style="margin: auto">
+			<div class="container-fluid">
+				<div class="row">
+					<form id="in_out_form" method="POST">
+						{% csrf_token %}
+						<input type="hidden" name="form_type" value="formTwo" />
+						<input type="hidden" name="bitsid" value="{{ student.bitsId }}" />
+						<div class="col s12 valign-wrapper">
+							<div class="col s6 push-s1">
+								<!-- <img
+								style="max-width: 180px"
+								class="circle profileImg"
+								src="{{ student.profile_picture }}"
+								/> -->
+								<img
+								style="max-width: 180px"
+								class="circle profileImg"
+								src="/media/2017A4PS0590_bsKDJSY.jpg"
+								/>
+							</div>
 
-    <div class="container">
-        <div class="row valign-wrapper" id="bodyWrap">
-          
-          <div class="col s10">
-                  <span class="card-title fresh-orange"><h4>Student</h4></span>
-                  <br>
-                <form id="sign_in" method="POST">
-                   {% csrf_token %}
-                  <div class="input-field" id="username" >
-                      <input  type="text" class="validate" name="username" autocomplete='username' autocorrect="off" autocapitalize="none">
-                      <label for="username">BITS ID</label>
-                  </div>
+							<div class="col s6 center-align">
+								<h5>
+									{{ student.name }}<br />{{ student.bitsId }}<br />
+									{{ student.phone }}
+								</h5>
+							</div>
+						</div>
 
-                  <button type="submit" class="waves-effect waves-light btn desert-yellow" id="loginbtn"><span class="deep-green">Submit</span></button>
+						{% if inout.inCampus and inout %}
+						<div class="col s10 push-s2 input-field" id="place">
+							<input
+								type="text"
+								class="validate"
+								name="place"
+								autocorrect="off"
+								autocapitalize="none"
+							/>
+							<label for="place">Place</label>
+						</div>
+						{% endif %}
 
-                </form>
-                <br>
-        </div>
+						{% if not inout %}
+						<div class="col s10 push-s2 input-field" id="place">
+							<input
+								type="text"
+								class="validate"
+								name="place"
+								autocorrect="off"
+								autocapitalize="none"
+							/>
+							<label for="place">Place (Leave blank if coming in campus)</label>
+						</div>
+						{% endif %}
 
-        <div class="col s10">
-                <span class="card-title fresh-orange"><h4>Student Details</h4></span>
-                <br>
+						<div class="col s10 push-s2">
 
-                <div class="container-fluid" style="margin-top: 10px;">
-                  <div class="row" style="position: relative;">
-                      <div class="col sm-2">
-                              <a href="/profile" class="valign-wrapper">
-                                  <img style="max-width:180px" class="circle profileImg" src="/media/2017A4PS0590_bsKDJSY.jpg">
-                              </a>
-                      </div>
-                      <div class="col sm-10" style="line-height:50px; position: relative;
-                      transform: translate(20%, 20%);">
-                              {{ student.name }} Dummy name<br>
-                              {{ student.bitsId }} Dummy ID<br>
-                              Dummy Phone Number
-                      </div>
-                      <div class="col sm-10" style="line-height:50px; position: relative; transform: translate(20%, 20%); text-align:end">
-                              <br>Dummy active leaves <button type="submit" class="waves-effect waves-light btn desert-yellow" id="loginbtn"><span class="deep-green">Activate</span></button>
-                              <br>
-                              Dummy active daypasses <button type="submit" class="waves-effect waves-light btn desert-yellow" id="loginbtn"><span class="deep-green">Activate</span></button>
-                      </div>
-                      <div class="col s10" style="line-height:50px; position: relative; transform: translate(20%, 20%);">
-                        <br><button type="submit" class="waves-effect waves-light btn desert-yellow" id="loginbtn"><span class="deep-green">In-Out</span></button>
-                      </div>
-                  </div>
-              </div>
-              
-              <br>
-      </div>
-      </div>
-    </div>
+							{% if not inout %}
+							<div>
+								<input type="checkbox" id="incampus_check" name="incampus_check" class="filled-in" />
+								<label for="incampus_check">Coming in campus?</label>
+							</div>
+							{% endif %}
 
+							{% if not inout.inCampus and inout %}
+							<div class="center-align">
+								<span>Welcome to campus!</span>
+							</div>
+							{% endif %}
 
-{% block content %}
-{% endblock %} 
+							{% if leave and inout.inCampus or leave and not inout %}
+							<div>
+								<input type="checkbox" id="leave_check" name="leave_check" class="filled-in" />
+								<label for="leave_check">Activate Leave</label>
+								<span>
+									{{ leave.dateTimeStart|date:"d/m/Y" }} {{ leave.dateTimeStart|time:"H:i" }} Approved: {{ leave.approved }}
+								</span>
+							</div>
+							{% endif %}
+							<br />
+							{% if daypass and inout.inCampus or daypass and not inout %}
+							<div>
+								<input type="checkbox" id="daypass_check" name="daypass_check" class="filled-in" />
+								<label for="daypass_check">Activate DayPass</label>
+								<span>
+									{{ daypass.dateTime|date:"d/M/y" }} {{ daypass.dateTime|time }} {{ daypass.corrAddress}}
+								</span>
+							</div>
+							{% endif %}
+						</div>
 
-  <!--  Scripts-->
-    <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
-    <script src="{% static 'js/materialize.js' %}"></script>
-    <script src="{% static 'js/init.js' %}"></script>
-    <style>
-    #bodyWrap {
-        height:110vh;
-    }
-    .clickable {
-        cursor: pointer;
-    }
-    </style>
-</body>
+						<div class="col s10 push-s2 center-align">
+							<button
+								type="submit"
+								class="waves-effect waves-light btn desert-yellow"
+								id="loginbtn"
+							>
+								<span class="deep-green">Record</span>
+							</button>
+						</div>
+					</form>
+					<div class="col s10 push-s2 center-align">
+						<br />
+						<a href="{% url 'gate_security' %}">Look for other student</a>
+					</div>
+				</div>
+			</div>
+		</div>
+		{% endif %} 
+		
+		{% if success %}
+		<div class="col s7" style="margin: auto">
+			<div class="container-fluid">
+				<div class="row">
+					<input type="hidden" name="form_type" value="formTwo" />
+					<input type="hidden" name="bitsid" value="{{ student.bitsId }}" />
+					<div class="col s12 valign-wrapper">
+						<div class="col s6 push-s1">
+							<!-- <img
+								style="max-width: 180px"
+								class="circle profileImg"
+								src="{{ student.profile_picture }}"
+							/> -->
+							<img
+								style="max-width: 120px"
+								class="circle profileImg responsive-img"
+								src="/media/2017A4PS0590_bsKDJSY.jpg"
+							/>
+						</div>
 
-</html>
+						<div class="col s6 center-align">
+							<h5>
+								{{ inout.student.name }}<br />{{ inout.student.bitsId }}<br />
+								{{ inout.student.phone }}
+							</h5>
+						</div>
+					</div>
+
+					<div class="col s10 push-s4 center-align">
+						<table>
+							<tbody>
+								<tr>
+									<td>Place</td>
+									<td>{{ inout.place }}</td>
+								</tr>
+								<tr>
+									<td>In Time</td>
+									<td>{{ inout.inDateTime|date:"d/M/y" }} {{ inout.inDateTime|time }}</td>
+								</tr>
+								<tr>
+									<td>Out Time</td>
+									<td>{{ inout.outDateTime|date:"d/M/y" }} {{ inout.outDateTime|time }}</td>
+								</tr>
+								<tr>
+									<td>In Campus</td>
+									<td>{{ inout.inCampus }}</td>
+								</tr>
+								<tr>
+									<td>On Leave</td>
+									<td>{{ inout.onLeave }}</td>
+								</tr>
+								<tr>
+									<td>On DayPass</td>
+									<td>{{ inout.onDaypass }}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+
+					<div class="col s10 push-s2 center-align">
+						<br />
+						<a href="{% url 'gate_security' %}">Look for other student</a>
+					</div>
+				</div>
+			</div>
+		</div>
+		{% endif %}
+	</div>
+</div>
+
+<style>
+	#bodyWrap {
+		height: 75vh;
+	}
+	.clickable {
+		cursor: pointer;
+	}
+	td{
+		padding: 0;
+	}
+</style>
+
+{% endblock %}

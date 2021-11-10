@@ -1,3 +1,12 @@
-from django.contrib import admin
-
 # Register your models here.
+from django.contrib import admin
+from gate_security.models import *
+
+
+models = [InOut,]
+
+class InOutAdmin(admin.ModelAdmin):
+    search_fields = ['student__name','student__bitsId']
+
+
+admin.site.register(InOut, InOutAdmin)
