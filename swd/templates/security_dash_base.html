@@ -28,12 +28,13 @@
             <div class="nav-content">
              <ul class="tabs tabs-transparent">
                 {% load main_extras %}
-                <li class="tab"><a href="/gate_security/security_leaves/" class="{% active_page request 'dash_security' %}" target="_self">Approved Leaves</a></li>
-                <li class="tab"><a href="/gate_security/daypasses_security/" class="{% active_page request 'daypasses_security' %}" target="_self">Approved Day Pass</a></li>
-                <li class="tab"><a href="/gate_security/" class="{% active_page request 'gate_security' %}" target="_self">In Out</a></li>
-                <li class="tab"><a href="/gate_security/in_out/" class="{% active_page request 'in_out' %}" target="_self">Students out</a></li>
-                <li class="tab"><a href="/gate_security/leave_out/" class="{% active_page request 'leave_out' %}" target="_self">Leave out</a></li>
-                <li class="tab"><a href="/gate_security/daypass_out/" class="{% active_page request 'daypass_out' %}" target="_self">Daypass out</a></li>
+                <li class="tab"><a href="{% url 'weekend_security' %}" class="{% active_page request 'weekend_security' %}" target="_self">Approved Weekend Passes</a></li>
+                <li class="tab"><a href="{% url 'dash_security_leaves' %}" class="{% active_page request 'dash_security_leaves' %}" target="_self">Approved Leaves</a></li>
+                <li class="tab"><a href="{% url 'daypasses_security' %}" class="{% active_page request 'daypasses_security' %}" target="_self">Approved Day Pass</a></li>
+                <li class="tab"><a href="{% url 'gate_security' %}" class="{% active_page request 'gate_security' %}" target="_self">In Out</a></li>
+                <li class="tab"><a href="{% url 'in_out' %}" class="{% active_page request 'in_out' %}" target="_self">Students Outside</a></li>
+                <li class="tab"><a href="{% url 'leave_out' %}" class="{% active_page request 'leave_out' %}" target="_self">Students on Leave Outside</a></li>
+                <li class="tab"><a href="{% url 'daypass_out' %}" class="{% active_page request 'daypass_out' %}" target="_self">Daypass Students Out</a></li>
             </ul>
         </div>
     </nav>
