@@ -124,7 +124,7 @@
 							<th style="text-align: center">Tel:(Res.)</th>
 						</tr>
 
-						{% for w in warden %}
+						{% for w in warden.all|dictsort:"hostel" %}
 						<tr align="center">
 							<td id="contact1">{{ w.name }}</td>
 							<td id="contact1">{{ w.hostel }}</td>
