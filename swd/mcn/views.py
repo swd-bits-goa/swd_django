@@ -99,6 +99,9 @@ def submit_mcn(request):
     context['itr_year'] = str(yr1+1) + "-" + str((yr2+1) % 100)
 
     mcn_period = MCNApplicationPeriod.objects.filter(Open__lte=currentDate, Close__gte=currentDate).last()
+    if mcn_period.Batch != "":
+        if(request.user.student.bitsId[:4] not in mcn_period.Batch):
+            mcn_period = None
     context['mcn_period'] = mcn_period
 
     already_submitted = MCNApplication.objects.filter(student=request.user.student, ApplicationPeriod=mcn_period).last()
