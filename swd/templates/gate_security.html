@@ -48,15 +48,10 @@
 						<input type="hidden" name="bitsid" value="{{ student.bitsId }}" />
 						<div class="col s12 valign-wrapper">
 							<div class="col s6 push-s1">
-								<!-- <img
-								style="max-width: 180px"
-								class="circle profileImg"
-								src="{{ student.profile_picture }}"
-								/> -->
 								<img
 								style="max-width: 180px"
 								class="circle profileImg"
-								src="/media/2017A4PS0590_bsKDJSY.jpg"
+								src="/media/{{ student.profile_picture }}"
 								/>
 							</div>
 
@@ -128,6 +123,16 @@
 								</span>
 							</div>
 							{% endif %}
+							<br />
+							{% if weekendpass and inout.inCampus or weekendpass and not inout %}
+							<div>
+								<input type="checkbox" id="weekendpass_check" name="weekendpass_check" class="filled-in" />
+								<label for="weekendpass_check">Activate Weekend Pass</label>
+								<span>
+									{{ weekendpass.expiryDate|date:"d/M/y" }} {{ weekendpass.place}}
+								</span>
+							</div>
+							{% endif %}
 						</div>
 
 						<div class="col s10 push-s2 center-align">
@@ -157,15 +162,10 @@
 					<input type="hidden" name="bitsid" value="{{ student.bitsId }}" />
 					<div class="col s12 valign-wrapper">
 						<div class="col s6 push-s1">
-							<!-- <img
+							<img
 								style="max-width: 180px"
 								class="circle profileImg"
-								src="{{ student.profile_picture }}"
-							/> -->
-							<img
-								style="max-width: 120px"
-								class="circle profileImg responsive-img"
-								src="/media/2017A4PS0590_bsKDJSY.jpg"
+								src="/media/{{ student.profile_picture }}"
 							/>
 						</div>
 
@@ -203,6 +203,10 @@
 								<tr>
 									<td>On DayPass</td>
 									<td>{{ inout.onDaypass }}</td>
+								</tr>
+								<tr>
+									<td>On Weekend Pass</td>
+									<td>{{ inout.onWeekendPass }}</td>
 								</tr>
 							</tbody>
 						</table>
