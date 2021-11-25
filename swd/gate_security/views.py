@@ -65,6 +65,7 @@ def gate_security(request):
                 'student': student,
                 'leave': leave,
                 'daypass': daypass,
+                'weekendpass': weekendpass,
                 'inout': inout,
                 'errors': errors,
             }
