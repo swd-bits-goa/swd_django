@@ -7,7 +7,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 import datetime
 from .models import MessBill, Leave
 from calendar import monthrange
-from import_export.admin import ExportActionModelAdmin
+from import_export.admin import ExportActionModelAdmin, ImportExportModelAdmin
 from .resources import *
 
 
@@ -40,7 +40,7 @@ class DiscoAdmin(admin.ModelAdmin):
     search_fields = ['student__bitsId', 'student__name']
 
 @admin.register(DayPass)
-class DayPassAdmin(admin.ModelAdmin):
+class DayPassAdmin(ImportExportModelAdmin, admin.ModelAdmin):
     search_fields = ['student__bitsId', 'student__name']
 
 @admin.register(Bonafide)
@@ -68,12 +68,10 @@ class BonafideAdmin(admin.ModelAdmin):
     bonafide_actions.short_description = 'Bonafide Actions'
     bonafide_actions.allow_tags = True
 
-def export_xls(modeladmin, request, queryset):
-    select = [ i.bitsId for i in queryset]
+def exportmessbill_xls(modeladmin, request, queryset):
+    select = [ i.student.bitsId for i in queryset]
     return HttpResponseRedirect("/messbill/?ids=%s" % (",".join(select)))
-
-
-export_xls.short_description = u"Export Mess Bill"
+exportmessbill_xls.short_description = u"Export Mess Bill"
 
 
 
@@ -81,17 +79,9 @@ def update_cgpa(modeladmin, request, queryset):
     return redirect('import_cgpa')
 update_cgpa.short_description = u"Update CGPAs with Excel File"
 
-class StudentAdmin(ExportActionModelAdmin):
-    search_fields = ['name', 'bitsId', 'user__username']
-    actions = [export_xls, update_cgpa, ]
-
 def add_new_students(modeladmin, request, queryset):
     return redirect('add_new_students')
 add_new_students.description = u"Add New Students from Excel"
-
-class StudentAdmin(ExportActionModelAdmin):
-    search_fields = ['name', 'bitsId', 'user__username']
-    actions = [export_xls, add_new_students, ]
 
 def delete_students(modeladmin, request, queryset):
     return redirect('delete_students')
@@ -99,8 +89,7 @@ delete_students.description = u"Delete Students from Excel"
 
 class StudentAdmin(ExportActionModelAdmin):
     search_fields = ['name', 'bitsId', 'user__username']
-    actions = [export_xls, delete_students, ]
-
+    actions = [exportmessbill_xls, update_cgpa, add_new_students, delete_students ]
 
 
 @admin.register(TeeBuy)
@@ -119,11 +108,12 @@ class ItemBuyAdmin(ExportActionModelAdmin,admin.ModelAdmin):
 class MessOptionAdmin(ExportActionModelAdmin,admin.ModelAdmin):
     resource_class = MessOptionResource
     search_fields = ['mess','monthYear', 'student__bitsId']
+    
 
 @admin.register(Leave)
-class LeaveAdmin(admin.ModelAdmin):
+class LeaveAdmin(ImportExportModelAdmin, admin.ModelAdmin):
     search_fields = ['student__name', 'student__bitsId','dateTimeStart','id', 'student__user__username']
-    actions = [export_xls, ]
+    actions = [exportmessbill_xls, ]
 
 @admin.register(Due)
 class DueAdmin(admin.ModelAdmin):
