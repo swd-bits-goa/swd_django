@@ -15,7 +15,7 @@ class MCNApplicationPeriod(models.Model):
     Open = models.DateTimeField(default=None)
     Close = models.DateTimeField(default=None)
     Name = models.TextField("Application Period Name", default="Semester X 2020-21")
-    Batch = models.TextField(null=True, blank=True)
+    Batch = models.TextField(null=True, blank=True, default='')
 
     def __str__(self):
         return self.Name + ": " + self.Open.strftime('%d-%b-%Y') + \
