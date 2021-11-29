@@ -7,7 +7,9 @@ from django.http import HttpResponseRedirect, HttpResponse
 import datetime
 from .models import MessBill, Leave
 from calendar import monthrange
-from import_export.admin import ExportActionModelAdmin, ImportExportModelAdmin
+from import_export import resources
+from import_export.formats import base_formats
+from import_export.admin import ExportActionModelAdmin, ExportMixin, ImportExportModelAdmin
 from .resources import *
 
 
@@ -32,19 +34,48 @@ models = [
     VacationDatesFill,
     Security]
 
+class HostelPSImEx(resources.ModelResource):
+    class Meta:
+        model = HostelPS
+        fields = ('student__bitsId','student__name', 'acadstudent','status', 'psStation', 'hostel', 'room')
+
 @admin.register(Disco)
-class HostelPSAdmin(admin.ModelAdmin):
+class HostelPSAdmin(ExportMixin,admin.ModelAdmin):
     search_fields = ['student__name', 'student__bitsId']
+    resource_class = HostelPSImEx
+
+    def get_export_formats(self):
+        formats = (
+          base_formats.XLS,
+          )
+        return [f for f in formats if f().can_export()]
 
 class DiscoAdmin(admin.ModelAdmin):
     search_fields = ['student__bitsId', 'student__name']
 
+class DayPassImEx(resources.ModelResource):
+    class Meta:
+        model = DayPass
+        fields = ('student__bitsId','student__name','reason','dateTime', 'corrAddress' ,'approvedBy__name',	'approved', 'disapproved', 'comment')
+
 @admin.register(DayPass)
-class DayPassAdmin(ImportExportModelAdmin, admin.ModelAdmin):
+class DayPassAdmin(ExportMixin, admin.ModelAdmin):
     search_fields = ['student__bitsId', 'student__name']
+    resource_class = DayPassImEx
+
+    def get_export_formats(self):
+        formats = (
+          base_formats.XLS,
+          )
+        return [f for f in formats if f().can_export()]
+
+class BonafideImEx(resources.ModelResource):
+    class Meta:
+        model = Bonafide
+        fields = ('student__bitsId','student__name','reason','otherReason', 'reqDate','status')
 
 @admin.register(Bonafide)
-class BonafideAdmin(admin.ModelAdmin):
+class BonafideAdmin(ExportMixin,admin.ModelAdmin):
     search_fields = ['reason','otherReason', 'reqDate','student__name','student__bitsId']
     list_display = (
         'id',
@@ -55,6 +86,7 @@ class BonafideAdmin(admin.ModelAdmin):
         'status',
         'bonafide_actions',
     )
+    resource_class = BonafideImEx
     list_filter = ('status',)
     def get_url(self, pk):
         url = '/bonafide/' + str(Bonafide.objects.get(pk=pk).id)
@@ -67,6 +99,12 @@ class BonafideAdmin(admin.ModelAdmin):
         )
     bonafide_actions.short_description = 'Bonafide Actions'
     bonafide_actions.allow_tags = True
+
+    def get_export_formats(self):
+        formats = (
+          base_formats.XLS,
+          )
+        return [f for f in formats if f().can_export()]
 
 def exportmessbill_xls(modeladmin, request, queryset):
     select = [ i.student.bitsId for i in queryset]
@@ -109,11 +147,22 @@ class MessOptionAdmin(ExportActionModelAdmin,admin.ModelAdmin):
     resource_class = MessOptionResource
     search_fields = ['mess','monthYear', 'student__bitsId']
     
+class LeaveImEx(resources.ModelResource):
+    class Meta:
+        model = Leave
+        fields = ('student__bitsId','student__name','reason','dateTimeStart', 'dateTimeEnd', 'consent', 'corrAddress', 'corrPhone','approvedBy__name',	'approved', 'disapproved', 'comment')
 
 @admin.register(Leave)
-class LeaveAdmin(ImportExportModelAdmin, admin.ModelAdmin):
+class LeaveAdmin(ExportMixin, admin.ModelAdmin):
     search_fields = ['student__name', 'student__bitsId','dateTimeStart','id', 'student__user__username']
     actions = [exportmessbill_xls, ]
+
+    resource_class = LeaveImEx
+    def get_export_formats(self):
+        formats = (
+          base_formats.XLS,
+          )
+        return [f for f in formats if f().can_export()]
 
 @admin.register(Due)
 class DueAdmin(admin.ModelAdmin):
