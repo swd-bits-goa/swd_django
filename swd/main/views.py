@@ -4,8 +4,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import *
 from django.views.decorators.csrf import csrf_protect
-from datetime import date, datetime, timedelta
-from .forms import MessForm, LeaveForm, BonafideForm, DayPassForm
+from datetime import date, time, datetime, timedelta
+from .forms import MessForm, LeaveForm, BonafideForm, DayPassForm, VacationLeaveNoMessForm
 from django.contrib import messages
 from django.utils.timezone import make_aware
 from django.core.mail import send_mail
@@ -245,7 +245,7 @@ def profile(request):
             'bonafides': bonafides,
             'daypasss': daypasss,
             'balance': balance,
-            'hostelps':hostelps,
+            'hostelps': hostelps,
         }
 
         if request.POST:
@@ -472,9 +472,129 @@ def messoption(request):
 
 
 @login_required
+def vacation_no_mess(request):
+    student = Student.objects.get(user=request.user)
+    leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
+    daypasss = DayPass.objects.filter(student=student, dateTime__gte=date.today() - timedelta(days=7))
+    bonafides = Bonafide.objects.filter(student=student, reqDate__gte=date.today() - timedelta(days=7))
+    messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
+    messopen = messopen.exclude(dateOpen__gt=date.today())
+    if messopen:
+        messoption = MessOption.objects.filter(monthYear=messopen[0].monthYear, student=student)
+
+    if messopen and not messoption and datetime.today().date() < messopen[0].dateClose:
+        option = 0
+        mess = 0
+    elif messopen and messoption:
+        option = 1
+        mess = messoption[0]
+    else:
+        option = 2
+        mess = 0
+
+    # Dues
+    try:
+        lasted = DuesPublished.objects.latest('date_published').date_published
+    except:
+        lasted = datetime(year=2004, month=1, day=1) # Before college was founded
+
+    otherdues = Due.objects.filter(student=student)
+    itemdues = ItemBuy.objects.filter(student=student,
+                                      created__gte=lasted)
+    teedues = TeeBuy.objects.filter(student=student,
+                                      created__gte=lasted)
+    total_amount = 0
+    for item in itemdues:
+        if item is not None:
+            total_amount += item.item.price
+    for tee in teedues:
+        if tee is not None:
+            total_amount += tee.totamt
+    for other in otherdues:
+        if other is not None:
+            total_amount += other.amount
+
+    with open(settings.CONSTANTS_LOCATION, 'r') as fp:
+        data = json.load(fp)
+    if student.nophd():
+        main_amt = data['phd-swd-advance']
+    else:
+        main_amt = data['swd-advance']
+    balance = float(main_amt) - float(total_amount)
+
+    form = VacationLeaveNoMessForm()
+    vacations = VacationDatesFill.objects.filter(
+        dateClose__gte=date.today(),
+        dateOpen__lte=date.today(),
+        messOption=None
+    )
+    if vacations:
+        vacation = vacations[0]
+    else:
+        vacation = None
+    vacation_context = { 'vacation': vacation }
+    
+    if vacation and vacation.check_student_valid(student):
+        if request.POST and vacation_context:
+            form = VacationLeaveNoMessForm(request.POST)
+            if form.is_valid(): 
+                in_date = datetime.strptime(request.POST.get('in_date'), '%d %B, %Y').date()
+                time0 = time.min
+                out_date = datetime.strptime(request.POST.get('out_date'), '%d %B, %Y').date()
+                in_date = datetime.combine(in_date, time0)
+                out_date = datetime.combine(out_date, time0)
+                status, obj = vacation.create_vacation(student, out_date, in_date)
+
+                context = {
+                    'option': option,
+                    'mess': mess,
+                    'leaves': leaves,
+                    'bonafides': bonafides,
+                    'balance' : balance,
+                    'daypasss': daypasss,
+                    'option1': 1,
+                    'out_date': out_date,
+                    'in_date': in_date,
+                    'student': student,
+                    'success': status
+                }
+            else:
+                context = {
+                    'option': option,
+                    'mess': mess,
+                    'leaves': leaves,
+                    'bonafides': bonafides,
+                    'balance' : balance,
+                    'daypasss': daypasss,
+                    'option1': 2,
+                    'form': form,
+                    'student': student
+                }
+        else:
+            context = {
+                'option': option,
+                'mess': mess,
+                'leaves': leaves,
+                'bonafides': bonafides,
+                'balance' : balance,
+                'daypasss': daypasss,
+                'option1': 0,
+                'form': form,
+                'student': student
+            }
+    else:
+        return redirect('leave')
+
+    return render(
+            request,
+            "vacation_no_mess.html",
+            dict(context, **vacation_context)
+    )
+
+
+@login_required
 @noPhD
 def leave(request):
-    dashboard
     student = Student.objects.get(user=request.user)
     leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
     daypasss = DayPass.objects.filter(student=student, dateTime__gte=date.today() - timedelta(days=7))
@@ -556,14 +676,13 @@ def leave(request):
             leaveform.dateTimeStart = make_aware(dateTimeStart)
             leaveform.dateTimeEnd = make_aware(dateTimeEnd)
             leaveform.student = student
-            print(request.POST.get('consent'))
             leaveform.save()
             if config.EMAIL_PROD:
                 email_to=[Warden.objects.get(hostel=HostelPS.objects.get(student=student).hostel).email]
             else:
                 email_to=["spammailashad@gmail.com"]                                                                     # For testing
-            mailObj=Leave.objects.latest('id')
-            mail_subject="New Leave ID: "+ str(mailObj.id)
+            mailObj = Leave.objects.latest('id')
+            mail_subject = "New Leave ID: "+ str(mailObj.id)
             if mailObj.student.parentEmail is None:
                 parentEmail = "No parent mail found"
             else:
@@ -577,10 +696,10 @@ def leave(request):
             else:
                 parentPhone = mailObj.student.parentPhone
                 
-            mail_message="Leave Application applied by "+ mailObj.student.name +" with leave id: " + str(mailObj.id) + ".\n"
-            mail_message=mail_message + "Parent name: " + parentName + "\nParent Email: "+ parentEmail + "\nParent Phone: " + parentPhone
-            mail_message=mail_message + "\nConsent type: " + mailObj.consent
-            send_mail(mail_subject,mail_message,settings.EMAIL_HOST_USER,email_to,fail_silently=False)
+            mail_message = "Leave Application applied by " + mailObj.student.name + " with leave id: " + str(mailObj.id) + ".\n"
+            mail_message = mail_message + "Parent name: " + parentName + "\nParent Email: " + parentEmail + "\nParent Phone: " + parentPhone
+            mail_message = mail_message + "\nConsent type: " + mailObj.consent
+            send_mail(mail_subject, mail_message, settings.EMAIL_HOST_USER, email_to, fail_silently=False)
 
             context = {
                 'option': option,
@@ -608,7 +727,6 @@ def leave(request):
                 'form': form,
                 'student': student
             }
-            print(form.errors)
     return render(request, "leave.html", dict(context, **leaveContext))
 
 

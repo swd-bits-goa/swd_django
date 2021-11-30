@@ -507,8 +507,10 @@ class VacationDatesFill(models.Model):
     messOption = models.ForeignKey(
         MessOptionOpen,
         on_delete=models.CASCADE,
+        blank=True,
+        null=True,
         default=None,
-        help_text="Mess Option for the months near corresponding Vacation")
+        help_text="Mess Option for the months (if any) near corresponding Vacation")
 
     class Meta:
         verbose_name = "Vacation Dates Option"
@@ -521,15 +523,10 @@ class VacationDatesFill(models.Model):
         """
         Checks whether the student has already filled vacation details.
         """
-        leaves_count = Leave.objects.filter(
-            student=student,
-            dateTimeStart__gte=self.allowDateAfter,
-            dateTimeEnd__lte=self.allowDateBefore
-            ).count()
-        if leaves_count == 0:
-            return True
-        else:
-            return False
+        return Leave.objects.filter(student=student, reason=self.description).count() == 0
+
+    def get_leave_comment(self):
+        return "Vacation " + self.description
 
     def create_vacation(self, student, dateTimeStart, dateTimeEnd):
         """
@@ -550,7 +547,7 @@ class VacationDatesFill(models.Model):
             leave.approved = True
             leave.disapproved = False
             leave.inprocess = False
-            leave.comment = "Vacation"
+            leave.comment = self.get_leave_comment()
             leave.save()
             return True, leave
         except Exception as e:
@@ -587,7 +584,7 @@ class VacationDatesFill(models.Model):
             leave object is present in database.
         """
         objs = Leave.objects.filter(
-            student=student, reason=self.description, comment="Vacation")
+            student=student, reason=self.description, comment=self.get_leave_comment())
         return objs.count() > 0
 
 
