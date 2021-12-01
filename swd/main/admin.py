@@ -7,8 +7,10 @@ from django.http import HttpResponseRedirect, HttpResponse
 import datetime
 from .models import MessBill, Leave
 from calendar import monthrange
-from import_export.admin import ExportActionModelAdmin, ImportExportModelAdmin
-from .resources import *
+from import_export import resources
+from import_export.formats import base_formats
+from import_export.admin import ExportActionModelAdmin, ExportMixin, ImportExportModelAdmin
+from .resources import ItemBuyResource, TeeBuyResource, MessOptionResource, StudentResource, HostelPSResource, DayPassResource, BonafideResource, LeaveResource  
 
 
 models = [
@@ -32,19 +34,36 @@ models = [
     VacationDatesFill,
     Security]
 
+
 @admin.register(Disco)
-class HostelPSAdmin(admin.ModelAdmin):
+class HostelPSAdmin(ExportMixin,admin.ModelAdmin):
     search_fields = ['student__name', 'student__bitsId']
+    resource_class = HostelPSResource
+
+    def get_export_formats(self):
+        formats = (
+          base_formats.XLS,
+          )
+        return [f for f in formats if f().can_export()]
 
 class DiscoAdmin(admin.ModelAdmin):
     search_fields = ['student__bitsId', 'student__name']
 
+
 @admin.register(DayPass)
-class DayPassAdmin(ImportExportModelAdmin, admin.ModelAdmin):
+class DayPassAdmin(ExportMixin, admin.ModelAdmin):
     search_fields = ['student__bitsId', 'student__name']
+    resource_class = DayPassResource
+
+    def get_export_formats(self):
+        formats = (
+          base_formats.XLS,
+          )
+        return [f for f in formats if f().can_export()]
+
 
 @admin.register(Bonafide)
-class BonafideAdmin(admin.ModelAdmin):
+class BonafideAdmin(ExportMixin,admin.ModelAdmin):
     search_fields = ['reason','otherReason', 'reqDate','student__name','student__bitsId']
     list_display = (
         'id',
@@ -55,6 +74,7 @@ class BonafideAdmin(admin.ModelAdmin):
         'status',
         'bonafide_actions',
     )
+    resource_class = BonafideResource
     list_filter = ('status',)
     def get_url(self, pk):
         url = '/bonafide/' + str(Bonafide.objects.get(pk=pk).id)
@@ -68,11 +88,16 @@ class BonafideAdmin(admin.ModelAdmin):
     bonafide_actions.short_description = 'Bonafide Actions'
     bonafide_actions.allow_tags = True
 
+    def get_export_formats(self):
+        formats = (
+          base_formats.XLS,
+          )
+        return [f for f in formats if f().can_export()]
+
 def exportmessbill_xls(modeladmin, request, queryset):
     select = [ i.student.bitsId for i in queryset]
     return HttpResponseRedirect("/messbill/?ids=%s" % (",".join(select)))
 exportmessbill_xls.short_description = u"Export Mess Bill"
-
 
 
 def update_cgpa(modeladmin, request, queryset):
@@ -95,8 +120,7 @@ class StudentAdmin(ExportActionModelAdmin):
 @admin.register(TeeBuy)
 class TeeBuyAdmin(ExportActionModelAdmin, admin.ModelAdmin):
     resource_class = TeeBuyResource
-    search_fields = ['tee__title']
-    
+    search_fields = ['tee__title']  
 
 
 @admin.register(ItemBuy)
@@ -104,11 +128,12 @@ class ItemBuyAdmin(ExportActionModelAdmin, admin.ModelAdmin):
     resource_class = ItemBuyResource  
     search_fields = ['item__title']
 
+
 @admin.register(MessOption)
 class MessOptionAdmin(ExportActionModelAdmin, admin.ModelAdmin):
     resource_class = MessOptionResource
     search_fields = ['mess','monthYear', 'student__bitsId']
-    
+
 
 @admin.register(Leave)
 class LeaveAdmin(ImportExportModelAdmin, admin.ModelAdmin):
@@ -117,6 +142,13 @@ class LeaveAdmin(ImportExportModelAdmin, admin.ModelAdmin):
     list_display = ('student', 'reason', 'dateTimeStart')
     list_filter = ('student', 'reason')
 
+    resource_class = LeaveResource
+    def get_export_formats(self):
+        formats = (
+          base_formats.XLS,
+          )
+        return [f for f in formats if f().can_export()]
+
 @admin.register(Due)
 class DueAdmin(admin.ModelAdmin):
     search_fields = ['student__name','amount','due_category__name','description','date_added']
@@ -124,5 +156,4 @@ class DueAdmin(admin.ModelAdmin):
 
 admin.site.register(Student, StudentAdmin)
 admin.site.register(HostelPS, HostelPSAdmin)
-# admin.site.register(Bonafide, BonafideAdmin)
 admin.site.register(models)
