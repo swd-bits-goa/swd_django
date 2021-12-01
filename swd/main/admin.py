@@ -118,27 +118,29 @@ class StudentAdmin(ExportActionModelAdmin):
 
 
 @admin.register(TeeBuy)
-class TeeBuyAdmin(ExportActionModelAdmin,admin.ModelAdmin):
+class TeeBuyAdmin(ExportActionModelAdmin, admin.ModelAdmin):
     resource_class = TeeBuyResource
     search_fields = ['tee__title']  
 
 
 @admin.register(ItemBuy)
-class ItemBuyAdmin(ExportActionModelAdmin,admin.ModelAdmin):
+class ItemBuyAdmin(ExportActionModelAdmin, admin.ModelAdmin):
     resource_class = ItemBuyResource  
     search_fields = ['item__title']
 
 
 @admin.register(MessOption)
-class MessOptionAdmin(ExportActionModelAdmin,admin.ModelAdmin):
+class MessOptionAdmin(ExportActionModelAdmin, admin.ModelAdmin):
     resource_class = MessOptionResource
     search_fields = ['mess','monthYear', 'student__bitsId']
 
 
 @admin.register(Leave)
-class LeaveAdmin(ExportMixin, admin.ModelAdmin):
-    search_fields = ['student__name', 'student__bitsId','dateTimeStart','id', 'student__user__username']
+class LeaveAdmin(ImportExportModelAdmin, admin.ModelAdmin):
+    search_fields = ['student__name', 'student__bitsId','dateTimeStart','id', 'student__user__username', 'reason']
     actions = [exportmessbill_xls, ]
+    list_display = ('student', 'reason', 'dateTimeStart')
+    list_filter = ('student', 'reason')
 
     resource_class = LeaveResource
     def get_export_formats(self):
