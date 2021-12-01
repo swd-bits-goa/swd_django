@@ -2443,11 +2443,12 @@ def update_hostel(request):
                         student = Student.objects.filter(bitsId=row[header['studentID']].value).first()
                         #print(student)
                     except Student.DoesNotExist:
-                        message_str = row[header['studentID']].value + " does not exist in database \n"
+                        message_str = str(row[header['studentID']].value) + " does not exist in database \n"
                         if message_str is not '':
                             messages.add_message(request,
                             message_tag, 
                             message_str)
+                            print(message_str)
                         continue
                     try:
                         hostel = HostelPS.objects.get(student=student)

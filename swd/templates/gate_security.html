@@ -133,6 +133,12 @@
 								</span>
 							</div>
 							{% endif %}
+							{% if inout.inCampus or not inout %}
+							<div>
+								<input type="checkbox" id="vacation_check" name="vacation_check" class="filled-in" />
+								<label for="vacation_check">Activate Vacation</label>
+							</div>
+							{% endif %}
 						</div>
 
 						<div class="col s10 push-s2 center-align">
@@ -207,6 +213,10 @@
 								<tr>
 									<td>On Weekend Pass</td>
 									<td>{{ inout.onWeekendPass }}</td>
+								</tr>
+								<tr>
+									<td>On Vacation</td>
+									<td>{{ inout.onVacation }}</td>
 								</tr>
 							</tbody>
 						</table>

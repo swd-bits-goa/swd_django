@@ -79,6 +79,7 @@ def gate_security(request):
             daypass_check = request.POST.get('daypass_check')
             incampus_check = request.POST.get('incampus_check')
             weekendpass_check = request.POST.get('weekendpass_check')
+            vacation_check = request.POST.get('vacation_check')
 
             try:
                 inout = InOut.objects.get(student__bitsId=username)
@@ -147,6 +148,10 @@ def gate_security(request):
                         inout.onWeekendPass = True
                         inout.save()
 
+                    elif vacation_check:
+                        inout.onVacation = True
+                        inout.save()
+
                 else:
                     inout.place = place
                     inout.inCampus = True
@@ -160,6 +165,8 @@ def gate_security(request):
                         daypass.inprocess = False
                         daypass.claimed = True
                         daypass.save()
+                    if inout.onVacation == True:
+                        inout.onVacation =False
                     inout.save()
             else:
                 inout = InOut(
@@ -169,7 +176,8 @@ def gate_security(request):
                             outDateTime=datetime.now(),
                             inCampus=False,
                             onLeave=False,
-                            onDaypass=False
+                            onDaypass=False,
+                            onVacation=True
                 )
                 if not incampus_check:
                     inout.inCampus=False
@@ -188,6 +196,9 @@ def gate_security(request):
                         inout.save()
                         daypass.inprocess = True
                         daypass.save()
+                    if vacation_check:
+                        inout.onVacation = True
+                        inout.save()
 
                 else:
                     inout.place=place
@@ -204,6 +215,8 @@ def gate_security(request):
                         daypass.inprocess = False
                         daypass.claimed = True
                         daypass.save()
+                    if inout.onVacation == True:
+                        inout.onVacation = True
                     inout.save()
             context = {
                 'student': student,

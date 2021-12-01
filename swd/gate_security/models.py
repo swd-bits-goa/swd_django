@@ -12,6 +12,7 @@ class InOut(models.Model):
     onLeave = models.BooleanField(null=False, default=False)
     onDaypass = models.BooleanField(null=False, default=False)
     onWeekendPass = models.BooleanField(null=False, default=False)
+    onVacation = models.BooleanField(null=False, default=False)
 
     def __str__(self):
         return self.student.bitsId + ' (' + self.student.name + ')'
