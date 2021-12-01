@@ -6,6 +6,9 @@ import re
 from django.utils import timezone
 from datetime import datetime
 from datetime import date
+from django.conf import settings
+import json
+
 
 try:
     from tools.dev_info import SALT_IMG as SALT
@@ -242,6 +245,10 @@ class Bonafide(models.Model):
     rejectedReason = models.TextField(default='', blank=True)
 
     def createText(self):
+
+        with open(settings.CONSTANTS_LOCATION, 'r') as fp:
+            data = json.load(fp)
+        bonafideAcademicSession = data['bonafide-academic-session']
     
         gender = "Mr. " if self.student.gender.lower() == 'm' else "Ms. "
         pronoun = "He " if gender=="Mr. " else "She "
@@ -268,9 +275,9 @@ class Bonafide(models.Model):
             year = today.year
         reason = self.otherReason if self.reason.lower()=='other' else self.reason
         if(res.status == "Student"):
-            return '''&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This is to certify that <i style="font-family: Monotype Corsiva">''' + gender + self.student.name.upper() + '''</i>, ID No. <i style="font-family: Monotype Corsiva">''' + self.student.bitsId + '''</i> is a bonafide student of '''+ yearName + ''' year class. ''' + pronoun +  ''' was admitted to the Institute on ''' + str(date_admit) + ''', for pursuing the <i style="font-family: Monotype Corsiva">'''+ branch + '''</i> ''' + ('''under dual degree ''' if dual_degree_student else '''''') + '''programme of studies. ''' +pronoun+'''is residing in the Hostel <i style="font-family: Monotype Corsiva">'''+res.hostel+'''-'''+res.room+'''</i> of this Institute. Date of joining the current academic session is 20 August ''' + str(year) + '''.<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This certificate is issued for the purpose of applying for ''' + reason + '''.'''
+            return '''&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This is to certify that <i style="font-family: Monotype Corsiva">''' + gender + self.student.name.upper() + '''</i>, ID No. <i style="font-family: Monotype Corsiva">''' + self.student.bitsId + '''</i> is a bonafide student of '''+ yearName + ''' year class. ''' + pronoun +  ''' was admitted to the Institute on ''' + str(date_admit) + ''', for pursuing the <i style="font-family: Monotype Corsiva">''' + branch + '''</i> ''' + ('''under dual degree ''' if dual_degree_student else '''''') + '''programme of studies. ''' + pronoun+'''is residing in the Hostel <i style="font-family: Monotype Corsiva">'''+res.hostel+'''-'''+res.room+'''</i> of this Institute. Date of joining the current academic session is ''' + str(bonafideAcademicSession) + '''.<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This certificate is issued for the purpose of applying for ''' + reason + '''.'''
         elif(res.status == "Thesis" or res.status == "PS2"):
-            return '''&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This is to certify that <i style="font-family: Monotype Corsiva">''' + gender + self.student.name.upper() + '''</i>, ID No. <i style="font-family: Monotype Corsiva">''' + self.student.bitsId + '''</i> is a bonafide student of '''+ yearName + ''' year class. ''' + pronoun +''' was admitted to the Institute on ''' + str(date_admit) + ''', for pursuing the <i style="font-family: Monotype Corsiva">''' + branch + '''</i> ''' + ('''under dual degree ''' if dual_degree_student else '''''') + '''programme of studies. ''' + pronoun+ ''' is pursuing <i>''' + res.status + '''</i> at <i style="font-family: Monotype Corsiva">''' + res.psStation + '''</i> as a part of the academic requirement of BITS-Pilani, Deemed University.<br>This certificate is issued for the purpose of applying for ''' + reason + '''.'''
+            return '''&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This is to certify that <i style="font-family: Monotype Corsiva">''' + gender + self.student.name.upper() + '''</i>, ID No. <i style="font-family: Monotype Corsiva">''' + self.student.bitsId + '''</i> is a bonafide student of '''+ yearName + ''' year class. ''' + pronoun +  ''' was admitted to the Institute on ''' + str(date_admit) + ''', for pursuing the <i style="font-family: Monotype Corsiva">''' + branch + '''</i> ''' + ('''under dual degree ''' if dual_degree_student else '''''') + '''programme of studies. ''' + pronoun+ ''' is pursuing <i style="font-family: Monotype Corsiva">''' + res.status + '''</i> at <i style="font-family: Monotype Corsiva">''' + res.psStation + '''</i> as a part of the academic requirement of BITS-Pilani, Deemed University.<br>This certificate is issued for the purpose of applying for ''' + reason + '''.'''
         else:
             return 'Bonafide is invalid for Graduate students'
 
