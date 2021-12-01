@@ -150,13 +150,6 @@ class LeaveAdmin(ImportExportModelAdmin, admin.ModelAdmin):
           )
         return [f for f in formats if f().can_export()]
 
-    resource_class = LeaveImEx
-    def get_export_formats(self):
-        formats = (
-          base_formats.XLS,
-          )
-        return [f for f in formats if f().can_export()]
-
 
 @admin.register(Due)
 class DueAdmin(admin.ModelAdmin):
