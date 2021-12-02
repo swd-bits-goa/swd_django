@@ -15,6 +15,7 @@
                                     <tr>
                                         <th>Name</th>
                                         <th>ID</th>
+                                        <th>Reason</th>
                                         <th>Ph No.</th>
                                         <th>Date</th>
                                         <th>Out time</th>
@@ -23,9 +24,10 @@
                                 </thead>
                                 <tbody>
                                     {% for out in inout %}
-                                    <tr class="clickable" data-id="{{ out.id }}">
+                                    <tr>
                                         <td>{{ out.student.name }}</td>
                                         <td>{{ out.student.bitsId }}</td>
+                                        <td>{{ out.reason }}</td>
                                         <td>{{ out.student.phone | floatformat:0 }}</td>
                                         <td>{{ out.outDateTime|date:"d/M/y" }}</td>
                                         <td>{{ out.outDateTime|time}}</td>   

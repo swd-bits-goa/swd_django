@@ -7,6 +7,7 @@ from django.views.generic import TemplateView
 
 from . import views
 
+
 urlpatterns = [
     url(r'^$', views.index, name='index'),
 
@@ -17,11 +18,11 @@ urlpatterns = [
     #login_success
     url(r'^accounts/profile/', views.login_success, name='login-success'),
 
-
     url(r'^dashboard/', views.dashboard, name="dashboard"),
     url(r'^profile/', views.profile, name="profile"),
     url(r'^messoption/', views.messoption, name="messoption"),
     url(r'^leave/', views.leave, name="leave"),
+    url(r'^vacation/$', views.vacation_no_mess, name="vacation_no_mess"),
     url(r'^certificates/', views.certificates, name="certificates"),
     url(r'bonafide/(?P<id>\d+)/$',views.printBonafide, name="printBonafide"),
     url(r'^warden/$', views.warden, name="warden"),
@@ -47,7 +48,6 @@ urlpatterns = [
     url(r'^developers/', views.developers, name="developers"),
     url(r'^mess-forgot/',views.mess_import, name='forgot'),
     url(r'^mess_exp/',views.mess_exp, name='mess_exp'),
-    #url(r'^mess_filter/',views.mess_filter, name='mess_filter'),
     url(r'^dues_dashboard/', views.dues_dashboard, name='dues_dashboard'),
     url(r'^import_dues_from_sheet/', views.import_dues_from_sheet, name='import_dues_from_sheet'),
     url(r'^publish_dues/', views.publish_dues, name='publish_dues'),

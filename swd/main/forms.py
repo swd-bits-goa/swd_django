@@ -4,10 +4,12 @@ from django.forms.widgets import TextInput, Textarea, FileInput
 from django.utils.translation import ugettext_lazy as _
 from datetime import date, datetime, timedelta
 
+
 class MessForm(forms.ModelForm):
     class Meta:
         model = MessOption
         fields = ['mess']
+
 
 class LeaveForm(forms.ModelForm):
     dateStart = forms.CharField(label='Departure Date', widget=forms.TextInput(attrs={'class': 'datepicker mask'}))
@@ -50,6 +52,7 @@ class LeaveForm(forms.ModelForm):
             'corrPhone': _('Contact No. during Leave'),
         }
 
+
 class BonafideForm(forms.ModelForm):
     class Meta:
         model = Bonafide
@@ -61,8 +64,10 @@ class BonafideForm(forms.ModelForm):
             'otherReason': _('Please mention if other reason'),
         }
 
+
 class printBonafideForm(forms.Form):
     text = forms.CharField(required=True, label='Body Text', widget=forms.Textarea(attrs={'class': 'materialize-textarea'}))
+
 
 class DayPassForm(forms.ModelForm):
     date = forms.CharField(label='Date', widget=forms.TextInput(attrs={'class': 'datepicker'}))
@@ -96,4 +101,28 @@ class DayPassForm(forms.ModelForm):
             'corrAddress': _(" Location you're visiting "),
             'document': _("Any Supporting Document"),
         }
-        
+
+
+class VacationLeaveNoMessForm(forms.Form):
+    out_date = forms.CharField(label='Out Date', widget=forms.TextInput(attrs={'class': 'datepicker'}))
+    in_date = forms.CharField(label='In Date', widget=forms.TextInput(attrs={'class': 'datepicker'}))
+    
+    def clean(self):
+        cleaned_data = super(VacationLeaveNoMessForm, self).clean()
+        out_date = datetime.strptime(cleaned_data['out_date'], '%d %B, %Y').date()
+        in_date = datetime.strptime(cleaned_data['in_date'], '%d %B, %Y').date()
+
+        if out_date >= in_date:
+            self.add_error(
+                    'in_date',
+                    "Vacation dates are inconsistent."
+            )
+        return cleaned_data
+
+    class Meta:
+        model = Leave
+        exclude = ['dateTimeStart', 'dateTimeEnd', 'student',
+                   'approvedBy', 'approved', 'disapproved',
+                   'inprocess', 'comment', 'corrPhone',
+                   'reason', 'corrAddress', 'consent', 'document']
+

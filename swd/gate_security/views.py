@@ -256,7 +256,11 @@ def in_out(request):
 
 @user_passes_test(lambda u: u.is_superuser or is_security(u))
 def leave_out(request):
-    inout = InOut.objects.filter(inCampus = False, onLeave = True, onDaypass = False).order_by('-outDateTime')
+    gte = datetime.combine(
+        datetime.today().date(),
+        time.min
+    )
+    inout = InOut.objects.filter(inCampus = False, onLeave = True, onDaypass = False, outDateTime__gte=gte).exclude(comment__icontains='vacation').order_by('-outDateTime')
     context = {
         'inout': inout,
     }
@@ -264,7 +268,11 @@ def leave_out(request):
 
 @user_passes_test(lambda u: u.is_superuser or is_security(u))
 def daypass_out(request):
-    inout = InOut.objects.filter(inCampus = False, onLeave = False, onDaypass = True).order_by('-outDateTime')
+    gte = datetime.combine(
+        datetime.today().date(),
+        time.min
+    )
+    inout = InOut.objects.filter(inCampus = False, onLeave = False, onDaypass = True, outDateTime__gte=gte).order_by('-outDateTime')
     context = {
         'inout': inout,
     }
