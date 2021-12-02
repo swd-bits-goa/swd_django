@@ -42,7 +42,6 @@ class MessOptionResource(resources.ModelResource):
 class StudentResource(resources.ModelResource):
     class Meta:
         model = Student
-        fields = ('bitsId', 'name')
 
 
 class HostelPSResource(resources.ModelResource):

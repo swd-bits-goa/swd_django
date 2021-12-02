@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.contrib.admin.options import ModelAdmin
 from django.shortcuts import redirect
 from main.models import *
 from django.utils.html import format_html
@@ -112,9 +113,15 @@ def delete_students(modeladmin, request, queryset):
     return redirect('delete_students')
 delete_students.description = u"Delete Students from Excel"
 
-class StudentAdmin(ExportActionModelAdmin):
+class StudentAdmin(ExportMixin, admin.ModelAdmin):
     search_fields = ['name', 'bitsId', 'user__username']
-    actions = [exportmessbill_xls, update_cgpa, add_new_students, delete_students ]
+    actions = [add_new_students, delete_students ]
+    resource_class = StudentResource
+    def get_export_formats(self):
+        formats = (
+          base_formats.XLS,
+          )
+        return [f for f in formats if f().can_export()]
 
 
 @admin.register(TeeBuy)
@@ -143,14 +150,6 @@ class LeaveAdmin(ImportExportModelAdmin, admin.ModelAdmin):
     list_filter = ('student', 'reason')
 
     resource_class = LeaveResource
-    def get_export_formats(self):
-        formats = (
-          base_formats.XLS,
-          )
-        return [f for f in formats if f().can_export()]
-
-
-    resource_class = LeaveImEx
     def get_export_formats(self):
         formats = (
           base_formats.XLS,
