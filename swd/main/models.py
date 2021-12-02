@@ -105,6 +105,8 @@ HOSTELS = (
     ('DH2', 'DH2'),
     ('DH3', 'DH3'),
     ('DH4', 'DH4'),
+    ('DH5', 'DH5'),
+    ('DH6', 'DH6')
 )
 
 class Warden(models.Model):
