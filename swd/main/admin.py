@@ -75,7 +75,6 @@ class BonafideAdmin(ExportMixin,admin.ModelAdmin):
         'bonafide_actions',
     )
     resource_class = BonafideResource
-
     list_filter = ('status',)
     def get_url(self, pk):
         url = '/bonafide/' + str(Bonafide.objects.get(pk=pk).id)
@@ -150,6 +149,13 @@ class LeaveAdmin(ImportExportModelAdmin, admin.ModelAdmin):
           )
         return [f for f in formats if f().can_export()]
 
+
+    resource_class = LeaveImEx
+    def get_export_formats(self):
+        formats = (
+          base_formats.XLS,
+          )
+        return [f for f in formats if f().can_export()]
 
 @admin.register(Due)
 class DueAdmin(admin.ModelAdmin):
