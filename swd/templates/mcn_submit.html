@@ -48,10 +48,10 @@
                         
 
                         <div class="row">
-                        <div class="input-field col s6">
-                        <label for="FathersIncome">Father's gross total income in INR</label>
-                        <input type="number" name="FathersIncome" id="FathersIncome" />
-                        </div>
+                            <div class="input-field col s6">
+                            <label for="FathersIncome">Father's gross total income in INR</label>
+                            <input type="number" name="FathersIncome" id="FathersIncome" />
+                            </div>
                         <div class="input-field col s6">
                         <label for="MothersIncome">Mother's gross total income in INR</label>
                         <input type="number" name="MothersIncome" id="MothersIncome" />
@@ -64,6 +64,7 @@
                         </div>
 
                         <div class="file-field input-field">
+                            <span>Merge all documents of Father in 1 pdf and upload.</span>
                         <div class="btn">
                             <span>Upload Father's ITR of AY {{ itr_year }}</span>
                             <input type="file" name="FathersIncomeDoc" id="FathersIncomeDoc">
@@ -74,6 +75,7 @@
                         </div>
 
                         <div class="file-field input-field">
+                            <span>Merge all documents of Mother in 1 pdf and upload.</span>
                         <div class="btn">
                             <span>Upload Mother's ITR of AY {{ itr_year }}</span>
                             <input type="file" name="MothersIncomeDoc" id="MothersIncomeDoc">
@@ -112,6 +114,10 @@
                             <i class="material-icons right">send</i>
                         </button>
                         </center>
+                        <div>
+                            <br />
+                            For any queries kindly email to <a href="mailto:scholarships@goa.bits-pilani.ac.in">scholarships@goa.bits-pilani.ac.in</a>
+                        </div>
                     </form>
                     {% endif %}
                 {% else %}
