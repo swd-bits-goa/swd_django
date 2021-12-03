@@ -16,15 +16,15 @@ except ModuleNotFoundError:
     SALT = '1234567890'
 
 MESS_CHOICES = (
-    ('A','Dining Hall A'),
-    ('C','Dining Hall C'),
-    ('D','Dining Hall D'))
+    ('A', 'Dining Hall A'),
+    ('C', 'Dining Hall C'),
+    ('D', 'Dining Hall D'))
 
 CONSENT_CHOICES = (
     ('Letter', 'Letter'),
     ('Fax', 'Fax'),
     ('Email', 'Email')
-    )
+)
 
 BONAFIDE_REASON_CHOICES = (
     ('Bank Loan', 'Bank Loan'),
@@ -54,28 +54,28 @@ BRANCH = {
 }
 
 ME = {
-    'H101':'M.E. Chemical',
-    'H103':'M.E. Computer Science',
-    'H112':'M.E. Software Systems',
-    'H123':'M.E. Microelectronics',
-    'H129':'M.E. biotechnology',
-    'H140':'M.E. Embedded Systems',
-    'H141':'M.E. Design Engineering',
-    'H106':'M.E. Mechanical',
-    'H151':'M.E. Sanitation Science, Technology and Management',
-    'H152':'M.Phil. In Liberal Studies',
+    'H101': 'M.E. Chemical',
+    'H103': 'M.E. Computer Science',
+    'H112': 'M.E. Software Systems',
+    'H123': 'M.E. Microelectronics',
+    'H129': 'M.E. biotechnology',
+    'H140': 'M.E. Embedded Systems',
+    'H141': 'M.E. Design Engineering',
+    'H106': 'M.E. Mechanical',
+    'H151': 'M.E. Sanitation Science, Technology and Management',
+    'H152': 'M.Phil. In Liberal Studies',
 }
 
 YEARNAMES = {
-     1: 'first',
-     2: 'second',
-     3: 'third',
-     4: 'fourth',
-     5: 'fifth',
-     6: 'sixth',
-     7: 'seventh',
-     8: 'eighth',
-     9: 'ninth',
+    1: 'first',
+    2: 'second',
+    3: 'third',
+    4: 'fourth',
+    5: 'fifth',
+    6: 'sixth',
+    7: 'seventh',
+    8: 'eighth',
+    9: 'ninth',
 }
 
 STUDENT_STATUS = (
@@ -109,6 +109,7 @@ HOSTELS = (
     ('DH6', 'DH6')
 )
 
+
 class Warden(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=50, null=True, blank=True)
@@ -117,25 +118,28 @@ class Warden(models.Model):
     phone_off = models.CharField(max_length=15, null=True, blank=True)
     phone_res = models.CharField(max_length=15, null=True, blank=True)
     email = models.EmailField(null=True, blank=True)
-    hostel = models.CharField(max_length=5, choices=HOSTELS, null=True, blank=True)
+    hostel = models.CharField(
+        max_length=5, choices=HOSTELS, null=True, blank=True)
 
     def __str__(self):
         return self.hostel + ' ' + self.name + ' ' + self.email + ' ' + self.chamber
+
 
 class HostelSuperintendent(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=50, null=True, blank=True)
     email = models.EmailField(null=True, blank=True)
     hostel = models.TextField(null=True, blank=True)
-    chamber = models.CharField(max_length = 10, null=True, blank=True)
-    office_ph = models.CharField(max_length = 12, null = True, blank=True)
-    residence_ph = models.CharField(max_length = 12, null = True, blank=True)
+    chamber = models.CharField(max_length=10, null=True, blank=True)
+    office_ph = models.CharField(max_length=12, null=True, blank=True)
+    residence_ph = models.CharField(max_length=12, null=True, blank=True)
     chamber = models.CharField(max_length=15, null=True, blank=True)
     phone_off = models.CharField(max_length=15, null=True, blank=True)
     phone_res = models.CharField(max_length=15, null=True, blank=True)
 
     def __str__(self):
         return self.hostel + ' ' + self.name + ' ' + self.email
+
 
 class Staff(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -146,7 +150,8 @@ class Staff(models.Model):
     def __str__(self):
         return self.staffType + ' ' + self.name
 
-class Student(models.Model):    
+
+class Student(models.Model):
     def hash_upload(instance, filename):
         ext = filename.split('.')[-1]
         tempname = (SALT+instance.bitsId).encode('utf-8')
@@ -157,7 +162,8 @@ class Student(models.Model):
     bitsId = models.CharField(max_length=15)
     gender = models.CharField(max_length=1, blank=True)
     bDay = models.DateField(blank=True, null=True)
-    profile_picture=models.FileField(upload_to=hash_upload, blank=True, null=True)
+    profile_picture = models.FileField(
+        upload_to=hash_upload, blank=True, null=True)
     phone = models.CharField(max_length=15, blank=True, null=True)
     email = models.EmailField(blank=True, null=True)
     address = models.TextField(blank=True, null=True)
@@ -196,19 +202,22 @@ class Student(models.Model):
         else:
             return False
 
+
 class DayScholar(models.Model):
-    student = models.OneToOneField('Student', on_delete = models.CASCADE)
+    student = models.OneToOneField('Student', on_delete=models.CASCADE)
 
     def __str__(self):
         return self.student.bitsId + ' (' + self.student.name + ')'
 
+
 class HostelPS(models.Model):
-    student = models.OneToOneField('Student', on_delete = models.CASCADE, related_name='hostelps')
+    student = models.OneToOneField(
+        'Student', on_delete=models.CASCADE, related_name='hostelps')
     acadstudent = models.BooleanField()
     status = models.CharField(max_length=10, choices=STUDENT_STATUS)
     psStation = models.TextField(null=True, blank=True)
     hostel = models.TextField(null=True, blank=True)
-    room = models.CharField(max_length = 7, null=True, blank=True)
+    room = models.CharField(max_length=7, null=True, blank=True)
 
     def __str__(self):
         return self.student.bitsId + ' (' + self.student.name + ')'
@@ -218,31 +227,35 @@ class HostelPS(models.Model):
             self.status = 'Student'
         super(HostelPS, self).save(*args, **kwargs)
 
+
 class CSA(models.Model):
-    student = models.OneToOneField('Student', on_delete = models.CASCADE)
+    student = models.OneToOneField('Student', on_delete=models.CASCADE)
     title = models.CharField(max_length=20)
     email = models.EmailField()
     pic = models.ImageField(blank=True, null=True)
-    priority=models.IntegerField(blank=True, null=True)
+    priority = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
         return self.title + ' ' + self.student.name + ' ' + self.email
 
+
 class MessOption(models.Model):
-    student = models.ForeignKey('Student', on_delete = models.CASCADE)
+    student = models.ForeignKey('Student', on_delete=models.CASCADE)
     monthYear = models.DateField()
     mess = models.CharField(max_length=1, choices=MESS_CHOICES)
 
     def __str__(self):
         return self.mess + ' ' + self.student.bitsId
 
+
 class Bonafide(models.Model):
-    student = models.ForeignKey('Student', on_delete = models.CASCADE)
+    student = models.ForeignKey('Student', on_delete=models.CASCADE)
     reason = models.CharField(max_length=20, choices=BONAFIDE_REASON_CHOICES)
     otherReason = models.TextField(null=True, blank=True)
     reqDate = models.DateField()
     printed = models.BooleanField(default=0, blank=True)
-    status = models.CharField(max_length=20, choices=BONAFIDE_STATUS_CHOICES, default= 'Pending')
+    status = models.CharField(
+        max_length=20, choices=BONAFIDE_STATUS_CHOICES, default='Pending')
     text = models.TextField(default='', blank=True)
     rejectedReason = models.TextField(default='', blank=True)
 
@@ -251,22 +264,22 @@ class Bonafide(models.Model):
         with open(settings.CONSTANTS_LOCATION, 'r') as fp:
             data = json.load(fp)
         bonafideAcademicSession = data['bonafide-academic-session']
-    
+
         gender = "Mr. " if self.student.gender.lower() == 'm' else "Ms. "
-        pronoun = "He " if gender=="Mr. " else "She "
-        firstDeg=self.student.bitsId[4:6]
-        secondDeg=self.student.bitsId[6:8]
-        res=HostelPS.objects.get(student=self.student)
+        pronoun = "He " if gender == "Mr. " else "She "
+        firstDeg = self.student.bitsId[4:6]
+        secondDeg = self.student.bitsId[6:8]
+        res = HostelPS.objects.get(student=self.student)
         branch = BRANCH[firstDeg]
         dual_degree_student = False
         if secondDeg != 'PS' and firstDeg != 'H1' and firstDeg != 'PH':
-            branch = branch +' and '+ BRANCH[secondDeg]
+            branch = branch + ' and ' + BRANCH[secondDeg]
             dual_degree_student = True
         if firstDeg == 'H1':
             branch = ME[self.student.bitsId[4:8]]
 
-        yearNum=self.reqDate.year-int(self.student.bitsId[0:4]) + 1
-        if(self.reqDate.month <8):
+        yearNum = self.reqDate.year-int(self.student.bitsId[0:4]) + 1
+        if(self.reqDate.month < 8):
             yearNum = yearNum - 1
         yearName = YEARNAMES[yearNum]
         date_admit = res.student.admit.strftime('%d/%m/%Y')
@@ -275,11 +288,11 @@ class Bonafide(models.Model):
             year = today.year - 1
         else:
             year = today.year
-        reason = self.otherReason if self.reason.lower()=='other' else self.reason
+        reason = self.otherReason if self.reason.lower() == 'other' else self.reason
         if(res.status == "Student"):
-            return '''&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This is to certify that <i style="font-family: Monotype Corsiva">''' + gender + self.student.name.upper() + '''</i>, ID No. <i style="font-family: Monotype Corsiva">''' + self.student.bitsId + '''</i> is a bonafide student of '''+ yearName + ''' year class. ''' + pronoun +  ''' was admitted to the Institute on ''' + str(date_admit) + ''', for pursuing the <i style="font-family: Monotype Corsiva">''' + branch + '''</i> ''' + ('''under dual degree ''' if dual_degree_student else '''''') + '''programme of studies. ''' + pronoun+'''is residing in the Hostel <i style="font-family: Monotype Corsiva">'''+res.hostel+'''-'''+res.room+'''</i> of this Institute. Date of joining the current academic session is ''' + str(bonafideAcademicSession) + '''.<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This certificate is issued for the purpose of applying for ''' + reason + '''.'''
+            return '''&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This is to certify that <i style="font-family: Monotype Corsiva">''' + gender + self.student.name.upper() + '''</i>, ID No. <i style="font-family: Monotype Corsiva">''' + self.student.bitsId + '''</i> is a bonafide student of ''' + yearName + ''' year class. ''' + pronoun + ''' was admitted to the Institute on ''' + str(date_admit) + ''', for pursuing the <i style="font-family: Monotype Corsiva">''' + branch + '''</i> ''' + ('''under dual degree ''' if dual_degree_student else '''''') + '''programme of studies. ''' + pronoun+'''is residing in the Hostel <i style="font-family: Monotype Corsiva">'''+res.hostel+'''-'''+res.room+'''</i> of this Institute. Date of joining the current academic session is ''' + str(bonafideAcademicSession) + '''.<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This certificate is issued for the purpose of applying for ''' + reason + '''.'''
         elif(res.status == "Thesis" or res.status == "PS2"):
-            return '''&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This is to certify that <i style="font-family: Monotype Corsiva">''' + gender + self.student.name.upper() + '''</i>, ID No. <i style="font-family: Monotype Corsiva">''' + self.student.bitsId + '''</i> is a bonafide student of '''+ yearName + ''' year class. ''' + pronoun +  ''' was admitted to the Institute on ''' + str(date_admit) + ''', for pursuing the <i style="font-family: Monotype Corsiva">''' + branch + '''</i> ''' + ('''under dual degree ''' if dual_degree_student else '''''') + '''programme of studies. ''' + pronoun+ ''' is pursuing <i style="font-family: Monotype Corsiva">''' + res.status + '''</i> at <i style="font-family: Monotype Corsiva">''' + res.psStation + '''</i> as a part of the academic requirement of BITS-Pilani, Deemed University.<br>This certificate is issued for the purpose of applying for ''' + reason + '''.'''
+            return '''&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This is to certify that <i style="font-family: Monotype Corsiva">''' + gender + self.student.name.upper() + '''</i>, ID No. <i style="font-family: Monotype Corsiva">''' + self.student.bitsId + '''</i> is a bonafide student of ''' + yearName + ''' year class. ''' + pronoun + ''' was admitted to the Institute on ''' + str(date_admit) + ''', for pursuing the <i style="font-family: Monotype Corsiva">''' + branch + '''</i> ''' + ('''under dual degree ''' if dual_degree_student else '''''') + '''programme of studies. ''' + pronoun + ''' is pursuing <i style="font-family: Monotype Corsiva">''' + res.status + '''</i> at <i style="font-family: Monotype Corsiva">''' + res.psStation + '''</i> as a part of the academic requirement of BITS-Pilani, Deemed University.<br>This certificate is issued for the purpose of applying for ''' + reason + '''.'''
         else:
             return 'Bonafide is invalid for Graduate students'
 
@@ -290,15 +303,17 @@ class Bonafide(models.Model):
     def __str__(self):
         return self.student.bitsId + ' (' + self.student.name + ') ' + self.reason
 
+
 class Leave(models.Model):
-    student = models.ForeignKey('Student', on_delete = models.CASCADE)
+    student = models.ForeignKey('Student', on_delete=models.CASCADE)
     dateTimeStart = models.DateTimeField()
     dateTimeEnd = models.DateTimeField()
     reason = models.TextField()
     consent = models.CharField(max_length=10, choices=CONSENT_CHOICES)
     corrAddress = models.TextField()
     corrPhone = models.CharField(max_length=15)
-    approvedBy = models.ForeignKey('Warden', blank=True, null=True, on_delete="PROTECT")
+    approvedBy = models.ForeignKey(
+        'Warden', blank=True, null=True, on_delete="PROTECT")
     approved = models.BooleanField(default=0, blank=True)
     disapproved = models.BooleanField(default=0, blank=True)
     inprocess = models.BooleanField(default=0, blank=True)
@@ -306,7 +321,8 @@ class Leave(models.Model):
     comment = models.TextField(default='', blank=True)
 
     def __str__(self):
-        return self.student.bitsId + ' '+ self.student.name + ' ' + str(self.id)
+        return self.student.bitsId + ' ' + self.student.name + ' ' + str(self.id)
+
 
 class DayPass(models.Model):
     def document_path(instance, filename):
@@ -315,12 +331,13 @@ class DayPass(models.Model):
         return 'documents/{}.{}'.format(
             hashlib.md5(tempname).hexdigest(), ext)
 
-    student = models.ForeignKey('Student', on_delete = models.CASCADE)
+    student = models.ForeignKey('Student', on_delete=models.CASCADE)
     reason = models.TextField()
     dateTime = models.DateTimeField(null=True, blank=False)
     inTime = models.DateTimeField(null=True, blank=False)
     corrAddress = models.TextField()
-    approvedBy = models.ForeignKey('HostelSuperintendent', blank=True, null=True, on_delete="PROTECT")
+    approvedBy = models.ForeignKey(
+        'HostelSuperintendent', blank=True, null=True, on_delete="PROTECT")
     approved = models.BooleanField(default=0, blank=True)
     disapproved = models.BooleanField(default=0, blank=True)
     inprocess = models.BooleanField(default=0, blank=True)
@@ -331,16 +348,18 @@ class DayPass(models.Model):
     def __str__(self):
         return self.student.bitsId + ' (' + self.student.name + ')'
 
+
 class LateComer(models.Model):
-    student = models.ForeignKey('Student', on_delete = models.CASCADE)
+    student = models.ForeignKey('Student', on_delete=models.CASCADE)
     dateTime = models.DateTimeField()
 
     def __str__(self):
         return self.student.bitsId + ' (' + self.student.name + ')'
 
+
 class Disco(models.Model):
-    student = models.ForeignKey('Student', on_delete = models.CASCADE)
-    dateOfViolation = models.DateField(blank = True, null = True)
+    student = models.ForeignKey('Student', on_delete=models.CASCADE)
+    dateOfViolation = models.DateField(blank=True, null=True)
     subject = models.TextField()
     action = models.TextField()
 
@@ -358,11 +377,12 @@ class MessOptionOpen(models.Model):
 
 
 class Transaction(models.Model):
-    student = models.ForeignKey('Student', on_delete = models.CASCADE)
+    student = models.ForeignKey('Student', on_delete=models.CASCADE)
     timestamp = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.timestamp + ' ' + student.user
+
 
 class MessBill(models.Model):
     month = models.DateField()
@@ -377,12 +397,13 @@ class MessBill(models.Model):
 
 # All store options are filled here
 
+
 class TeeAdd(models.Model):
     title = models.CharField(max_length=30)
     desc = models.TextField()
     pic = models.ImageField(blank=True, null=True)
     price = models.FloatField()
-    nick_price = models.FloatField(blank = True, null = True)
+    nick_price = models.FloatField(blank=True, null=True)
     nick = models.BooleanField(blank=True)
     colors = models.CharField(max_length=100, blank=True, null=True)
     sizes = models.CharField(max_length=100, blank=True, null=True)
@@ -390,6 +411,7 @@ class TeeAdd(models.Model):
 
     def __str__(self):
         return self.title + ' - Rs.' + str(self.price)
+
 
 class ItemAdd(models.Model):
     title = models.CharField(max_length=30)
@@ -401,9 +423,10 @@ class ItemAdd(models.Model):
     def __str__(self):
         return self.title + ' - Rs.' + str(self.price)
 
+
 class TeeBuy(models.Model):
-    student = models.ForeignKey('Student', on_delete = models.CASCADE)
-    tee = models.ForeignKey('TeeAdd', on_delete = models.CASCADE)
+    student = models.ForeignKey('Student', on_delete=models.CASCADE)
+    tee = models.ForeignKey('TeeAdd', on_delete=models.CASCADE)
     qty = models.IntegerField()
     nick = models.CharField(max_length=100, blank=True, null=True)
     color = models.CharField(max_length=10, blank=True, null=True)
@@ -420,14 +443,16 @@ class TeeBuy(models.Model):
         else:
             self.totamt = float(self.qty) * float(self.tee.nick_price)
         super(TeeBuy, self).save(*args, **kwargs)
-  
+
+
 class ItemBuy(models.Model):
-    student = models.ForeignKey('Student', on_delete = models.CASCADE)
-    item = models.ForeignKey('ItemAdd', on_delete = models.CASCADE)
+    student = models.ForeignKey('Student', on_delete=models.CASCADE)
+    item = models.ForeignKey('ItemAdd', on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.student.bitsId + ' ' + self.item.title
+
 
 class DueCategory(models.Model):
     name = models.CharField(max_length=100)
@@ -435,6 +460,7 @@ class DueCategory(models.Model):
 
     def __str__(self):
         return "Due category with name {} and description '{}'".format(self.name, self.description)
+
 
 class Due(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
@@ -449,6 +475,7 @@ class Due(models.Model):
     def __str__(self):
         return self.student.bitsId + "'s due entry with amount " + str(self.amount)
 
+
 class DuesPublished(models.Model):
     # This model keeps track of when dues was completely up to date
     # last time.
@@ -457,29 +484,32 @@ class DuesPublished(models.Model):
     def __str__(self):
         return str(self.date_published)
 
+
 class FileAdd(models.Model):
 
     file = models.FileField()
-    link = models.CharField(max_length=200, blank=True, null=True, editable = False, default='/')
+    link = models.CharField(max_length=200, blank=True,
+                            null=True, editable=False, default='/')
 
     def __str__(self):
         return self.link
 
     def save(self, *args, **kwargs):
-        self.link = '/media/' + self.file.name 
+        self.link = '/media/' + self.file.name
         super().save(*args, **kwargs)
 
 
 class Notice(models.Model):
-    
-    date = models.DateField(editable=False) 
+
+    date = models.DateField(editable=False)
     title = models.CharField(max_length=100)
     desc = models.TextField()
-    file = models.ForeignKey(FileAdd, on_delete=models.CASCADE, null=True, blank=True)
+    file = models.ForeignKey(
+        FileAdd, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return self.desc
-    
+
     def save(self, *args, **kwargs):
         self.date = timezone.now()
         super().save(*args, **kwargs)
@@ -487,16 +517,20 @@ class Notice(models.Model):
 
 class Document(models.Model):
     title = models.CharField(max_length=100)
-    file = models.ForeignKey(FileAdd, on_delete=models.CASCADE, null=True, blank=True)
+    file = models.ForeignKey(
+        FileAdd, on_delete=models.CASCADE, null=True, blank=True)
     #link = models.CharField(max_length=50, blank=True, null=True)
+
     def __str__(self):
-        return self.title    
+        return self.title
+
+
 class AntiRagging(models.Model):
     title = models.CharField(max_length=100)
     link = models.CharField(max_length=100)
 
     def __str__(self):
-        return self.title  
+        return self.title
 
 
 class VacationDatesFill(models.Model):
@@ -544,11 +578,18 @@ class VacationDatesFill(models.Model):
         param:
         student : Student Object
         data : python dictionary
-        
+
         returns:
         True, obj :  when object created
         False, error: when no object created, error is a str
         """
+        date_check = self.check_start_end_dates_in_range(
+            dateTimeStart=dateTimeStart,
+            dateTimeEnd=dateTimeEnd
+        )
+        if not date_check:
+            return False, "Dates Not in Allowed Range"
+
         try:
             leave = Leave(student=student, reason=self.description)
             leave.dateTimeStart = dateTimeStart
@@ -561,7 +602,7 @@ class VacationDatesFill(models.Model):
             return True, leave
         except Exception as e:
             return False, str(e)
-    
+
     def check_date_in_range(self, date):
         """
         Checks whether the date is between allowDateAfter and allowDateBefore
@@ -570,11 +611,11 @@ class VacationDatesFill(models.Model):
         date: datetime object
         """
         if date.date() <= self.allowDateBefore.date() \
-            and date.date() >= self.allowDateAfter.date():
+                and date.date() >= self.allowDateAfter.date():
             return True
         else:
             return False
-    
+
     def check_start_end_dates_in_range(self, dateTimeStart, dateTimeEnd):
         """
         Checks whether both start and end date time objects are in range
@@ -616,5 +657,6 @@ class AddressChangeRequest(models.Model):
         self.student.save()
         self.save()
 
+
 class Security(models.Model):
-    user = models.OneToOneField(User, on_delete= models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
