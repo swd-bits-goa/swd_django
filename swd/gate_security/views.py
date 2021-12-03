@@ -216,7 +216,7 @@ def gate_security(request):
                         daypass.claimed = True
                         daypass.save()
                     if inout.onVacation == True:
-                        inout.onVacation = True
+                        inout.onVacation = False
                     inout.save()
             context = {
                 'student': student,
@@ -260,7 +260,7 @@ def leave_out(request):
         datetime.today().date(),
         time.min
     )
-    inout = InOut.objects.filter(inCampus = False, onLeave = True, onDaypass = False, outDateTime__gte=gte).exclude(comment__icontains='vacation').order_by('-outDateTime')
+    inout = InOut.objects.filter(inCampus = False, onLeave = True, onDaypass = False, outDateTime__gte=gte).order_by('-outDateTime')
     context = {
         'inout': inout,
     }
