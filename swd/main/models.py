@@ -583,13 +583,6 @@ class VacationDatesFill(models.Model):
         True, obj :  when object created
         False, error: when no object created, error is a str
         """
-        date_check = self.check_start_end_dates_in_range(
-            dateTimeStart=dateTimeStart,
-            dateTimeEnd=dateTimeEnd
-        )
-        if not date_check:
-            return False, "Dates Not in Allowed Range"
-
         try:
             leave = Leave(student=student, reason=self.description)
             leave.dateTimeStart = dateTimeStart
