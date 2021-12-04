@@ -334,8 +334,8 @@ def messoption(request):
         messopen_new = MessOptionOpen.objects.all().last()
         try:
             messoption = MessOption.objects.filter(monthYear=messopen_new.monthYear, student=student)
-        except MessOption.DoesNotExist:
-            pass
+        except:
+            messoption = None
         
 
 
@@ -415,7 +415,8 @@ def messoption(request):
             }
     
     vacations = VacationDatesFill.objects.filter(
-        dateClose__gte=date.today(), dateOpen__lte=date.today())
+        dateClose__gte=date.today(), dateOpen__lte=date.today()).exclude(
+                messOption=None)
     
     if vacations:
         vacation_open = vacations[0]

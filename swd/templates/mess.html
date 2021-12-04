@@ -9,6 +9,7 @@
             <div class="col s12 l12">
                 <div class="card">
                     <div class="card-content">
+                        {% if vacation or mess %}
                         <span class="card-title">
                             Mess Option for
                             {% if vacation %}
@@ -17,7 +18,7 @@
                                 {{ mess.monthYear|date:'M Y' }}
                             {% endif %}
                         </span>
-                         {% if option == 0 %}
+                        {% if option == 0 %}
                         <form method="POST">
                             {% csrf_token %}
                             <div class="col-md-12">
@@ -76,6 +77,11 @@
                         {% else %}
                          <p> Sorry the mess filling period is over. Your mess will be alloted randomly and displayed here</p>
                         {% endif %}
+                    {% else %}
+
+                    Nothing's Here, come back again please!
+
+                    {% endif %}
                     </div>
                 </div>
             </div>
