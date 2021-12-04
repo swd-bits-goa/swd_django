@@ -550,6 +550,7 @@ def vacation_no_mess(request):
         'bonafides': bonafides,
         'balance' : balance,
         'daypasss': daypasss,
+        'student': student
     }
 
     errors = []
