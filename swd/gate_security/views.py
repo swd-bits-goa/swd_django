@@ -64,14 +64,13 @@ def gate_security(request):
                 weekendpass = None
 
             try:
-                t = time(0,0)
-                d = date.today()
                 vacationdates = VacationDatesFill.objects.get(
-                                allowDateAfter__gte=datetime.combine(d,t),
+                                allowDateAfter__lte=datetime.today().date(),
+                                allowDateBefore__gte=datetime.today().date()
                 )
             except VacationDatesFill.DoesNotExist:
                 vacationdates = None
-
+            print(vacationdates)
 
             context = {
                 'student': student,
