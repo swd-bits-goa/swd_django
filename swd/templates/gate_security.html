@@ -109,7 +109,7 @@
 								<input type="checkbox" id="leave_check" name="leave_check" class="filled-in" />
 								<label for="leave_check">Activate Leave</label>
 								<span>
-									{{ leave.dateTimeStart|date:"d/m/Y" }} {{ leave.dateTimeStart|time:"H:i" }} Approved: {{ leave.approved }}
+									{{ leave.dateTimeStart|date:"d/m/Y" }} {{ leave.dateTimeStart|time:"H:i" }} Approved: {{ leave.approved }} Reason: {{ leave.reason }}
 								</span>
 							</div>
 							{% endif %}
@@ -134,10 +134,14 @@
 							</div>
 							{% endif %}
 							{% if inout.inCampus or not inout %}
+							{% if not leave or leave.comment != "Vacation" %}
+							{% if vacationdates %}
 							<div>
 								<input type="checkbox" id="vacation_check" name="vacation_check" class="filled-in" />
 								<label for="vacation_check">Activate Vacation</label>
 							</div>
+							{% endif %}
+							{% endif %}
 							{% endif %}
 						</div>
 

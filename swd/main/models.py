@@ -569,7 +569,7 @@ class VacationDatesFill(models.Model):
         return Leave.objects.filter(student=student, reason=self.description).count() == 0
 
     def get_leave_comment(self):
-        return "Vacation " + self.description
+        return "Vacation"
 
     def create_vacation(self, student, dateTimeStart, dateTimeEnd):
         """
