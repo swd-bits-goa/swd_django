@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
-{% block content %}
 
+{% block content %}
 
 <div>
     <div class="section">
@@ -8,10 +8,25 @@
         <div class="row">
             <div class="col s12 l6">
                 <div class="card">
-                    {% if vacation %}
                     <div class="card-content">
+                    {% if vacation %}
                     <span class="card-title">Apply for {{ vacation.get_leave_comment }}</span>
+                        <p class="light-blue-text">
+                        Make sure your vacation dates are between
+                        {{ vacation.allowDateAfter.date }} and {{ vacation.allowDateBefore.date }}
+                        </p>
+                        <p>
+                        {% if errors %}
+                            {% for e in errors %}
+                                <div class="red-text alert alert-danger">
+                                    <strong>{{ e|escape }}</strong>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                        </p>
+
                         {% if option1 == 0 %}
+                        
                         <form method="POST">
                             {% csrf_token %}
                             <div class="col-md-12">
@@ -25,40 +40,47 @@
                                 <button class="btn desert-yellow waves-light waves-effect" type="submit">SUBMIT</button>
                             </div>
                         </form>
+
                         {% elif option1 == 1 %}
-                        <p>Vacation Leave successfully recorded.</p>
-                        <p>Leave applied from {{ out_date }}({{ out_time }}) to {{ in_date }}({{ in_time }})</p>
+                        
+                        <p>
+                            Vacation Leave successfully recorded.
+                        </p>
+                        <div class="green-text">
+                            Leave applied from {{ student_vacation.dateTimeStart}} to {{ student_vacation.dateTimeEnd }}
+                        </div>
+                        
                         {% else %}
-                        {% if form.errors %}
-                        {% for error in form.non_field_errors %}
-                        <div class="red-text alert alert-danger">
-                            <strong>{{ error|escape }}</strong>
-                        </div>
-                        {% endfor %}
-                        {% endif %}
-                        <div class=red-text>
-                            <p>There was a problem with form submission. Please refill.</p>
-                        </div>
-                        <form method="POST">
-                            {% csrf_token %}
-                            <div class="col-md-12">
-                                {% for field in form %}
-                                {% if form.errors %}
-                                {% for error in field.errors %}
-                                <div class="red-text alert alert-danger">
-                                    <strong>{{ error|escape }}</strong>
-                                </div>
+                        
+                            {% if form.errors %}
+                                {% for error in form.non_field_errors %}
+                                    <div class="red-text alert alert-danger">
+                                        <strong>{{ error|escape }}</strong>
+                                    </div>
                                 {% endfor %}
-                                {% endif %}
-                                <div class="input-field col s12">
-                                    {{ field }} {{ field.label_tag }}
+                            {% endif %}
+
+
+                            <form method="POST">
+                                {% csrf_token %}
+                                <div class="col-md-12">
+                                    {% for field in form %}
+                                        {% if form.errors %}
+                                        {% for error in field.errors %}
+                                            <div class="red-text alert alert-danger">
+                                                <strong>{{ error|escape }}</strong>
+                                            </div>
+                                        {% endfor %}
+                                        {% endif %}
+                                        <div class="input-field col s12">
+                                            {{ field }} {{ field.label_tag }}
+                                    </div>
+                                    {% endfor %}
                                 </div>
-                                {% endfor %}
-                            </div>
-                            <div class="col-xs-4">
-                                <button class="btn btn-block bg-green waves-effect" type="submit">SUBMIT</button>
-                            </div>
-                        </form>
+                                <div class="col-xs-4">
+                                    <button class="btn btn-block bg-green waves-effect" type="submit">SUBMIT</button>
+                                </div>
+                            </form>
                         {% endif %}
                     </div>
                     {% else %}
@@ -93,4 +115,5 @@
         padding-right: 9%;
     }
 </style>
+
 {% endblock %}

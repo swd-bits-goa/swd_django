@@ -41,7 +41,9 @@ class LeaveForm(forms.ModelForm):
     class Meta:
         model = Leave
         exclude = ['dateTimeStart', 'dateTimeEnd', 'student',
-                   'approvedBy', 'approved', 'disapproved', 'inprocess', 'comment', 'corrPhone']
+                   'approvedBy', 'approved', 'disapproved', 'inprocess',
+                   'comment', 'corrPhone', 'claimed']
+
         widgets = {
             'reason': forms.Textarea(attrs={'class': 'materialize-textarea validate'}),
             'corrAddress': forms.Textarea(attrs={'class': 'materialize-textarea validate'}),
@@ -73,7 +75,12 @@ class DayPassForm(forms.ModelForm):
     date = forms.CharField(label='Date', widget=forms.TextInput(attrs={'class': 'datepicker'}))
     time = forms.CharField(label='Out Time', widget=forms.TextInput(attrs={'class': 'timepicker'}))
     intime = forms.CharField(label='In Time', widget=forms.TextInput(attrs={'class': 'timepicker'}))
-    document = forms.FileField(label="Any Supporting Document", required=False, widget=forms.FileInput(attrs={'class': 'file-field input-field'}))
+    document = forms.FileField(
+            label="Any Supporting Document",
+            required=False,
+            widget=forms.FileInput(attrs={'class': 'file-field input-field'})
+    )
+    
     def clean(self):
         cleaned_data = super(DayPassForm, self).clean()
         date = datetime.strptime(cleaned_data['date'], '%d %B, %Y').date()

@@ -307,7 +307,6 @@ def loginform(request):
             return redirect('dashboard')
         else:
             messages.add_message(request, messages.INFO,  "Incorrect username or password", extra_tags='red')
-            print('Not able to authenticate')
 
     return render(request, "sign-in.html", {})
 
@@ -335,9 +334,8 @@ def messoption(request):
         messopen_new = MessOptionOpen.objects.all().last()
         try:
             messoption = MessOption.objects.filter(monthYear=messopen_new.monthYear, student=student)
-            print(messoption)
-        except MessOption.DoesNotExist:
-            pass
+        except:
+            messoption = None
         
 
 
@@ -417,7 +415,8 @@ def messoption(request):
             }
     
     vacations = VacationDatesFill.objects.filter(
-        dateClose__gte=date.today(), dateOpen__lte=date.today())
+        dateClose__gte=date.today(), dateOpen__lte=date.today()).exclude(
+                messOption=None)
     
     if vacations:
         vacation_open = vacations[0]
@@ -454,7 +453,6 @@ def messoption(request):
             context['errors'] = errors
 
         if (vacations.count() and len(errors) == 0) or (vacations.count() == 0) or (edit):
-            print("Inside Mess Filling")
             # Mess Option Filling
             mess = request.POST.get('mess')
             if edit:
@@ -528,63 +526,83 @@ def vacation_no_mess(request):
         dateOpen__lte=date.today(),
         messOption=None
     )
+    vacation_context = {}
+
     if vacations:
-        vacation = vacations[0]
+        vacation_open = vacations[0]
+        student_vacation = Leave.objects.filter(
+                student=student,
+                reason=vacation_open.description)
+        if student_vacation.count():
+            student_vacation = student_vacation[0]
+        else:
+            student_vacation = None
     else:
-        vacation = None
-    vacation_context = { 'vacation': vacation }
+        vacation_open = None
+        student_vacation = None
+   
+    vacation_context['vacation'] = vacation_open
+    vacation_context['student_vacation'] = student_vacation
     
-    if vacation and vacation.check_student_valid(student):
-        if request.POST and vacation_context:
+    context = {
+        'option': option,
+        'mess': mess,
+        'leaves': leaves,
+        'bonafides': bonafides,
+        'balance' : balance,
+        'daypasss': daypasss,
+        'student': student
+    }
+
+    errors = []
+    if vacation_open and student_vacation is None:
+        if request.POST:
             form = VacationLeaveNoMessForm(request.POST)
-            if form.is_valid(): 
+            if form.is_valid():
                 in_date = datetime.strptime(request.POST.get('in_date'), '%d %B, %Y').date()
                 time0 = time.min
                 out_date = datetime.strptime(request.POST.get('out_date'), '%d %B, %Y').date()
                 in_date = datetime.combine(in_date, time0)
                 out_date = datetime.combine(out_date, time0)
-                status, obj = vacation.create_vacation(student, out_date, in_date)
 
-                context = {
-                    'option': option,
-                    'mess': mess,
-                    'leaves': leaves,
-                    'bonafides': bonafides,
-                    'balance' : balance,
-                    'daypasss': daypasss,
-                    'option1': 1,
-                    'out_date': out_date,
-                    'in_date': in_date,
-                    'student': student,
-                    'success': status
-                }
+                allowed = True
+                if not vacation_open.check_date_in_range(in_date):
+                    errors.append("In Date should be within specified range.")
+                    allowed = False
+                if not vacation_open.check_date_in_range(out_date):
+                    allowed = False
+                    errors.append("Out Date should be within specified range.")
+                if in_date < out_date:
+                    allowed = False
+                    errors.append("Out Date should be before In Date")
+                if allowed:
+                    created, obj = vacation_open.create_vacation(
+                            student, out_date, in_date)
+                    if not created:
+                        errors.append(obj)
+                    else:
+                        vacation_context['student_vacation'] = obj
+                
+                if len(errors) == 0:
+                    context['option1'] = 1
+                else:
+                    context['option1'] = 2
             else:
-                context = {
-                    'option': option,
-                    'mess': mess,
-                    'leaves': leaves,
-                    'bonafides': bonafides,
-                    'balance' : balance,
-                    'daypasss': daypasss,
-                    'option1': 2,
-                    'form': form,
-                    'student': student
-                }
+                context['option1'] = 2
         else:
-            context = {
-                'option': option,
-                'mess': mess,
-                'leaves': leaves,
-                'bonafides': bonafides,
-                'balance' : balance,
-                'daypasss': daypasss,
-                'option1': 0,
-                'form': form,
-                'student': student
-            }
+            errors = []
+            context['option1'] = 0
     else:
-        return redirect('leave')
+        if vacation_open is None:
+            context['option1'] = 1
+            errors.append("No vacations nearby. Please keep checking this space for other details.")
+        if student_vacation is not None:
+            context['option1'] = 1
+            errors.append("You have already submitted the details.")
 
+    vacation_context['errors'] = errors
+    context['form'] = form
+    
     return render(
             request,
             "vacation_no_mess.html",
@@ -599,7 +617,7 @@ def leave(request):
     leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
     daypasss = DayPass.objects.filter(student=student, dateTime__gte=date.today() - timedelta(days=7))
     bonafides = Bonafide.objects.filter(student=student, reqDate__gte=date.today() - timedelta(days=7))
-    #mess
+    # mess
     messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
     messopen = messopen.exclude(dateOpen__gt=date.today())
     if messopen:
@@ -615,7 +633,7 @@ def leave(request):
         option = 2
         mess = 0
 
-        #dues
+    # dues
     try:
         lasted = DuesPublished.objects.latest('date_published').date_published
     except:
@@ -919,14 +937,12 @@ def wardenleaveapprove(request, leave):
 
     if request.POST:
         approved = request.POST.getlist('group1')
-        print(approved)
         comment = request.POST.get('comment')
         mail_message={}
         if config.EMAIL_PROD:
             email_to = [str(leave.student.user.username) + "@goa.bits-pilani.ac.in"]
         else:
             email_to = ["spammailashad@gmail.com"]
-            print(str(leave.student.user.username) + "@goa.bits-pilani.ac.in")
         mail_subject="Leave Status - "
         mail_message=leave.student.name+",\n"
 
@@ -2222,7 +2238,6 @@ def import_cgpa(request):
                         messages.add_message(request,
                                             message_tag, 
                                             message_str)
-                        print(message_str)
                         continue
                     change = student.change_cgpa(float(row[header['CGPA']].value))
                     if change is False:
@@ -2231,9 +2246,7 @@ def import_cgpa(request):
                         messages.add_message(request,
                                             message_tag, 
                                             message_str)
-                        print(message_str)
                     else:
-                        print(str(row[header['studentID']].value) + " cgpa changed.")
                         count = count + 1
             message_str = "CGPAs successfully updated of " + str(count) + " students."
         else:
@@ -2304,7 +2317,6 @@ def add_new_students(request):
                             username = 'h' + studentID[0:4] + studentID[8:11]
                         else:
                             username = 'f' + studentID[0:4] + studentID[8:11]
-                    print(username)
                     password = User.objects.make_random_password()
 
                     # Date of Birth and Date of Admit
@@ -2559,14 +2571,12 @@ def update_hostel(request):
                     # create User model first then Student model
                     try:
                         student = Student.objects.filter(bitsId=row[header['studentID']].value).first()
-                        #print(student)
                     except Student.DoesNotExist:
                         message_str = str(row[header['studentID']].value) + " does not exist in database \n"
                         if message_str is not '':
                             messages.add_message(request,
                             message_tag, 
                             message_str)
-                            print(message_str)
                         continue
                     try:
                         hostel = HostelPS.objects.get(student=student)
@@ -3172,7 +3182,6 @@ def leave_export(request):
             ws.col(col_num).width = columns[col_num][1]
 
         for i in approved:
-            print(i)
             obj = i.student
             row = [
                 obj.bitsId,
@@ -3417,7 +3426,6 @@ def leave_diff(request):
                             disapproved=False
                         Leave.objects.get(student = student, dateTimeStart__date = rev_sdate, approved=approved, disapproved=False, inprocess=False)
                     except Leave.DoesNotExist:
-                        print("Exception caught")
                         row = [
                             row[header['loginID']].value,
                             row[header['sdate']].value,
@@ -3462,7 +3470,6 @@ def get_corr_address(request):
         #ds = ds.strftime('%Y-%m-%d')
         de = datetime(year=2020, month=3, day=15)
         #de = de.strftime('%Y-%m-%d')
-        print(ds)
         query = Leave.objects.filter(dateTimeStart__date__gte = ds, dateTimeEnd__date__lte = de ,approved = True)
         columns = [
                 (u"studentID", 6000),
