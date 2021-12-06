@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import InOut, WeekendPass
-from main.models import Leave, DayPass, Student
+from main.models import Leave, DayPass, Student, VacationDatesFill
 from django.views.decorators.csrf import csrf_protect
 from django.conf import settings
 from django.db.models import Q
@@ -17,6 +17,8 @@ def gate_security(request):
     errors = []
     if request.method == 'POST':
         if request.POST.get("form_type") == 'formOne':
+            #The first form - In the inout tab when the guard enters bitsID and all the active
+            # leaves etc are shown for a particular student.
             username = request.POST.get('username')
             try:
                 student = Student.objects.get(bitsId=username)
@@ -61,6 +63,15 @@ def gate_security(request):
             except WeekendPass.DoesNotExist:
                 weekendpass = None
 
+            try:
+                vacationdates = VacationDatesFill.objects.get(
+                                allowDateAfter__lte=datetime.today().date(),
+                                allowDateBefore__gte=datetime.today().date()
+                )
+            except VacationDatesFill.DoesNotExist:
+                vacationdates = None
+            print(vacationdates)
+
             context = {
                 'student': student,
                 'leave': leave,
@@ -68,10 +79,12 @@ def gate_security(request):
                 'weekendpass': weekendpass,
                 'inout': inout,
                 'errors': errors,
+                'vacationdates': vacationdates,
             }
             return render(request, "gate_security.html", context)
 
         elif request.POST.get("form_type") == 'formTwo':
+            #The guard records an inout activity of the student
             username = request.POST.get('bitsid')
             student = Student.objects.get(bitsId=username)
             place = request.POST.get('place')
@@ -123,7 +136,17 @@ def gate_security(request):
             except WeekendPass.DoesNotExist:
                 weekendpass = None
 
+            try:
+                t = time(0,0)
+                d = date.today()
+                vacationdates = VacationDatesFill.objects.get(
+                                allowDateAfter__gte=datetime.combine(d,t),
+                )
+            except VacationDatesFill.DoesNotExist:
+                vacationdates = None
+
             if inout:
+                #We have an existing inout object created of the student
                 if inout.inCampus == True:
                     # Student is leaving campus
                     inout.place = place
@@ -134,8 +157,10 @@ def gate_security(request):
 
                     if leave_check:
                         inout.onLeave = True
-                        inout.save()
                         leave.inprocess = True
+                        if leave.comment == 'Vacation':
+                            inout.onVacation = True
+                        inout.save()
                         leave.save()
 
                     elif daypass_check:
@@ -153,6 +178,7 @@ def gate_security(request):
                         inout.save()
 
                 else:
+                    #Student is coming back in campus
                     inout.place = place
                     inout.inCampus = True
                     inout.inDateTime = datetime.now()
@@ -169,6 +195,7 @@ def gate_security(request):
                         inout.onVacation =False
                     inout.save()
             else:
+                #Creating an inout object of the student in case it was not existing
                 inout = InOut(
                             student=student,
                             place=place,
@@ -180,6 +207,7 @@ def gate_security(request):
                             onVacation=True
                 )
                 if not incampus_check:
+                    #If the student is leaving campus
                     inout.inCampus=False
                     inout.outDateTime = datetime.now()
                     inout.inDateTime = None
@@ -187,6 +215,8 @@ def gate_security(request):
 
                     if leave_check:
                         inout.onLeave = True
+                        if leave.comment == 'Vacation':
+                            inout.onVacation = True
                         inout.save()
                         leave.inprocess = True
                         leave.save()
@@ -201,6 +231,7 @@ def gate_security(request):
                         inout.save()
 
                 else:
+                    #If the student is coming back in campus
                     inout.place=place
                     inout.inCampus=True
                     inout.inDateTime = datetime.now()
