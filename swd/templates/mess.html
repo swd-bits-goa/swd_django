@@ -9,7 +9,7 @@
             <div class="col s12 l12">
                 <div class="card">
                     <div class="card-content">
-                        {% if vacation or mess %}
+                    {% if vacation or mess %}
                         <span class="card-title">
                             Mess Option for
                             {% if vacation %}
@@ -75,7 +75,7 @@
                         {% elif option == 2 %}
                         <p>You have filled this period's mess as <b> Dining Hall {{mess.mess}}</b></p>
                         {% else %}
-                         <p> Sorry the mess filling period is over. Your mess will be alloted randomly and displayed here</p>
+                        <p> Sorry the mess filling period is over. Your mess will be alloted randomly and displayed here</p>
                         {% endif %}
                     {% else %}
 

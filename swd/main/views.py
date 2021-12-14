@@ -324,8 +324,7 @@ def messoption(request):
     leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
     daypasss = DayPass.objects.filter(student=student, dateTime__gte=date.today() - timedelta(days=7))
     bonafides = Bonafide.objects.filter(student=student, reqDate__gte=date.today() - timedelta(days=7))
-    messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
-    messopen = messopen.exclude(dateOpen__gt=date.today())
+    messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today(), dateOpen__lte=date.today())
     errors = []
 
     if messopen:
@@ -335,9 +334,7 @@ def messoption(request):
         try:
             messoption = MessOption.objects.filter(monthYear=messopen_new.monthYear, student=student)
         except:
-            messoption = None
-        
-
+            messoption = [ None ]
 
     # dues
     try:
@@ -374,17 +371,19 @@ def messoption(request):
     if request.GET:
         edit = request.GET.get('edit')
 
-    if (messopen and not messoption and datetime.today().date() < messopen[0].dateClose) or (messopen and edit):
+    if (messopen and not messoption) or (messopen and edit):
         form = MessForm(request.POST)
         context = {
             'option': 0,
+            'mess': messopen[0],
             'form': form,
             'dateClose': messopen[0].dateClose,
             'student': student,
             'balance': balance,
             'leaves': leaves,
             'bonafides': bonafides,
-            'daypasss': daypasss,}
+            'daypasss': daypasss,
+        }
     elif messopen and messoption:
         context = {
             'option': 1,
