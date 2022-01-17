@@ -22,8 +22,13 @@
 
                                 </tr>
                                 <tr>
+                                    <!-- temporary fix to hide default DOB of 2021 batch -->
                                     <td>DOB</td>
+                                    {% if '2021' in student.bitsId %}
+                                    <td></td>
+                                    {% else %}
                                     <td>{{ student.bDay }}</td>
+                                    {% endif %}
                                 </tr>
                                 <tr>
                                     <td>Address</td>
