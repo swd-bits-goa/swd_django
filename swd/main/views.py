@@ -120,7 +120,9 @@ def dashboard(request):
     
     with open(settings.CONSTANTS_LOCATION, 'r') as fp:
         data = json.load(fp)
-    if student.nophd():
+    if student.advance_amount != None:
+        main_amt = student.advance_amount
+    elif student.nophd():
         main_amt = data['phd-swd-advance']
     else:
         main_amt = data['swd-advance']
@@ -214,7 +216,9 @@ def profile(request):
         
         with open(settings.CONSTANTS_LOCATION, 'r') as fp:
             data = json.load(fp)
-        if student.nophd():
+        if student.advance_amount != None:
+            main_amt = student.advance_amount
+        elif student.nophd():
             main_amt = data['phd-swd-advance']
         else:
             main_amt = data['swd-advance']
@@ -360,7 +364,9 @@ def messoption(request):
     
     with open(settings.CONSTANTS_LOCATION, 'r') as fp:
         data = json.load(fp)
-    if student.nophd():
+    if student.advance_amount != None:
+        main_amt = student.advance_amount
+    elif student.nophd():
         main_amt = data['phd-swd-advance']
     else:
         main_amt = data['swd-advance']
@@ -513,7 +519,9 @@ def vacation_no_mess(request):
 
     with open(settings.CONSTANTS_LOCATION, 'r') as fp:
         data = json.load(fp)
-    if student.nophd():
+    if student.advance_amount != None:
+        main_amt = student.advance_amount
+    elif student.nophd():
         main_amt = data['phd-swd-advance']
     else:
         main_amt = data['swd-advance']
@@ -656,7 +664,9 @@ def leave(request):
     
     with open(settings.CONSTANTS_LOCATION, 'r') as fp:
         data = json.load(fp)
-    if student.nophd():
+    if student.advance_amount != None:
+        main_amt = student.advance_amount
+    elif student.nophd():
         main_amt = data['phd-swd-advance']
     else:
         main_amt = data['swd-advance']
@@ -779,7 +789,9 @@ def certificates(request):
     
     with open(settings.CONSTANTS_LOCATION, 'r') as fp:
         data = json.load(fp)
-    if student.nophd():
+    if student.advance_amount != None:
+        main_amt = student.advance_amount
+    elif student.nophd():
         main_amt = data['phd-swd-advance']
     else:
         main_amt = data['swd-advance']
@@ -1074,7 +1086,9 @@ def daypass(request):
     
     with open(settings.CONSTANTS_LOCATION, 'r') as fp:
         data = json.load(fp)
-    if student.nophd():
+    if student.advance_amount != None:
+        main_amt = student.advance_amount
+    elif student.nophd():
         main_amt = data['phd-swd-advance']
     else:
         main_amt = data['swd-advance']
@@ -1369,7 +1383,9 @@ def store(request):
     
     with open(settings.CONSTANTS_LOCATION, 'r') as fp:
         data = json.load(fp)
-    if student.nophd():
+    if student.advance_amount != None:
+        main_amt = student.advance_amount
+    elif student.nophd():
         main_amt = data['phd-swd-advance']
     else:
         main_amt = data['swd-advance']
@@ -1512,7 +1528,9 @@ def dues(request):
     
     with open(settings.CONSTANTS_LOCATION, 'r') as fp:
         data = json.load(fp)
-    if student.nophd():
+    if student.advance_amount != None:
+        main_amt = student.advance_amount
+    elif student.nophd():
         main_amt = data['phd-swd-advance']
     else:
         main_amt = data['swd-advance']
@@ -1620,7 +1638,9 @@ def search(request):
         
         with open(settings.CONSTANTS_LOCATION, 'r') as fp:
             data = json.load(fp)
-        if student.nophd():
+        if student.advance_amount != None:
+            main_amt = student.advance_amount
+        elif student.nophd():
             main_amt = data['phd-swd-advance']
         else:
             main_amt = data['swd-advance']
@@ -1792,7 +1812,9 @@ def documents(request):
             
             with open(settings.CONSTANTS_LOCATION, 'r') as fp:
                 data = json.load(fp)
-            if student.nophd():
+            if student.advance_amount != None:
+                main_amt = student.advance_amount
+            elif student.nophd():
                 main_amt = data['phd-swd-advance']
             else:
                 main_amt = data['swd-advance']
@@ -2000,10 +2022,10 @@ def import_dues_from_sheet(request):
                 first_iter = True
                 categories = []
                 for row in sheet.get_rows():
-                    # ID No | Name | Expense 1 | Expense 2 | ... | Expense N
+                    # ID No | Name | Expense 1 | Expense 2 | ... | Expense N | advance_amount
                     #              [ DueCategory(expense 1), DueCategory(expense 2), ...]
                     if first_iter:
-                        for i in range(2, len(row)):
+                        for i in range(2, len(row)-1): # advance_amount will be last column
                             categories.append(retrieve_or_create_due_category(name=row[i].value))
 
                         first_iter = False
@@ -2045,7 +2067,14 @@ def import_dues_from_sheet(request):
                                                due_category=category,
                                                description=category.name,
                                                date_added=datetime.now().date())
-
+                    
+                    try:
+                        student.advance_amount = row[len(row)-1].value
+                        student.save()
+                    except:
+                        student.advance_amount = None
+                        student.save()
+                        continue
             os.remove(tmp)
 
             messages.success(request, "Dues have been imported")
@@ -2086,7 +2115,9 @@ def developers(request):
             
             with open(settings.CONSTANTS_LOCATION, 'r') as fp:
                 data = json.load(fp)
-            if student.nophd():
+            if student.advance_amount != None:
+                main_amt = student.advance_amount
+            elif student.nophd():
                 main_amt = data['phd-swd-advance']
             else:
                 main_amt = data['swd-advance']
