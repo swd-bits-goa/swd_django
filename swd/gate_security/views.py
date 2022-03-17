@@ -184,13 +184,17 @@ def gate_security(request):
                     inout.inDateTime = datetime.now()
                     inout.outDateTime = None
                     if inout.onLeave == True:
+                        inout.onLeave = False
                         leave.inprocess = False
                         leave.claimed = True
                         leave.save()
+                        inout.save()
                     if inout.onDaypass == True:
+                        inout.onDaypass = False
                         daypass.inprocess = False
                         daypass.claimed = True
                         daypass.save()
+                        inout.save()
                     if inout.onVacation == True:
                         inout.onVacation =False
                     inout.save()
