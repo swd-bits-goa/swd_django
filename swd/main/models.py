@@ -373,6 +373,7 @@ class MessOptionOpen(models.Model):
     monthYear = models.DateField()
     dateOpen = models.DateField()
     dateClose = models.DateField()
+    capacity = models.IntegerField(null=True)
 
     def __str__(self):
         return str(self.monthYear.month) + ' Open: ' + str(self.dateOpen) + ' Close: ' + str(self.dateClose)
