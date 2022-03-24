@@ -460,20 +460,22 @@ def messoption(request):
         if (vacations.count() and len(errors) == 0) or (vacations.count() == 0) or (edit and len(errors) == 0):
             # Mess Option Filling
             mess = request.POST.get('mess')
-            if edit:
-                messoption.delete()
             if messopen[0].capacity != None:
                 if MessOption.objects.filter(mess=mess).count() < messopen[0].capacity:
+                    if edit:
+                        messoption.delete()
                     messoptionfill = MessOption(
                         student=student,
                         monthYear=messopen[0].monthYear,
                         mess=mess)
                     messoptionfill.save()
-                    context['mess'] = messoption[0]
+                    context['mess'] = messoptionfill
                     context['option'] = 1
                 else:
                     context['capacity']="Choose different mess, capacity full."
             else:
+                if edit:
+                    messoption.delete()
                 messoptionfill = MessOption(
                         student=student,
                         monthYear=messopen[0].monthYear,
