@@ -1,4 +1,5 @@
 import os
+import time
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'swd.settings')
 
 import django
@@ -6,7 +7,7 @@ django.setup()
 
 from django.contrib.auth.models import User
 from django.conf import settings
-from main.models import Student, Leave, MessOption, Bonafide, Warden, HostelPS, CSA, Security, HostelSuperintendent
+from main.models import Student, Leave, MessOption, Bonafide, Warden, HostelPS, CSA, Security, HostelSuperintendent, Notice
 from django.utils import timezone
 
 import random
@@ -294,8 +295,8 @@ def create_hostelsuperintendent(i):
             mHostelSuperintendent = HostelSuperintendent(
                 user=mUser,
                 name=mUser.first_name, 
-                email=mUser.email,               
-                hostel=hostel_choices[4*i]+", "+hostel_choices[4*i+1]+", "+hostel_choices[4*i+2]+", "+hostel_choices[4*i+3],
+                email=mUser.email,
+                hostel=", ".join(hostel_choices[4*i : 4*i+4]), # Convenient solution because the number of hostels is divisible by 4
                 chamber='BX12',
                 phone_off=fake_number_generator(),
                 phone_res=fake_number_generator(),
@@ -305,6 +306,15 @@ def create_hostelsuperintendent(i):
             return True
     except Exception as e:
         print("Exception raised in creating hostel superintendent " + str(i) + ": " + str(e))
+    return False
+
+
+def create_dummy_notice(i):
+    try:
+        notice = Notice.objects.create(date=datetime.datetime.now(), title=f"Notice {i}", desc="Notice description goes here")
+        return True
+    except Exception as e:
+        print("Exception raised in creating notice " + str(i) + ": " + str(e))
     return False
 
 if __name__ == '__main__':
@@ -320,11 +330,12 @@ if __name__ == '__main__':
 
     agreed = input("THIS WILL CLEAR ALL THE EXISTING DATABASE RECORDS. Continue? [Y/n]: ")
     if agreed in ['Y', 'y', 'YES']:
-        print("Clearing existing database....")
+        print("Clearing existing database...", end=" ")
     else:
         print("Exiting")
         exit()
     
+    stime = time.time()
     Leave.objects.all().delete()
     HostelPS.objects.all().delete()
     MessOption.objects.all().delete()
@@ -335,49 +346,63 @@ if __name__ == '__main__':
     CSA.objects.all().delete()
     Security.objects.all().delete()
     HostelSuperintendent.objects.all().delete()
+    Notice.objects.all().delete()
+    print(f"Cleared in {time.time() - stime:.3f}s")
 
     print("Generating the fake data now....")
     
     create_super_user()
 
     student_success = True
+    stime = time.time()
+    print("Creating students...", end=" ")
     for i in range(args.id_start, args.id_end, args.id_jump):
         student_success &= create_student(i)
     if student_success:
-        print(str(1 + (args.id_end - args.id_start) // args.id_jump) + " Students created.")
+        print(f"{1 + (args.id_end - args.id_start) // args.id_jump} created in {time.time()-stime:.3f}s")
 
     warden_success = True
+    stime = time.time()
+    print("Creating wardens...", end=" ")
     for i in range(len(hostel_choices)):
         warden_success &= create_warden(i)
     if warden_success:
-        print(str(i+1) + " Wardens created.")
+        print(f"{i+1} created in {time.time()-stime:.3f}s")
 
     hostel_success = True
+    stime = time.time()
+    print("Creating hostelPS...", end=" ")
     students_list = Student.objects.all()
     i = 0
     for student in students_list:
         hostel_success &= create_hostel(i, student)
         i += 1
     if hostel_success:
-        print(str(i) + " hostelPS created.")
+        print(f"{i} created in {time.time()-stime:.3f}s")
 
     mess_success = True
+    stime = time.time()
+    print("Creating Mess Options...", end=" ")
     i = 0
     for student in students_list:
         mess_success &= create_mess(i, student)
         i += 1
     if mess_success:
-        print(str(i) + " Mess Options created.")
+        print(f"{i} created in {time.time()-stime:.3f}s")
 
     bonafide_success = True
+    stime = time.time()
+    print("Creating Bonafides...", end=" ")
     i = 0
     for student in students_list:
         bonafide_success &= create_bonafide(i, student)
         i += 1
     if bonafide_success:
-        print(str(i) + " Bonafides created.")
+        print(f"{i} created in {time.time()-stime:.3f}s")
 
     leave_success = True
+    stime = time.time()
+    print("Creating Leaves...", end=" ")
     i = 0
     for student in students_list:
         hostel = HostelPS.objects.get(student=student)
@@ -386,29 +411,45 @@ if __name__ == '__main__':
             leave_success &= create_leave(i, student, warden)
             i += 1
     if leave_success:
-        print(str(i) + " Leaves created.")
+        print(f"{i} created in {time.time()-stime:.3f}s")
 
 
     csa_success = True
+    stime = time.time()
+    print("Creating CSA Members...", end=" ")
     i = 0
     for student in students_list:
         if i<5:
             csa_success &= create_csa(i, student)
             i += 1
     if csa_success:
-        print(str(i) + " Csa Members created.")
+        print(f"{i} created in {time.time()-stime:.3f}s")
         
     security_success = True
+    stime = time.time()
+    print("Creating Securities...", end=" ")
     for i in range(10):
         security_success &= create_security(i)
     if security_success:
-        print(str(i+1) + " Security created.")
+        print(f"{i+1} created in {time.time()-stime:.3f}s")
 
     hostelsuperintendent_success = True
+    stime = time.time()
+    print("Creating Hostel Superintendents...", end=" ")
     for i in range(5):
         hostelsuperintendent_success &= create_hostelsuperintendent(i)
     if hostelsuperintendent_success:
-        print(str(i+1) + " Hostel Superintendents created.")
+        print(f"{i+1} created in {time.time()-stime:.3f}s")
+
+    # Create fake notices
+
+    notice_success = True
+    stime = time.time()
+    print("Creating Notices...", end=" ")
+    for i in range(15):
+        notice_success &= create_dummy_notice(i+1)
+    if notice_success:
+        print(f"{i+1} created in {time.time()-stime:.3f}s")
 
 
     print("Data Population Completed")
