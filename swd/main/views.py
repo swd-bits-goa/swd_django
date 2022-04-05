@@ -770,7 +770,6 @@ def leave(request):
 
 
 @login_required
-@noPhD
 def certificates(request):
     student = Student.objects.get(user=request.user)
     leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
