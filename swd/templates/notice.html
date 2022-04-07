@@ -33,8 +33,8 @@
                 {{ notice.desc|safe|linebreaks}}
               </div>
             </div>
+            {% endfor %}
           </p>
-          {% endfor %}
 
           {% if queryset.has_other_pages %}
           <ul class="pagination">
