@@ -70,7 +70,7 @@
                 <li class="tab"><a href="/dashboard" target="_self">Dashboard</a></li>
                 {% if not student.nophd %}<li class="tab"><a href="/messoption" target="_self">Mess Option</a></li>{% endif %}
                 {% if not student.nophd %}<li class="tab"><a href="/leave" target="_self">Leave</a></li>{% endif %}
-                <li class="tab"><a href="/certificates" target="_self">Certificates</a></li>
+                {% if not student.nophd %}<li class="tab"><a href="/certificates" target="_self">Certificates</a></li>{% endif %}
                 {% if not student.nophd %}<li class="tab"><a href="/daypass" target="_self">Daypass</a></li>{% endif %}
                 <li class="tab"><a href="/store" target="_self">Store</a></li>
                 <li class="tab"><a href="/dues" target="_self">Dues</a></li>
@@ -95,7 +95,7 @@
                 <li class="tab"><a href="/dashboard" class="{% active_page request 'dashboard' %}" target="_self">Dashboard</a></li>
                 {% if not student.nophd %}<li class="tab"><a href="/messoption" class="{% active_page request 'messoption' %}" target="_self">Mess Option</a></li>{% endif %}
                 {% if not student.nophd %}<li class="tab"><a href="/leave"  class="{% active_page request 'leave' %}" target="_self">Leave</a></li>{% endif %}
-                <li class="tab"><a href="/certificates" class="{% active_page request 'certificates' %}" target="_self">Certificates</a></li>
+                {% if not student.nophd %}<li class="tab"><a href="/certificates" class="{% active_page request 'certificates' %}" target="_self">Certificates</a></li>{% endif %}
                 {% if not student.nophd %}<li class="tab"><a href="/daypass" class="{% active_page request 'daypass' %}" target="_self">Daypass</a></li>{% endif %}
                 <li class="tab"><a href="/store" class="{% active_page request 'store' %}" target="_self">Store</a></li>
                 <li class="tab"><a href="/dues" class="{% active_page request 'dues' %}" target="_self">Dues</a></li>
