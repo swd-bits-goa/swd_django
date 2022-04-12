@@ -47,10 +47,11 @@ def gate_security(request):
                 t1 = time(23,59)
                 d = date.today()
                 leave = Leave.objects.get(
-                        dateTimeStart__gte=datetime.combine(d,t),
+                        dateTimeEnd__gte=datetime.combine(d,t),
                         dateTimeStart__lte=datetime.combine(d,t1),
                         student__bitsId=username,
-                        claimed=False
+                        claimed=False,
+                        approved=True
                 )
             except Leave.DoesNotExist:
                 leave = None
@@ -105,9 +106,9 @@ def gate_security(request):
             try:
                 leave = Leave.objects.get(
                             (
-                                Q(dateTimeStart__gte=datetime.combine(d,t)) &
+                                Q(dateTimeEnd__gte=datetime.combine(d,t)) &
                                 Q(dateTimeStart__lte=datetime.combine(d,t1)) &
-                                Q(claimed=False)
+                                Q(claimed=False) & Q(approved=True)
                             ) |
                             Q(inprocess=True),
                             student__bitsId=username
@@ -267,7 +268,7 @@ def dash_security_leaves(request):
     t = time(0,0)
     t1 = time(23,59)
     d = date.today()
-    approved_leaves = Leave.objects.filter(approved__exact=True, dateTimeStart__gte=datetime.combine(d,t), dateTimeStart__lte=datetime.combine(d,t1)).order_by('-dateTimeStart')
+    approved_leaves = Leave.objects.filter(approved__exact=True, dateTimeEnd__gte=datetime.combine(d,t), dateTimeStart__lte=datetime.combine(d,t1)).order_by('-dateTimeStart')
     context = {'leaves' : approved_leaves}
     return render(request, "dash_security.html", context)
 
