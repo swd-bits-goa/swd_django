@@ -146,7 +146,7 @@ class MessOptionAdmin(ExportActionModelAdmin, admin.ModelAdmin):
 class LeaveAdmin(ImportExportModelAdmin, admin.ModelAdmin):
     search_fields = ['student__name', 'student__bitsId','dateTimeStart','id', 'student__user__username', 'reason']
     actions = [exportmessbill_xls, ]
-    list_display = ('student', 'reason', 'dateTimeStart')
+    list_display = ('student', 'reason','approved','dateTimeStart')
     list_filter = ('student', 'reason')
 
     resource_class = LeaveResource

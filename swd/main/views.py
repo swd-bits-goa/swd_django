@@ -715,45 +715,48 @@ def leave(request):
             leaveform.dateTimeStart = make_aware(dateTimeStart)
             leaveform.dateTimeEnd = make_aware(dateTimeEnd)
             leaveform.student = student
-            leaveform.save()
-            if config.EMAIL_PROD:
-                email_to=[Warden.objects.get(hostel=HostelPS.objects.get(student=student).hostel).email]
+            if Leave.objects.filter(student=student,dateTimeStart=dateTimeStart,dateTimeEnd=dateTimeEnd).exists():
+                pass
             else:
-                email_to=["spammailashad@gmail.com"]                                                                     # For testing
-            mailObj = Leave.objects.latest('id')
-            mail_subject = "New Leave ID: "+ str(mailObj.id)
-            if mailObj.student.parentEmail is None:
-                parentEmail = "No parent mail found"
-            else:
-                parentEmail = mailObj.student.parentEmail
-            if mailObj.student.parentName is None:
-                parentName = "Parent name is null"
-            else:
-                parentName = mailObj.student.parentName
-            if mailObj.student.parentPhone is None:
-                parentPhone = "No parent phone"
-            else:
-                parentPhone = mailObj.student.parentPhone
-                
-            mail_message = "Leave Application applied by " + mailObj.student.name + " with leave id: " + str(mailObj.id) + ".\n"
-            mail_message = mail_message + "Parent name: " + parentName + "\nParent Email: " + parentEmail + "\nParent Phone: " + parentPhone
-            mail_message = mail_message + "\nConsent type: " + mailObj.consent
-            send_mail(mail_subject, mail_message, settings.EMAIL_HOST_USER, email_to, fail_silently=False)
+                leaveform.save()
+                if config.EMAIL_PROD:
+                    email_to=[Warden.objects.get(hostel=HostelPS.objects.get(student=student).hostel).email]
+                else:
+                    email_to=["spammailashad@gmail.com"]                                                                     # For testing
+                mailObj = Leave.objects.latest('id')
+                mail_subject = "New Leave ID: "+ str(mailObj.id)
+                if mailObj.student.parentEmail is None:
+                    parentEmail = "No parent mail found"
+                else:
+                    parentEmail = mailObj.student.parentEmail
+                if mailObj.student.parentName is None:
+                    parentName = "Parent name is null"
+                else:
+                    parentName = mailObj.student.parentName
+                if mailObj.student.parentPhone is None:
+                    parentPhone = "No parent phone"
+                else:
+                    parentPhone = mailObj.student.parentPhone
+                    
+                mail_message = "Leave Application applied by " + mailObj.student.name + " with leave id: " + str(mailObj.id) + ".\n"
+                mail_message = mail_message + "Parent name: " + parentName + "\nParent Email: " + parentEmail + "\nParent Phone: " + parentPhone
+                mail_message = mail_message + "\nConsent type: " + mailObj.consent
+                send_mail(mail_subject, mail_message, settings.EMAIL_HOST_USER, email_to, fail_silently=False)
 
-            context = {
-                'option': option,
-                'mess': mess,
-                'leaves': leaves,
-                'bonafides': bonafides,
-                'balance' : balance,
-                'daypasss': daypasss,
-                'option1': 1,
-                'dateStart': request.POST.get('dateStart'),
-                'dateEnd': request.POST.get('dateEnd'),
-                'timeStart': request.POST.get('timeStart'),
-                'timeEnd': request.POST.get('timeEnd'),
-                'student': student
-            }
+                context = {
+                    'option': option,
+                    'mess': mess,
+                    'leaves': leaves,
+                    'bonafides': bonafides,
+                    'balance' : balance,
+                    'daypasss': daypasss,
+                    'option1': 1,
+                    'dateStart': request.POST.get('dateStart'),
+                    'dateEnd': request.POST.get('dateEnd'),
+                    'timeStart': request.POST.get('timeStart'),
+                    'timeEnd': request.POST.get('timeEnd'),
+                    'student': student
+                }
         else:
             context = {
                 'option': option,
