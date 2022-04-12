@@ -1,6 +1,6 @@
 # SWD Website BITS Goa
 
-The main repository for the development of SWD website of BITS Goa. It is hosted at swd.bits-goa.ac.in
+The main repository for the development of SWD website of BITS Goa.<br>Hosted at [swd.bits-goa.ac.in](https://swd.bits-goa.ac.in)
 
 ---
 
@@ -41,7 +41,7 @@ $ pip install -r requirements.txt
 
 * db.sqlite3 is the database for this repository, you can delete that if you want to start with a fresh database and follow: (But not required and can skip this step)
 
-### Shifting to development
+## Shifting to development
 
 * Go to swd/config.py and change ```PRODUCTION``` and ```EMAIL_PROD``` to ```False```
 * While committing any changes, make sure to change ```PRODUCTION``` and ```EMAIL_PROD``` variable to ```True``` again
@@ -61,7 +61,7 @@ $ python manage.py migrate
 $ python manage.py createsuperuser
 ```
 
-### Populate the database
+## Populate the database
 
 * To generate dummy data for the website, use the following script
 
@@ -71,7 +71,7 @@ $ python populate_data.py
 
 * this will create a super user with username as ```admin``` and password as ```password```
 
-### Running the development server
+## Running the development server
 
 * Run the server and access at localhost:8000
 
@@ -79,15 +79,21 @@ $ python populate_data.py
 $ python manage.py runserver
 ```
 
-### Logging in
-
-* To login as a student use the format as username: f20180001 or p20180001 and password: password
-* To login as a warden use the format as username: **warden0**, **warden1**, **warden2**, etc. and password: **password**
-* To login as a hostel superintendent use the format as username: **superintendent0**, **superintendent1**, etc. and password: **password**
-* To login as a security guard use the format as username: **security0**, **security1**, etc. and password: **password**
-* To login as admin, username: admin and password: password
+## Logging In
 
 **Important:** This requires the `dev_info.py` to be present in `tools` folder. Please contact the maintainers if you don't have it.
+
+Here's a list of usernames for different types of credentials. The password for all of these is `password`.
+
+* **Admin**<br>Username: `admin`
+
+* **Student**<br>Example: `f20180001` or `p20180001`<br>A full list of generated students can be found in the admin tab
+
+* **Warden**<br>Format: `warden_<hostel name>`<br>Example: `warden_AH1`, `warden_AH2` (hostel name always in uppercase)
+
+* **Hostel Superintendent**<br>Format: `superintendent_<hostel 1>_<hostel 2>`<br><details><summary>Full list of usernames</summary>`superintendent_AH1_AH2`, `superintendent_AH3_AH4`, `superintendent_AH5_AH6`, `superintendent_AH7_AH8`, `superintendent_AH9_CH1`, `superintendent_CH2_CH3`, `superintendent_CH4_CH5`, `superintendent_CH6_CH7`, `superintendent_DH1_DH2`, `superintendent_DH3_DH4`, `superintendent_DH5_DH6`</details>
+
+* **Gate Security**:<br>Username: **security**
 
 ---
 

@@ -19,16 +19,7 @@ import argparse
 Running this script will create a dummy population. For convenience, here's the command line statement to create a small dataset:
 $ python populate_data.py --dataset_size small
 
-Here are some dummy credentials that will be created, all with the password 'password':
-admin
-    The superuser
-warden_<hostel name in lowercase>
-    The warden of a hostel
-superintendent_<hostel_choices[i]>_<hostel_choices[i+1]>
-    A superintendent in charge of hostels `hostel_choices[i+1]` and `hostel_choices[i+1]`. Note that the superintendent for the last hostel (DH6 as of writing this) may be in charge of only the last one in case the number of hostels is odd. All other superintendents are given by two consecutive hostels in `hostel_choices`
-    eg: superintendent_AH1_AH2, superintendent_CH2_CH3 etc.
-security0
-    The main gate security
+For a list of all dummy credentials that will be created, check out the README
 """
 
 boolen_choices = [True, False]
@@ -353,7 +344,7 @@ def create_leaves(student_list):
                 consent='Email',
                 corrAddress='Earth',
                 corrPhone=fake_number_generator(),
-                approvedBy=status and warden,
+                approvedBy=warden,
                 approved=status,
                 disapproved=not status,
                 inprocess=not status,
@@ -387,19 +378,18 @@ def create_csas(student_list):
     
     print(f"{len(csa_list)} created in {time.time() - stime:.3f}s")
 
-def create_securities(number=10):
-    """Creates a list of Users, then maps a Security to each User"""
+def create_security():
+    """Creates one user, then maps a Security to that user"""
 
     # First, generate the list of security users
     stime = time.time()
-    print("Creating Security Users...", end=" ")
+    print("Creating Security User...", end=" ")
     user_data = [
         {
-            "username": f'security{i}',
-            "first-name": f'security{i}',
-            "email": f"security{i}@goa.bits-pilani.ac.in"
+            "username": f'security',
+            "first-name": f'security',
+            "email": f"security@goa.bits-pilani.ac.in"
         }
-        for i in range(number)
     ]
     user_list = create_generic_users(user_data)
     print(f"{len(user_list)} created in {time.time() - stime:.3f}s")
@@ -407,17 +397,11 @@ def create_securities(number=10):
     # Next, generate a list of securities
     security_list = []
     stime = time.time()
-    print("Creating Securities...", end=" ")
-    for i in range(number):
-        user = user_list[i]
-        security = Security(
-            user=user
-        )
-        security_list.append(security)
-    
+    print("Creating Security...", end=" ")
+    security = Security(user=user_list[0])
     with transaction.atomic():
-        Security.objects.bulk_create(security_list)
-    print(f"{len(security_list)} created in {time.time() - stime:.3f}s")
+        security.save()
+    print(f"Created in {time.time() - stime:.3f}s")
 
 def create_hostelsuperintendents():
     """Creates a list of Users, then maps a HostelSuperIntendent to each User"""
@@ -527,10 +511,10 @@ if __name__ == '__main__':
     create_bonafides(students_list)
     create_leaves(students_list)
     create_csas(students_list)
-    create_securities(number=1) # Only one gate security - security0
+    create_security()
     create_hostelsuperintendents()
     create_notices(number=15)
 
     create_super_user()
 
-    print(f"\nDataset completed in {time.time() - stime:.3f}s")
+    print(f"\nDataset populated in {time.time() - stime:.3f}s")
