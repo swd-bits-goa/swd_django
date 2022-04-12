@@ -158,7 +158,8 @@ class LeaveAdmin(ImportExportModelAdmin, admin.ModelAdmin):
 
 @admin.register(Due)
 class DueAdmin(admin.ModelAdmin):
-    search_fields = ['student__name','amount','due_category__name','description','date_added']
+    search_fields = ['student__name','student__bitsId','amount','due_category__name','description','date_added']
+    list_display = ('student', 'amount','due_category','date_added',)
 
 
 admin.site.register(Student, StudentAdmin)
