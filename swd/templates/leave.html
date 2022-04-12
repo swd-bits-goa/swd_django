@@ -118,6 +118,25 @@
         node.parentNode.classList.add('masked-parent-field')
         node.parentNode.appendChild(maskedDiv)
     })
+
+    // Patch for when user gets impatient and clicks the submit button multiple times
+    document.querySelector("button[type='submit']").onclick = function(event) {
+        is_form_valid = true
+        // Check if each input element is valid
+        for(const e of document.querySelectorAll("input")) {
+            is_form_valid = is_form_valid && e.checkValidity() && e.value != ""
+        }
+        console.log("Form Validity: "+is_form_valid)
+        if(is_form_valid) {
+            // Disable submit button
+            document.querySelector("button[type='submit']").setAttribute("disabled", true)
+            // Submit the form
+            document.querySelector("form").submit()
+        }
+        else {
+            event.preventDefault()
+        }
+    }
 </script>
 
 <style>
