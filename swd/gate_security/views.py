@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, HttpResponse
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import InOut, WeekendPass
 from main.models import Leave, DayPass, Student, VacationDatesFill
@@ -9,7 +9,9 @@ from django.contrib.auth.models import User
 from main.templatetags.main_extras import is_hostelsuperintendent, is_warden, is_security, get_base_template
 import swd.config as config
 from datetime import date, datetime, timedelta, time
-
+from dateutil import rrule, parser
+from django.contrib import messages
+import xlwt
 
 @user_passes_test(lambda u: u.is_superuser or is_security(u))
 def gate_security(request):
@@ -284,11 +286,68 @@ def dash_security_daypass(request):
 
 @user_passes_test(lambda u: u.is_superuser or is_security(u))
 def in_out(request):
-    inout = InOut.objects.filter(inCampus = False, onLeave = False, onDaypass = False).order_by('-outDateTime')
-    context = {
-        'inout': inout,
-    }
-    return render(request, "all_in_out.html",context)
+    if not request.POST:
+        inout = InOut.objects.filter(inCampus = False, onLeave = False, onDaypass = False).order_by('-outDateTime')
+        context = {
+            'inout': inout,
+        }
+        return render(request, "all_in_out.html", context)
+    
+    # Handle POST request here
+
+    CURRENT_DATE_TIME = datetime.now()
+    
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = f'attachment; filename=Students-Outside-{CURRENT_DATE_TIME}.xls'
+    wb = xlwt.Workbook(encoding='utf-8')
+    ws = wb.add_sheet(f"Students Outside")
+
+    heading_style = xlwt.easyxf('font: bold on, height 280; align: wrap on, vert centre, horiz center')
+    h2_font_style = xlwt.easyxf('font: bold on')
+    font_style = xlwt.easyxf('align: wrap on')
+
+    columns = [
+        (u"InOut ID", 6000),
+        (u"Name", 6000),
+        (u"BITS ID", 6000),
+        (u"Out Date", 3000),
+        (u"Out Time", 3000)
+    ]
+
+    # This function is not documented but given in examples of repo
+    #     here: https://github.com/python-excel/xlwt/blob/master/examples/merged.py
+    # Prototype:
+    #     sheet.write_merge(row1, row2, col1, col2, 'text', fontStyle)
+    # Write the header in merged cells
+    ws.write_merge(0, 0, 0, len(columns)-1, "Students Outside", heading_style)
+
+    ws.write(1, 0, "Generated:", h2_font_style)
+    ws.write(1, 1, CURRENT_DATE_TIME.strftime('%d/%b/%Y'), font_style)
+
+    row_num = 2
+
+    # Write all column titles
+    for col_num in range(len(columns)):
+        ws.write(row_num, col_num, columns[col_num][0], h2_font_style)
+        ws.col(col_num).width = columns[col_num][1]
+
+    inouts = InOut.objects.filter(inCampus = False)
+
+    for inout in inouts:
+        row_num += 1
+        student = inout.student
+
+        out_datetime = parser.parse(str(inout.outDateTime))
+        out_date = out_datetime.date().strftime("%d/%m/%Y")
+        out_time = out_datetime.time().strftime("%H:%M")
+
+        row = [inout.id, student.name, student.bitsId, out_date, out_time]
+
+        for col_num in range(len(row)):
+            ws.write(row_num, col_num, row[col_num], font_style)
+    wb.save(response)
+    messages.success(request, "Students Outside exported. Download will automatically start.")
+    return response
 
 @user_passes_test(lambda u: u.is_superuser or is_security(u))
 def leave_out(request):
