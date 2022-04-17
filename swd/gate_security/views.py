@@ -307,9 +307,9 @@ def in_out(request):
     font_style = xlwt.easyxf('align: wrap on')
 
     columns = [
-        (u"InOut ID", 6000),
         (u"Name", 6000),
         (u"BITS ID", 6000),
+        (u"Contact", 6000),
         (u"Out Date", 3000),
         (u"Out Time", 3000),
         (u"Location", 6000),
@@ -348,7 +348,7 @@ def in_out(request):
         reason = [i for i in possible_reasons if i[0]]
         reason = reason[0][1] if len(reason) else ""
 
-        row = [inout.id, student.name, student.bitsId, out_date, out_time, inout.place, reason]
+        row = [student.name, student.bitsId, student.phone, out_date, out_time, inout.place, reason]
 
         for col_num in range(len(row)):
             ws.write(row_num, col_num, row[col_num], font_style)
