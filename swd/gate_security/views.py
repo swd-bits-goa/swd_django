@@ -311,7 +311,9 @@ def in_out(request):
         (u"Name", 6000),
         (u"BITS ID", 6000),
         (u"Out Date", 3000),
-        (u"Out Time", 3000)
+        (u"Out Time", 3000),
+        (u"Location", 6000),
+        (u"Reason", 3000),
     ]
 
     # This function is not documented but given in examples of repo
@@ -341,7 +343,12 @@ def in_out(request):
         out_date = out_datetime.date().strftime("%d/%m/%Y")
         out_time = out_datetime.time().strftime("%H:%M")
 
-        row = [inout.id, student.name, student.bitsId, out_date, out_time]
+        # Get reason for inout
+        possible_reasons = [(inout.onLeave, "Leave"), (inout.onDaypass, "Daypass"), (inout.onWeekendPass, "WeekendPass"), (inout.onVacation, "Vacation")]
+        reason = [i for i in possible_reasons if i[0]]
+        reason = reason[0][1] if len(reason) else ""
+
+        row = [inout.id, student.name, student.bitsId, out_date, out_time, inout.place, reason]
 
         for col_num in range(len(row)):
             ws.write(row_num, col_num, row[col_num], font_style)
