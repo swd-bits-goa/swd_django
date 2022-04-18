@@ -2,6 +2,20 @@
 {% load staticfiles %}
 {% block content %}
 
+<style>
+    .header-approved-leaves {
+        font-size: 24px;
+        display: flex;
+        align-items: center;
+    }
+
+    .export-button {
+        margin-left: auto;
+        font-size: 0.75em;
+        text-transform: uppercase;
+    }
+</style>
+
     <div class="section no-pad-bot" id="index-banner"></div>
     <div>
         <div class="section">
@@ -9,7 +23,14 @@
                 <div class="col s6 l12">
                     <div class="card">
                         <div class="card-content">
-                            <span class="card-title">Students Out</span>
+                            <form action={% url 'in_out' %} method="POST">
+                                {% csrf_token %}
+                                <header class="header-approved-leaves">
+                                    <span>Students Out</span>
+                                    <button type="submit" class="btn btn-block bg-green waves-effect export-button" >Export</button>
+                                </header>
+                            </form>
+                            <!-- <span class="card-title">Students Out</span> -->
                             <table class="bordered highlight">
                                 <thead>
                                     <tr>
