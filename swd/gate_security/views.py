@@ -324,7 +324,7 @@ def in_out(request):
     ws.write_merge(0, 0, 0, len(columns)-1, "Students Outside", heading_style)
 
     ws.write(1, 0, "Generated:", h2_font_style)
-    ws.write(1, 1, CURRENT_DATE_TIME.strftime('%d/%b/%Y'), font_style)
+    ws.write(1, 1, CURRENT_DATE_TIME.strftime('%d/%b/%Y , %H:%M:%S'), font_style)
 
     row_num = 2
 
