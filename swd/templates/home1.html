@@ -158,7 +158,8 @@
       }
 
       .staff {
-        box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+        background-color: rgb(0, 0, 0, 0.05);
+        /* box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px; */
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -178,8 +179,12 @@
       }
 
       .staff__description {
-        padding: 5px;
+        padding: 0.5em;
         width: 100%;
+      }
+
+      .staff__description h5 {
+        font-weight: 600;
       }
     </style>
     {% endblock %}
