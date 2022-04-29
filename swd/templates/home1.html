@@ -3,9 +3,8 @@
 {% block content %}
 
 <div class="backdrop-container">
-  <img id="back-swd" src="{% static 'img/swd-back.png' %}" width="100%">
-  <div class="card login-box desktop">
-    <h5 style="color:#F46036">Sign In</h5>
+  <div class="login-box desktop">
+    <h5 style="color:#F46036; font-weight: 700;">Sign In</h5>
     <form id="sign_in" method="POST" action="login/">
       {% csrf_token %}
       <div class="input-field" id="username">
@@ -126,6 +125,13 @@
     </div>
 
     <style>
+      .backdrop-container {
+        background-image: url("{% static 'img/swd-back.png' %}");
+        background-position: center;
+        background-size: cover;
+        padding: 1.5em;
+      }
+
       img {
         object-fit: cover;
       }
@@ -139,15 +145,17 @@
       }
 
       .backdrop-container {
+        min-height: 150px;
         position: relative;
       }
 
       .login-box {
-        position: absolute;
-        top: 16px;
-        right: 20px;
-        width: 460px;
-        padding: 14px;
+        position: relative;
+        border-radius: 5px;
+        width: 40%;
+        background-color: rgba(255, 255, 255, 0.8);
+        box-shadow: 5px 5px 3px 0 rgba(0, 0, 0, 0.1);
+        padding: 1em;
       }
 
       .staff-container {
