@@ -1,12 +1,30 @@
-{% extends 'indexbase.html' %} {% block content %}
-<style>
-	td {width: 50%;}
-</style>
-<div class="card content">
-	<p align="center" style="font-size:16px; font-family:Arial, Helvetica, sans-serif; color:#000066"><b>
-			HOSTEL FACILITIES</b></p>
-	<table class="centered bordered striped">
+{% extends 'indexbase.html' %}
 
+{% block content %}
+	<style>
+		td {
+			width: 50%;
+		}
+		
+		table {
+			margin-bottom: 1em;
+		}
+
+		.section-title {
+			font-family: 'Arial', 'Helvetica', sans-serif;
+			text-align: center;
+			padding: 1em;
+			font-size: 1.5em;
+		}
+	</style>
+
+	<!-- Hostel Facilities -->
+
+	<div class="section-title" style="color:#000066">
+		<b>HOSTEL FACILITIES</b>
+	</div>
+
+	<table class="centered bordered striped">
 		<tr align="center">
 			<td>No of Hostels</td>
 			<td>{{ hostels }}</td>
@@ -18,12 +36,12 @@
 		</tr>
 
 		<tr align="center">
-			<td>Facilities </td>
+			<td>Amenities</td>
 			<td>Cot, Study Table, Chair,<br> Wadrobe, Network Connection<br>Continuous water & Electricity supply</td>
 		</tr>
 
 		<tr align="center">
-			<td>Bathrooms </td>
+			<td>Bathrooms</td>
 			<td>Shared<br>(On an average 1 Bathroom/<br>Toilet shared by 4 students)</td>
 		</tr>
 
@@ -37,14 +55,15 @@
 			<td> Badminton Court<br>Common Room (1)<br>(Equipped with: TV, indoor sports like<br> table tennis and
 				carrom)</td>
 		</tr>
+	</table>
 
-	</table><br />
-	<p align="center" style="font-size:16px; font-family:Arial, Helvetica, sans-serif; color:#000066"> <b>
-			MESS FACILITIES</b></p>
+	<!-- Mess Facilities -->
+
+	<div class="section-title" style="color:#000066">
+		<b>MESS FACILITIES</b>
+	</div>
 
 	<table class="centered bordered striped">
-
-
 		<tr align="center">
 			<td>Dining Halls </td>
 			<td>3<br>(A, C & D) </td>
@@ -59,37 +78,29 @@
 			<td>Catering </td>
 			<td>Outsourced </td>
 		</tr>
+	</table>
 
-	</table><br />
-</div>
-<p align="center" style="font-size:16px; font-family:Arial, Helvetica, sans-serif; color:#000066"> <b>
-		OTHER FACILITIES</b></p>
-<div class="card content">
+	<!-- Other Facilities -->
+
+	<div class="section-title" style="color:#000066">
+		<b>OTHER FACILITIES</b>
+	</div>
+	
 	<table class="centered bordered striped">
 		<tr>
-			<td><b>Financial Aid:</b></td>
-			<td>Institute Merit and Merit Cum Need Scholarship</td>
+			<td><b>Financial Aid</b></td>
+			<td>
+				Institute Merit and Merit Cum Need Scholarship<br>
+				Student Aid Fund Financial Assistance
+			</td>
 		</tr>
 		<tr>
-			<td></td>
-			<td>Student Aid Fund Financial Assistance</td>
+			<td><b>Online Services</b></td>
+			<td>
+				Mess selection facility every month<br>
+				Apply for issue of certificate<br>
+				Leave application submission
+			</td>
 		</tr>
-		<tr>
-			<td>Online Services:</td>
-			<td>Mess selection facility every month</td>
-		</tr>
-		<tr>
-			<td></td>
-			<td>Apply for issue of certificate</td>
-		</tr>
-		<tr>
-			<td></td>
-			<td>Leave application submission</td>
-		</tr>
-
 	</table>
-</div>
-<br><br>
-
-
 {% endblock %}
