@@ -1,12 +1,118 @@
-{% extends 'indexbase.html' %} {% block content %}
-<style>
-	td {width: 50%;}
-</style>
-<div class="card content">
-	<p align="center" style="font-size:16px; font-family:Arial, Helvetica, sans-serif; color:#000066"><b>
-			HOSTEL FACILITIES</b></p>
-	<table class="centered bordered striped">
+{% extends 'indexbase.html' %}
+{% load staticfiles %}
 
+{% block content %}
+	<style>
+		td {
+			width: 50%;
+		}
+		
+		table {
+			margin-bottom: 1em;
+		}
+
+		.section-title {
+			font-family: 'Arial', 'Helvetica', sans-serif;
+			text-align: center;
+			padding: 1em;
+			font-size: 1.5em;
+			color: #006;
+		}
+	</style>
+
+	<style>
+		.showcase-section {
+			padding: 2em 0;
+			position: relative;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+
+		.showcase-wrapper {
+			position: relative;
+			width: 50%;
+		}
+
+		@media (max-width: 1024px) {
+			.showcase-wrapper {
+				width: 75%;
+			}
+		}
+
+		@media (max-width: 750px) {
+			.showcase-wrapper {
+				width: 90%;
+			}
+		}
+
+		.showcase-container {
+			position: relative;
+			height: 0;
+			padding-bottom: calc(100% * 9 / 16);
+			width: 100%;
+		}
+
+		.showcase-navigation {
+			position: absolute;
+			width: 50px;
+			height: 50px;
+			background-color: #2d2d2d;
+			border-radius: 999px;
+			top: 50%;
+			left: 0;
+			transform: translate(-50%, -50%);
+			z-index: 999;
+			cursor: pointer;
+			background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolygon points='0,50 80,100 80,0' fill='%23fff'/%3E%3C/svg%3E");;
+			background-position: center;
+			background-repeat: no-repeat;
+			background-size: 50%;
+		}
+
+		@media (max-width: 720px) {
+			.showcase-navigation {
+				width: 30px;
+				height: 30px;
+			}
+		}
+		
+		.showcase-navigation--right {
+			left: unset;
+			right: 0;
+			background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolygon points='100,50 20,100 20,0' fill='%23fff'/%3E%3C/svg%3E");
+			transform: translate(50%, -50%);
+		}
+
+		.showcase {
+			object-fit: contain;
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			opacity: 0;
+			transition: opacity 250ms ease;
+		}
+
+		.showcase--selected {
+			opacity: 1;
+		}
+
+		img {
+			width: 100%;
+			height: 100%;
+			object-fit: contain;
+		}
+	</style>
+
+	<!-- Hostel Facilities -->
+
+	<div class="section-title">
+		<b>HOSTEL FACILITIES</b>
+	</div>
+
+	<table class="centered bordered striped">
 		<tr align="center">
 			<td>No of Hostels</td>
 			<td>{{ hostels }}</td>
@@ -18,12 +124,12 @@
 		</tr>
 
 		<tr align="center">
-			<td>Facilities </td>
+			<td>Amenities</td>
 			<td>Cot, Study Table, Chair,<br> Wadrobe, Network Connection<br>Continuous water & Electricity supply</td>
 		</tr>
 
 		<tr align="center">
-			<td>Bathrooms </td>
+			<td>Bathrooms</td>
 			<td>Shared<br>(On an average 1 Bathroom/<br>Toilet shared by 4 students)</td>
 		</tr>
 
@@ -34,62 +140,149 @@
 
 		<tr align="center">
 			<td>Recreational</td>
-			<td> Badminton Court<br>Common Room (1)<br>(Equipped with: TV, indoor sports like<br> table tennis and
-				carrom)</td>
+			<td> Badminton Court<br>Common Room (1)<br>(Equipped with: TV, indoor sports like<br> table tennis and carrom)</td>
 		</tr>
-
-	</table><br />
-	<p align="center" style="font-size:16px; font-family:Arial, Helvetica, sans-serif; color:#000066"> <b>
-			MESS FACILITIES</b></p>
-
-	<table class="centered bordered striped">
-
-
-		<tr align="center">
-			<td>Dining Halls </td>
-			<td>3<br>(A, C & D) </td>
-		</tr>
-
-		<tr align="center">
-			<td>Capacity </td>
-			<td>1200 </td>
-		</tr>
-
-		<tr align="center">
-			<td>Catering </td>
-			<td>Outsourced </td>
-		</tr>
-
-	</table><br />
-</div>
-<p align="center" style="font-size:16px; font-family:Arial, Helvetica, sans-serif; color:#000066"> <b>
-		OTHER FACILITIES</b></p>
-<div class="card content">
-	<table class="centered bordered striped">
-		<tr>
-			<td><b>Financial Aid:</b></td>
-			<td>Institute Merit and Merit Cum Need Scholarship</td>
-		</tr>
-		<tr>
-			<td></td>
-			<td>Student Aid Fund Financial Assistance</td>
-		</tr>
-		<tr>
-			<td>Online Services:</td>
-			<td>Mess selection facility every month</td>
-		</tr>
-		<tr>
-			<td></td>
-			<td>Apply for issue of certificate</td>
-		</tr>
-		<tr>
-			<td></td>
-			<td>Leave application submission</td>
-		</tr>
-
 	</table>
-</div>
-<br><br>
 
+	<div class="showcase-section">
+		<div class="showcase-wrapper">
+			<div class="showcase-navigation showcase-navigation--left"></div>
+			<div class="showcase-container">
+				<div class="showcase showcase--selected">
+              		<img src="{% static 'img/services/hostel1.jpg' %}" alt="">
+				</div>
+				<div class="showcase">
+					<img src="{% static 'img/services/hostel2.jpg' %}" alt="">
+				</div>
+				<div class="showcase">
+              		<img src="{% static 'img/services/hostel3.jpg' %}" alt="">
+				</div>
+				<div class="showcase">
+					<img src="{% static 'img/services/hostel4.jpg' %}" alt="">
+				</div>
+				<div class="showcase">
+              		<img src="{% static 'img/services/hostel5.jpg' %}" alt="">
+				</div>
+				<div class="showcase">
+					<img src="{% static 'img/services/hostel6.jpg' %}" alt="">
+				</div>
+				<div class="showcase">
+					<img src="{% static 'img/services/hostel7.jpg' %}" alt="">
+				</div>
+				<div class="showcase">
+					<img src="{% static 'img/services/hostel8.jpg' %}" alt="">
+				</div>
+				<div class="showcase">
+					<img src="{% static 'img/services/hostel9.jpg' %}" alt="">
+				</div>
+			</div>
+			<div class="showcase-navigation showcase-navigation--right"></div>
+		</div>
+	</div>
 
+	<!-- Mess Facilities -->
+
+	<div class="section-title">
+		<b>MESS FACILITIES</b>
+	</div>
+
+	<table class="centered bordered striped">
+		<tr align="center">
+			<td>Dining Halls</td>
+			<td>3<br>(A, C & D)</td>
+		</tr>
+
+		<tr align="center">
+			<td>Capacity</td>
+			<td>1200</td>
+		</tr>
+
+		<tr align="center">
+			<td>Catering</td>
+			<td>Outsourced</td>
+		</tr>
+	</table>
+
+	<div class="showcase-section">
+		<div class="showcase-wrapper">
+			<div class="showcase-navigation showcase-navigation--left"></div>
+			<div class="showcase-container" style="padding-bottom: calc(100% * 12 / 16);">
+				<div class="showcase showcase--selected">
+              		<img src="{% static 'img/services/C-Mess.jpg' %}" alt="">
+				</div>
+				<div class="showcase">
+					<img src="{% static 'img/services/C-Mess-2.jpg' %}" alt="">
+				</div>
+				<div class="showcase">
+              		<img src="{% static 'img/services/C-Mess-3.jpg' %}" alt="">
+				</div>
+				<div class="showcase">
+					<img src="{% static 'img/services/C-Mess-4.jpg' %}" alt="">
+				</div>
+				<div class="showcase">
+              		<img src="{% static 'img/services/A-Mess.jpg' %}" alt="">
+				</div>
+				<div class="showcase">
+					<img src="{% static 'img/services/A-Mess-2.jpg' %}" alt="">
+				</div>
+				<div class="showcase">
+					<img src="{% static 'img/services/A-Mess-3.jpg' %}" alt="">
+				</div>
+			</div>
+			<div class="showcase-navigation showcase-navigation--right"></div>
+		</div>
+	</div>
+
+	<!-- Other Facilities -->
+
+	<div class="section-title">
+		<b>OTHER FACILITIES</b>
+	</div>
+	
+	<table class="centered bordered striped">
+		<tr>
+			<td><b>Financial Aid</b></td>
+			<td>
+				Institute Merit and Merit Cum Need Scholarship<br>
+				Student Aid Fund Financial Assistance
+			</td>
+		</tr>
+		<tr>
+			<td><b>Online Services</b></td>
+			<td>
+				Mess selection facility every month<br>
+				Apply for issue of certificate<br>
+				Leave application submission
+			</td>
+		</tr>
+	</table>
+
+	<!-- Very poor custom carousel, please for the love of God make a better one soon -->
+
+	<script>
+		document.querySelectorAll(".showcase-navigation").forEach(element => element.onclick = function(event) {
+			let is_right = this.classList.contains("showcase-navigation--right")
+			let selected_class = "showcase--selected"
+			let old_selected = this.parentElement.querySelector(`.${selected_class}`)
+			old_selected.classList.remove(selected_class)
+			if(is_right) {
+				if (old_selected.nextElementSibling) {
+					old_selected.nextElementSibling.classList.add(selected_class)
+				}
+				else {
+					old_selected.classList.remove(selected_class)
+					old_selected.parentElement.firstElementChild.classList.add(selected_class)
+				}
+			}
+			else {
+				if (old_selected.previousElementSibling) {
+					old_selected.previousElementSibling.classList.add(selected_class)
+				}
+				else {
+					old_selected.classList.remove(selected_class)
+					old_selected.parentElement.lastElementChild.classList.add(selected_class)
+				}
+			}
+		})
+	</script>
 {% endblock %}
