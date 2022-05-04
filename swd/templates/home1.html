@@ -20,7 +20,12 @@
 
       <button type="submit" class="waves-effect waves-light btn desert-yellow" id="loginbtn"><span
           class="deep-green">Login</span></button>
-
+      <a href="https://cc.bits-goa.ac.in/ldap/index.php">
+        <button type="button" class="waves-effect waves-light btn desert-yellow">
+          <span class="deep-green">Reset Password</span>
+      </button>
+      </a>
+      
     </form>
     <br>
     {% if messages %} {% for message in messages %}
@@ -32,18 +37,20 @@
 <div class="container-fluid">
 
   <div class="section">
-    <div class="row">
-      <div class="col s12 m6 desktop">
+    <div class="row center">
+      <h4 style="color:#074F57;">Office of Student Welfare Division</h4>
 
-        <h4 style="color:#074F57">About</h4>
-        <p style="justify-content: center;">The Student Welfare Division at BITS Pilani, K.K. Birla Goa Campus shall
+      <!-- <div class="col s12 m6"> -->
+
+        <!-- <p style="justify-content: center;"> The staff of the Office of Student Affairs welcomes questions and suggestions from students. -->
+          <!-- The Student Welfare Division at BITS Pilani, K.K. Birla Goa Campus shall
           always strive to provide the most conducive environment to bring out the best out of every student. It is our
           endeavor to do anything and everything possible to make the student's stay in the campus the most memorable
-          one.
-          <br><br>
-          Our division cares for every student and shall always look into their needs that may arise from time to time.
-        </p>
-        <br>
+          one. -->
+          <!-- <br><br> -->
+          <!-- Our division cares for every student and shall always look into their needs that may arise from time to time. -->
+        <!-- </p> -->
+        <!-- <br>
         Other activities of the Division include:
         <ul>
           <li>• Collection of fees</li>
@@ -53,27 +60,17 @@
           <li>• Hostel accommodation to students and leave related issues</li>
           <li>• Issue of Receipts, ID Cards, bonafide Certificates & No Objection Cetificates</li>
           <li>• Monitoring the Student Activity Center</li>
-        </ul>
-        <br><br><br>
-        <img src="{% static 'img/bits_img.jpg' %}" style="width: 100%;">
-      </div>
-      <div class="col s12 m6">
-        <h4 style="color:#F46036">Notices</h4>
+        </ul> -->
+      <!-- </div> -->
+      <h4 style="color:#F46036;">Notices</h4>
+      <div class="col s12 m6" style="display: inline-block; float: none;">
         {% include 'notice.html' %}
       </div>
     </div>
+
     <div class="row">
       <div class="col s12 m12 l12">
-        <h4>Contact</h4>
-        <b>Phone: </b>+91 0832 2580(148/157)<br>
-        <b>Email: </b>swd@goa.bits-pilani.ac.in<br>
-        <b>Office Hours: </b><br>Monday to Friday 9AM - 1PM & 2PM - 5PM<br>Saturday 9AM - 1PM<br>
-        <b>Campus Location: </b><a href="https://www.google.com/maps/place/BITS+Pilani+K+K+Birla+Goa+Campus/@15.3921698,73.8807793,16.92z/data=!4m5!3m4!1s0x0:0x4ad5683010110240!8m2!3d15.3911236!4d73.8781616">Birla Institute of Technology & Science, Pilani Goa Campus. Near NH17B, Zuarinagar, Goa, India</a>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col s12 m12 l12">
-        <h4>Meet Our Staff</h4>
+        <h4 style="text-align: center;">Meet Our Staff</h4>
         <div class="staff-container">
           <div class="staff">
             <div class="staff__photo">
@@ -122,7 +119,22 @@
           </div>
         </div>
       </div>
+   </div>
+
+   <div class="row">
+    <div class="col s12 m6 desktop" style="display: inline-block; float: left;">
+      <img src="{% static 'img/bits_img.jpg' %}" style="width: 100%;">
+     </div>
+    <div class="col s12 m6 l6" style="display: inline-block; float: right;">
+      <h4>Contact Us</h4>
+      <b>Phone: </b>+91 0832 2580(148/157)<br>
+      <b>Email: </b>swd@goa.bits-pilani.ac.in<br>
+      <b>Office Hours: </b><br>Monday to Friday 9AM - 1PM & 2PM - 5PM<br>Saturday 9AM - 1PM<br>
+      <b>Campus Location: </b><a href="https://www.google.com/maps/place/BITS+Pilani+K+K+Birla+Goa+Campus/@15.3921698,73.8807793,16.92z/data=!4m5!3m4!1s0x0:0x4ad5683010110240!8m2!3d15.3911236!4d73.8781616">Birla Institute of Technology & Science, Pilani, K. K. Birla Goa Campus.</a>
     </div>
+    
+  </div>
+   
 
     <style>
       .backdrop-container {
@@ -153,16 +165,18 @@
         position: relative;
         border-radius: 5px;
         width: 40%;
-        background-color: rgba(255, 255, 255, 0.8);
+        background-color: rgba(255, 255, 255, 0.7);
         box-shadow: 5px 5px 3px 0 rgba(0, 0, 0, 0.1);
         padding: 1em;
+        margin: auto;
+        text-align: center;
       }
 
       .staff-container {
         width: 100%;
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem;
+        gap: 5rem;
       }
 
       .staff {
