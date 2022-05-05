@@ -1215,7 +1215,7 @@ def messbill(request):
             mess=messOpt,
             monthYear__range=(start_date.replace(day=1), end_date.replace(day=1))
         )
-
+        messages.error(request, 'Exporting {} messoptions'.format(values.count()))
         for k in values:
 
             obj = k.student
@@ -3663,3 +3663,6 @@ def delete_students(request):
                             message_tag, 
                             message_str)
     return render(request, "del_students.html", {'header': "Delete existing students from Database"})
+
+def messagefromdean(request):
+    return render(request,"messagefromdean.html",{})
