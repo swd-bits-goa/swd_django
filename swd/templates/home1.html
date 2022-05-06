@@ -37,8 +37,8 @@
 <div class="container-fluid">
 
   <div class="section">
-    <div class="row center">
-      <h4 style="color:#074F57;">Office of Student Welfare Division</h4>
+    <div class="row">
+      <h4 style="color:#074F57; text-align: center;">Office of Student Welfare Division</h4>
 
       <!-- <div class="col s12 m6"> -->
 
@@ -62,8 +62,11 @@
           <li>• Monitoring the Student Activity Center</li>
         </ul> -->
       <!-- </div> -->
-      <h4 style="color:#F46036;">Notices</h4>
-      <div class="col s12 m6" style="display: inline-block; float: none;">
+      <div class="col s12 m6">
+        <img class="message" src="{% static 'img/messagefromdean.png' %}" alt="">
+      </div>
+      <div class="col s12 m6 center">
+        <h4 style="color:#F46036;">Notices</h4>
         {% include 'notice.html' %}
       </div>
     </div>
@@ -165,18 +168,25 @@
         position: relative;
         border-radius: 5px;
         width: 40%;
-        background-color: rgba(255, 255, 255, 0.7);
+        background-color: rgba(255, 255, 255, 0.8);
         box-shadow: 5px 5px 3px 0 rgba(0, 0, 0, 0.1);
         padding: 1em;
-        margin: auto;
         text-align: center;
+        margin-left: auto;
+        margin-right: 0;
+      }
+
+      .message{
+        object-fit: cover;
+        max-width: 100%;
+        image-rendering:optimizeQuality;
       }
 
       .staff-container {
         width: 100%;
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 5rem;
+        gap: 4rem;
       }
 
       .staff {
