@@ -172,7 +172,7 @@ section.services__section {
   }
 }
 
-section.services__section::after {
+section.services__section:not(:last-of-type):after {
   content: '';
   position: absolute;
   bottom: 0;
