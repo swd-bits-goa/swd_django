@@ -166,6 +166,12 @@ section.services__section {
   padding-top: 2em;
 }
 
+@media (min-width: 1024px) {
+  section.services__section {
+    padding: 2em 4em;
+  }
+}
+
 section.services__section::after {
   content: '';
   position: absolute;
@@ -189,6 +195,7 @@ section.services__section::after {
   padding: 1em 0;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   align-items: center;
 }
 
@@ -202,7 +209,7 @@ section.services__section::after {
   }
   
   .section__features {
-    width: 40% !important;
+    width: 30% !important;
   }
   .section__showcase {
     width: 60% !important;
