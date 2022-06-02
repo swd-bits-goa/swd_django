@@ -22,7 +22,7 @@ jdcal==1.4.1
 MarkupPy==1.14
 odfpy==1.4.0
 openpyxl==3.0.0
-Pillow==9.1.0
+Pillow==9.1.1
 promise==2.1
 psycopg2==2.9.1
 PyJWT==1.5.3
