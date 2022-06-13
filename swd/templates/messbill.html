@@ -47,14 +47,18 @@
                             <form method="POST">
                                 {% csrf_token %}
                                 <div class="row">
-                                    <div class="input-field col s6">
-                                        <input id="start_date" name="start_date" type="text" class="datepicker">
-                                        <label for="start_date">Start Date</label>
-                                    </div>
-                                    <div class="input-field col s6">
-                                        <input id="end_date" name="end_date" type="text" class="datepicker">
-                                        <label for="end_date">End Date</label>
-                                    </div>
+                                    {% for field in form %}
+                                        {% if form.errors %}
+                                            {% for error in field.errors %}
+                                                <div class="red-text alert alert-danger">
+                                                    <strong>{{ error|escape }}</strong>
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                        <div class="input-field col s6">
+                                            {{ field }} {{ field.label_tag }}
+                                        </div>
+                                    {% endfor %}
                                 </div>
                                 <div class="row">
                                     <fieldset id="export_type" class="form-group">
@@ -109,6 +113,17 @@
         }
     </style>
     <script>
+        // Patch fix for datepicker
+        // Frontend devs -> please fix this issue asap. This is a temp patch.
+        // Mehul Mohan (And now Aryan Pingle)
+        document.querySelectorAll('input.mask').forEach(node => {
+            const maskedDiv = document.createElement('div')
+            maskedDiv.onclick = () => { setTimeout(() => { console.log('clicked'); node.click() }, 50) }
+            maskedDiv.setAttribute('style', 'position:absolute;top:0;left:0;width:100%;height:100%;')
+            node.parentNode.classList.add('masked-parent-field')
+            node.parentNode.appendChild(maskedDiv)
+        })
+
         $('.datepicker').pickadate({
                 selectMonths: true, // Creates a dropdown to control month
                 selectYears: 15, // Creates a dropdown of 15 years to control year,

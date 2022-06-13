@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import *
 from django.views.decorators.csrf import csrf_protect
 from datetime import date, time, datetime, timedelta
-from .forms import MessForm, LeaveForm, BonafideForm, DayPassForm, VacationLeaveNoMessForm
+from .forms import MessBillForm, MessForm, LeaveForm, BonafideForm, DayPassForm, VacationLeaveNoMessForm
 from django.contrib import messages
 from django.utils.timezone import make_aware
 from django.core.mail import send_mail
@@ -1160,10 +1160,15 @@ def messbill(request):
     # Exports Mess Bill dues in an excel file
     # template: messbill.html
 
-    if request.GET:
+    if request.GET: # Not sure if this is required, but don't wanna break production (again)
         selected = request.GET['ids']
         values = [x for x in selected.split(',')]
     if request.POST:
+        generated_form = MessBillForm(request.POST)
+
+        if not generated_form.is_valid():
+            return render(request, "messbill.html", {"form": generated_form})
+
         messOpt = request.POST.get('mess')
         response = HttpResponse(content_type='application/ms-excel')
         response['Content-Disposition'] = 'attachment; filename='+ str(messOpt) +'-MessBill.xls'
@@ -1180,8 +1185,8 @@ def messbill(request):
         #     sheet.write_merge(row1, row2, col1, col2, 'text', fontStyle)
         ws.write_merge(0, 0, 0, 4, str(messOpt) + "-Mess", heading_style)
 
-        start_date = datetime.strptime(request.POST.get('start_date'), '%d %B, %Y').date()
-        end_date = datetime.strptime(request.POST.get('end_date'), '%d %B, %Y').date()
+        start_date = datetime.strptime(request.POST.get('dateStart'), '%d %B, %Y').date()
+        end_date = datetime.strptime(request.POST.get('dateEnd'), '%d %B, %Y').date()
         end_date = end_date if end_date<date.today() else date.today()
 
         ws.write(1, 0, "From:", h2_font_style)
@@ -1301,7 +1306,8 @@ def messbill(request):
         messages.success(request, "Export done. Download will automatically start.")
         return response
 
-    return render(request, "messbill.html", {})
+    form = MessBillForm()
+    return render(request, "messbill.html", {"form": form})
 
 @user_passes_test(lambda u: u.is_superuser)
 def import_mess_bill(request):
