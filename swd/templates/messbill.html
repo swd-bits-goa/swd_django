@@ -46,15 +46,22 @@
                             <span class="card-title">Export Student Mess Bills</span>
                             <form method="POST">
                                 {% csrf_token %}
+                                <!-- For Field Errors -->
+                                {% if form.errors %}
                                 <div class="row">
                                     {% for field in form %}
-                                        {% if form.errors %}
-                                            {% for error in field.errors %}
-                                                <div class="red-text alert alert-danger">
-                                                    <strong>{{ error|escape }}</strong>
-                                                </div>
-                                            {% endfor %}
-                                        {% endif %}
+                                        <div class="input-field col s6">
+                                                {% for error in field.errors %}
+                                                    <div class="red-text alert alert-danger">
+                                                        <strong>{{ error|escape }}</strong>
+                                                    </div>
+                                                {% endfor %}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                                <div class="row">
+                                    {% for field in form %}
                                         <div class="input-field col s6">
                                             {{ field }} {{ field.label_tag }}
                                         </div>
