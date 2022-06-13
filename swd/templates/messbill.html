@@ -68,7 +68,7 @@
                                     </p>
                                     <p>
                                         <input name="extype" type="radio" id="typefinal" value="F" />
-                                        <label for="typefinal">Final Data (if exists, data imported imported manually)</label>
+                                        <label for="typefinal">Final Data (if exists, data imported manually)</label>
                                     </p>
                                     </fieldset>
                                 </div>
@@ -119,7 +119,7 @@
         document.querySelectorAll('input.mask').forEach(node => {
             const maskedDiv = document.createElement('div')
             maskedDiv.onclick = () => { setTimeout(() => { console.log('clicked'); node.click() }, 50) }
-            maskedDiv.setAttribute('style', 'position:absolute;top:0;left:0;width:100%;height:100%;')
+            maskedDiv.setAttribute('style', 'position:absolute;top:0;left:0;width:100%;height:100%;cursor:pointer;')
             node.parentNode.classList.add('masked-parent-field')
             node.parentNode.appendChild(maskedDiv)
         })
