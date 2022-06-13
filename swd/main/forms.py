@@ -10,6 +10,22 @@ class MessForm(forms.ModelForm):
         model = MessOption
         fields = ['mess']
 
+class MessBillForm(forms.Form):
+    dateStart = forms.CharField(label='Start Date', widget=forms.TextInput(attrs={'class': 'datepicker mask'}))
+    dateEnd = forms.CharField(label='End Date', widget=forms.TextInput(attrs={'class': 'datepicker mask'}))
+
+    def clean(self):
+        cleaned_data = super().clean()
+        dateStart = datetime.strptime(cleaned_data['dateStart'], '%d %B, %Y').date()
+        dateEnd = datetime.strptime(cleaned_data['dateEnd'], '%d %B, %Y').date()
+        if (dateStart > dateEnd):
+            self.add_error('dateEnd', "End Date must be after Start Date")
+        if (dateStart > date.today()):
+            self.add_error('dateStart', "Start Date must be before today")
+        if (dateEnd > date.today()):
+            self.add_error('dateEnd', "End Date must be before today")
+        
+        return cleaned_data
 
 class LeaveForm(forms.ModelForm):
     dateStart = forms.CharField(label='Departure Date', widget=forms.TextInput(attrs={'class': 'datepicker mask'}))
