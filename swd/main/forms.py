@@ -20,7 +20,6 @@ class MessBillForm(forms.Form):
             return cleaned_data
 
         dateStart = datetime.strptime(cleaned_data['dateStart'], '%d %B, %Y').date()
-        print(dateStart)
         dateEnd = datetime.strptime(cleaned_data['dateEnd'], '%d %B, %Y').date()
         if (dateStart > dateEnd):
             self.add_error('dateEnd', "End Date must be after Start Date")

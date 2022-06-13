@@ -43,7 +43,7 @@
                 <div class="col s6 l6">
                     <div class="card">
                         <div class="card-content">
-                            <span class="card-title">Export Student Mess Bills</span>
+                            <span class="card-title"><b>Export Student Mess Bills</b></span>
                             <form method="POST">
                                 {% csrf_token %}
                                 <!-- For Field Errors -->
@@ -51,11 +51,11 @@
                                 <div class="row">
                                     {% for field in form %}
                                         <div class="input-field col s6">
-                                                {% for error in field.errors %}
-                                                    <div class="red-text alert alert-danger">
-                                                        <strong>{{ error|escape }}</strong>
-                                                    </div>
-                                                {% endfor %}
+                                            {% for error in field.errors %}
+                                                <div class="red-text alert alert-danger">
+                                                    <strong>{{ error|escape }}</strong>
+                                                </div>
+                                            {% endfor %}
                                         </div>
                                     {% endfor %}
                                 </div>
