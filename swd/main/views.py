@@ -2338,6 +2338,7 @@ def add_new_students(request):
 
             count = 0
             count_created = 0
+            created = False
             idx = 1
             header = {}
             for sheet in workbook.sheets():
@@ -2413,9 +2414,7 @@ def add_new_students(request):
                         rev_admit = datetime.strptime('01Jan1985', '%d%b%Y')
 
                     try:    
-                        student,created = Student.objects.update_or_create(
-                            user=user,
-                            defaults={
+                        updated_vals = {
                             'bitsId':str(row[header['studentID']].value)[:15],
                             'name':str(row[header['name']].value)[:50],
                             'bDay':rev_bDay,
@@ -2427,8 +2426,32 @@ def add_new_students(request):
                             'bloodGroup':str(row[header['bloodgp']].value)[:10],
                             'parentName':str(row[header['fname']].value)[:50],
                             'parentPhone':str(row[header['parent mobno']].value)[:20],
-                            'parentEmail':str(row[header['parent mail']].value)[:50]},
-                        )
+                            'parentEmail':str(row[header['parent mail']].value)[:50]
+                        }         
+                        try:
+                            obj = Student.objects.get(user=user)
+                            for key, value in updated_vals.items():
+                                #print(f"{key}, {value}")
+                                if (value):
+                                    setattr(obj, key, value)
+                            obj.save()
+                        except Student.DoesNotExist:
+                            obj = Student(
+                            user=user,
+                            bitsId=str(row[header['studentID']].value)[:15],
+                            name=str(row[header['name']].value)[:50],
+                            bDay=rev_bDay,
+                            admit=rev_admit,
+                            gender=str(row[header['Stu_gender']].value)[0],
+                            phone=str(row[header['stu_mobile']].value)[:15],
+                            email=str(row[header['stu_email (other then institute)']].value),
+                            address=str(row[header['ADDRESS']].value),
+                            bloodGroup=str(row[header['bloodgp']].value)[:10],
+                            parentName=str(row[header['fname']].value)[:50],
+                            parentPhone=str(row[header['parent mobno']].value)[:20],
+                            parentEmail=str(row[header['parent mail']].value)[:50])
+                            obj.save()
+                            created = True
                         if created:
                             count_created = count_created + 1
                         else:
