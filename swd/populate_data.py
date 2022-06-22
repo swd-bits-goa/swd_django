@@ -19,10 +19,11 @@ import argparse
 Running this script will create a dummy population. For convenience, here's the command line statement to create a small dataset:
 $ python populate_data.py --dataset_size small
 
+For convenience, this script also creates a file 'student-details.txt' that contains the name and ID of all students created
 For a list of all dummy credentials that will be created, check out the README
 """
 
-boolen_choices = [True, False]
+boolean_choices = [True, False]
 gender_choices = ['M', 'F']
 branch_choices = ['A1', 'A3', 'A4', 'A7', 'A8', 'B1', 'B2', 'B3', 'B4', 'B5']
 single_degree_choices = ['A1', 'A3', 'A4', 'A7', 'A8']
@@ -53,7 +54,7 @@ def fake_date(start=bDay_start, end=bDay_end):
 
 
 def fake_boolean():
-    return random.choice(boolen_choices)
+    return random.choice(boolean_choices)
 
 
 def fake_bonafide():
@@ -203,6 +204,14 @@ def create_students_list(PER_BATCH_SIZE, YEAR_START, YEAR_END):
             students_list.append(mStudent)
 
             counter += 1
+
+    # Create file with student details
+    relevant_details = ['name', 'bitsId', 'email', 'gender', 'phone']
+    with open("student-details.txt", 'w') as file:
+        details = []
+        for student in students_list:
+            details.append("\t".join(str(getattr(student, detail)) for detail in relevant_details))
+        file.write("\n".join(details))
     
     with transaction.atomic():
         Student.objects.bulk_create(students_list)
