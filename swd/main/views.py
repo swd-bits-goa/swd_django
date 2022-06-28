@@ -3050,55 +3050,57 @@ def update_ps(request):
 
 @user_passes_test(lambda u: u.is_staff)
 def export_mess_leave(request):
-    if request.POST:
-        month = int(request.POST["month"])
-        year = int(request.POST["year"])
-        mess = request.POST["mess"]
+    if not request.POST:
+        return render(request, "export_mess_leave.html")
 
-        _, month_end_day = monthrange(year, month)
-        month_start_date = make_aware(datetime(year=year, month=month, day=1))
-        month_end_date = make_aware(datetime(year=year, month=month, day=month_end_day))
+    # Handle the POST request (i.e. generate Excel sheet)
+    
+    month = int(request.POST["month"])
+    year = int(request.POST["year"])
+    mess = request.POST["mess"]
 
-        leave_within_month = \
-            Q(dateTimeStart__month__exact=month, dateTimeStart__year__exact=year) |\
-            Q(dateTimeEnd__month__exact=month, dateTimeEnd__year__exact=year)
+    _, month_end_day = monthrange(year, month)
+    month_start_date = make_aware(datetime(year=year, month=month, day=1))
+    month_end_date = make_aware(datetime(year=year, month=month, day=month_end_day))
 
-        leaves = Leave.objects.filter(leave_within_month,          # Leave is in that month
-            student__messoption__monthYear__month__exact=month,    # Was in that mess that month
-            student__messoption__monthYear__year__exact=year,
-            student__messoption__mess__exact=mess,
-            approved__exact=True)
+    leave_within_month = \
+        Q(dateTimeStart__month__exact=month, dateTimeStart__year__exact=year) |\
+        Q(dateTimeEnd__month__exact=month, dateTimeEnd__year__exact=year)
 
-        response = HttpResponse(content_type='application/ms-excel')
-        response['Content-Disposition'] = 'attachment; filename="mess_leaves.xls"'
+    leaves = Leave.objects.filter(leave_within_month,          # Leave is in that month
+        student__messoption__monthYear__month__exact=month,    # Was in that mess that month
+        student__messoption__monthYear__year__exact=year,
+        student__messoption__mess__exact=mess,
+        approved__exact=True)
 
-        wb = xlwt.Workbook(encoding='utf-8')
-        ws = wb.add_sheet('Mess Leave Details')
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename="mess_leaves.xls"'
 
-        font_style = xlwt.XFStyle()
-        font_style.font.bold = True
+    wb = xlwt.Workbook(encoding='utf-8')
+    ws = wb.add_sheet('Mess Leave Details')
 
-        columns = ['ID', 'Name', 'Leave Start', 'Leave End', 'Number of days to bill']
+    font_style = xlwt.XFStyle()
+    font_style.font.bold = True
 
-        for i, col_name in enumerate(columns):
-            ws.write(0, i, col_name, font_style)
+    columns = ['ID', 'Name', 'Leave Start', 'Leave End', 'Number of days to bill']
 
-        font_style = xlwt.XFStyle()
-        for row_num, leave in enumerate(leaves, start=1):
-            bill_start = max(leave.dateTimeStart, month_start_date)
-            bill_end = min(leave.dateTimeEnd, month_end_date)
-            num_days = (bill_end - bill_start).days + 1
+    for i, col_name in enumerate(columns):
+        ws.write(0, i, col_name, font_style)
 
-            row_contents = [leave.student.bitsId, leave.student.name,
-                leave.dateTimeStart, leave.dateTimeEnd, num_days]
+    font_style = xlwt.XFStyle()
+    for row_num, leave in enumerate(leaves, start=1):
+        bill_start = max(leave.dateTimeStart, month_start_date)
+        bill_end = min(leave.dateTimeEnd, month_end_date)
+        num_days = (bill_end - bill_start).days + 1
 
-            for col_num, content in enumerate(row_contents):
-                ws.write(row_num, col_num, str(content), font_style)
+        row_contents = [leave.student.bitsId, leave.student.name,
+            leave.dateTimeStart, leave.dateTimeEnd, num_days]
 
-        wb.save(response)
-        return response
+        for col_num, content in enumerate(row_contents):
+            ws.write(row_num, col_num, str(content), font_style)
 
-    return render(request, "export_mess_leave.html")
+    wb.save(response)
+    return response
 
 @user_passes_test(lambda u: u.is_superuser)
 def update_address(request):
