@@ -257,7 +257,7 @@ class Bonafide(models.Model):
     printed = models.BooleanField(default=0, blank=True)
     status = models.CharField(
         max_length=20, choices=BONAFIDE_STATUS_CHOICES, default='Pending')
-    text = models.TextField(default='', blank=True)
+    text = models.TextField(default='', blank=True) # Better to call createText() when needed
     rejectedReason = models.TextField(default='', blank=True)
 
     def createText(self):
