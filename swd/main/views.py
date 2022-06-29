@@ -899,7 +899,7 @@ def certificates(request):
 def printBonafide(request,id=None):
     instance = Bonafide.objects.get(id=id)
     context = {
-            "text"  :instance.text,
+            "text"  :instance.createText(),
             "date"  :date.today(),
             "id"    :id
     }

@@ -264,7 +264,6 @@ class Bonafide(models.Model):
 
         with open(settings.CONSTANTS_LOCATION, 'r') as fp:
             data = json.load(fp)
-        bonafideAcademicSession = data['bonafide-academic-session']
 
         gender = "Mr. " if self.student.gender.lower() == 'm' else "Ms. "
         pronoun = "He " if gender == "Mr. " else "She "
@@ -291,9 +290,9 @@ class Bonafide(models.Model):
             year = today.year
         reason = self.otherReason if self.reason.lower() == 'other' else self.reason
         if(res.status == "Student"):
-            return '''&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This is to certify that <i style="font-family: Monotype Corsiva">''' + gender + self.student.name.upper() + '''</i>, ID No. <i style="font-family: Monotype Corsiva">''' + self.student.bitsId + '''</i> is a bonafide student of ''' + yearName + ''' year class. ''' + pronoun + ''' was admitted to the Institute on ''' + str(date_admit) + ''', for pursuing the <i style="font-family: Monotype Corsiva">''' + branch + '''</i> ''' + ('''under dual degree ''' if dual_degree_student else '''''') + '''programme of studies. ''' + pronoun+'''is residing in the Hostel <i style="font-family: Monotype Corsiva">'''+res.hostel+'''-'''+res.room+'''</i> of this Institute. <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This certificate is issued for the purpose of applying for ''' + reason + '''.'''
+            return f'''&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This is to certify that <i style="font-family: Monotype Corsiva">{gender + self.student.name.upper()}</i>, ID No. <i style="font-family: Monotype Corsiva">{self.student.bitsId}</i> is a bonafide student of {yearName} year class. {pronoun} was admitted to the Institute on {str(date_admit)}, for pursuing the <i style="font-family: Monotype Corsiva">{branch}</i> {"under dual degree " if dual_degree_student else ""}programme of studies. {pronoun} is residing in the Hostel <i style="font-family: Monotype Corsiva">{res.hostel}-{res.room}</i> of this Institute. <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This certificate is issued for the purpose of applying for {reason}.'''
         elif(res.status == "Thesis" or res.status == "PS2"):
-            return '''&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This is to certify that <i style="font-family: Monotype Corsiva">''' + gender + self.student.name.upper() + '''</i>, ID No. <i style="font-family: Monotype Corsiva">''' + self.student.bitsId + '''</i> is a bonafide student of ''' + yearName + ''' year class. ''' + pronoun + ''' was admitted to the Institute on ''' + str(date_admit) + ''', for pursuing the <i style="font-family: Monotype Corsiva">''' + branch + '''</i> ''' + ('''under dual degree ''' if dual_degree_student else '''''') + '''programme of studies. ''' + pronoun + ''' is pursuing <i style="font-family: Monotype Corsiva">''' + res.status + '''</i> at <i style="font-family: Monotype Corsiva">''' + res.psStation + '''</i>.<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This certificate is issued for the purpose of applying for ''' + reason + '''.'''
+            return f'''&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This is to certify that <i style="font-family: Monotype Corsiva">{gender + self.student.name.upper()}</i>, ID No. <i style="font-family: Monotype Corsiva">{self.student.bitsId}</i> is a bonafide student of {yearName} year class. {pronoun} was admitted to the Institute on {str(date_admit)}, for pursuing the <i style="font-family: Monotype Corsiva">{branch}</i> {"under dual degree " if dual_degree_student else ""}programme of studies. {pronoun} is pursuing <i style="font-family: Monotype Corsiva">{res.status}</i> at <i style="font-family: Monotype Corsiva">{res.psStation}</i>.<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This certificate is issued for the purpose of applying for {reason}.'''
         else:
             return 'Bonafide is invalid for Graduate students'
 
