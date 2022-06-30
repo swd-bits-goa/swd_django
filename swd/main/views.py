@@ -16,7 +16,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from django.contrib.auth.models import User
 
-from calendar import monthrange
+from calendar import monthrange, month_name
 from dateutil import rrule
 from datetime import datetime
 from django.db import IntegrityError
@@ -3083,6 +3083,8 @@ def export_mess_leave(request):
     wb = xlwt.Workbook(encoding='utf-8')
     ws = wb.add_sheet('Mess Leave Details')
 
+    heading_style = xlwt.easyxf('font: bold on, height 280; align: wrap on, vert centre, horiz center')
+    h2_style = xlwt.easyxf('font: bold on; align: vert centre, horiz centre')
     font_style = xlwt.XFStyle()
     font_style.font.bold = True
 
@@ -3094,13 +3096,17 @@ def export_mess_leave(request):
         ('Leave Duration', 4000)
     ]
 
+    # Write the heading
+
+    ws.write_merge(0, 0, 0, len(columns), f"Mess Leaves - {month_name[month]}, {year}", heading_style)
+
     for i, (col_name, col_width) in enumerate(columns):
-        ws.write(0, i, col_name, font_style)
+        ws.write(1, i, col_name, h2_style)
         ws.col(i).width = col_width
 
     _, DAYS_IN_MONTH = monthrange(year, month)
     font_style = xlwt.XFStyle()
-    for row_num, leave in enumerate(leaves, start=1):
+    for row_num, leave in enumerate(leaves, start=2):
         start_day = leave.dateTimeStart.day # 1 indexed
         if(leave.dateTimeStart.month < month):
             start_day = 1
