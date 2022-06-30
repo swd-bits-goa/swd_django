@@ -3055,8 +3055,8 @@ def export_mess_leave(request):
 
     # Handle the POST request (i.e. generate Excel sheet)
     
-    month = int(request.POST["month"])
     year = int(request.POST["year"])
+    month = int(request.POST["month"])
     mess = request.POST["mess"]
 
     _, month_end_day = monthrange(year, month)
