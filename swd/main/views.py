@@ -3059,19 +3059,23 @@ def export_mess_leave(request):
     month = int(request.POST["month"])
     mess = request.POST["mess"]
 
-    _, month_end_day = monthrange(year, month)
-    month_start_date = make_aware(datetime(year=year, month=month, day=1))
-    month_end_date = make_aware(datetime(year=year, month=month, day=month_end_day))
+    # WHAT TO DO:
+    # First get students in that mess from messOption
+    # Get leaves of all these students' leaves with start or end date containing month
+    
+    # Get students in that mess
+    students = MessOption.objects.filter(mess=mess).values_list("student", flat=True)
 
-    leave_within_month = \
+    # This is a query for getting leaves of these students if they intersect the selected duration
+    query = Q(student__in=students) & (
         Q(dateTimeStart__month__exact=month, dateTimeStart__year__exact=year) |\
         Q(dateTimeEnd__month__exact=month, dateTimeEnd__year__exact=year)
+    )
 
-    leaves = Leave.objects.filter(leave_within_month,          # Leave is in that month
-        student__messoption__monthYear__month__exact=month,    # Was in that mess that month
-        student__messoption__monthYear__year__exact=year,
-        student__messoption__mess__exact=mess,
-        approved__exact=True)
+    # Use the above query, and also make sure leaves are approved
+    leaves = Leave.objects.filter(query, approved__exact=True)
+    
+    # At this point, leaves is a QuerySet containing approved leaves in that month and year from that mess
 
     response = HttpResponse(content_type='application/ms-excel')
     response['Content-Disposition'] = 'attachment; filename="mess_leaves.xls"'
@@ -3082,19 +3086,33 @@ def export_mess_leave(request):
     font_style = xlwt.XFStyle()
     font_style.font.bold = True
 
-    columns = ['ID', 'Name', 'Leave Start', 'Leave End', 'Number of days to bill']
+    columns = [
+        ('ID', 4000),
+        ('Name', 4000),
+        ('Leave Start', 8000),
+        ('Leave End', 8000),
+        ('Leave Duration', 4000)
+    ]
 
-    for i, col_name in enumerate(columns):
+    for i, (col_name, col_width) in enumerate(columns):
         ws.write(0, i, col_name, font_style)
+        ws.col(i).width = col_width
 
+    _, DAYS_IN_MONTH = monthrange(year, month)
     font_style = xlwt.XFStyle()
     for row_num, leave in enumerate(leaves, start=1):
-        bill_start = max(leave.dateTimeStart, month_start_date)
-        bill_end = min(leave.dateTimeEnd, month_end_date)
-        num_days = (bill_end - bill_start).days + 1
+        start_day = leave.dateTimeStart.day # 1 indexed
+        if(leave.dateTimeStart.month < month):
+            start_day = 1
+        
+        end_day = leave.dateTimeEnd.day # 1 indexed
+        if(leave.dateTimeEnd.month > month):
+            end_day = DAYS_IN_MONTH
+        
+        leave_duration = (end_day - start_day) + 1
 
         row_contents = [leave.student.bitsId, leave.student.name,
-            leave.dateTimeStart, leave.dateTimeEnd, num_days]
+            leave.dateTimeStart, leave.dateTimeEnd, leave_duration]
 
         for col_num, content in enumerate(row_contents):
             ws.write(row_num, col_num, str(content), font_style)
