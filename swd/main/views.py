@@ -3078,15 +3078,14 @@ def export_mess_leave(request):
     # At this point, leaves is a QuerySet containing approved leaves in that month and year from that mess
 
     response = HttpResponse(content_type='application/ms-excel')
-    response['Content-Disposition'] = 'attachment; filename="mess_leaves.xls"'
+    response['Content-Disposition'] = f'attachment; filename="{mess} Mess Leaves {month_name[month]}, {year}.xls"'
 
     wb = xlwt.Workbook(encoding='utf-8')
     ws = wb.add_sheet('Mess Leave Details')
 
     heading_style = xlwt.easyxf('font: bold on, height 280; align: wrap on, vert centre, horiz center')
     h2_style = xlwt.easyxf('font: bold on; align: vert centre, horiz centre')
-    font_style = xlwt.XFStyle()
-    font_style.font.bold = True
+    font_style = xlwt.easyxf('font: bold on')
 
     columns = [
         ('ID', 4000),
@@ -3097,28 +3096,31 @@ def export_mess_leave(request):
     ]
 
     # Write the heading
+    ws.write_merge(0, 0, 0, len(columns)-1, f"{mess} Mess Leaves - {month_name[month]}, {year}", heading_style)
 
-    ws.write_merge(0, 0, 0, len(columns), f"Mess Leaves - {month_name[month]}, {year}", heading_style)
-
+    # Write the column titles
     for i, (col_name, col_width) in enumerate(columns):
         ws.write(1, i, col_name, h2_style)
         ws.col(i).width = col_width
 
     _, DAYS_IN_MONTH = monthrange(year, month)
+
     font_style = xlwt.XFStyle()
     for row_num, leave in enumerate(leaves, start=2):
+        # First day of the leave within the given month
         start_day = leave.dateTimeStart.day # 1 indexed
         if(leave.dateTimeStart.month < month):
             start_day = 1
         
+        # Last day of the leave within the given month
         end_day = leave.dateTimeEnd.day # 1 indexed
         if(leave.dateTimeEnd.month > month):
             end_day = DAYS_IN_MONTH
         
+        # Number of leave days within the given period
         leave_duration = (end_day - start_day) + 1
 
-        row_contents = [leave.student.bitsId, leave.student.name,
-            leave.dateTimeStart, leave.dateTimeEnd, leave_duration]
+        row_contents = [leave.student.bitsId, leave.student.name, leave.dateTimeStart, leave.dateTimeEnd, leave_duration]
 
         for col_num, content in enumerate(row_contents):
             ws.write(row_num, col_num, str(content), font_style)
