@@ -3,47 +3,84 @@
 {% block content %}
 <div class="container">
     <h4>Export Mess Leave</h4>
-    <form action="{% url "export_mess_leave" %}" method="POST" enctype="multipart/form-data">
+    <form action="{% url 'export_mess_leave' %}" method="POST" enctype="multipart/form-data">
         {% csrf_token %}
 
-        <div class="input-field col s12">
-            <select name="mess">
-                <option value="A">A Mess</option>
-                <option value="C">C Mess</option>
-                <option value="D">D Mess</option>
-            </select>
-            <label>Mess</label>
+        <div class="row">
+            <div class="input-field col s12">
+                <select name="year">
+                    <option value="2022">2022</option>
+                    <option value="2021">2021</option>
+                    <option value="2020">2020</option>
+                    <option value="2019">2019</option>
+                </select>
+                <label>Year</label>
+            </div>
         </div>
 
-        <div class="input-field col s12">
-            <select name="year">
-                <option value="2020">2020</option>
-                <option value="2019">2019</option>
-            </select>
-            <label>Year</label>
+        <div class="row">
+            <div class="col s12">
+                <select name="month">
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
+                    <option value="4">April</option>
+                    <option value="5">May</option>
+                    <option value="6" selected="selected">June</option>
+                    <option value="7">July</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                </select>
+                <label>Month</label>
+            </div>
         </div>
 
-        <div class="input-field col s12">
-            <select name="month">
-                <option value="1">January</option>
-                <option value="2">February</option>
-                <option value="3">March</option>
-                <option value="4">April</option>
-                <option value="5">May</option>
-                <option value="6">June</option>
-                <option value="7">July</option>
-                <option value="8">August</option>
-                <option value="9">September</option>
-                <option value="10">October</option>
-                <option value="11">November</option>
-                <option value="12">December</option>
-            </select>
-            <label>Month</label>
+        <div class="row">
+            <div class="col s12">
+                <fieldset id="mess_option" class="form-group">
+                <p>
+                    <input name="mess" type="radio" id="test1" value="A" checked/>
+                    <label for="test1">Complete A Mess</label>
+                </p>
+                <p>
+                    <input name="mess" type="radio" id="test2" value="C" />
+                    <label for="test2">Complete C Mess</label>
+                </p>
+                <p>
+                    <input name="mess" type="radio" id="test4" value="D" />
+                    <label for="test4">Complete D Mess</label>
+                </p>
+                </fieldset>
+            </div>
         </div>
 
-        <button type="submit" class="btn">
-            Download Excel Sheet
-        </button>
+        <div class="row">
+            <div class="col s6 left-align">
+                <button class="btn btn-block bg-green waves-effect" type="submit">Download Excel Sheet</button>
+            </div>
+        </div>
     </form>
 </div>
+
+
+<style>
+    .clickable {
+        cursor: pointer;
+    }
+</style>
+<script>
+    // Patch fix for datepicker
+    // Frontend devs -> please fix this issue asap. This is a temp patch.
+    // Mehul Mohan (And now Aryan Pingle)
+    document.querySelectorAll('input.mask').forEach(node => {
+        const maskedDiv = document.createElement('div')
+        maskedDiv.onclick = () => { setTimeout(() => { console.log('clicked'); node.click() }, 50) }
+        maskedDiv.setAttribute('style', 'position:absolute;top:0;left:0;width:100%;height:100%;cursor:pointer;')
+        node.parentNode.classList.add('masked-parent-field')
+        node.parentNode.appendChild(maskedDiv)
+    })
+</script>
 {% endblock %}

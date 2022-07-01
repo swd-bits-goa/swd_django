@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import *
 from django.views.decorators.csrf import csrf_protect
 from datetime import date, time, datetime, timedelta
-from .forms import MessForm, LeaveForm, BonafideForm, DayPassForm, VacationLeaveNoMessForm
+from .forms import MessBillForm, MessForm, LeaveForm, BonafideForm, DayPassForm, VacationLeaveNoMessForm
 from django.contrib import messages
 from django.utils.timezone import make_aware
 from django.core.mail import send_mail
@@ -16,7 +16,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from django.contrib.auth.models import User
 
-from calendar import monthrange
+from calendar import monthrange, month_name
 from dateutil import rrule
 from datetime import datetime
 from django.db import IntegrityError
@@ -1160,10 +1160,15 @@ def messbill(request):
     # Exports Mess Bill dues in an excel file
     # template: messbill.html
 
-    if request.GET:
+    if request.GET: # Not sure if this is required, but don't wanna break production (again)
         selected = request.GET['ids']
         values = [x for x in selected.split(',')]
     if request.POST:
+        generated_form = MessBillForm(request.POST)
+
+        if not generated_form.is_valid():
+            return render(request, "messbill.html", {"form": generated_form})
+
         messOpt = request.POST.get('mess')
         response = HttpResponse(content_type='application/ms-excel')
         response['Content-Disposition'] = 'attachment; filename='+ str(messOpt) +'-MessBill.xls'
@@ -1180,8 +1185,8 @@ def messbill(request):
         #     sheet.write_merge(row1, row2, col1, col2, 'text', fontStyle)
         ws.write_merge(0, 0, 0, 4, str(messOpt) + "-Mess", heading_style)
 
-        start_date = datetime.strptime(request.POST.get('start_date'), '%d %B, %Y').date()
-        end_date = datetime.strptime(request.POST.get('end_date'), '%d %B, %Y').date()
+        start_date = datetime.strptime(request.POST.get('dateStart'), '%d %B, %Y').date()
+        end_date = datetime.strptime(request.POST.get('dateEnd'), '%d %B, %Y').date()
         end_date = end_date if end_date<date.today() else date.today()
 
         ws.write(1, 0, "From:", h2_font_style)
@@ -1301,7 +1306,8 @@ def messbill(request):
         messages.success(request, "Export done. Download will automatically start.")
         return response
 
-    return render(request, "messbill.html", {})
+    form = MessBillForm()
+    return render(request, "messbill.html", {"form": form})
 
 @user_passes_test(lambda u: u.is_superuser)
 def import_mess_bill(request):
@@ -3044,55 +3050,83 @@ def update_ps(request):
 
 @user_passes_test(lambda u: u.is_staff)
 def export_mess_leave(request):
-    if request.POST:
-        month = int(request.POST["month"])
-        year = int(request.POST["year"])
-        mess = request.POST["mess"]
+    if not request.POST:
+        return render(request, "export_mess_leave.html")
 
-        _, month_end_day = monthrange(year, month)
-        month_start_date = make_aware(datetime(year=year, month=month, day=1))
-        month_end_date = make_aware(datetime(year=year, month=month, day=month_end_day))
+    # Handle the POST request (i.e. generate Excel sheet)
+    
+    year = int(request.POST["year"])
+    month = int(request.POST["month"])
+    mess = request.POST["mess"]
 
-        leave_within_month = \
-            Q(dateTimeStart__month__exact=month, dateTimeStart__year__exact=year) |\
-            Q(dateTimeEnd__month__exact=month, dateTimeEnd__year__exact=year)
+    # WHAT TO DO:
+    # First get students in that mess from messOption
+    # Get leaves of all these students' leaves with start or end date containing month
+    
+    # Get students in that mess
+    students = MessOption.objects.filter(mess=mess).values_list("student", flat=True)
 
-        leaves = Leave.objects.filter(leave_within_month,          # Leave is in that month
-            student__messoption__monthYear__month__exact=month,    # Was in that mess that month
-            student__messoption__monthYear__year__exact=year,
-            student__messoption__mess__exact=mess,
-            approved__exact=True)
+    # This is a query for getting leaves of these students if they intersect the selected duration
+    query = Q(student__in=students) & (
+        Q(dateTimeStart__month__exact=month, dateTimeStart__year__exact=year) |\
+        Q(dateTimeEnd__month__exact=month, dateTimeEnd__year__exact=year)
+    )
 
-        response = HttpResponse(content_type='application/ms-excel')
-        response['Content-Disposition'] = 'attachment; filename="mess_leaves.xls"'
+    # Use the above query, and also make sure leaves are approved
+    leaves = Leave.objects.filter(query, approved__exact=True)
+    
+    # At this point, leaves is a QuerySet containing approved leaves in that month and year from that mess
 
-        wb = xlwt.Workbook(encoding='utf-8')
-        ws = wb.add_sheet('Mess Leave Details')
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = f'attachment; filename="{mess} Mess Leaves {month_name[month]}, {year}.xls"'
 
-        font_style = xlwt.XFStyle()
-        font_style.font.bold = True
+    wb = xlwt.Workbook(encoding='utf-8')
+    ws = wb.add_sheet('Mess Leave Details')
 
-        columns = ['ID', 'Name', 'Leave Start', 'Leave End', 'Number of days to bill']
+    heading_style = xlwt.easyxf('font: bold on, height 280; align: wrap on, vert centre, horiz center')
+    h2_style = xlwt.easyxf('font: bold on; align: vert centre, horiz centre')
+    font_style = xlwt.easyxf('font: bold on')
 
-        for i, col_name in enumerate(columns):
-            ws.write(0, i, col_name, font_style)
+    columns = [
+        ('ID', 4000),
+        ('Name', 4000),
+        ('Leave Start', 8000),
+        ('Leave End', 8000),
+        ('Leave Duration', 4000)
+    ]
 
-        font_style = xlwt.XFStyle()
-        for row_num, leave in enumerate(leaves, start=1):
-            bill_start = max(leave.dateTimeStart, month_start_date)
-            bill_end = min(leave.dateTimeEnd, month_end_date)
-            num_days = (bill_end - bill_start).days + 1
+    # Write the heading
+    ws.write_merge(0, 0, 0, len(columns)-1, f"{mess} Mess Leaves - {month_name[month]}, {year}", heading_style)
 
-            row_contents = [leave.student.bitsId, leave.student.name,
-                leave.dateTimeStart, leave.dateTimeEnd, num_days]
+    # Write the column titles
+    for i, (col_name, col_width) in enumerate(columns):
+        ws.write(1, i, col_name, h2_style)
+        ws.col(i).width = col_width
 
-            for col_num, content in enumerate(row_contents):
-                ws.write(row_num, col_num, str(content), font_style)
+    _, DAYS_IN_MONTH = monthrange(year, month)
 
-        wb.save(response)
-        return response
+    font_style = xlwt.XFStyle()
+    for row_num, leave in enumerate(leaves, start=2):
+        # First day of the leave within the given month
+        start_day = leave.dateTimeStart.day # 1 indexed
+        if(leave.dateTimeStart.month < month):
+            start_day = 1
+        
+        # Last day of the leave within the given month
+        end_day = leave.dateTimeEnd.day # 1 indexed
+        if(leave.dateTimeEnd.month > month):
+            end_day = DAYS_IN_MONTH
+        
+        # Number of leave days within the given period
+        leave_duration = (end_day - start_day) + 1
 
-    return render(request, "export_mess_leave.html")
+        row_contents = [leave.student.bitsId, leave.student.name, leave.dateTimeStart, leave.dateTimeEnd, leave_duration]
+
+        for col_num, content in enumerate(row_contents):
+            ws.write(row_num, col_num, str(content), font_style)
+
+    wb.save(response)
+    return response
 
 @user_passes_test(lambda u: u.is_superuser)
 def update_address(request):

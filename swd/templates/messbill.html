@@ -43,18 +43,29 @@
                 <div class="col s6 l6">
                     <div class="card">
                         <div class="card-content">
-                            <span class="card-title">Export Student Mess Bills</span>
+                            <span class="card-title"><b>Export Student Mess Bills</b></span>
                             <form method="POST">
                                 {% csrf_token %}
+                                <!-- For Field Errors -->
+                                {% if form.errors %}
                                 <div class="row">
-                                    <div class="input-field col s6">
-                                        <input id="start_date" name="start_date" type="text" class="datepicker">
-                                        <label for="start_date">Start Date</label>
-                                    </div>
-                                    <div class="input-field col s6">
-                                        <input id="end_date" name="end_date" type="text" class="datepicker">
-                                        <label for="end_date">End Date</label>
-                                    </div>
+                                    {% for field in form %}
+                                        <div class="input-field col s6">
+                                            {% for error in field.errors %}
+                                                <div class="red-text alert alert-danger">
+                                                    <strong>{{ error|escape }}</strong>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                                <div class="row">
+                                    {% for field in form %}
+                                        <div class="input-field col s6">
+                                            {{ field }} {{ field.label_tag }}
+                                        </div>
+                                    {% endfor %}
                                 </div>
                                 <div class="row">
                                     <fieldset id="export_type" class="form-group">
@@ -64,7 +75,7 @@
                                     </p>
                                     <p>
                                         <input name="extype" type="radio" id="typefinal" value="F" />
-                                        <label for="typefinal">Final Data (if exists, data imported imported manually)</label>
+                                        <label for="typefinal">Final Data (if exists, data imported manually)</label>
                                     </p>
                                     </fieldset>
                                 </div>
@@ -109,6 +120,17 @@
         }
     </style>
     <script>
+        // Patch fix for datepicker
+        // Frontend devs -> please fix this issue asap. This is a temp patch.
+        // Mehul Mohan (And now Aryan Pingle)
+        document.querySelectorAll('input.mask').forEach(node => {
+            const maskedDiv = document.createElement('div')
+            maskedDiv.onclick = () => { setTimeout(() => { console.log('clicked'); node.click() }, 50) }
+            maskedDiv.setAttribute('style', 'position:absolute;top:0;left:0;width:100%;height:100%;cursor:pointer;')
+            node.parentNode.classList.add('masked-parent-field')
+            node.parentNode.appendChild(maskedDiv)
+        })
+
         $('.datepicker').pickadate({
                 selectMonths: true, // Creates a dropdown to control month
                 selectYears: 15, // Creates a dropdown of 15 years to control year,
