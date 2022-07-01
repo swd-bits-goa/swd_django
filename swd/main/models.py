@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 import os
 import hashlib
 import re
+import random
 from django.utils import timezone
 from datetime import datetime
 from datetime import date
@@ -257,17 +258,14 @@ class Bonafide(models.Model):
     printed = models.BooleanField(default=0, blank=True)
     status = models.CharField(
         max_length=20, choices=BONAFIDE_STATUS_CHOICES, default='Pending')
-    text = models.TextField(default='', blank=True)
+    text = models.TextField(default='', blank=True) # Better to call createText() when needed
     rejectedReason = models.TextField(default='', blank=True)
 
     def createText(self):
-
-        with open(settings.CONSTANTS_LOCATION, 'r') as fp:
-            data = json.load(fp)
-        bonafideAcademicSession = data['bonafide-academic-session']
-
-        gender = "Mr. " if self.student.gender.lower() == 'm' else "Ms. "
-        pronoun = "He " if gender == "Mr. " else "She "
+        gender = "M" if self.student.gender.lower() == 'm' else "F"
+        honorific = "Mr." if gender == "M" else "Ms."
+        pronoun = "He" if gender == "M" else "She"
+        possessive = "His" if gender == "M" else "Her"
         firstDeg = self.student.bitsId[4:6]
         secondDeg = self.student.bitsId[6:8]
         res = HostelPS.objects.get(student=self.student)
@@ -290,10 +288,37 @@ class Bonafide(models.Model):
         else:
             year = today.year
         reason = self.otherReason if self.reason.lower() == 'other' else self.reason
+
+        # Address will be shown in case reason is "Passport"
+        address = self.student.address
+        formatted_address = re.sub(r'\s*,\s*', ", ", address).strip(", ")
+        address_html_for_passport = f'''
+        <p>
+            {possessive} permanent address as per our records is: {formatted_address}
+        </p>
+        '''.strip()
+
         if(res.status == "Student"):
-            return '''&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This is to certify that <i style="font-family: Monotype Corsiva">''' + gender + self.student.name.upper() + '''</i>, ID No. <i style="font-family: Monotype Corsiva">''' + self.student.bitsId + '''</i> is a bonafide student of ''' + yearName + ''' year class. ''' + pronoun + ''' was admitted to the Institute on ''' + str(date_admit) + ''', for pursuing the <i style="font-family: Monotype Corsiva">''' + branch + '''</i> ''' + ('''under dual degree ''' if dual_degree_student else '''''') + '''programme of studies. ''' + pronoun+'''is residing in the Hostel <i style="font-family: Monotype Corsiva">'''+res.hostel+'''-'''+res.room+'''</i> of this Institute. <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This certificate is issued for the purpose of applying for ''' + reason + '''.'''
+            return f'''
+            <p>
+                This is to certify that <i>{honorific} {self.student.name.upper()}</i>, ID No. <i>{self.student.bitsId}</i> is a bonafide student of {yearName} year class. {pronoun} was admitted to the Institute on {str(date_admit)}, for pursuing the <i>{branch}</i> {"under dual degree " if dual_degree_student else ""}programme of studies. {pronoun} is residing in the Hostel <i>{res.hostel}-{res.room}</i> of this Institute as on date.
+            </p>
+            { address_html_for_passport if reason == "Passport" else ""}
+            <p>
+                This certificate is issued for the purpose of applying for {reason}.
+            </p>
+            '''.strip()
+
         elif(res.status == "Thesis" or res.status == "PS2"):
-            return '''&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This is to certify that <i style="font-family: Monotype Corsiva">''' + gender + self.student.name.upper() + '''</i>, ID No. <i style="font-family: Monotype Corsiva">''' + self.student.bitsId + '''</i> is a bonafide student of ''' + yearName + ''' year class. ''' + pronoun + ''' was admitted to the Institute on ''' + str(date_admit) + ''', for pursuing the <i style="font-family: Monotype Corsiva">''' + branch + '''</i> ''' + ('''under dual degree ''' if dual_degree_student else '''''') + '''programme of studies. ''' + pronoun + ''' is pursuing <i style="font-family: Monotype Corsiva">''' + res.status + '''</i> at <i style="font-family: Monotype Corsiva">''' + res.psStation + '''</i>.<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This certificate is issued for the purpose of applying for ''' + reason + '''.'''
+            return f'''
+            <p>
+                This is to certify that <i>{honorific} {self.student.name.upper()}</i>, ID No. <i>{self.student.bitsId}</i> is a bonafide student of {yearName} year class. {pronoun} was admitted to the Institute on {str(date_admit)}, for pursuing the <i>{branch}</i> {"under dual degree " if dual_degree_student else ""}programme of studies. {pronoun} is pursuing <i>{res.status}</i> at <i>{res.psStation}</i>.
+            </p>
+            { address_html_for_passport if reason == "Passport" else ""}
+            <p>
+                This certificate is issued for the purpose of applying for {reason}.
+            </p>
+            '''.strip()
         else:
             return 'Bonafide is invalid for Graduate students'
 

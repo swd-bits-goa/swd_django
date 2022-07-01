@@ -43,6 +43,18 @@
       margin-left: auto;
       margin-right: auto;
     }
+
+    .certificate-text > p {
+      text-indent: 4ch;
+      font-size: 18px;
+      line-height: 1.25;
+      text-align: justify;
+    }
+
+    .certificate-text i {
+      font-family: 'Monotype Corsiva';
+      font-size: 1.1em;
+    }
   </style>
   <div id="letterhead">
     <img src="{% static 'img/bonafide_header.png' %}" width=595px>
@@ -56,9 +68,9 @@
           style="float:right;">Date: {{ date|date:"d-F-Y" }}</span></h3>
     </div>
     <h2 align="center" style="padding-top: 30px">CERTIFICATE</h1>
-      <p line-height=200% style="font-size: 18px; line-height: 1.5; text-align: justify;">
+      <div class="certificate-text">
         {{ text | safe}}
-      </p>
+      </div>
       <br><br><br>
       <p>
         <span style="text-align:center; float:right; font-size: 20px">

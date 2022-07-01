@@ -901,9 +901,9 @@ def certificates(request):
 def printBonafide(request,id=None):
     instance = Bonafide.objects.get(id=id)
     context = {
-            "text"  :instance.text,
-            "date"  :date.today(),
-            "id"    :id
+        "text"  :instance.createText(),
+        "date"  :date.today(),
+        "id"    :id
     }
     instance.printed=True
     instance.status='Approved'
