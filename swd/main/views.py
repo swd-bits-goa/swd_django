@@ -378,58 +378,56 @@ def messoption(request):
 
     if request.GET:
         edit = request.GET.get('edit')
+    
+    context = {
+        'student': student,
+        'balance': balance,
+        'leaves': leaves,
+        'bonafides': bonafides,
+        'daypasss': daypasss,
+    }
 
-    if (messopen and not messoption) or (messopen and edit):
+    if messopen and (not messoption or edit):
+        # if messopen is active and student doesn't have a messoption / wants to edit it
+        # Opens the edit page
         form = MessForm(request.POST)
-        context = {
+        context.update({
             'option': 0,
             'mess': messopen[0],
             'form': form,
             'dateClose': messopen[0].dateClose,
-            'student': student,
-            'balance': balance,
-            'leaves': leaves,
-            'bonafides': bonafides,
-            'daypasss': daypasss,
-        }
+        })
     elif messopen and messoption:
-        context = {
+        # Messopen is active and student already has a messoption
+        # Page shows the messoption and an edit button
+        context.update({
             'option': 1,
             'mess': messoption[0],
-            'student': student,
-            'balance': balance,
-            'leaves': leaves,
-            'bonafides': bonafides,
-            'daypasss': daypasss,}
+        })
     elif messoption:
-        context = {
+        # Messopen is not active and student already has a messoption
+        # Page shows "you have filled this period's mess as <messname>"
+        context.update({
             'option': 2,
-            'student': student,
-            'leaves': leaves,
-            'balance': balance,
-            'bonafides': bonafides,
-            'daypasss': daypasss,
             'mess': messoption[0],
-            }
+        })
     else:
-        context = {
+        # messoptionopen is not active and student doesn't have a messoption
+        # Page shows "Nothing's Here, come back again please!"
+        context.update({
             'option': 3,
-            'student': student,
-            'leaves': leaves,
-            'balance': balance,
-            'bonafides': bonafides,
-            'daypasss': daypasss,
-            }
+        })
     
-    vacations = VacationDatesFill.objects.filter(
-        dateClose__gte=date.today(), dateOpen__lte=date.today()).exclude(
-                messOption=None)
+    vacations = VacationDatesFill.objects \
+        .filter(dateClose__gte=date.today(), dateOpen__lte=date.today()) \
+        .exclude(messOption=None)
     
     if vacations:
         vacation_open = vacations[0]
         student_vacation = Leave.objects.filter(
             student=student,
-            reason=vacation_open.description)
+            reason=vacation_open.description
+        )
         if student_vacation:
             student_vacation = student_vacation[0]
         context['vacation'] = vacation_open
@@ -469,7 +467,8 @@ def messoption(request):
                     messoptionfill = MessOption(
                         student=student,
                         monthYear=messopen[0].monthYear,
-                        mess=mess)
+                        mess=mess
+                    )
                     messoptionfill.save()
                     context['mess'] = messoptionfill
                     context['option'] = 1
@@ -479,9 +478,10 @@ def messoption(request):
                 if edit:
                     messoption.delete()
                 messoptionfill = MessOption(
-                        student=student,
-                        monthYear=messopen[0].monthYear,
-                        mess=mess)
+                    student=student,
+                    monthYear=messopen[0].monthYear,
+                    mess=mess
+                )
                 messoptionfill.save()
         # if created or (vacations.count() == 0):
         #     return redirect('messoption')
