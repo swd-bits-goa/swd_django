@@ -330,17 +330,24 @@ def messoption(request):
     leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
     daypasss = DayPass.objects.filter(student=student, dateTime__gte=date.today() - timedelta(days=7))
     bonafides = Bonafide.objects.filter(student=student, reqDate__gte=date.today() - timedelta(days=7))
-    messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today(), dateOpen__lte=date.today())
+
+    # MessOptionOpen or None
+    messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today(), dateOpen__lte=date.today()).first() or None
+
+    messoption = None # MessOption or None
     errors = []
 
-    if messopen:
-        messoption = MessOption.objects.filter(monthYear=messopen[0].monthYear, student=student)
+    if messopen: # If there is a MessOptionOpen active right now
+        # Get the student's MessOption
+        messoption = MessOption.objects.filter(student=student, monthYear=messopen.monthYear).first()
     else:
-        messopen_new = MessOptionOpen.objects.all().last()
+        # Get the most recent MessOptionOpen
+        messopen_last = MessOptionOpen.objects.all().last()
+        # Try to get the student's MessOption
         try:
-            messoption = MessOption.objects.filter(monthYear=messopen_new.monthYear, student=student)
+            messoption = MessOption.objects.filter(monthYear=messopen_last.monthYear, student=student).first()
         except:
-            messoption = [ None ]
+            messoption = None
 
     # dues
     try:
@@ -374,10 +381,7 @@ def messoption(request):
         main_amt = data['swd-advance']
     balance = float(main_amt) - float(total_amount)
 
-    edit = 0
-
-    if request.GET:
-        edit = request.GET.get('edit')
+    edit = True if (request.GET and 'edit' in request.GET) else False
     
     context = {
         'student': student,
@@ -388,28 +392,28 @@ def messoption(request):
     }
 
     if messopen and (not messoption or edit):
-        # if messopen is active and student doesn't have a messoption / wants to edit it
+        # If a MessOptionOpen is active and student doesn't have a MessOption / wants to edit it
         # Opens the edit page
         form = MessForm(request.POST)
         context.update({
             'option': 0,
-            'mess': messopen[0],
+            'mess': messopen,
             'form': form,
-            'dateClose': messopen[0].dateClose,
+            'dateClose': messopen.dateClose,
         })
     elif messopen and messoption:
-        # Messopen is active and student already has a messoption
-        # Page shows the messoption and an edit button
+        # Messopen is active and student already has a MessOption
+        # Page shows the MessOption and an edit button
         context.update({
             'option': 1,
-            'mess': messoption[0],
+            'mess': messoption,
         })
     elif messoption:
         # Messopen is not active and student already has a messoption
         # Page shows "you have filled this period's mess as <messname>"
         context.update({
             'option': 2,
-            'mess': messoption[0],
+            'mess': messoption,
         })
     else:
         # messoptionopen is not active and student doesn't have a messoption
@@ -460,31 +464,37 @@ def messoption(request):
         if (vacations.count() and len(errors) == 0) or (vacations.count() == 0) or (edit and len(errors) == 0):
             # Mess Option Filling
             mess = request.POST.get('mess')
-            if messopen[0].capacity != None:
-                if MessOption.objects.filter(mess=mess).count() < messopen[0].capacity:
+            if messopen.capacity != None:
+                if MessOption.objects.filter(monthYear=messopen.monthYear, mess=mess).count() < messopen.capacity:
+                    # Mess isn't full, so create the messoption
                     if edit:
-                        messoption.delete()
-                    messoptionfill = MessOption(
-                        student=student,
-                        monthYear=messopen[0].monthYear,
-                        mess=mess
-                    )
-                    messoptionfill.save()
-                    context['mess'] = messoptionfill
+                        messoption.student = student
+                        messoption.monthYear = messopen.monthYear
+                        messoption.mess = mess
+                    else:
+                        messoption = MessOption(
+                            student = student,
+                            monthYear = messopen.monthYear,
+                            mess = mess
+                        )
+                    messoption.save()
+                    context['mess'] = messoption
                     context['option'] = 1
                 else:
                     context['capacity']="Choose different mess, capacity full."
-            else:
+            else: # In case they gave no capacity, assume it is unlimited
                 if edit:
-                    messoption.delete()
-                messoptionfill = MessOption(
-                    student=student,
-                    monthYear=messopen[0].monthYear,
-                    mess=mess
-                )
-                messoptionfill.save()
-        # if created or (vacations.count() == 0):
-        #     return redirect('messoption')
+                    messoption.student = student
+                    messoption.monthYear = messopen.monthYear
+                    messoption.mess = mess
+                else:
+                    messoption = MessOption(
+                        student = student,
+                        monthYear = messopen.monthYear,
+                        mess = mess
+                    )
+                messoption.save()
+
     return render(request, "mess.html", context)
 
 
