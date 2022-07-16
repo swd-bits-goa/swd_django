@@ -3254,8 +3254,9 @@ def update_bank_account(request):
                     # create User model first then Student model
                     try:
                         student = Student.objects.get(bitsId=row[header['studentID']].value)
-                        student.bank_account_no = str(int(row[header['account']].value))
+                        student.bank_account_no = str(row[header['account']].value)
                         student.save()
+                        count+=1
                     except Exception:
                         message_str + "student " + row[header['studentID']].value + " not in database"
                     
