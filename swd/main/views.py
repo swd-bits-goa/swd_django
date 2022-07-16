@@ -2398,7 +2398,10 @@ def add_new_students(request):
                     dob = row[header['Stu_DOB']]
                     
                     if dob.ctype == 1: # XL_CELL_TEXT
-                        rev_bDay = datetime.strptime(dob.value, '%d-%b-%Y').strftime('%Y-%m-%d')
+                        try:
+                            rev_bDay = datetime.strptime(dob.value, '%d-%b-%Y').strftime('%Y-%m-%d')
+                        except ValueError:
+                            rev_bDay = datetime.strptime(dob.value, '%Y-%m-%d').strftime('%Y-%m-%d')
                         
                     elif (dob.ctype == 3): # XL_CELL_DATE
                         rev_bDay = xlrd.xldate.xldate_as_datetime(dob.value, 0)
@@ -2410,8 +2413,10 @@ def add_new_students(request):
                     do_admit = row[header['admit']]
                     
                     if (do_admit.ctype == 1): # XL_CELL_TEXT
-                        
-                        rev_admit = datetime.strptime(do_admit.value, '%d/%m/%Y').strftime('%Y-%m-%d')
+                        try: 
+                            rev_admit = datetime.strptime(do_admit.value, '%d/%m/%Y').strftime('%Y-%m-%d')
+                        except ValueError:
+                            rev_admit = datetime.strptime(do_admit.value, '%Y-%m-%d').strftime('%Y-%m-%d')
                         
                     elif do_admit.ctype == 3: # XL_CELL_DATE
                         rev_admit = xlrd.xldate.xldate_as_datetime(do_admit.value, 0)
