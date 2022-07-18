@@ -283,7 +283,10 @@ class Bonafide(models.Model):
         yearName = YEARNAMES[yearNum]
         date_admit = res.student.admit.strftime('%d/%m/%Y')
         today = date.today()
-        if (today.month < 8):
+
+        # This assumes that someone changes their year of college starting from month 7 (July)
+        # TODO: Allow admin to change this month 
+        if (today.month < 7):
             year = today.year - 1
         else:
             year = today.year
