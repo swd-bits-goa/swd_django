@@ -343,11 +343,8 @@ def messoption(request):
     else:
         # Get the most recent MessOptionOpen
         messopen_last = MessOptionOpen.objects.all().last()
-        # Try to get the student's MessOption
-        try:
-            messoption = MessOption.objects.filter(monthYear=messopen_last.monthYear, student=student).first()
-        except:
-            messoption = None
+        # Get student's messoption from the most recent MessOptionOpen, otherwise set it to None
+        messoption = MessOption.objects.filter(monthYear=messopen_last.monthYear, student=student).first()
 
     # dues
     try:
@@ -480,6 +477,8 @@ def messoption(request):
                     messoption.save()
                     context['mess'] = messoption
                     context['option'] = 1
+                    # Redirect back to same page to avoid form resubmission popup
+                    return redirect("messoption")
                 else:
                     context['capacity']="Choose different mess, capacity full."
             else: # In case they gave no capacity, assume it is unlimited
@@ -494,6 +493,8 @@ def messoption(request):
                         mess = mess
                     )
                 messoption.save()
+                # Redirect back to same page to avoid form resubmission popup
+                return redirect("messoption")
 
     return render(request, "mess.html", context)
 
