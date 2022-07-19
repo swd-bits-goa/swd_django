@@ -343,8 +343,10 @@ def messoption(request):
     else:
         # Get the most recent MessOptionOpen
         messopen_last = MessOptionOpen.objects.all().last()
-        # Get student's messoption from the most recent MessOptionOpen, otherwise set it to None
-        messoption = MessOption.objects.filter(monthYear=messopen_last.monthYear, student=student).first()
+        messoption = None
+        if messopen_last:
+            # Get student's messoption from the most recent MessOptionOpen, otherwise set it to None
+            messoption = MessOption.objects.filter(monthYear=messopen_last.monthYear, student=student).first()
 
     # dues
     try:
