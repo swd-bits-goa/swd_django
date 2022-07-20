@@ -278,18 +278,12 @@ class Bonafide(models.Model):
             branch = ME[self.student.bitsId[4:8]]
 
         yearNum = self.reqDate.year-int(self.student.bitsId[0:4]) + 1
-        if(self.reqDate.month < 8):
+        # TODO: Instead of hardcoding to July (month 7), give control to admin
+        if(self.reqDate.month < 7):
             yearNum = yearNum - 1
         yearName = YEARNAMES[yearNum]
         date_admit = res.student.admit.strftime('%d/%m/%Y')
-        today = date.today()
-
-        # This assumes that someone changes their year of college starting from month 7 (July)
-        # TODO: Allow admin to change this month 
-        if (today.month < 7):
-            year = today.year - 1
-        else:
-            year = today.year
+        
         reason = self.otherReason if self.reason.lower() == 'other' else self.reason
 
         # Address will be shown in case reason is "Passport"
