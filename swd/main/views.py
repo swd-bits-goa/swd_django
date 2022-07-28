@@ -1766,7 +1766,8 @@ def sac(request):
     
 def contact(request):
     context = {
-        'warden' : Warden.objects.all() 
+        'warden' : Warden.objects.all(), 
+        'sid': HostelSuperintendent.objects.all()
     }
     return render(request,"contact.html",context)
 
