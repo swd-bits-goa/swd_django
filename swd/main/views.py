@@ -1,3 +1,4 @@
+from unicodedata import name
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseForbidden
 from django.contrib.auth import authenticate, login, logout
@@ -1778,7 +1779,8 @@ def sac(request):
     
 def contact(request):
     context = {
-        'warden' : Warden.objects.all() 
+        'warden' : Warden.objects.all(), 
+        'sid': HostelSuperintendent.objects.all()
     }
     return render(request,"contact.html",context)
 
@@ -2515,6 +2517,8 @@ def add_wardens(request):
                 out.write(xl_file.read())
             workbook = xlrd.open_workbook(tmp)
 
+            count_created=0
+            created=False
             count = 0
             idx = 1
             header = {}
@@ -2543,17 +2547,40 @@ def add_wardens(request):
                             email=emailID,
                             password=password)
 
-                    
-                    warden = Warden.objects.create(
-                        user=user,
-                        name=row[header['Name']].value,
-                        phone_off=str(int(row[header['Tel:(Off.)']].value)),
-                        phone_res=str(int(row[header['Tel:(Res.)']].value)),
-                        email=emailID,
-                        chamber=row[header['Chamber No.']].value,
-                        hostel=row[header['Function']].value,
-                        )
-                    count = count + 1
+                    try:    
+                        updated_vals = {
+                            'name':row[header['Name']].value,
+                            'phone_off':str(int(row[header['Tel:(Off.)']].value)),
+                            'phone_res':str(int(row[header['Tel:(Res.)']].value)),
+                            'email':emailID,
+                            'chamber':row[header['Chamber No.']].value,
+                            'hostel':row[header['Function']].value,
+                        }         
+                        try:
+                            obj = Warden.objects.get(user=user)
+                            for key, value in updated_vals.items():
+                                #print(f"{key}, {value}")
+                                if (value):
+                                    setattr(obj, key, value)
+                            obj.save()
+                        except Warden.DoesNotExist:
+                            obj = Warden(
+                            user=user,
+                            name=row[header['Name']].value,
+                            phone_off=str(int(row[header['Tel:(Off.)']].value)),
+                            phone_res=str(int(row[header['Tel:(Res.)']].value)),
+                            email=emailID,
+                            chamber=row[header['Chamber No.']].value,
+                            hostel=row[header['Function']].value,)
+                            obj.save()
+                            created = True
+                        if created:
+                            count_created = count_created + 1
+                        else:
+                            count = count + 1
+                    except Exception:
+                        message_str + name + " failed"
+
             message_str = str(count) + " new wardens added."
         else:
             message_str = "No File Uploaded."
