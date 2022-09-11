@@ -132,7 +132,7 @@ def dashboard(request):
 
     #mess
     messopen = MessOptionOpen.objects.filter(dateClose__gte=datetime.today())
-    #messopen = messopen.exclude(dateOpen__gt=date.today())
+    messopen = messopen.exclude(dateOpen__gt=date.today())
     if messopen:
         messoption = MessOption.objects.filter(monthYear=messopen[0].monthYear, student=student)
         
