@@ -70,9 +70,9 @@ def index(request):
             notices = paginator.page(paginator.num_pages)
 
         context = {
-        'queryset' : notices,
+            'queryset' : notices,
         }
-        return render(request, 'home1.html',context)
+        return render(request, 'home.html',context)
 
 
 def login_success(request):
