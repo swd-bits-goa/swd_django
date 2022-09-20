@@ -3,7 +3,37 @@
   
 {% block content %}
 
+<style>
+  .check-notices-section {
+    position: relative;
+    padding: 1em;
+    border-radius: 5px;
+    font-size: 1.5em;
+    background-color: hsl(15, 100%, 75%);
+    color: black;
+    text-align: center;
+    box-shadow: 0 5px 5px 0 rgba(0, 0, 0, 0.5);
+    margin-bottom: 20px;
+    margin-top: 5px;
+    animation: fade-in 750ms ease;
+  }
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: scale(90%);
+    }
+    to {
+      opacity: 1;
+      transform: scale(100%);
+    }
+  }
+</style>
+
 <div class="container-fluid ">
+  <div class="check-notices-section">
+    <b style="font-size: 1.5em;">REMINDER</b><br>
+    Regularly check SWD notices and documents - late emails and missed deadlines are unacceptable 
+  </div>
     <h4 style="color:#F46036; margin: 0; padding: 8px; font-size: 31px">Recent Notices</h4>
           {% include 'notice.html' %} 
           {% include 'storeitems.html' %}
