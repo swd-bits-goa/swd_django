@@ -182,85 +182,90 @@ def profile(request):
             'option1' : 'wardenbase.html',
             'warden' : warden,
         }
-    elif is_hostelsuperintendent(request.user):
+        return render(request, "profile.html", context)
+
+    if is_hostelsuperintendent(request.user):
         hostelsuperintendent = HostelSuperintendent.objects.get(user=request.user)
         context = {
             'option1' : 'superintendentbase.html',
             'hostelsuperintendent' : hostelsuperintendent
         }
+        return render(request, "profile.html", context)
+
+    # By this point, user is not a warden or superintendent
+
+    student = Student.objects.get(user=request.user)
+    hostelps = HostelPS.objects.get(student=student)
+    leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
+    daypasss = DayPass.objects.filter(student=student, dateTime__gte=date.today() - timedelta(days=7))
+    bonafides = Bonafide.objects.filter(student=student, reqDate__gte=date.today() - timedelta(days=7))
+    #dues
+    try:
+        lasted = DuesPublished.objects.latest('date_published').date_published
+    except:
+        lasted = datetime(year=2004, month=1, day=1) # Before college was founded
+
+    otherdues = Due.objects.filter(student=student)
+    itemdues = ItemBuy.objects.filter(student=student,
+                                    created__gte=lasted)
+    teedues = TeeBuy.objects.filter(student=student,
+                                    created__gte=lasted)
+    total_amount = 0
+    for item in itemdues:
+        if item is not None:
+            total_amount += item.item.price
+    for tee in teedues:
+        if tee is not None:
+            total_amount += tee.totamt
+    for other in otherdues:
+        if other is not None:
+            total_amount += other.amount
+    
+    with open(settings.CONSTANTS_LOCATION, 'r') as fp:
+        data = json.load(fp)
+    if student.advance_amount != None:
+        main_amt = student.advance_amount
+    elif student.nophd():
+        main_amt = data['phd-swd-advance']
     else:
-        student = Student.objects.get(user=request.user)
-        hostelps = HostelPS.objects.get(student=student)
-        leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
-        daypasss = DayPass.objects.filter(student=student, dateTime__gte=date.today() - timedelta(days=7))
-        bonafides = Bonafide.objects.filter(student=student, reqDate__gte=date.today() - timedelta(days=7))
-        #dues
-        try:
-            lasted = DuesPublished.objects.latest('date_published').date_published
-        except:
-            lasted = datetime(year=2004, month=1, day=1) # Before college was founded
+        main_amt = data['swd-advance']
+    balance = float(main_amt) - float(total_amount)
 
-        otherdues = Due.objects.filter(student=student)
-        itemdues = ItemBuy.objects.filter(student=student,
-                                        created__gte=lasted)
-        teedues = TeeBuy.objects.filter(student=student,
-                                        created__gte=lasted)
-        total_amount = 0
-        for item in itemdues:
-            if item is not None:
-                total_amount += item.item.price
-        for tee in teedues:
-            if tee is not None:
-                total_amount += tee.totamt
-        for other in otherdues:
-            if other is not None:
-                total_amount += other.amount
-        
-        with open(settings.CONSTANTS_LOCATION, 'r') as fp:
-            data = json.load(fp)
-        if student.advance_amount != None:
-            main_amt = student.advance_amount
-        elif student.nophd():
-            main_amt = data['phd-swd-advance']
-        else:
-            main_amt = data['swd-advance']
-        balance = float(main_amt) - float(total_amount)
+    #mess
+    messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
+    messopen = messopen.exclude(dateOpen__gt=date.today())
+    if messopen:
+        messoption = MessOption.objects.filter(monthYear=messopen[0].monthYear, student=student)
 
-        #mess
-        messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
-        messopen = messopen.exclude(dateOpen__gt=date.today())
-        if messopen:
-            messoption = MessOption.objects.filter(monthYear=messopen[0].monthYear, student=student)
+    if messopen and not messoption and datetime.today().date() < messopen[0].dateClose:
+        option = 0
+        mess = 0
+    elif messopen and messoption:
+        option = 1
+        mess = messoption[0]
+    else:
+        option = 2
+        mess = 0
 
-        if messopen and not messoption and datetime.today().date() < messopen[0].dateClose:
-            option = 0
-            mess = 0
-        elif messopen and messoption:
-            option = 1
-            mess = messoption[0]
-        else:
-            option = 2
-            mess = 0
+    context = {
+        'option1' : 'base.html',
+        'student': student,
+        'option': option,
+        'mess': mess,
+        'leaves': leaves,
+        'bonafides': bonafides,
+        'daypasss': daypasss,
+        'balance': balance,
+        'hostelps': hostelps,
+    }
 
-        context = {
-            'option1' : 'base.html',
-            'student': student,
-            'option': option,
-            'mess': mess,
-            'leaves': leaves,
-            'bonafides': bonafides,
-            'daypasss': daypasss,
-            'balance': balance,
-            'hostelps': hostelps,
-        }
+    if request.POST:
+        address = request.POST.get('address')
 
-        if request.POST:
-            address = request.POST.get('address')
+        addr_request = AddressChangeRequest(student=student, new_address=address)
+        addr_request.save()
 
-            addr_request = AddressChangeRequest(student=student, new_address=address)
-            addr_request.save()
-
-            return HttpResponse("{ status: 'ok' }")
+        return HttpResponse("{ status: 'ok' }")
 
     return render(request, "profile.html", context)
 
