@@ -157,19 +157,18 @@ def dashboard(request):
         mess = 0
 
     context = {
-            'option': option,
-            'mess': mess,
-            'student': student,
-            'leaves': leaves,
-            'bonafides': bonafides,
-            'daypasss': daypasss,
-            'balance': balance,
-            'address': address,
-            'queryset' : notices,
-            'student': student,
-            'tees': tees,
-            'items': items
-            }
+        'student': student,
+        'option': option,
+        'mess': mess,
+        'leaves': leaves,
+        'bonafides': bonafides,
+        'daypasss': daypasss,
+        'balance': balance,
+        'address': address,
+        'queryset' : notices,
+        'tees': tees,
+        'items': items
+    }
 
     return render(request, "dashboard.html", context)
 
@@ -1453,7 +1452,6 @@ def store(request):
 
 
 
-    # tees_json = json.dumps(list(tees), cls=DjangoJSONEncoder)
     context = {
         'student': student,
         'tees': tees,
@@ -1464,7 +1462,6 @@ def store(request):
         'leaves': leaves,
         'bonafides': bonafides,
         'daypasss': daypasss,
-        # 'tees_json': tees_json,
     }
 
     if request.POST:
@@ -1795,10 +1792,10 @@ def studentDetails(request,id=None):
             res=HostelPS.objects.get(student__id=id)
             disco=Disco.objects.filter(student__id=id)
             context = {
-                     'student'  :student,
-                     'residence' :res,
-                     'disco' : disco,
-                     'option': option
+                'student'  :student,
+                'residence' :res,
+                'disco' : disco,
+                'option': option
             }
             return render(request,"studentdetails.html",context)
         else:
@@ -1880,15 +1877,15 @@ def documents(request):
                 option = 2
                 mess = 0
             context = {
-                            'option1' : 'base.html',
-                            'student' : student,
-                            'queryset' : Document.objects.all().order_by('-pk'),
-                            'option': option,
-                            'mess': mess,
-                            'balance': balance,
-                            'leaves': leaves,
-                            'bonafides': bonafides,
-                            'daypasss': daypasss,
+                'option1' : 'base.html',
+                'student' : student,
+                'queryset' : Document.objects.all().order_by('-pk'),
+                'option': option,
+                'mess': mess,
+                'balance': balance,
+                'leaves': leaves,
+                'bonafides': bonafides,
+                'daypasss': daypasss,
             }
     return render(request,"documents.html",context)
 
@@ -2184,14 +2181,14 @@ def developers(request):
                 mess = 0
 
             context = {
-                        'option1' : 'base.html',
-                        'student': student,
-                        'option': option,
-                        'mess': mess,
-                        'leaves': leaves,
-                        'bonafides': bonafides,
-                        'daypasss': daypasss,
-                        'balance': balance,
+                'option1' : 'base.html',
+                'student': student,
+                'option': option,
+                'mess': mess,
+                'leaves': leaves,
+                'bonafides': bonafides,
+                'daypasss': daypasss,
+                'balance': balance,
             }
     else:
             context = {
