@@ -1784,6 +1784,30 @@ def contact(request):
     }
     return render(request,"contact.html",context)
 
+def mess_info(request):
+
+    months = {}
+    students=MessOption.objects.all()
+
+    for st in students:
+        m=st.monthYear.strftime('%B')
+        y=st.monthYear.strftime('%Y')
+        months[f"{m} {y}"]=[0,0,0]  
+    for st in students:
+        m=st.monthYear.strftime('%B')
+        y=st.monthYear.strftime('%Y')
+        if st.mess=="A":
+            months[f"{m} {y}"][0]+=1
+        elif st.mess=="D":
+            months[f"{m} {y}"][1]+=1
+        elif st.mess=="C":
+            months[f"{m} {y}"][2]+=1        
+    context = {
+        'months':months
+    }
+    print(months)
+    return render(request,"mess_info.html",context)
+
 def studentDetails(request,id=None):
     option = get_base_template(request)
     if request.user.is_authenticated:
