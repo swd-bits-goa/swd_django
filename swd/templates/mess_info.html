@@ -1,11 +1,10 @@
-{% extends 'indexbase.html' %} {% block content %}
+{% extends 'indexbase.html' %}
 
+{% block content %}
 <div class="container">
-
-
 	<div class="row">
-		{% for k,v in months.items %}
-		<p align="center" style="font-size:16px; color:#000066"> <b>Mess Statistics for {{k}}</b></p>
+		{% for month_and_year, messoptions in mess_data.items reversed %}
+		<p align="center" style="font-size:16px; color:#000066"> <b>Mess Statistics for {{ month_and_year }}</b></p>
 		<div class="card-content cardContact">
 			<table class="centered bordered striped" width="540px">
 				<tr>
@@ -15,21 +14,20 @@
 
 				<tr align="center">
 					<td id="contact1">A mess</td>
-					<td id="contact1">{{v.0}}</td>
+					<td id="contact1">{{ messoptions.0 }}</td>
 				</tr>
 				<tr align="center">
 					<td id="contact1">C mess</td>
-					<td id="contact1">{{v.1}}</td>
+					<td id="contact1">{{ messoptions.1 }}</td>
 				</tr>
 				<tr align="center">
 					<td id="contact1">D mess</td>
-					<td id="contact1">{{v.2}}</td>
+					<td id="contact1">{{ messoptions.2 }}</td>
 				</tr>
 			</table><br />
 		</div>
 		{% endfor %}
 	</div>
-
 </div>
 
 
