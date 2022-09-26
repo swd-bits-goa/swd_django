@@ -1783,28 +1783,36 @@ def contact(request):
     return render(request,"contact.html",context)
 
 def mess_info(request):
+    """
+    Renders 'mess_info.html' at 'admin/mess_info/'
+    """
 
-    months = {}
-    students=MessOption.objects.all()
+    mess_data = {}
+    messoptions = MessOption.objects.all()
 
-    for st in students:
-        m=st.monthYear.strftime('%B')
-        y=st.monthYear.strftime('%Y')
-        months[f"{m} {y}"]=[0,0,0]  
-    for st in students:
-        m=st.monthYear.strftime('%B')
-        y=st.monthYear.strftime('%Y')
-        if st.mess=="A":
-            months[f"{m} {y}"][0]+=1
-        elif st.mess=="D":
-            months[f"{m} {y}"][1]+=1
-        elif st.mess=="C":
-            months[f"{m} {y}"][2]+=1        
+    # Count students per mess per month
+    for messoption in messoptions:
+        month_name = messoption.monthYear.strftime('%B')
+        year = messoption.monthYear.strftime('%Y')
+
+        month_year = f"{month_name}, {year}"
+
+        # If there is no entry for this month+year, create a blank one
+        if not month_year in mess_data:
+            mess_data[month_year] = [0, 0, 0]
+
+        if messoption.mess == "A":
+            mess_data[month_year][0] += 1
+        elif messoption.mess=="D":
+            mess_data[month_year][1] += 1
+        elif messoption.mess=="C":
+            mess_data[month_year][2] += 1
+
     context = {
-        'months':months
+        'mess_data': mess_data
     }
-    print(months)
-    return render(request,"mess_info.html",context)
+    
+    return render(request, "mess_info.html", context)
 
 def studentDetails(request,id=None):
     option = get_base_template(request)
