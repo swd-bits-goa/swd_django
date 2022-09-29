@@ -1837,6 +1837,7 @@ def documents(request):
             }
         else:
             student = Student.objects.get(user=request.user)
+            hostelps = HostelPS.objects.get(student=student)
             leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
             daypasss = DayPass.objects.filter(student=student, dateTime__gte=date.today() - timedelta(days=7))
             bonafides = Bonafide.objects.filter(student=student, reqDate__gte=date.today() - timedelta(days=7))
@@ -1891,7 +1892,7 @@ def documents(request):
             context = {
                 'option1' : 'base.html',
                 'student' : student,
-                'queryset' : Document.objects.all().order_by('-pk'),
+                'queryset' : Document.objects.all().order_by('-pk').filter(Q(hostel=hostelps.hostel) | Q(hostel=None)),
                 'option': option,
                 'mess': mess,
                 'balance': balance,
