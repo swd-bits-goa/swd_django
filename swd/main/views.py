@@ -170,6 +170,18 @@ def dashboard(request):
         'items': items
     }
 
+    # Check for hostel documents
+    hostel_documents = []
+    hostelps = HostelPS.objects.filter(student=student).first()
+    if hostelps:
+        # Hostel found, now get documents with that hostel
+        hostel_documents = Document.objects.filter(hostel=hostelps.hostel)
+    if len(hostel_documents) != 0:
+        context.update({
+            'hostel_documents': hostel_documents,
+            'hostelps': hostelps.hostel
+        })
+
     return render(request, "dashboard.html", context)
 
 

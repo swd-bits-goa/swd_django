@@ -554,12 +554,11 @@ class Notice(models.Model):
 
 class Document(models.Model):
     title = models.CharField(max_length=100)
-    file = models.ForeignKey(
-        FileAdd, on_delete=models.CASCADE, null=True, blank=True)
-    #link = models.CharField(max_length=50, blank=True, null=True)
+    file = models.ForeignKey(FileAdd, on_delete=models.CASCADE, null=True, blank=True)
+    hostel = models.CharField(max_length=5, choices=HOSTELS, null=True, blank=True) # blank = meant for all hostels
 
     def __str__(self):
-        return self.title
+        return f"(hostel: {self.hostel or 'all'}) {self.title}"
 
 
 class AntiRagging(models.Model):
