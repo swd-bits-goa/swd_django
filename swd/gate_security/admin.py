@@ -7,7 +7,7 @@ class InOutAdmin(admin.ModelAdmin):
     search_fields = ['student__name','student__bitsId', 'inDateTime', 'onLeave', 'onDaypass']
 
 class WeekendPassAdmin(admin.ModelAdmin):
-    search_fields = ['student', 'expiryDate']
+    search_fields = ['student__name', 'student__bitsId', 'expiryDate']
     list_display = ('student', 'expiryDate', 'approved')
 
 admin.site.register(InOut, InOutAdmin)
