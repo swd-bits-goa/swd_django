@@ -70,9 +70,9 @@ def index(request):
             notices = paginator.page(paginator.num_pages)
 
         context = {
-        'queryset' : notices,
+            'queryset' : notices,
         }
-        return render(request, 'home1.html',context)
+        return render(request, 'home.html',context)
 
 
 def login_success(request):
@@ -132,7 +132,7 @@ def dashboard(request):
 
     #mess
     messopen = MessOptionOpen.objects.filter(dateClose__gte=datetime.today())
-    #messopen = messopen.exclude(dateOpen__gt=date.today())
+    messopen = messopen.exclude(dateOpen__gt=date.today())
     if messopen:
         messoption = MessOption.objects.filter(monthYear=messopen[0].monthYear, student=student)
         
@@ -157,19 +157,18 @@ def dashboard(request):
         mess = 0
 
     context = {
-            'option': option,
-            'mess': mess,
-            'student': student,
-            'leaves': leaves,
-            'bonafides': bonafides,
-            'daypasss': daypasss,
-            'balance': balance,
-            'address': address,
-            'queryset' : notices,
-            'student': student,
-            'tees': tees,
-            'items': items
-            }
+        'student': student,
+        'option': option,
+        'mess': mess,
+        'leaves': leaves,
+        'bonafides': bonafides,
+        'daypasss': daypasss,
+        'balance': balance,
+        'address': address,
+        'queryset' : notices,
+        'tees': tees,
+        'items': items
+    }
 
     return render(request, "dashboard.html", context)
 
@@ -182,85 +181,90 @@ def profile(request):
             'option1' : 'wardenbase.html',
             'warden' : warden,
         }
-    elif is_hostelsuperintendent(request.user):
+        return render(request, "profile.html", context)
+
+    if is_hostelsuperintendent(request.user):
         hostelsuperintendent = HostelSuperintendent.objects.get(user=request.user)
         context = {
             'option1' : 'superintendentbase.html',
             'hostelsuperintendent' : hostelsuperintendent
         }
+        return render(request, "profile.html", context)
+
+    # By this point, user is not a warden or superintendent
+
+    student = Student.objects.get(user=request.user)
+    hostelps = HostelPS.objects.get(student=student)
+    leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
+    daypasss = DayPass.objects.filter(student=student, dateTime__gte=date.today() - timedelta(days=7))
+    bonafides = Bonafide.objects.filter(student=student, reqDate__gte=date.today() - timedelta(days=7))
+    #dues
+    try:
+        lasted = DuesPublished.objects.latest('date_published').date_published
+    except:
+        lasted = datetime(year=2004, month=1, day=1) # Before college was founded
+
+    otherdues = Due.objects.filter(student=student)
+    itemdues = ItemBuy.objects.filter(student=student,
+                                    created__gte=lasted)
+    teedues = TeeBuy.objects.filter(student=student,
+                                    created__gte=lasted)
+    total_amount = 0
+    for item in itemdues:
+        if item is not None:
+            total_amount += item.item.price
+    for tee in teedues:
+        if tee is not None:
+            total_amount += tee.totamt
+    for other in otherdues:
+        if other is not None:
+            total_amount += other.amount
+    
+    with open(settings.CONSTANTS_LOCATION, 'r') as fp:
+        data = json.load(fp)
+    if student.advance_amount != None:
+        main_amt = student.advance_amount
+    elif student.nophd():
+        main_amt = data['phd-swd-advance']
     else:
-        student = Student.objects.get(user=request.user)
-        hostelps = HostelPS.objects.get(student=student)
-        leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
-        daypasss = DayPass.objects.filter(student=student, dateTime__gte=date.today() - timedelta(days=7))
-        bonafides = Bonafide.objects.filter(student=student, reqDate__gte=date.today() - timedelta(days=7))
-        #dues
-        try:
-            lasted = DuesPublished.objects.latest('date_published').date_published
-        except:
-            lasted = datetime(year=2004, month=1, day=1) # Before college was founded
+        main_amt = data['swd-advance']
+    balance = float(main_amt) - float(total_amount)
 
-        otherdues = Due.objects.filter(student=student)
-        itemdues = ItemBuy.objects.filter(student=student,
-                                        created__gte=lasted)
-        teedues = TeeBuy.objects.filter(student=student,
-                                        created__gte=lasted)
-        total_amount = 0
-        for item in itemdues:
-            if item is not None:
-                total_amount += item.item.price
-        for tee in teedues:
-            if tee is not None:
-                total_amount += tee.totamt
-        for other in otherdues:
-            if other is not None:
-                total_amount += other.amount
-        
-        with open(settings.CONSTANTS_LOCATION, 'r') as fp:
-            data = json.load(fp)
-        if student.advance_amount != None:
-            main_amt = student.advance_amount
-        elif student.nophd():
-            main_amt = data['phd-swd-advance']
-        else:
-            main_amt = data['swd-advance']
-        balance = float(main_amt) - float(total_amount)
+    #mess
+    messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
+    messopen = messopen.exclude(dateOpen__gt=date.today())
+    if messopen:
+        messoption = MessOption.objects.filter(monthYear=messopen[0].monthYear, student=student)
 
-        #mess
-        messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
-        messopen = messopen.exclude(dateOpen__gt=date.today())
-        if messopen:
-            messoption = MessOption.objects.filter(monthYear=messopen[0].monthYear, student=student)
+    if messopen and not messoption and datetime.today().date() < messopen[0].dateClose:
+        option = 0
+        mess = 0
+    elif messopen and messoption:
+        option = 1
+        mess = messoption[0]
+    else:
+        option = 2
+        mess = 0
 
-        if messopen and not messoption and datetime.today().date() < messopen[0].dateClose:
-            option = 0
-            mess = 0
-        elif messopen and messoption:
-            option = 1
-            mess = messoption[0]
-        else:
-            option = 2
-            mess = 0
+    context = {
+        'option1' : 'base.html',
+        'student': student,
+        'option': option,
+        'mess': mess,
+        'leaves': leaves,
+        'bonafides': bonafides,
+        'daypasss': daypasss,
+        'balance': balance,
+        'hostelps': hostelps,
+    }
 
-        context = {
-            'option1' : 'base.html',
-            'student': student,
-            'option': option,
-            'mess': mess,
-            'leaves': leaves,
-            'bonafides': bonafides,
-            'daypasss': daypasss,
-            'balance': balance,
-            'hostelps': hostelps,
-        }
+    if request.POST:
+        address = request.POST.get('address')
 
-        if request.POST:
-            address = request.POST.get('address')
+        addr_request = AddressChangeRequest(student=student, new_address=address)
+        addr_request.save()
 
-            addr_request = AddressChangeRequest(student=student, new_address=address)
-            addr_request.save()
-
-            return HttpResponse("{ status: 'ok' }")
+        return HttpResponse("{ status: 'ok' }")
 
     return render(request, "profile.html", context)
 
@@ -1448,7 +1452,6 @@ def store(request):
 
 
 
-    # tees_json = json.dumps(list(tees), cls=DjangoJSONEncoder)
     context = {
         'student': student,
         'tees': tees,
@@ -1459,7 +1462,6 @@ def store(request):
         'leaves': leaves,
         'bonafides': bonafides,
         'daypasss': daypasss,
-        # 'tees_json': tees_json,
     }
 
     if request.POST:
@@ -1790,10 +1792,10 @@ def studentDetails(request,id=None):
             res=HostelPS.objects.get(student__id=id)
             disco=Disco.objects.filter(student__id=id)
             context = {
-                     'student'  :student,
-                     'residence' :res,
-                     'disco' : disco,
-                     'option': option
+                'student'  :student,
+                'residence' :res,
+                'disco' : disco,
+                'option': option
             }
             return render(request,"studentdetails.html",context)
         else:
@@ -1875,15 +1877,15 @@ def documents(request):
                 option = 2
                 mess = 0
             context = {
-                            'option1' : 'base.html',
-                            'student' : student,
-                            'queryset' : Document.objects.all().order_by('-pk'),
-                            'option': option,
-                            'mess': mess,
-                            'balance': balance,
-                            'leaves': leaves,
-                            'bonafides': bonafides,
-                            'daypasss': daypasss,
+                'option1' : 'base.html',
+                'student' : student,
+                'queryset' : Document.objects.all().order_by('-pk'),
+                'option': option,
+                'mess': mess,
+                'balance': balance,
+                'leaves': leaves,
+                'bonafides': bonafides,
+                'daypasss': daypasss,
             }
     return render(request,"documents.html",context)
 
@@ -2179,14 +2181,14 @@ def developers(request):
                 mess = 0
 
             context = {
-                        'option1' : 'base.html',
-                        'student': student,
-                        'option': option,
-                        'mess': mess,
-                        'leaves': leaves,
-                        'bonafides': bonafides,
-                        'daypasss': daypasss,
-                        'balance': balance,
+                'option1' : 'base.html',
+                'student': student,
+                'option': option,
+                'mess': mess,
+                'leaves': leaves,
+                'bonafides': bonafides,
+                'daypasss': daypasss,
+                'balance': balance,
             }
     else:
             context = {
