@@ -28,28 +28,40 @@ models = [
     HostelSuperintendent,
     Notice,
     FileAdd,
-    Document,
     AntiRagging,
     DueCategory,
     DuesPublished,
     VacationDatesFill,
-    Security]
+    Security
+]
 
-
-@admin.register(Disco)
-class HostelPSAdmin(ExportMixin,admin.ModelAdmin):
+@admin.register(HostelPS)
+class HostelPSAdmin(ExportMixin, admin.ModelAdmin):
     search_fields = ['student__name', 'student__bitsId']
+    list_display = ['student', 'hostel', 'room']
+    list_filter = ['hostel']
     resource_class = HostelPSResource
 
     def get_export_formats(self):
         formats = (
-          base_formats.XLS,
-          )
+            base_formats.XLS,
+        )
         return [f for f in formats if f().can_export()]
 
-class DiscoAdmin(admin.ModelAdmin):
+@admin.register(Document)
+class DocumentAdmin(admin.ModelAdmin):
+    search_fields = ['title']
+    list_display = ['title']
+
+@admin.register(Disco)
+class DiscoAdmin(ExportMixin, admin.ModelAdmin):
     search_fields = ['student__bitsId', 'student__name']
 
+    def get_export_formats(self):
+        formats = (
+            base_formats.XLS,
+        )
+        return [f for f in formats if f().can_export()]
 
 @admin.register(DayPass)
 class DayPassAdmin(ExportMixin, admin.ModelAdmin):
@@ -113,6 +125,7 @@ def delete_students(modeladmin, request, queryset):
     return redirect('delete_students')
 delete_students.description = u"Delete Students from Excel"
 
+@admin.register(Student)
 class StudentAdmin(ExportMixin, admin.ModelAdmin):
     search_fields = ['name', 'bitsId', 'user__username']
     actions = [add_new_students, delete_students ]
@@ -163,7 +176,4 @@ class DueAdmin(admin.ModelAdmin):
     search_fields = ['student__name','student__bitsId','amount','due_category__name','description','date_added']
     list_display = ('student', 'amount','due_category','date_added',)
 
-
-admin.site.register(Student, StudentAdmin)
-admin.site.register(HostelPS, HostelPSAdmin)
 admin.site.register(models)
