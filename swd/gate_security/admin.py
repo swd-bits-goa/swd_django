@@ -12,5 +12,3 @@ class WeekendPassAdmin(admin.ModelAdmin):
 
 admin.site.register(InOut, InOutAdmin)
 admin.site.register(WeekendPass, WeekendPassAdmin)
-
-
