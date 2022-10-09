@@ -23,176 +23,97 @@
 
 				<p align="center" style="font-size:16px; color:#000066"> <b>Faculty Incharge</b></p>
 				<div class="card-content cardContact">
-					<table class="centered bordered striped" width="540px">
-						<tr>
-							<th style="text-align: center"> Name</th>
-							<th style="text-align: center"> Function </th>
-							<th style="text-align: center"> Email:@goa.bits-pilani.ac.in </th>
-							<th style="text-align: center">Chamber No.</th>
-							<th style="text-align: center">Tel:(Off.)</th>
+					<table class="centered bordered " width="540px">
+
+						<tr align="center">
+							<td style="text-align:center;vertical-align: middle;width: 70px;">Associate Dean, Student Welfare Division</td>
+  							<td style="padding: 0px;vertical-align: middle;margin: 0%;width: 170px;"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/Placeholder_4-3_red.svg/120px-Placeholder_4-3_red.svg.png?20061104215256" alt="" width="150"/></td>
+  							<td style="font-size:medium;vertical-align: middle;text-align: left;width: 300px;"><p style="display:flex;justify-content:center;align-items:center">Name: Prof. Angshuman Sarkar <br />
+  							Email: ad.swd@goa.bits-pilani.ac.in <br />
+  							Contact No. (Office): +91 08322580149</p>
 						</tr>
 
 						<tr align="center">
-							<td id="contact1">Prof. Angshuman Sarkar</td>
-							<td id="contact1">Associate Dean, Student Welfare Division</td>
-							<td id="contact1">ad.swd</td>
-							<td id="contact1">B-213</td>
-							<td id="contact1">2580261</td>
-						</tr>
+							<td style="text-align:center;vertical-align: middle;width: 70px;">Chief Warden</td>
+  							<td style="padding: 0px;vertical-align: middle;margin: 0%;width: 170px;"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/Placeholder_4-3_red.svg/120px-Placeholder_4-3_red.svg.png?20061104215256" alt="" width="150"/></td>
+  							<td style="font-size:medium;vertical-align: middle;text-align: left;width: 300px;"><p style="display:flex;justify-content:center;align-items:center">Name: Prof. Sukanta Mondal <br />
+  							Email: chiefwarden@goa.bits-pilani.ac.in <br />
+  							Contact No. (Office): +91 08322580149</p></td>
 
-						<tr align="center">
-							<td id="contact1">Prof. Sukanta Mondal</td>
-							<td id="contact1">Chief Warden</td>
-							<td id="contact1">chiefwarden</td>
-							<td id="contact1">B-111</td>
-							<td id="contact1">2580149</td>
 						</tr>
 					</table><br />
 				</div>
 				<p align="center" style="font-size:16px; color:#000066"> <b>Superintendents</b></p>
 				<div class="card-content cardContact">
-					<table class="centered bordered striped" width="540px">
-						<tr>
-							<th style="text-align: center"> Name</th>
-							<th style="text-align: center"> Function </th>
-							<th style="text-align: center"> Email:@goa.bits-pilani.ac.in </th>
-							<th style="text-align: center">Chamber No.</th>
-							<th style="text-align: center">Tel:(Off.)</th>
-							<th style="text-align: center">Tel:(Res.)</th>
-						</tr>
+					<table class="centered bordered" width="60%">
+						{% for w in sup|dictsort:"hostel" %}
+						 <tr>
+							 <td id="contact1" style="text-align:center;vertical-align: middle;width: 70px;">{{ w.hostel }}</td>
+							 <td style="padding: 0px;vertical-align: middle;margin: 0%;width: 170px;"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/Placeholder_4-3_red.svg/120px-Placeholder_4-3_red.svg.png?20061104215256" alt="" width="150"/></td>
+							 <td id="contact1" style="font-size:medium;vertical-align: middle;text-align: left;width: 300px;"><p style="display:flex;justify-content:center;align-items:center">Name: {{ w.name }}<br/>
+							 Email: {{ w.email }}<br/>
+							 Contact No: (O):{{ w.phone_off|floatformat }}, (R):{{ w.phone_res|floatformat }}<br/>
+							 Chamber: {{ w.chamber }}</p></td>
+						 </tr>
+						  {% endfor %}
+						</table><br />
 
-						<tr align="center">
-							<td id="contact1">Mr. S.Y.Muralidhara</td>
-							<td id="contact1">Senior Office Superintendent</td>
-							<td id="contact1">symuralidhara</td>
-							<td id="contact1">B-217</td>
-							<td id="contact1">2580147</td>
-							<td id="contact1">2580715</td>
-						</tr>
+					</div>
+					<p align="center" style="font-size:16px; color:#000066"> <b>Assistant Superintendents</b></p>
+					<div class="card-content cardContact">
+						<table class="centered bordered" width="60%">
+   
+							{% for w in asup|dictsort:"hostel" %}
+							 <tr>
+								 <td id="contact1" style="text-align:center;vertical-align: middle;width: 70px;">{{ w.hostel }}</td>
+								 <td style="padding: 0px;vertical-align: middle;margin: 0%;width: 170px;"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/Placeholder_4-3_red.svg/120px-Placeholder_4-3_red.svg.png?20061104215256" alt="" width="150"/></td>
+								 <td id="contact1" style="font-size:medium;vertical-align: middle;text-align: left;width: 300px;"><p style="display:flex;justify-content:center;align-items:center">Name: {{ w.name }}<br/>
+								 Email: {{ w.email }}<br/>
+								 Contact No: (O):{{ w.phone_off|floatformat }}, (R):{{ w.phone_res|floatformat }}<br/>
+								 Chamber: {{ w.chamber }}</p></td>
+							 </tr>
+							 {% endfor %}
 
-						<tr align="center">
-							<td id="contact1">Mrs. Sonali Malik </td>
-							<td id="contact1">Hostel Superintendent</td>
-							<td id="contact1">smallik</td>
-							<td id="contact1">B-216</td>
-							<td id="contact1">2580146</td>
-							<td id="contact1">2580756</td>
-						</tr>
+							</table><br />
 
+						</div>
+						<p align="center" style="font-size:16px; color:#000066"> <b>Boys Hostel Wardens</b></p>
+						<div class="card-content cardContact">
 
-						<tr align="center">
-							<td id="contact1">Mr. Viren Dhamaskar</td>
-							<td id="contact1">Assistant Hostel Superintendent</td>
-							<td id="contact1">virend</td>
-							<td id="contact1">AH1-154</td>
-							<td id="contact1">2580622</td>
-							<td id="contact1">2580527</td>
-						</tr>
+							<table class="centered bordered" width="60%">
 
-						<tr align="center">
-							<td id="contact1">Mr. Shridhar Patil</td>
-							<td id="contact1">Assistant Hostel Superintendent</td>
-							<td id="contact1">shridharp</td>
-							<td id="contact1">AH4-101</td>
-							<td id="contact1">2580621</td>
-							<td id="contact1">2580528</td>
-						</tr>
-
-						<tr align="center">
-							<td id="contact1">Mr. Ajay Sharma</td>
-							<td id="contact1">Assistant Hostel Superintendent</td>
-							<td id="contact1">ajays</td>
-							<td id="contact1">DH6</td>
-							<td id="contact1">2580624</td>
-							<td id="contact1">2580529</td>
-						</tr>
-
-						<tr align="center">
-							<td id="contact1">Mrs. Savy Pal</td>
-							<td id="contact1">Assistant Hostel Superintendent</td>
-							<td id="contact1">savyp</td>
-							<td id="contact1">CH7</td>
-							<td id="contact1">2580623</td>
-							<td id="contact1">2580526</td>
-						</tr>
-
-					</table><br />
-
-				</div>
-				<p align="center" style="font-size:16px; color:#000066"> <b> Wardens</b></p>
-				<div class="card-content cardContact">
-					<table class="centered bordered striped" width="540px">
-						<tr>
-							<th style="text-align: center"> Name</th>
-							<th style="text-align: center"> Function </th>
-							<th style="text-align: center"> Email</th>
-							<th style="text-align: center">Chamber No.</th>
-							<th style="text-align: center">Tel:(Off.)</th>
-							<th style="text-align: center">Tel:(Res.)</th>
-						</tr>
-
-						{% for w in warden.all|dictsort:"hostel" %}
-						<tr align="center">
-							<td id="contact1">{{ w.name }}</td>
-							<td id="contact1">{{ w.hostel }}</td>
-							<td id="contact1">{{ w.email }}</td>
-							<td id="contact1">{{ w.chamber }}</td>
-							<td id="contact1">{{ w.phone_off|floatformat }}</td>
-							<td id="contact1">{{ w.phone_res|floatformat }}</td>
+								{% for w in bw|dictsort:"hostel" %}
+								<tr>
+									<td id="contact1" style="text-align:center;vertical-align: middle;width: 70px;">{{ w.hostel }}</td>
+									<td style="padding: 0px;vertical-align: middle;margin: 0%;width: 170px;"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/Placeholder_4-3_red.svg/120px-Placeholder_4-3_red.svg.png?20061104215256" alt="" width="150"/></td>
+									<td id="contact1" style="font-size:medium;vertical-align: middle;text-align: left;width: 300px;"><p style="display:flex;justify-content:center;align-items:center">Name: {{ w.name }}<br/>
+									Email: {{ w.email }}<br/>
+									Contact No: (O):{{ w.phone_off|floatformat }}, (R):{{ w.phone_res|floatformat }}<br/>
+									Chamber: {{ w.chamber }}</p></td>
 						</tr>
 						{% endfor %}
 
 					</table><br />
 				</div>
-				<p align="center" style="font-size:16px; color:#000066"><b>Staff Members</b></p>
-				Email: swd@goa.bits-pilani.ac.in
-				<table class="centered bordered striped" width="540px">
-					<tr align="center-content">
-						<th style="text-align: center"> Name</th>
-						<th style="text-align: center"> Help/Queries</th>
-						<th style="text-align: center">Office No.</th>
-						<th style="text-align: center">Tel:(Off.)</th>
-					</tr>
 
-					<tr align="center">
-						<td id="contact1">Ms.Namrata Sawant</td>
-						<td id="contact1">Refund, Dues.</td>
-						<td id="contact1">B-102</td>
-						<td id="contact1">2580148</td>
-					</tr>
+				<br />
+				<p align="center" style="font-size:16px; color:#000066"> <b>Girls Hostel Wardens</b></p>
+				<div class="card-content cardContact">
+					<table class="centered bordered" width="60%">
 
-					<tr align="center">
-						<td id="contact1">Ms.Kalpita Desai</td>
-						<td id="contact1">Fees Receipts, Dup Id Card.</td>
-						<td id="contact1">B-102</td>
-						<td id="contact1">2580148</td>
-					</tr>
-
-					<tr align="center">
-						<td id="contact1">Ms.Sonali Naik</td>
-						<td id="contact1">Scholarship, Migration.</td>
-						<td id="contact1">B-102</td>
-						<td id="contact1">2580157</td>
-					</tr>
-
-					<tr align="center">
-						<td id="contact1">Ms.Sunita Prabhudesai</td>
-						<td id="contact1">Certificates, Semester Fees.</td>
-						<td id="contact1">B-102</td>
-						<td id="contact1">2580157</td>
-					</tr>
-
-					<tr align="center">
-						<td id="contact1">Mr.Santosh Kumar Biswal</td>
-						<td id="contact1">General, Lost & Found</td>
-						<td id="contact1">B-102</td>
-						<td id="contact1">+91 8956271338</td>
-					</tr>
-				</table>
-	
+						{% for w in gw|dictsort:"hostel" %}						
+						<tr>
+							<td id="contact1" style="text-align:center;vertical-align: middle;width: 70px;">{{ w.hostel }}</td>
+ 							<td style="padding: 0px;vertical-align: middle;margin: 0%;width: 170px;"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/Placeholder_4-3_red.svg/120px-Placeholder_4-3_red.svg.png?20061104215256" alt="" width="150"/></td>
+ 							<td id="contact1" style="font-size:medium;vertical-align: middle;text-align: left;width: 300px;"><p style="display:flex;justify-content:center;align-items:center">Name: {{ w.name }}<br/>
+ 							Email: {{ w.email }}<br/>
+ 							Contact No: (O):{{ w.phone_off|floatformat }}, (R):{{ w.phone_res|floatformat }}<br/>
+ 							Chamber: {{ w.chamber }}</p></td>
+						</tr>
+						{% endfor %}
+					</table><br />
+				</div>
 			<br />
-
-
 	</div>
 
 </div>
