@@ -552,6 +552,7 @@ class Notice(models.Model):
         super().save(*args, **kwargs)
 
 
+
 class Document(models.Model):
     title = models.CharField(max_length=100)
     file = models.ForeignKey(
@@ -697,3 +698,8 @@ class AddressChangeRequest(models.Model):
 
 class Security(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+
+class Notification(models.Model):
+    date = models.DateField(editable=False)
+    count = models.CharField(max_length=100)
+

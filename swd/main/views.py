@@ -1,3 +1,8 @@
+from calendar import monthrange
+import json
+import tempfile
+import os
+import xlwt
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseForbidden
 from django.contrib.auth import authenticate, login, logout
@@ -31,12 +36,6 @@ import re
 import xlrd
 xlrd.xlsx.ensure_elementtree_imported(False, None)
 xlrd.xlsx.Element_has_iter = True
-import xlwt
-import os
-import tempfile
-import json
-
-from calendar import monthrange
 
 
 def noPhD(func):
@@ -46,6 +45,7 @@ def noPhD(func):
             return redirect("/dashboard/")
         return func(request, *args, **kwargs)
     return check
+
 
 def index(request):
     if request.user.is_authenticated:
@@ -70,20 +70,24 @@ def index(request):
             notices = paginator.page(paginator.num_pages)
 
         context = {
-        'queryset' : notices,
+        'queryset': notices,
         }
-        return render(request, 'home1.html',context)
+        return render(request, 'home1.html', context)
 
 
 def login_success(request):
     return HttpResponse("Success!")
 
+
 @login_required
 def dashboard(request):
     student = Student.objects.get(user=request.user)
-    leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
-    daypasss = DayPass.objects.filter(student=student, dateTime__gte=date.today() - timedelta(days=7))
-    bonafides = Bonafide.objects.filter(student=student, reqDate__gte=date.today() - timedelta(days=7))
+    leaves = Leave.objects.filter(
+        student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
+    daypasss = DayPass.objects.filter(
+        student=student, dateTime__gte=date.today() - timedelta(days=7))
+    bonafides = Bonafide.objects.filter(
+        student=student, reqDate__gte=date.today() - timedelta(days=7))
     address = student.address
     tees = TeeAdd.objects.filter(available=True).order_by('-pk')
     items = ItemAdd.objects.filter(available=True)
@@ -102,7 +106,8 @@ def dashboard(request):
     try:
         lasted = DuesPublished.objects.latest('date_published').date_published
     except:
-        lasted = datetime(year=2004, month=1, day=1) # Before college was founded
+        # Before college was founded
+        lasted = datetime(year=2004, month=1, day=1)
 
     otherdues = Due.objects.filter(student=student)
     itemdues = ItemBuy.objects.filter(student=student,
@@ -119,7 +124,7 @@ def dashboard(request):
     for other in otherdues:
         if other is not None:
             total_amount += other.amount
-    
+
     with open(settings.CONSTANTS_LOCATION, 'r') as fp:
         data = json.load(fp)
     if student.advance_amount != None:
@@ -134,8 +139,9 @@ def dashboard(request):
     messopen = MessOptionOpen.objects.filter(dateClose__gte=datetime.today())
     #messopen = messopen.exclude(dateOpen__gt=date.today())
     if messopen:
-        messoption = MessOption.objects.filter(monthYear=messopen[0].monthYear, student=student)
-        
+        messoption = MessOption.objects.filter(
+            monthYear=messopen[0].monthYear, student=student)
+
     if messopen and not messoption and datetime.today().date() < messopen[0].dateClose:
         form = MessForm(request.POST)
         context = {
@@ -165,7 +171,7 @@ def dashboard(request):
             'daypasss': daypasss,
             'balance': balance,
             'address': address,
-            'queryset' : notices,
+            'queryset': notices,
             'student': student,
             'tees': tees,
             'items': items
@@ -179,26 +185,32 @@ def profile(request):
     if is_warden(request.user):
         warden = Warden.objects.get(user=request.user)
         context = {
-            'option1' : 'wardenbase.html',
-            'warden' : warden,
+            'option1': 'wardenbase.html',
+            'warden': warden,
         }
     elif is_hostelsuperintendent(request.user):
-        hostelsuperintendent = HostelSuperintendent.objects.get(user=request.user)
+        hostelsuperintendent = HostelSuperintendent.objects.get(
+            user=request.user)
         context = {
-            'option1' : 'superintendentbase.html',
-            'hostelsuperintendent' : hostelsuperintendent
+            'option1': 'superintendentbase.html',
+            'hostelsuperintendent': hostelsuperintendent
         }
     else:
         student = Student.objects.get(user=request.user)
         hostelps = HostelPS.objects.get(student=student)
-        leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
-        daypasss = DayPass.objects.filter(student=student, dateTime__gte=date.today() - timedelta(days=7))
-        bonafides = Bonafide.objects.filter(student=student, reqDate__gte=date.today() - timedelta(days=7))
+        leaves = Leave.objects.filter(
+            student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
+        daypasss = DayPass.objects.filter(
+            student=student, dateTime__gte=date.today() - timedelta(days=7))
+        bonafides = Bonafide.objects.filter(
+            student=student, reqDate__gte=date.today() - timedelta(days=7))
         #dues
         try:
-            lasted = DuesPublished.objects.latest('date_published').date_published
+            lasted = DuesPublished.objects.latest(
+                'date_published').date_published
         except:
-            lasted = datetime(year=2004, month=1, day=1) # Before college was founded
+            # Before college was founded
+            lasted = datetime(year=2004, month=1, day=1)
 
         otherdues = Due.objects.filter(student=student)
         itemdues = ItemBuy.objects.filter(student=student,
@@ -215,7 +227,7 @@ def profile(request):
         for other in otherdues:
             if other is not None:
                 total_amount += other.amount
-        
+
         with open(settings.CONSTANTS_LOCATION, 'r') as fp:
             data = json.load(fp)
         if student.advance_amount != None:
@@ -230,7 +242,8 @@ def profile(request):
         messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
         messopen = messopen.exclude(dateOpen__gt=date.today())
         if messopen:
-            messoption = MessOption.objects.filter(monthYear=messopen[0].monthYear, student=student)
+            messoption = MessOption.objects.filter(
+                monthYear=messopen[0].monthYear, student=student)
 
         if messopen and not messoption and datetime.today().date() < messopen[0].dateClose:
             option = 0
@@ -243,7 +256,7 @@ def profile(request):
             mess = 0
 
         context = {
-            'option1' : 'base.html',
+            'option1': 'base.html',
             'student': student,
             'option': option,
             'mess': mess,
@@ -257,7 +270,8 @@ def profile(request):
         if request.POST:
             address = request.POST.get('address')
 
-            addr_request = AddressChangeRequest(student=student, new_address=address)
+            addr_request = AddressChangeRequest(
+                student=student, new_address=address)
             addr_request.save()
 
             return HttpResponse("{ status: 'ok' }")
@@ -268,7 +282,8 @@ def profile(request):
 @user_passes_test(lambda a: a.is_superuser)
 def address_approval_dashboard(request):
     if request.POST:
-        approve = AddressChangeRequest.objects.get(id=request.POST["request_id"])
+        approve = AddressChangeRequest.objects.get(
+            id=request.POST["request_id"])
 
         if request.POST["approved"] == "false":
             approve.reject()
@@ -299,7 +314,8 @@ def loginform(request):
     if request.POST:
         username = request.POST.get('username')
         password = request.POST.get('password')
-        user = authenticate(request, username=username.lower(), password=password)
+        user = authenticate(
+            request, username=username.lower(), password=password)
         if user is not None:
             login(request, user)
             if user.is_staff:
@@ -312,7 +328,8 @@ def loginform(request):
                 return redirect('dash_security_leaves')
             return redirect('dashboard')
         else:
-            messages.add_message(request, messages.INFO,  "Incorrect username or password", extra_tags='red')
+            messages.add_message(
+                request, messages.INFO,  "Incorrect username or password", extra_tags='red')
 
     return render(request, "sign-in.html", {})
 
@@ -327,32 +344,39 @@ def logoutform(request):
 @noPhD
 def messoption(request):
     student = Student.objects.get(user=request.user)
-    leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
-    daypasss = DayPass.objects.filter(student=student, dateTime__gte=date.today() - timedelta(days=7))
-    bonafides = Bonafide.objects.filter(student=student, reqDate__gte=date.today() - timedelta(days=7))
+    leaves = Leave.objects.filter(
+        student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
+    daypasss = DayPass.objects.filter(
+        student=student, dateTime__gte=date.today() - timedelta(days=7))
+    bonafides = Bonafide.objects.filter(
+        student=student, reqDate__gte=date.today() - timedelta(days=7))
 
     # MessOptionOpen or None
-    messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today(), dateOpen__lte=date.today()).first() or None
+    messopen = MessOptionOpen.objects.filter(
+        dateClose__gte=date.today(), dateOpen__lte=date.today()).first() or None
 
-    messoption = None # MessOption or None
+    messoption = None  # MessOption or None
     errors = []
 
-    if messopen: # If there is a MessOptionOpen active right now
+    if messopen:  # If there is a MessOptionOpen active right now
         # Get the student's MessOption
-        messoption = MessOption.objects.filter(student=student, monthYear=messopen.monthYear).first()
+        messoption = MessOption.objects.filter(
+            student=student, monthYear=messopen.monthYear).first()
     else:
         # Get the most recent MessOptionOpen
         messopen_last = MessOptionOpen.objects.all().last()
         messoption = None
         if messopen_last:
             # Get student's messoption from the most recent MessOptionOpen, otherwise set it to None
-            messoption = MessOption.objects.filter(monthYear=messopen_last.monthYear, student=student).first()
+            messoption = MessOption.objects.filter(
+                monthYear=messopen_last.monthYear, student=student).first()
 
     # dues
     try:
         lasted = DuesPublished.objects.latest('date_published').date_published
     except:
-        lasted = datetime(year=2004, month=1, day=1) # Before college was founded
+        # Before college was founded
+        lasted = datetime(year=2004, month=1, day=1)
 
     otherdues = Due.objects.filter(student=student)
     itemdues = ItemBuy.objects.filter(student=student,
@@ -369,7 +393,7 @@ def messoption(request):
     for other in otherdues:
         if other is not None:
             total_amount += other.amount
-    
+
     with open(settings.CONSTANTS_LOCATION, 'r') as fp:
         data = json.load(fp)
     if student.advance_amount != None:
@@ -381,7 +405,7 @@ def messoption(request):
     balance = float(main_amt) - float(total_amount)
 
     edit = True if (request.GET and 'edit' in request.GET) else False
-    
+
     context = {
         'student': student,
         'balance': balance,
@@ -420,11 +444,11 @@ def messoption(request):
         context.update({
             'option': 3,
         })
-    
+
     vacations = VacationDatesFill.objects \
         .filter(dateClose__gte=date.today(), dateOpen__lte=date.today()) \
         .exclude(messOption=None)
-    
+
     if vacations:
         vacation_open = vacations[0]
         student_vacation = Leave.objects.filter(
@@ -440,17 +464,21 @@ def messoption(request):
         # Vacation Details Filling when availaible
         created = False
         if vacations:
-            dateStart = datetime.strptime(request.POST.get('dateStart'), '%d %B, %Y').date()
+            dateStart = datetime.strptime(
+                request.POST.get('dateStart'), '%d %B, %Y').date()
             timeStart = gen_random_datetime().time()
             dateTimeStart = make_aware(datetime.combine(dateStart, timeStart))
-            dateEnd = datetime.strptime(request.POST.get('dateEnd'), '%d %B, %Y').date()
+            dateEnd = datetime.strptime(
+                request.POST.get('dateEnd'), '%d %B, %Y').date()
             timeEnd = gen_random_datetime().time()
             dateTimeEnd = make_aware(datetime.combine(dateEnd, timeEnd))
-            
+
             if not vacation_open.check_date_in_range(dateTimeEnd):
-                errors.append("End Date Time should be within specified range.")
+                errors.append(
+                    "End Date Time should be within specified range.")
             if not vacation_open.check_date_in_range(dateTimeStart):
-                errors.append("Start Date Time should be within specified range.")
+                errors.append(
+                    "Start Date Time should be within specified range.")
             if vacation_open.check_start_end_dates_in_range(dateTimeStart, dateTimeEnd):
                 if edit:
                     student_vacation.delete()
@@ -472,9 +500,9 @@ def messoption(request):
                         messoption.mess = mess
                     else:
                         messoption = MessOption(
-                            student = student,
-                            monthYear = messopen.monthYear,
-                            mess = mess
+                            student=student,
+                            monthYear=messopen.monthYear,
+                            mess=mess
                         )
                     messoption.save()
                     context['mess'] = messoption
@@ -482,17 +510,17 @@ def messoption(request):
                     # Redirect back to same page to avoid form resubmission popup
                     return redirect("messoption")
                 else:
-                    context['capacity']="Choose different mess, capacity full."
-            else: # In case they gave no capacity, assume it is unlimited
+                    context['capacity'] = "Choose different mess, capacity full."
+            else:  # In case they gave no capacity, assume it is unlimited
                 if edit:
                     messoption.student = student
                     messoption.monthYear = messopen.monthYear
                     messoption.mess = mess
                 else:
                     messoption = MessOption(
-                        student = student,
-                        monthYear = messopen.monthYear,
-                        mess = mess
+                        student=student,
+                        monthYear=messopen.monthYear,
+                        mess=mess
                     )
                 messoption.save()
                 # Redirect back to same page to avoid form resubmission popup
@@ -504,13 +532,17 @@ def messoption(request):
 @login_required
 def vacation_no_mess(request):
     student = Student.objects.get(user=request.user)
-    leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
-    daypasss = DayPass.objects.filter(student=student, dateTime__gte=date.today() - timedelta(days=7))
-    bonafides = Bonafide.objects.filter(student=student, reqDate__gte=date.today() - timedelta(days=7))
+    leaves = Leave.objects.filter(
+        student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
+    daypasss = DayPass.objects.filter(
+        student=student, dateTime__gte=date.today() - timedelta(days=7))
+    bonafides = Bonafide.objects.filter(
+        student=student, reqDate__gte=date.today() - timedelta(days=7))
     messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
     messopen = messopen.exclude(dateOpen__gt=date.today())
     if messopen:
-        messoption = MessOption.objects.filter(monthYear=messopen[0].monthYear, student=student)
+        messoption = MessOption.objects.filter(
+            monthYear=messopen[0].monthYear, student=student)
 
     if messopen and not messoption and datetime.today().date() < messopen[0].dateClose:
         option = 0
@@ -526,7 +558,8 @@ def vacation_no_mess(request):
     try:
         lasted = DuesPublished.objects.latest('date_published').date_published
     except:
-        lasted = datetime(year=2004, month=1, day=1) # Before college was founded
+        # Before college was founded
+        lasted = datetime(year=2004, month=1, day=1)
 
     otherdues = Due.objects.filter(student=student)
     itemdues = ItemBuy.objects.filter(student=student,
@@ -574,16 +607,16 @@ def vacation_no_mess(request):
     else:
         vacation_open = None
         student_vacation = None
-   
+
     vacation_context['vacation'] = vacation_open
     vacation_context['student_vacation'] = student_vacation
-    
+
     context = {
         'option': option,
         'mess': mess,
         'leaves': leaves,
         'bonafides': bonafides,
-        'balance' : balance,
+        'balance': balance,
         'daypasss': daypasss,
         'student': student
     }
@@ -598,7 +631,8 @@ def vacation_no_mess(request):
                 in_date = datetime(2022, 8, 14).date()
 
                 time0 = time.min
-                out_date = datetime.strptime(request.POST.get('out_date'), '%d %B, %Y').date()
+                out_date = datetime.strptime(
+                    request.POST.get('out_date'), '%d %B, %Y').date()
                 in_date = datetime.combine(in_date, time0)
                 out_date = datetime.combine(out_date, time0)
 
@@ -619,7 +653,7 @@ def vacation_no_mess(request):
                         errors.append(obj)
                     else:
                         vacation_context['student_vacation'] = obj
-                
+
                 if len(errors) == 0:
                     context['option1'] = 1
                 else:
@@ -632,14 +666,15 @@ def vacation_no_mess(request):
     else:
         if vacation_open is None:
             context['option1'] = 1
-            errors.append("No vacations nearby. Please keep checking this space for other details.")
+            errors.append(
+                "No vacations nearby. Please keep checking this space for other details.")
         if student_vacation is not None:
             context['option1'] = 1
             errors.append("You have already submitted the details.")
 
     vacation_context['errors'] = errors
     context['form'] = form
-    
+
     return render(
             request,
             "vacation_no_mess.html",
@@ -651,14 +686,18 @@ def vacation_no_mess(request):
 @noPhD
 def leave(request):
     student = Student.objects.get(user=request.user)
-    leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
-    daypasss = DayPass.objects.filter(student=student, dateTime__gte=date.today() - timedelta(days=7))
-    bonafides = Bonafide.objects.filter(student=student, reqDate__gte=date.today() - timedelta(days=7))
+    leaves = Leave.objects.filter(
+        student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
+    daypasss = DayPass.objects.filter(
+        student=student, dateTime__gte=date.today() - timedelta(days=7))
+    bonafides = Bonafide.objects.filter(
+        student=student, reqDate__gte=date.today() - timedelta(days=7))
     # mess
     messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
     messopen = messopen.exclude(dateOpen__gt=date.today())
     if messopen:
-        messoption = MessOption.objects.filter(monthYear=messopen[0].monthYear, student=student)
+        messoption = MessOption.objects.filter(
+            monthYear=messopen[0].monthYear, student=student)
 
     if messopen and not messoption and datetime.today().date() < messopen[0].dateClose:
         option = 0
@@ -674,7 +713,8 @@ def leave(request):
     try:
         lasted = DuesPublished.objects.latest('date_published').date_published
     except:
-        lasted = datetime(year=2004, month=1, day=1) # Before college was founded
+        # Before college was founded
+        lasted = datetime(year=2004, month=1, day=1)
 
     otherdues = Due.objects.filter(student=student)
     itemdues = ItemBuy.objects.filter(student=student,
@@ -691,7 +731,7 @@ def leave(request):
     for other in otherdues:
         if other is not None:
             total_amount += other.amount
-    
+
     with open(settings.CONSTANTS_LOCATION, 'r') as fp:
         data = json.load(fp)
     if student.advance_amount != None:
@@ -709,8 +749,8 @@ def leave(request):
         'leaves': leaves,
         'bonafides': bonafides,
         'daypasss': daypasss,
-        'option1' : 0,
-        'balance' : balance,
+        'option1': 0,
+        'balance': balance,
         'student': student,
         'form': form
     }
@@ -723,26 +763,32 @@ def leave(request):
         form = LeaveForm(request.POST)
         if form.is_valid():
             leaveform = form.save(commit=False)
-            dateStart = datetime.strptime(request.POST.get('dateStart'), '%d %B, %Y').date()
-            timeStart = datetime.strptime(request.POST.get('timeStart'), '%H:%M').time()
+            dateStart = datetime.strptime(
+                request.POST.get('dateStart'), '%d %B, %Y').date()
+            timeStart = datetime.strptime(
+                request.POST.get('timeStart'), '%H:%M').time()
             dateTimeStart = datetime.combine(dateStart, timeStart)
-            dateEnd = datetime.strptime(request.POST.get('dateEnd'), '%d %B, %Y').date()
-            timeEnd = datetime.strptime(request.POST.get('timeEnd'), '%H:%M').time()
+            dateEnd = datetime.strptime(
+                request.POST.get('dateEnd'), '%d %B, %Y').date()
+            timeEnd = datetime.strptime(
+                request.POST.get('timeEnd'), '%H:%M').time()
             dateTimeEnd = datetime.combine(dateEnd, timeEnd)
             leaveform.corrPhone = request.POST.get('phone_number')
             leaveform.dateTimeStart = make_aware(dateTimeStart)
             leaveform.dateTimeEnd = make_aware(dateTimeEnd)
             leaveform.student = student
-            if Leave.objects.filter(student=student,dateTimeStart=dateTimeStart,dateTimeEnd=dateTimeEnd).exists():
+            if Leave.objects.filter(student=student, dateTimeStart=dateTimeStart, dateTimeEnd=dateTimeEnd).exists():
                 pass
             else:
                 leaveform.save()
                 if config.EMAIL_PROD:
-                    email_to=[Warden.objects.get(hostel=HostelPS.objects.get(student=student).hostel).email]
+                    email_to = [Warden.objects.get(
+                        hostel=HostelPS.objects.get(student=student).hostel).email]
                 else:
-                    email_to=["spammailashad@gmail.com"]                                                                     # For testing
+                    # For testing
+                    email_to = ["spammailashad@gmail.com"]
                 mailObj = Leave.objects.latest('id')
-                mail_subject = "New Leave ID: "+ str(mailObj.id)
+                mail_subject = "New Leave ID: " + str(mailObj.id)
                 if mailObj.student.parentEmail is None:
                     parentEmail = "No parent mail found"
                 else:
@@ -755,18 +801,22 @@ def leave(request):
                     parentPhone = "No parent phone"
                 else:
                     parentPhone = mailObj.student.parentPhone
-                    
-                mail_message = "Leave Application applied by " + mailObj.student.name + " with leave id: " + str(mailObj.id) + ".\n"
-                mail_message = mail_message + "Parent name: " + parentName + "\nParent Email: " + parentEmail + "\nParent Phone: " + parentPhone
+
+                mail_message = "Leave Application applied by " + \
+                    mailObj.student.name + " with leave id: " + \
+                        str(mailObj.id) + ".\n"
+                mail_message = mail_message + "Parent name: " + parentName + \
+                    "\nParent Email: " + parentEmail + "\nParent Phone: " + parentPhone
                 mail_message = mail_message + "\nConsent type: " + mailObj.consent
-                send_mail(mail_subject, mail_message, settings.EMAIL_HOST_USER, email_to, fail_silently=False)
+                send_mail(mail_subject, mail_message,
+                          settings.EMAIL_HOST_USER, email_to, fail_silently=False)
 
                 context = {
                     'option': option,
                     'mess': mess,
                     'leaves': leaves,
                     'bonafides': bonafides,
-                    'balance' : balance,
+                    'balance': balance,
                     'daypasss': daypasss,
                     'option1': 1,
                     'dateStart': request.POST.get('dateStart'),
@@ -781,7 +831,7 @@ def leave(request):
                 'mess': mess,
                 'leaves': leaves,
                 'bonafides': bonafides,
-                'balance' : balance,
+                'balance': balance,
                 'daypasss': daypasss,
                 'option1': 2,
                 'form': form,
@@ -794,15 +844,19 @@ def leave(request):
 @noPhD
 def certificates(request):
     student = Student.objects.get(user=request.user)
-    leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
-    daypasss = DayPass.objects.filter(student=student, dateTime__gte=date.today() - timedelta(days=7))
-    bonafides = Bonafide.objects.filter(student=student, reqDate__gte=date.today() - timedelta(days=7))
+    leaves = Leave.objects.filter(
+        student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
+    daypasss = DayPass.objects.filter(
+        student=student, dateTime__gte=date.today() - timedelta(days=7))
+    bonafides = Bonafide.objects.filter(
+        student=student, reqDate__gte=date.today() - timedelta(days=7))
 
 #dues
     try:
         lasted = DuesPublished.objects.latest('date_published').date_published
     except:
-        lasted = datetime(year=2004, month=1, day=1) # Before college was founded
+        # Before college was founded
+        lasted = datetime(year=2004, month=1, day=1)
 
     otherdues = Due.objects.filter(student=student)
     itemdues = ItemBuy.objects.filter(student=student,
@@ -819,7 +873,7 @@ def certificates(request):
     for other in otherdues:
         if other is not None:
             total_amount += other.amount
-    
+
     with open(settings.CONSTANTS_LOCATION, 'r') as fp:
         data = json.load(fp)
     if student.advance_amount != None:
@@ -834,7 +888,8 @@ def certificates(request):
     messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
     messopen = messopen.exclude(dateOpen__gt=date.today())
     if messopen:
-        messoption = MessOption.objects.filter(monthYear=messopen[0].monthYear, student=student)
+        messoption = MessOption.objects.filter(
+            monthYear=messopen[0].monthYear, student=student)
 
     if messopen and not messoption and datetime.today().date() < messopen[0].dateClose:
         option = 0
@@ -858,19 +913,19 @@ def certificates(request):
         'bonafides': bonafides,
         'daypasss': daypasss,
     }
-    queryset=Bonafide.objects.filter(student=student)
+    queryset = Bonafide.objects.filter(student=student)
     rejected = 0
     for bonafide in queryset:
-        if bonafide.status=="Rejected":
+        if bonafide.status == "Rejected":
             rejected = 1
     bonafideContext = {
         'bonafides': queryset,
         'rejected': rejected
     }
-    sem_count=[0,0]
+    sem_count = [0, 0]
     for bonafide in queryset:
-        if datetime.now().year==bonafide.reqDate.year:
-            sem_count[(int(bonafide.reqDate.month)-1)//6]+=1
+        if datetime.now().year == bonafide.reqDate.year:
+            sem_count[(int(bonafide.reqDate.month)-1)//6] += 1
     if sem_count[(datetime.now().month-1)//6] < 3:
         if request.POST:
             form = BonafideForm(request.POST)
@@ -910,27 +965,29 @@ def certificates(request):
 
     return render(request, "certificates.html", dict(context, **bonafideContext))
 
+
 @user_passes_test(lambda u: u.is_staff)
-def printBonafide(request,id=None):
+def printBonafide(request, id=None):
     instance = Bonafide.objects.get(id=id)
     context = {
         "text": instance.text,
         "date": date.today(),
         "id": id
     }
-    instance.printed=True
-    instance.status='Approved'
-    instance.save() 
-    return render(request,"bonafidepage.html",context)
+    instance.printed = True
+    instance.status = 'Approved'
+    instance.save()
+    return render(request, "bonafidepage.html", context)
 
 
 @login_required
 @user_passes_test(is_warden)
 def warden(request):
     warden = Warden.objects.get(user=request.user)
-    leaves = Leave.objects.filter(student__hostelps__hostel__icontains=warden.hostel).order_by('approved', '-id')
+    leaves = Leave.objects.filter(
+        student__hostelps__hostel__icontains=warden.hostel).order_by('approved', '-id')
     context = {
-        'option':1,
+        'option': 1,
         'warden': warden,
         'leaves': leaves,
     }
@@ -938,43 +995,47 @@ def warden(request):
     if request.GET:
         name = request.GET.get('name')
         date = request.GET.get('date')
-        leavesearch=[]
+        leavesearch = []
         for leave in leaves:
             if name.lower() in leave.student.name.lower():
-                dt=str(leave.dateTimeStart.year)+'-'+str(leave.dateTimeStart.month).zfill(2)+'-'+str(leave.dateTimeStart.day).zfill(2)
+                dt = str(leave.dateTimeStart.year)+'-'+str(leave.dateTimeStart.month).zfill(
+                    2)+'-'+str(leave.dateTimeStart.day).zfill(2)
                 if date == "" or date in dt:
                     leavesearch.append(leave)
         postContext = {
-            'leaves':leavesearch
+            'leaves': leavesearch
         }
     return render(request, "warden.html", dict(context, **postContext))
+
 
 @login_required
 @user_passes_test(is_hostelsuperintendent)
 def hostelsuperintendent(request):
     hostelsuperintendent = HostelSuperintendent.objects.get(user=request.user)
     daypass = DayPass.objects.all().order_by('-inprocess', '-dateTime')
-    
+
     context = {
-        'option':1,
+        'option': 1,
         'hostelsuperintendent': hostelsuperintendent,
         'daypasss': daypass
     }
     return render(request, "hostelsuperintendent.html", context)
+
 
 @login_required
 @user_passes_test(is_warden)
 def wardenleaveapprove(request, leave):
     leave = Leave.objects.get(id=leave)
     warden = Warden.objects.get(user=request.user)
-    daypasss = DayPass.objects.filter(student__hostelps__hostel=warden.hostel).order_by('approved', '-id')[:50]
+    daypasss = DayPass.objects.filter(
+        student__hostelps__hostel=warden.hostel).order_by('approved', '-id')[:50]
     leaves = Leave.objects.filter(student=leave.student)
 
     context = {
         'option': 2,
         'warden': warden,
         'leave': leave,
-        'daypasss' : daypasss,
+        'daypasss': daypasss,
         'leaves': leaves,
         'student': leave.student
     }
@@ -982,28 +1043,37 @@ def wardenleaveapprove(request, leave):
     if request.POST:
         approved = request.POST.getlist('group1')
         comment = request.POST.get('comment')
-        mail_message={}
+        mail_message = {}
         if config.EMAIL_PROD:
-            email_to = [str(leave.student.user.username) + "@goa.bits-pilani.ac.in"]
+            email_to = [str(leave.student.user.username) +
+                            "@goa.bits-pilani.ac.in"]
         else:
             email_to = ["spammailashad@gmail.com"]
-        mail_subject="Leave Status - "
-        mail_message=leave.student.name+",\n"
+        mail_subject = "Leave Status - "
+        mail_message = leave.student.name+",\n"
 
         if '1' in approved:
-            leave.approved=True
+            leave.approved = True
             leave.disapproved = False
             leave.inprocess = False
             leave.approvedBy = warden
-            mail_subject=mail_subject + "Successful!"
-            mail_message=mail_message+ "Success! Your leave application with leave id: " + str(leave.id) + " from " + leave.dateTimeStart.strftime('%d/%m/%Y') + " to "+leave.dateTimeEnd.strftime('%d/%m/%Y')+" has been approved."
+            mail_subject = mail_subject + "Successful!"
+            mail_message = mail_message + "Success! Your leave application with leave id: " + \
+                str(leave.id) + " from " + leave.dateTimeStart.strftime('%d/%m/%Y') + \
+                    " to " + \
+                        leave.dateTimeEnd.strftime(
+                            '%d/%m/%Y')+" has been approved."
         elif '2' in approved:
-            leave.disapproved=True
+            leave.disapproved = True
             leave.approved = False
             leave.inprocess = False
             leave.approvedBy = warden
-            mail_subject=mail_subject + "Unsuccessful!"
-            mail_message=mail_message+"Unsuccessful! Your leave application with leave id: "+ str(leave.id) + " from " + leave.dateTimeStart.strftime('%d/%m/%Y') + " to "+leave.dateTimeEnd.strftime('%d/%m/%Y')+" has been disapproved."
+            mail_subject = mail_subject + "Unsuccessful!"
+            mail_message = mail_message+"Unsuccessful! Your leave application with leave id: " + \
+                str(leave.id) + " from " + leave.dateTimeStart.strftime('%d/%m/%Y') + \
+                    " to " + \
+                        leave.dateTimeEnd.strftime(
+                            '%d/%m/%Y')+" has been disapproved."
         else:
             leave.inprocess = True
             leave.approved = False
@@ -1011,13 +1081,15 @@ def wardenleaveapprove(request, leave):
             leave.approvedBy = None
 
         leave.comment = comment
-        if(leave.comment != ''):
-            mail_message=mail_message+"\nComments: " + leave.comment
-        send_mail(mail_subject,mail_message,settings.EMAIL_HOST_USER,email_to,fail_silently=False)
+        if (leave.comment != ''):
+            mail_message = mail_message+"\nComments: " + leave.comment
+        send_mail(mail_subject, mail_message,
+                  settings.EMAIL_HOST_USER, email_to, fail_silently=False)
         leave.save()
         return redirect('warden')
 
     return render(request, "warden.html", context)
+
 
 @login_required
 @user_passes_test(is_hostelsuperintendent)
@@ -1033,28 +1105,35 @@ def hostelsuperintendentdaypassapprove(request, daypass):
         approved = request.POST.getlist('group1')
         comment = request.POST.get('comment')
 
-        mail_message={}
+        mail_message = {}
         if config.EMAIL_PROD:
-            email_to = [str(daypass.student.user.username) + "@goa.bits-pilani.ac.in"]
+            email_to = [str(daypass.student.user.username) +
+                            "@goa.bits-pilani.ac.in"]
         else:
             email_to = ["swdbitstest@gmail.com"]
-        mail_subject="Daypass Status - "
-        mail_message=daypass.student.name+",\n"
+        mail_subject = "Daypass Status - "
+        mail_message = daypass.student.name+",\n"
 
         if '1' in approved:
-            daypass.approved=True
+            daypass.approved = True
             daypass.disapproved = False
             daypass.inprocess = False
             daypass.approvedBy = hostelsuperintendent
-            mail_subject=mail_subject + "Successful!"
-            mail_message=mail_message+ "Success! Your Daypass application with id: " + str(daypass.id) + " on " + daypass.dateTime.strftime('%d/%m/%Y') + " has been approved."
+            mail_subject = mail_subject + "Successful!"
+            mail_message = mail_message + "Success! Your Daypass application with id: " + \
+                str(daypass.id) + " on " + \
+                    daypass.dateTime.strftime(
+                        '%d/%m/%Y') + " has been approved."
         elif '2' in approved:
-            daypass.disapproved=True
+            daypass.disapproved = True
             daypass.approved = False
             daypass.inprocess = False
             daypass.approvedBy = hostelsuperintendent
-            mail_subject=mail_subject + "Unsuccessful!"
-            mail_message=mail_message+ "Unsuccessful! Your Daypass application with id: " + str(daypass.id) + " on " + daypass.dateTime.strftime('%d/%m/%Y') + " has been disapproved."
+            mail_subject = mail_subject + "Unsuccessful!"
+            mail_message = mail_message + "Unsuccessful! Your Daypass application with id: " + \
+                str(daypass.id) + " on " + \
+                    daypass.dateTime.strftime(
+                        '%d/%m/%Y') + " has been disapproved."
         else:
             daypass.inprocess = True
             daypass.approved = False
@@ -1062,12 +1141,12 @@ def hostelsuperintendentdaypassapprove(request, daypass):
             daypass.approvedBy = None
 
         daypass.comment = comment
-        if(daypass.comment != ''):
-            mail_message=mail_message+"\nComments: " + daypass.comment
-        send_mail(mail_subject,mail_message,settings.EMAIL_HOST_USER,email_to,fail_silently=False)
+        if (daypass.comment != ''):
+            mail_message = mail_message+"\nComments: " + daypass.comment
+        send_mail(mail_subject, mail_message,
+                  settings.EMAIL_HOST_USER, email_to, fail_silently=False)
         daypass.save()
         return redirect('hostelsuperintendent')
-
 
     return render(request, "hostelsuperintendent.html", context)
 
@@ -1076,14 +1155,18 @@ def hostelsuperintendentdaypassapprove(request, daypass):
 @noPhD
 def daypass(request):
     student = Student.objects.get(user=request.user)
-    leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
-    daypasss = DayPass.objects.filter(student=student, dateTime__gte=date.today() - timedelta(days=7))
-    bonafides = Bonafide.objects.filter(student=student, reqDate__gte=date.today() - timedelta(days=7))
+    leaves = Leave.objects.filter(
+        student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
+    daypasss = DayPass.objects.filter(
+        student=student, dateTime__gte=date.today() - timedelta(days=7))
+    bonafides = Bonafide.objects.filter(
+        student=student, reqDate__gte=date.today() - timedelta(days=7))
     #mess
     messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
     messopen = messopen.exclude(dateOpen__gt=date.today())
     if messopen:
-        messoption = MessOption.objects.filter(monthYear=messopen[0].monthYear, student=student)
+        messoption = MessOption.objects.filter(
+            monthYear=messopen[0].monthYear, student=student)
 
     if messopen and not messoption and datetime.today().date() < messopen[0].dateClose:
         option = 0
@@ -1099,7 +1182,8 @@ def daypass(request):
     try:
         lasted = DuesPublished.objects.latest('date_published').date_published
     except:
-        lasted = datetime(year=2004, month=1, day=1) # Before college was founded
+        # Before college was founded
+        lasted = datetime(year=2004, month=1, day=1)
 
     otherdues = Due.objects.filter(student=student)
     itemdues = ItemBuy.objects.filter(student=student,
@@ -1116,7 +1200,7 @@ def daypass(request):
     for other in otherdues:
         if other is not None:
             total_amount += other.amount
-    
+
     with open(settings.CONSTANTS_LOCATION, 'r') as fp:
         data = json.load(fp)
     if student.advance_amount != None:
@@ -1129,7 +1213,7 @@ def daypass(request):
 
     form = DayPassForm()
     context = {
-        'option1' : 0,
+        'option1': 0,
         'student': student,
         'form': form,
         'option': option,
@@ -1148,11 +1232,13 @@ def daypass(request):
         form = DayPassForm(request.POST, request.FILES)
         if form.is_valid():
             daypassform = form.save(commit=False)
-            date1 = datetime.strptime(request.POST.get('date'), '%d %B, %Y').date()
+            date1 = datetime.strptime(
+                request.POST.get('date'), '%d %B, %Y').date()
             time = datetime.strptime(request.POST.get('time'), '%H:%M').time()
-            intime = datetime.strptime(request.POST.get('intime'), '%H:%M').time()
+            intime = datetime.strptime(
+                request.POST.get('intime'), '%H:%M').time()
             dateTime = datetime.combine(date1, time)
-            inTime = datetime.combine(date1,intime)
+            inTime = datetime.combine(date1, intime)
             daypassform.dateTime = make_aware(dateTime)
             daypassform.student = student
             daypassform.inTime = make_aware(inTime)
@@ -1170,12 +1256,14 @@ def daypass(request):
             }
     return render(request, "daypass.html", dict(context, **daypassContext))
 
+
 @user_passes_test(lambda u: u.is_staff)
 def messbill(request):
     # Exports Mess Bill dues in an excel file
     # template: messbill.html
 
-    if request.GET: # Not sure if this is required, but don't wanna break production (again)
+    # Not sure if this is required, but don't wanna break production (again)
+    if request.GET:
         selected = request.GET['ids']
         values = [x for x in selected.split(',')]
     if request.POST:
@@ -1186,11 +1274,13 @@ def messbill(request):
 
         messOpt = request.POST.get('mess')
         response = HttpResponse(content_type='application/ms-excel')
-        response['Content-Disposition'] = 'attachment; filename='+ str(messOpt) +'-MessBill.xls'
+        response['Content-Disposition'] = 'attachment; filename=' + \
+            str(messOpt) + '-MessBill.xls'
         wb = xlwt.Workbook(encoding='utf-8')
         ws = wb.add_sheet(str(messOpt) + "-Mess")
 
-        heading_style = xlwt.easyxf('font: bold on, height 280; align: wrap on, vert centre, horiz center')
+        heading_style = xlwt.easyxf(
+            'font: bold on, height 280; align: wrap on, vert centre, horiz center')
         h2_font_style = xlwt.easyxf('font: bold on')
         font_style = xlwt.easyxf('align: wrap on')
 
@@ -1200,9 +1290,11 @@ def messbill(request):
         #     sheet.write_merge(row1, row2, col1, col2, 'text', fontStyle)
         ws.write_merge(0, 0, 0, 4, str(messOpt) + "-Mess", heading_style)
 
-        start_date = datetime.strptime(request.POST.get('dateStart'), '%d %B, %Y').date()
-        end_date = datetime.strptime(request.POST.get('dateEnd'), '%d %B, %Y').date()
-        end_date = end_date if end_date<date.today() else date.today()
+        start_date = datetime.strptime(
+            request.POST.get('dateStart'), '%d %B, %Y').date()
+        end_date = datetime.strptime(
+            request.POST.get('dateEnd'), '%d %B, %Y').date()
+        end_date = end_date if end_date < date.today() else date.today()
 
         ws.write(1, 0, "From:", h2_font_style)
         ws.write(1, 1, start_date.strftime('%d/%b/%Y'), font_style)
@@ -1233,9 +1325,11 @@ def messbill(request):
 
         values = MessOption.objects.filter(
             mess=messOpt,
-            monthYear__range=(start_date.replace(day=1), end_date.replace(day=1))
+            monthYear__range=(start_date.replace(
+                day=1), end_date.replace(day=1))
         )
-        messages.error(request, 'Exporting {} messoptions'.format(values.count()))
+        messages.error(
+            request, 'Exporting {} messoptions'.format(values.count()))
         for k in values:
 
             obj = k.student
@@ -1291,12 +1385,14 @@ def messbill(request):
                     ws.write(row_num, col_num, row[col_num], font_style)
 
             elif request.POST.get('extype') is 'F':
-                month_list = list(rrule.rrule(rrule.MONTHLY, dtstart=start_date, until=end_date))
+                month_list = list(rrule.rrule(
+                    rrule.MONTHLY, dtstart=start_date, until=end_date))
                 for month in month_list:
                     # The desc has to match with the desc in created Dues object
                     #       exactly same as desc created in import_mess_bill view
                     desc = "Mess Due " + month.strftime("%B %y")
-                    dues = Due.objects.filter(student=obj, description=desc).first()
+                    dues = Due.objects.filter(
+                        student=obj, description=desc).first()
                     if dues is not None:
                         finalamt = dues.amount
                     else:
@@ -1315,14 +1411,17 @@ def messbill(request):
                     for col_num in range(len(row)):
                         ws.write(row_num, col_num, row[col_num], font_style)
             else:
-                messages.error(request, 'Invalid: extype={} found'.format(request.POST.get('extype')))
+                messages.error(request, 'Invalid: extype={} found'.format(
+                    request.POST.get('extype')))
 
         wb.save(response)
-        messages.success(request, "Export done. Download will automatically start.")
+        messages.success(
+            request, "Export done. Download will automatically start.")
         return response
 
     form = MessBillForm()
     return render(request, "messbill.html", {"form": form})
+
 
 @user_passes_test(lambda u: u.is_superuser)
 def import_mess_bill(request):
@@ -1362,7 +1461,8 @@ def import_mess_bill(request):
                         try:
                             student = Student.objects.get(bitsId=bitsId)
                             due = float(col[4].value)
-                            month = datetime.strptime(request.POST.get('month'), '%B').date()
+                            month = datetime.strptime(
+                                request.POST.get('month'), '%B').date()
                             month = month.replace(day=1, year=year_selected)
                             # desc is hardcoded and referenced in messbill view also
                             # any change here should also be done in desc
@@ -1389,12 +1489,14 @@ def import_mess_bill(request):
     return render(request, "import_mess_bill.html", {})
 
 
-
 def store(request):
     student = Student.objects.get(user=request.user)
-    leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
-    daypasss = DayPass.objects.filter(student=student, dateTime__gte=date.today() - timedelta(days=7))
-    bonafides = Bonafide.objects.filter(student=student, reqDate__gte=date.today() - timedelta(days=7))
+    leaves = Leave.objects.filter(
+        student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
+    daypasss = DayPass.objects.filter(
+        student=student, dateTime__gte=date.today() - timedelta(days=7))
+    bonafides = Bonafide.objects.filter(
+        student=student, reqDate__gte=date.today() - timedelta(days=7))
     tees = TeeAdd.objects.filter(available=True).order_by('-pk')
     items = ItemAdd.objects.filter(available=True)
     teesj = TeeAdd.objects.filter(available=True).values_list('title')
@@ -1402,7 +1504,8 @@ def store(request):
     try:
         lasted = DuesPublished.objects.latest('date_published').date_published
     except:
-        lasted = datetime(year=2004, month=1, day=1) # Before college was founded
+        # Before college was founded
+        lasted = datetime(year=2004, month=1, day=1)
 
     otherdues = Due.objects.filter(student=student)
     itemdues = ItemBuy.objects.filter(student=student,
@@ -1419,7 +1522,7 @@ def store(request):
     for other in otherdues:
         if other is not None:
             total_amount += other.amount
-    
+
     with open(settings.CONSTANTS_LOCATION, 'r') as fp:
         data = json.load(fp)
     if student.advance_amount != None:
@@ -1434,7 +1537,8 @@ def store(request):
     messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
     messopen = messopen.exclude(dateOpen__gt=date.today())
     if messopen:
-        messoption = MessOption.objects.filter(monthYear=messopen[0].monthYear, student=student)
+        messoption = MessOption.objects.filter(
+            monthYear=messopen[0].monthYear, student=student)
 
     if messopen and not messoption and datetime.today().date() < messopen[0].dateClose:
         option = 0
@@ -1445,8 +1549,6 @@ def store(request):
     else:
         option = 2
         mess = 0
-
-
 
     # tees_json = json.dumps(list(tees), cls=DjangoJSONEncoder)
     context = {
@@ -1466,21 +1568,24 @@ def store(request):
         if request.POST.get('what') == 'item':
             itemno = ItemAdd.objects.get(id=int(request.POST.get('info')))
             bought = False;
-            if ItemBuy.objects.filter(student=student,item=itemno).exists():
+            if ItemBuy.objects.filter(student=student, item=itemno).exists():
                 bought = True
             else:
                 bought = False
             if bought == True:
-                messages.add_message(request, messages.INFO,"You have already paid for "+ itemno.title,extra_tags='orange')
+                messages.add_message(
+                    request, messages.INFO, "You have already paid for " + itemno.title, extra_tags='orange')
             elif itemno.available == True:
-                itembuy = ItemBuy.objects.create(item = itemno, student=student)
-                messages.add_message(request, messages.INFO, itemno.title + ' item bought. Thank you for purchasing. Headover to DUES to check your purchases.', extra_tags='green')
+                itembuy = ItemBuy.objects.create(item=itemno, student=student)
+                messages.add_message(request, messages.INFO, itemno.title +
+                                     ' item bought. Thank you for purchasing. Headover to DUES to check your purchases.', extra_tags='green')
             else:
-                messages.add_message(request, messages.INFO,  'Item not available', extra_tags='red')
+                messages.add_message(request, messages.INFO,
+                                     'Item not available', extra_tags='red')
         if request.POST.get('what') == 'tee':
             teeno = TeeAdd.objects.get(id=int(request.POST.get('info')))
             bought = False;
-            query=TeeBuy.objects.filter(student=student,tee=teeno)
+            query = TeeBuy.objects.filter(student=student, tee=teeno)
             try:
                 nick = request.POST.get('nick')
                 if nick == None:
@@ -1499,16 +1604,20 @@ def store(request):
                     message_error = "Color doesn't match the database."
                 if qty is None:
                     message_error = "Provide quantity of the tees you want."
-                for i in range(0,query.count()):
-                    if query[i].size==sizes:
+                for i in range(0, query.count()):
+                    if query[i].size == sizes:
                         bought = True
                 if bought == True:
-                    messages.add_message(request,messages.INFO,"You have already paid for "+ teeno.title,extra_tags='orange')
+                    messages.add_message(
+                        request, messages.INFO, "You have already paid for " + teeno.title, extra_tags='orange')
                 elif message_error == "":
-                    teebuy = TeeBuy.objects.create(tee = teeno, student=student, nick=nick, size=sizes, color=colors, qty=qty)
-                    messages.add_message(request, messages.INFO, teeno.title + ' tee bought. Thank you for purchasing. Headover to DUES to check your purchases.', extra_tags='green')
+                    teebuy = TeeBuy.objects.create(
+                        tee=teeno, student=student, nick=nick, size=sizes, color=colors, qty=qty)
+                    messages.add_message(request, messages.INFO, teeno.title +
+                                         ' tee bought. Thank you for purchasing. Headover to DUES to check your purchases.', extra_tags='green')
                 else:
-                    messages.add_message(request, messages.INFO,  message_error, extra_tags='red')
+                    messages.add_message(
+                        request, messages.INFO,  message_error, extra_tags='red')
 
             except Exception as e:
                 print(e)
@@ -1516,18 +1625,23 @@ def store(request):
             # teebuy = TeeBuy.objects.create(tee = teeno, student=student, )
     return render(request, "store.html", context)
 
+
 @login_required
 def dues(request):
     student = Student.objects.get(user=request.user)
-    leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
-    daypasss = DayPass.objects.filter(student=student, dateTime__gte=date.today() - timedelta(days=7))
-    bonafides = Bonafide.objects.filter(student=student, reqDate__gte=date.today() - timedelta(days=7))
+    leaves = Leave.objects.filter(
+        student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
+    daypasss = DayPass.objects.filter(
+        student=student, dateTime__gte=date.today() - timedelta(days=7))
+    bonafides = Bonafide.objects.filter(
+        student=student, reqDate__gte=date.today() - timedelta(days=7))
 
     #mess
     messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
     messopen = messopen.exclude(dateOpen__gt=date.today())
     if messopen:
-        messoption = MessOption.objects.filter(monthYear=messopen[0].monthYear, student=student)
+        messoption = MessOption.objects.filter(
+            monthYear=messopen[0].monthYear, student=student)
 
     if messopen and not messoption and datetime.today().date() < messopen[0].dateClose:
         option = 0
@@ -1542,7 +1656,8 @@ def dues(request):
     try:
         lasted = DuesPublished.objects.latest('date_published').date_published
     except:
-        lasted = datetime(year=2004, month=1, day=1) # Before college was founded
+        # Before college was founded
+        lasted = datetime(year=2004, month=1, day=1)
 
     otherdues = Due.objects.filter(student=student)
     itemdues = ItemBuy.objects.filter(student=student,
@@ -1558,13 +1673,13 @@ def dues(request):
             total_amount += tee.totamt
     for other in otherdues:
         if other is not None:
-            total_amount += other.amount            
+            total_amount += other.amount
 
     with open(settings.CONSTANTS_LOCATION, 'r') as fp:
         data = json.load(fp)
     swd_adv = float(data['swd-advance'])
     balance = swd_adv - float(total_amount)
-    
+
     with open(settings.CONSTANTS_LOCATION, 'r') as fp:
         data = json.load(fp)
     if student.advance_amount != None:
@@ -1591,58 +1706,64 @@ def dues(request):
 
     return render(request, "dues.html", context)
 
+
 @login_required
-def search(request):    
-    perm=0;
-    option='indexbase.html';
+def search(request):
+    perm = 0;
+    option = 'indexbase.html';
     context = {
-        'hostels' : [i[0] for i in HOSTELS],
-        'branches' : BRANCH,
+        'hostels': [i[0] for i in HOSTELS],
+        'branches': BRANCH,
         'permission': perm,
-        'option' :option
+        'option': option
     }
-    
+
     if is_warden(request.user):
         warden = Warden.objects.get(user=request.user)
         option = 'wardenbase.html'
-        perm=1
+        perm = 1
         context = {
-            'hostels' : [i[0] for i in HOSTELS],
-            'branches' : BRANCH,
+            'hostels': [i[0] for i in HOSTELS],
+            'branches': BRANCH,
             'permission': perm,
-            'option' :option,
-            'warden' : warden,
+            'option': option,
+            'warden': warden,
         }
     elif is_hostelsuperintendent(request.user):
         option = 'superintendentbase.html'
-        perm=1
-        hostelsuperintendent = HostelSuperintendent.objects.get(user=request.user)
+        perm = 1
+        hostelsuperintendent = HostelSuperintendent.objects.get(
+            user=request.user)
         context = {
-            'hostels' : [i[0] for i in HOSTELS],
-            'branches' : BRANCH,
+            'hostels': [i[0] for i in HOSTELS],
+            'branches': BRANCH,
             'permission': perm,
-            'option' :option,
-            'hostelsuperintendent':hostelsuperintendent,
+            'option': option,
+            'hostelsuperintendent': hostelsuperintendent,
         }
     elif request.user.is_staff:
-        perm=1
+        perm = 1
         context = {
-            'hostels' : [i[0] for i in HOSTELS],
-            'branches' : BRANCH,
+            'hostels': [i[0] for i in HOSTELS],
+            'branches': BRANCH,
             'permission': perm,
-            'option' :option,
+            'option': option,
         }
     elif request.user.is_authenticated:
         student = Student.objects.get(user=request.user)
-        leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
-        daypasss = DayPass.objects.filter(student=student, dateTime__gte=date.today() - timedelta(days=7))
-        bonafides = Bonafide.objects.filter(student=student, reqDate__gte=date.today() - timedelta(days=7))
+        leaves = Leave.objects.filter(
+            student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
+        daypasss = DayPass.objects.filter(
+            student=student, dateTime__gte=date.today() - timedelta(days=7))
+        bonafides = Bonafide.objects.filter(
+            student=student, reqDate__gte=date.today() - timedelta(days=7))
 
         #mess
         messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
         messopen = messopen.exclude(dateOpen__gt=date.today())
         if messopen:
-            messoption = MessOption.objects.filter(monthYear=messopen[0].monthYear, student=student)
+            messoption = MessOption.objects.filter(
+                monthYear=messopen[0].monthYear, student=student)
 
         if messopen and not messoption and datetime.today().date() < messopen[0].dateClose:
             option = 0
@@ -1655,9 +1776,11 @@ def search(request):
             mess = 0
 
         try:
-            lasted = DuesPublished.objects.latest('date_published').date_published
+            lasted = DuesPublished.objects.latest(
+                'date_published').date_published
         except:
-            lasted = datetime(year=2004, month=1, day=1) # Before college was founded
+            # Before college was founded
+            lasted = datetime(year=2004, month=1, day=1)
 
         otherdues = Due.objects.filter(student=student)
         itemdues = ItemBuy.objects.filter(student=student,
@@ -1674,7 +1797,7 @@ def search(request):
         for other in otherdues:
             if other is not None:
                 total_amount += other.amount
-        
+
         with open(settings.CONSTANTS_LOCATION, 'r') as fp:
             data = json.load(fp)
         if student.advance_amount != None:
@@ -1686,11 +1809,11 @@ def search(request):
         balance = float(main_amt) - float(total_amount)
 
         context = {
-           'hostels' : [i[0] for i in HOSTELS],
-           'branches' : BRANCH,
+           'hostels': [i[0] for i in HOSTELS],
+           'branches': BRANCH,
            'permission': perm,
-           'option' :option,
-           'student' :student,
+           'option': option,
+           'student': student,
            'leaves': leaves,
            'option': option,
            'mess': mess,
@@ -1716,7 +1839,8 @@ def search(request):
                 return render(request, "search_logged_in.html", dict(context, **postContext))
             else:
                 return render(request, "search.html", dict(context, **postContext))
-        students = Student.objects.filter(Q(name__icontains=name) & Q(bitsId__icontains=bitsId) & Q(bitsId__contains=branch) & Q(hostelps__hostel__contains=hostel) & Q(hostelps__room__contains=room))
+        students = Student.objects.filter(Q(name__icontains=name) & Q(bitsId__icontains=bitsId) & Q(
+            bitsId__contains=branch) & Q(hostelps__hostel__contains=hostel) & Q(hostelps__room__contains=room))
         searchstr = {}
 
         if name is not "":
@@ -1731,8 +1855,8 @@ def search(request):
             searchstr['Room'] = room
 
         postContext = {
-            'students' : students,
-            'searchstr' : searchstr
+            'students': students,
+            'searchstr': searchstr
         }
 
         if students.count() == 0:
@@ -1745,60 +1869,85 @@ def search(request):
         return render(request, "search.html", dict(context, **postContext))
 
 
-
 def notice(request):
     context = {
-        'queryset' : Notice.objects.all().order_by('-id')
+        'queryset': Notice.objects.all().order_by('-id')
     }
-    return render(request,"notice.html",context)
+    return render(request, "notice.html", context)
+
 
 def antiragging(request):
-    return render(request,"antiragging.html",{})
+    return render(request, "antiragging.html", {})
+
 
 def swd(request):
     context = {
-        'hostels' : len(HOSTELS)
+        'hostels': len(HOSTELS)
     }
-    return render(request,"swd.html",context)
+    return render(request, "swd.html", context)
+
 
 def csa(request):
-    y=1-(datetime.now().month-1)//6
+    y = 1-(datetime.now().month-1)//6
 
     context = {
-        'csa' : CSA.objects.all().order_by('priority'),
-        'year' : datetime.now().year - y
+        'csa': CSA.objects.all().order_by('priority'),
+        'year': datetime.now().year - y
     }
-    return render(request,"csa.html",context)
+    return render(request, "csa.html", context)
+
 
 def migration(request):
-    return render(request,"migration.html",{})    
+    return render(request, "migration.html", {})
+
 
 def sac(request):
-    return render(request,"sac.html",{})
-    
-def contact(request):
-    context = {
-        'warden' : Warden.objects.all() 
-    }
-    return render(request,"contact.html",context)
+    return render(request, "sac.html", {})
 
-def studentDetails(request,id=None):
+
+def contact(request):
+     sid = HostelSuperintendent.objects.all()
+     wa = Warden.objects.all()
+     sup = []
+     asup = []
+     bw = []
+     gw = []
+     for s in sid:
+         if s.chamber[1:2] == "H":
+             sup.append(s)
+         else:
+             asup.append(s)
+     for w in wa:
+         if w.hostel != "CH4" and w.hostel != "CH7" and w.hostel != "CH5":
+             bw.append(w)
+         else:
+             gw.append(w)
+     context = {
+         'sup': sup,
+         'asup': asup,
+         'bw': bw,
+         'gw': gw
+     }
+     return render(request, "contact.html", context)
+
+
+def studentDetails(request, id=None):
     option = get_base_template(request)
     if request.user.is_authenticated:
         if is_warden(request.user) or is_hostelsuperintendent(request.user) or request.user.is_staff:
             student = Student.objects.get(id=id)
-            res=HostelPS.objects.get(student__id=id)
-            disco=Disco.objects.filter(student__id=id)
+            res = HostelPS.objects.get(student__id=id)
+            disco = Disco.objects.filter(student__id=id)
             context = {
-                     'student'  :student,
-                     'residence' :res,
-                     'disco' : disco,
+                     'student': student,
+                     'residence': res,
+                     'disco': disco,
                      'option': option
             }
-            return render(request,"studentdetails.html",context)
+            return render(request, "studentdetails.html", context)
         else:
             messages.error(request, "Unauthorised access. Contact Admin.")
-            return redirect('search')            
+            return redirect('search')
     else:
         messages.error(request, "Login to gain access.")
         return redirect('login')
@@ -1810,28 +1959,34 @@ def documents(request):
         if is_warden(request.user):
             warden = Warden.objects.get(user=request.user)
             context = {
-                            'option1' : 'wardenbase.html',
-                            'warden' : warden,
-                            'queryset' : Document.objects.all().order_by('-pk'),
+                            'option1': 'wardenbase.html',
+                            'warden': warden,
+                            'queryset': Document.objects.all().order_by('-pk'),
             }
         elif is_hostelsuperintendent(request.user):
-            hostelsuperintendent = HostelSuperintendent.objects.get(user=request.user)
+            hostelsuperintendent = HostelSuperintendent.objects.get(
+                user=request.user)
             context = {
-                            'option1' : 'superintendentbase.html',
-                            'hostelsuperintendent' : hostelsuperintendent,
-                            'queryset' : Document.objects.all().order_by('-pk'),
+                            'option1': 'superintendentbase.html',
+                            'hostelsuperintendent': hostelsuperintendent,
+                            'queryset': Document.objects.all().order_by('-pk'),
             }
         else:
             student = Student.objects.get(user=request.user)
-            leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
-            daypasss = DayPass.objects.filter(student=student, dateTime__gte=date.today() - timedelta(days=7))
-            bonafides = Bonafide.objects.filter(student=student, reqDate__gte=date.today() - timedelta(days=7))
+            leaves = Leave.objects.filter(
+                student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
+            daypasss = DayPass.objects.filter(
+                student=student, dateTime__gte=date.today() - timedelta(days=7))
+            bonafides = Bonafide.objects.filter(
+                student=student, reqDate__gte=date.today() - timedelta(days=7))
 
             #dues
             try:
-                lasted = DuesPublished.objects.latest('date_published').date_published
+                lasted = DuesPublished.objects.latest(
+                    'date_published').date_published
             except:
-                lasted = datetime(year=2004, month=1, day=1) # Before college was founded
+                # Before college was founded
+                lasted = datetime(year=2004, month=1, day=1)
 
             otherdues = Due.objects.filter(student=student)
             itemdues = ItemBuy.objects.filter(student=student,
@@ -1848,7 +2003,7 @@ def documents(request):
             for other in otherdues:
                 if other is not None:
                     total_amount += other.amount
-            
+
             with open(settings.CONSTANTS_LOCATION, 'r') as fp:
                 data = json.load(fp)
             if student.advance_amount != None:
@@ -1858,12 +2013,14 @@ def documents(request):
             else:
                 main_amt = data['swd-advance']
             balance = float(main_amt) - float(total_amount)
-            
+
             #mess
-            messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
+            messopen = MessOptionOpen.objects.filter(
+                dateClose__gte=date.today())
             messopen = messopen.exclude(dateOpen__gt=date.today())
             if messopen:
-                messoption = MessOption.objects.filter(monthYear=messopen[0].monthYear, student=student)
+                messoption = MessOption.objects.filter(
+                    monthYear=messopen[0].monthYear, student=student)
 
             if messopen and not messoption and datetime.today().date() < messopen[0].dateClose:
                 option = 0
@@ -1875,9 +2032,9 @@ def documents(request):
                 option = 2
                 mess = 0
             context = {
-                            'option1' : 'base.html',
-                            'student' : student,
-                            'queryset' : Document.objects.all().order_by('-pk'),
+                            'option1': 'base.html',
+                            'student': student,
+                            'queryset': Document.objects.all().order_by('-pk'),
                             'option': option,
                             'mess': mess,
                             'balance': balance,
@@ -1885,12 +2042,13 @@ def documents(request):
                             'bonafides': bonafides,
                             'daypasss': daypasss,
             }
-    return render(request,"documents.html",context)
+    return render(request, "documents.html", context)
+
 
 def latecomer(request):
     if request.user.is_authenticated:
-        finallist=[]
-        late = LateComer.objects.all() 
+        finallist = []
+        late = LateComer.objects.all()
         if is_warden(request.user):
             option = 'wardenbase.html'
             warden = Warden.objects.get(user=request.user)
@@ -1899,34 +2057,35 @@ def latecomer(request):
                 for instance in late:
                     if q.student == instance.student:
                         finallist.append(instance)
-            context={
-                        'warden' : warden,
-                        'option' : option,
-                        'list' : finallist,
+            context = {
+                        'warden': warden,
+                        'option': option,
+                        'list': finallist,
             }
         elif is_hostelsuperintendent(request.user):
-            finallist=late.order_by('-dateTime')
+            finallist = late.order_by('-dateTime')
             option = 'superintendentbase.html'
-            hostelsuperintendent = HostelSuperintendent.objects.get(user=request.user)
-            context={
-                        'hostelsuperintendent' : hostelsuperintendent,
-                        'option' : option,
-                        'list' : finallist,
+            hostelsuperintendent = HostelSuperintendent.objects.get(
+                user=request.user)
+            context = {
+                        'hostelsuperintendent': hostelsuperintendent,
+                        'option': option,
+                        'list': finallist,
             }
         else:
             messages.error(request, "Unauthorised access. Contact Admin.")
             return render(request, "home1.html", {})
-        return render(request,"latecomer.html",context)
+        return render(request, "latecomer.html", context)
     else:
         messages.error(request, "Login to gain access")
         return redirect('login')
 
+
 def antiragging(request):
     context = {
-                    'queryset' : AntiRagging.objects.all()
+                    'queryset': AntiRagging.objects.all()
     }
-    return render(request,"antiragging.html",context)
-
+    return render(request, "antiragging.html", context)
 
 
 @user_passes_test(lambda u: u.is_superuser)
@@ -1945,10 +2104,9 @@ def mess_import(request):
 
             idx = 1
 
-
             for sheet in workbook.sheets():
                 for i in sheet.get_rows():
-                    if str(i[1].value)=="ID":
+                    if str(i[1].value) == "ID":
                         continue
                     # Format : Name | Bits ID | MESS
                     bid = str(i[1].value)
@@ -1956,15 +2114,18 @@ def mess_import(request):
                     month = date.today().month + 1
                     my = datetime(date.today().year, month, 1)
                     try:
-                        messop = MessOption.objects.get(student=s, monthYear= my)
+                        messop = MessOption.objects.get(
+                            student=s, monthYear=my)
                         messop.mess = str(i[2].value)
                         messop.save()
                     except MessOption.DoesNotExist as e:
-                        messop = MessOption.objects.create(student = s, monthYear = my, mess = str(i[2].value))
+                        messop = MessOption.objects.create(
+                            student=s, monthYear=my, mess=str(i[2].value))
                     no_of_mess_option_added += 1
 
     context = {'added': no_of_mess_option_added}
     return render(request, "mess_defaulters_upload.html", context)
+
 
 @user_passes_test(lambda u: u.is_superuser)
 def mess_exp(request):
@@ -1982,18 +2143,17 @@ def mess_exp(request):
             gt_month = month + 1
             gt_year = year
 
-        messopted = MessOption.objects.filter(monthYear__gte=datetime(year, month, 1), monthYear__lt=datetime(gt_year, gt_month,1))
+        messopted = MessOption.objects.filter(monthYear__gte=datetime(
+            year, month, 1), monthYear__lt=datetime(gt_year, gt_month, 1))
         ids = []
         for i in range(len(messopted)):
             ids.append(messopted[i].student.bitsId)
-        grad_ps = HostelPS.objects.filter(Q(status__exact="Graduate") | Q(room="") | Q(room="0") | Q(room="0.0") | Q(student__bitsId__contains="PH") | Q(acadstudent=False) | Q(room=None))
+        grad_ps = HostelPS.objects.filter(Q(status__exact="Graduate") | Q(room="") | Q(room="0") | Q(
+            room="0.0") | Q(student__bitsId__contains="PH") | Q(acadstudent=False) | Q(room=None))
         for i in range(len(grad_ps)):
             ids.append(grad_ps[i].student.bitsId)
 
-
         students = Student.objects.exclude(bitsId__in=ids)
-
-
 
         response = HttpResponse(content_type='application/ms-excel')
         response['Content-Disposition'] = 'attachment; filename="mess_defaulters.xls"'
@@ -2022,9 +2182,9 @@ def mess_exp(request):
         wb.save(response)
         return response
 
-    years = [x for x in range(date.today().year-4, date.today().year+4,1)]
-    months = [x for x in range(1,13,1)]
-    context = { 'years': years,
+    years = [x for x in range(date.today().year-4, date.today().year+4, 1)]
+    months = [x for x in range(1, 13, 1)]
+    context = {'years': years,
                 'months': months,
                 }
 
@@ -2035,11 +2195,13 @@ def mess_exp(request):
 def dues_dashboard(request):
     return render(request, "dues_dashboard.html")
 
+
 def retrieve_or_create_due_category(name, desc=""):
     query, created = DueCategory.objects.get_or_create(name=name,
                                                        description=desc)
 
     return query
+
 
 @user_passes_test(lambda a: a.is_superuser)
 def import_dues_from_sheet(request):
@@ -2049,7 +2211,8 @@ def import_dues_from_sheet(request):
             extension = xlfile_uploaded.name.rsplit('.', 1)[1]
             if ('xls' != extension):
                 if ('xlsx' != extension):
-                    messages.error(request, "Please upload .xls or .xlsx file only")
+                    messages.error(
+                        request, "Please upload .xls or .xlsx file only")
                     return redirect('dues_dashboard')
 
             fd, tmp = tempfile.mkstemp()
@@ -2064,8 +2227,9 @@ def import_dues_from_sheet(request):
                     # ID No | Name | Expense 1 | Expense 2 | ... | Expense N | advance_amount
                     #              [ DueCategory(expense 1), DueCategory(expense 2), ...]
                     if first_iter:
-                        for i in range(2, len(row)-1): # advance_amount will be last column
-                            categories.append(retrieve_or_create_due_category(name=row[i].value))
+                        for i in range(2, len(row)-1):  # advance_amount will be last column
+                            categories.append(
+                                retrieve_or_create_due_category(name=row[i].value))
 
                         first_iter = False
                         continue
@@ -2106,7 +2270,7 @@ def import_dues_from_sheet(request):
                                                due_category=category,
                                                description=category.name,
                                                date_added=datetime.now().date())
-                    
+
                     try:
                         student.advance_amount = row[len(row)-1].value
                         student.save()
@@ -2124,17 +2288,23 @@ def import_dues_from_sheet(request):
 
     return redirect('dues_dashboard')
 
+
 def developers(request):
     if request.user.is_authenticated:
             student = Student.objects.get(user=request.user)
-            leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
-            daypasss = DayPass.objects.filter(student=student, dateTime__gte=date.today() - timedelta(days=7))
-            bonafides = Bonafide.objects.filter(student=student, reqDate__gte=date.today() - timedelta(days=7))
+            leaves = Leave.objects.filter(
+                student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
+            daypasss = DayPass.objects.filter(
+                student=student, dateTime__gte=date.today() - timedelta(days=7))
+            bonafides = Bonafide.objects.filter(
+                student=student, reqDate__gte=date.today() - timedelta(days=7))
             #dues
             try:
-                lasted = DuesPublished.objects.latest('date_published').date_published
+                lasted = DuesPublished.objects.latest(
+                    'date_published').date_published
             except:
-                lasted = datetime(year=2004, month=1, day=1) # Before college was founded
+                # Before college was founded
+                lasted = datetime(year=2004, month=1, day=1)
 
             otherdues = Due.objects.filter(student=student)
             itemdues = ItemBuy.objects.filter(student=student,
@@ -2151,7 +2321,7 @@ def developers(request):
             for other in otherdues:
                 if other is not None:
                     total_amount += other.amount
-            
+
             with open(settings.CONSTANTS_LOCATION, 'r') as fp:
                 data = json.load(fp)
             if student.advance_amount != None:
@@ -2163,10 +2333,12 @@ def developers(request):
             balance = float(main_amt) - float(total_amount)
 
             #mess
-            messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today())
+            messopen = MessOptionOpen.objects.filter(
+                dateClose__gte=date.today())
             messopen = messopen.exclude(dateOpen__gt=date.today())
             if messopen:
-                messoption = MessOption.objects.filter(monthYear=messopen[0].monthYear, student=student)
+                messoption = MessOption.objects.filter(
+                    monthYear=messopen[0].monthYear, student=student)
 
             if messopen and not messoption and datetime.today().date() < messopen[0].dateClose:
                 option = 0
@@ -2179,7 +2351,7 @@ def developers(request):
                 mess = 0
 
             context = {
-                        'option1' : 'base.html',
+                        'option1': 'base.html',
                         'student': student,
                         'option': option,
                         'mess': mess,
@@ -2190,7 +2362,7 @@ def developers(request):
             }
     else:
             context = {
-                'option1' : 'indexbase.html',
+                'option1': 'indexbase.html',
         }
 
     return render(request, "developers.html", context)
@@ -2210,14 +2382,18 @@ def publish_dues(request):
         """
 
         try:
-            lasted = DuesPublished.objects.latest('date_published').date_published
+            lasted = DuesPublished.objects.latest(
+                'date_published').date_published
         except:
-            lasted = datetime(year=2004, month=1, day=1) # Before college was founded
+            # Before college was founded
+            lasted = datetime(year=2004, month=1, day=1)
 
         # Create/retrieve categories for
         # Tees, ItemBuy, LateComer
-        tee_category = retrieve_or_create_due_category('TeeBuy', 'TShirt was bought')
-        itembuy_category = retrieve_or_create_due_category('ItemBuy', 'An Item was bought')
+        tee_category = retrieve_or_create_due_category(
+            'TeeBuy', 'TShirt was bought')
+        itembuy_category = retrieve_or_create_due_category(
+            'ItemBuy', 'An Item was bought')
 
         tees = TeeBuy.objects.filter(created__gte=lasted)
         for tee_buy in tees:
@@ -2261,7 +2437,6 @@ def edit_constants(request):
 
 
 @user_passes_test(lambda u: u.is_superuser)
-
 def import_cgpa(request):
     """
         Takes Excel Sheet as FILE input.
@@ -2277,9 +2452,10 @@ def import_cgpa(request):
             extension = xl_file.name.rsplit('.', 1)[1]
             if ('xls' != extension):
                 if ('xlsx' != extension):
-                    messages.error(request, "Please upload .xls or .xlsx file only")
+                    messages.error(
+                        request, "Please upload .xls or .xlsx file only")
                     messages.add_message(request,
-                                        message_tag, 
+                                        message_tag,
                                         message_str)
                     return render(request, "update_cgpa.html", {})
 
@@ -2300,32 +2476,36 @@ def import_cgpa(request):
                         idx = 0
                         continue
                     try:
-                        student = Student.objects.get(bitsId=row[header['studentID']].value)
+                        student = Student.objects.get(
+                            bitsId=row[header['studentID']].value)
                     except Student.DoesNotExist:
                         message_str = str(row[header['studentID']].value) + " not found in " \
                             "database"
                         messages.add_message(request,
-                                            message_tag, 
+                                            message_tag,
                                             message_str)
                         continue
-                    change = student.change_cgpa(float(row[header['CGPA']].value))
+                    change = student.change_cgpa(
+                        float(row[header['CGPA']].value))
                     if change is False:
                         message_str = str(row[header['studentID']].value) + " does not have " \
                             "a valid CGPA " + str(row[header['CGPA']].value)
                         messages.add_message(request,
-                                            message_tag, 
+                                            message_tag,
                                             message_str)
                     else:
                         count = count + 1
-            message_str = "CGPAs successfully updated of " + str(count) + " students."
+            message_str = "CGPAs successfully updated of " + \
+                str(count) + " students."
         else:
             message_str = "No File Added."
 
     if message_str is not '':
         messages.add_message(request,
-                            message_tag, 
+                            message_tag,
                             message_str)
     return render(request, "update_cgpa.html", {})
+
 
 @user_passes_test(lambda u: u.is_superuser)
 def add_new_students(request):
@@ -2344,9 +2524,10 @@ def add_new_students(request):
             extension = xl_file.name.rsplit('.', 1)[1]
             if ('xls' != extension):
                 if ('xlsx' != extension):
-                    messages.error(request, "Please upload .xls or .xlsx file only")
+                    messages.error(
+                        request, "Please upload .xls or .xlsx file only")
                     messages.add_message(request,
-                                        message_tag, 
+                                        message_tag,
                                         message_str)
                     return render(request, "add_students.html", {})
 
@@ -2370,10 +2551,10 @@ def add_new_students(request):
                             col_no = col_no + 1
                         idx = 0
                         continue
-                    
+
                     # create User model first then Student model
                     studentID = row[header['studentID']].value
-                    if len(studentID)==13:
+                    if len(studentID) == 13:
                         if studentID[4] == 'P':
                             username = 'p' + studentID[0:4] + studentID[8:12]
                         elif studentID[4] == 'H':
@@ -2393,11 +2574,11 @@ def add_new_students(request):
                     # Date of Birth and Date of Admit
                     # These col values are expected to be in dd-Mon-yy format
                     # For Example: 07-Jan-97
-                    
+
                     try:
                         user = User.objects.get(username=username)
-                        user.email='random@hello.com',
-                        user.password=password
+                        user.email = 'random@hello.com',
+                        user.password = password
                         user.save()
                     except User.DoesNotExist:
                         user = User.objects.create_user(
@@ -2409,49 +2590,53 @@ def add_new_students(request):
                     # These col values are expected to be in dd-Mon-yy format
                     # For Example: 07-Jan-97
                     dob = row[header['Stu_DOB']]
-                    
-                    if dob.ctype == 1: # XL_CELL_TEXT
+
+                    if dob.ctype == 1:  # XL_CELL_TEXT
                         try:
-                            rev_bDay = datetime.strptime(dob.value, '%d-%b-%Y').strftime('%Y-%m-%d')
+                            rev_bDay = datetime.strptime(
+                                dob.value, '%d-%b-%Y').strftime('%Y-%m-%d')
                         except ValueError:
-                            rev_bDay = datetime.strptime(dob.value, '%Y-%m-%d').strftime('%Y-%m-%d')
-                        
-                    elif (dob.ctype == 3): # XL_CELL_DATE
+                            rev_bDay = datetime.strptime(
+                                dob.value, '%Y-%m-%d').strftime('%Y-%m-%d')
+
+                    elif (dob.ctype == 3):  # XL_CELL_DATE
                         rev_bDay = xlrd.xldate.xldate_as_datetime(dob.value, 0)
-                        
+
                     else:
                         rev_bDay = datetime.strptime('01Jan1985', '%d%b%Y')
-                        
-                    
+
                     do_admit = row[header['admit']]
-                    
-                    if (do_admit.ctype == 1): # XL_CELL_TEXT
-                        try: 
-                            rev_admit = datetime.strptime(do_admit.value, '%d/%m/%Y').strftime('%Y-%m-%d')
+
+                    if (do_admit.ctype == 1):  # XL_CELL_TEXT
+                        try:
+                            rev_admit = datetime.strptime(
+                                do_admit.value, '%d/%m/%Y').strftime('%Y-%m-%d')
                         except ValueError:
-                            rev_admit = datetime.strptime(do_admit.value, '%Y-%m-%d').strftime('%Y-%m-%d')
-                        
-                    elif do_admit.ctype == 3: # XL_CELL_DATE
-                        rev_admit = xlrd.xldate.xldate_as_datetime(do_admit.value, 0)
-                        
+                            rev_admit = datetime.strptime(
+                                do_admit.value, '%Y-%m-%d').strftime('%Y-%m-%d')
+
+                    elif do_admit.ctype == 3:  # XL_CELL_DATE
+                        rev_admit = xlrd.xldate.xldate_as_datetime(
+                            do_admit.value, 0)
+
                     else:
                         rev_admit = datetime.strptime('01Jan1985', '%d%b%Y')
 
-                    try:    
+                    try:
                         updated_vals = {
-                            'bitsId':str(row[header['studentID']].value)[:15],
-                            'name':str(row[header['name']].value)[:50],
-                            'bDay':rev_bDay,
-                            'admit':rev_admit,
-                            'gender':str(row[header['Stu_gender']].value)[0],
-                            'phone':str(row[header['stu_mobile']].value)[:15],
-                            'email':str(row[header['stu_email (other then institute)']].value),
-                            'address':str(row[header['ADDRESS']].value),
-                            'bloodGroup':str(row[header['bloodgp']].value)[:10],
-                            'parentName':str(row[header['fname']].value)[:50],
-                            'parentPhone':str(row[header['parent mobno']].value)[:20],
-                            'parentEmail':str(row[header['parent mail']].value)[:50]
-                        }         
+                            'bitsId': str(row[header['studentID']].value)[:15],
+                            'name': str(row[header['name']].value)[:50],
+                            'bDay': rev_bDay,
+                            'admit': rev_admit,
+                            'gender': str(row[header['Stu_gender']].value)[0],
+                            'phone': str(row[header['stu_mobile']].value)[:15],
+                            'email': str(row[header['stu_email (other then institute)']].value),
+                            'address': str(row[header['ADDRESS']].value),
+                            'bloodGroup': str(row[header['bloodgp']].value)[:10],
+                            'parentName': str(row[header['fname']].value)[:50],
+                            'parentPhone': str(row[header['parent mobno']].value)[:20],
+                            'parentEmail': str(row[header['parent mail']].value)[:50]
+                        }
                         try:
                             obj = Student.objects.get(user=user)
                             for key, value in updated_vals.items():
@@ -2468,11 +2653,13 @@ def add_new_students(request):
                             admit=rev_admit,
                             gender=str(row[header['Stu_gender']].value)[0],
                             phone=str(row[header['stu_mobile']].value)[:15],
-                            email=str(row[header['stu_email (other then institute)']].value),
+                            email=str(
+                                row[header['stu_email (other then institute)']].value),
                             address=str(row[header['ADDRESS']].value),
                             bloodGroup=str(row[header['bloodgp']].value)[:10],
                             parentName=str(row[header['fname']].value)[:50],
-                            parentPhone=str(row[header['parent mobno']].value)[:20],
+                            parentPhone=str(
+                                row[header['parent mobno']].value)[:20],
                             parentEmail=str(row[header['parent mail']].value)[:50])
                             obj.save()
                             created = True
@@ -2482,16 +2669,18 @@ def add_new_students(request):
                             count = count + 1
                     except Exception:
                         message_str + studentID + " failed"
-                            
-            message_str = str(count_created) + " new students added," + "\n" + str(count) + " students updated."
+
+            message_str = str(count_created) + " new students added," + \
+                              "\n" + str(count) + " students updated."
         else:
             message_str = "No File Uploaded."
 
     if message_str is not '':
         messages.add_message(request,
-                            message_tag, 
+                            message_tag,
                             message_str)
     return render(request, "add_students.html", {'header': "Add Newly Admitted Students to Database"})
+
 
 @user_passes_test(lambda u: u.is_superuser)
 def add_wardens(request):
@@ -2504,9 +2693,10 @@ def add_wardens(request):
             extension = xl_file.name.rsplit('.', 1)[1]
             if ('xls' != extension):
                 if ('xlsx' != extension):
-                    messages.error(request, "Please upload .xls or .xlsx file only")
+                    messages.error(
+                        request, "Please upload .xls or .xlsx file only")
                     messages.add_message(request,
-                                        message_tag, 
+                                        message_tag,
                                         message_str)
                     return render(request, "add_students.html", {'header': "Add new wardens"})
 
@@ -2529,7 +2719,8 @@ def add_wardens(request):
                         idx = 0
                         continue
                     # create User model first then Student model
-                    emailID = row[header['Email:@goa.bits-pilani.ac.in']].value + "@goa.bits-pilani.ac.in"
+                    emailID = row[header['Email:@goa.bits-pilani.ac.in']
+                        ].value + "@goa.bits-pilani.ac.in"
                     username = emailID.split('@', 1)[0]
                     password = User.objects.make_random_password()
                     try:
@@ -2543,17 +2734,42 @@ def add_wardens(request):
                             email=emailID,
                             password=password)
 
-                    
-                    warden = Warden.objects.create(
-                        user=user,
-                        name=row[header['Name']].value,
-                        phone_off=str(int(row[header['Tel:(Off.)']].value)),
-                        phone_res=str(int(row[header['Tel:(Res.)']].value)),
-                        email=emailID,
-                        chamber=row[header['Chamber No.']].value,
-                        hostel=row[header['Function']].value,
-                        )
-                    count = count + 1
+
+                    try:
+                         updated_vals = {
+                             'name': row[header['Name']].value,
+                             'phone_off': str(int(row[header['Tel:(Off.)']].value)),
+                             'phone_res': str(int(row[header['Tel:(Res.)']].value)),
+                             'email': emailID,
+                             'chamber': row[header['Chamber No.']].value,
+                             'hostel': row[header['Function']].value,
+                         }
+                         try:
+                             obj = Warden.objects.get(user=user)
+                             for key, value in updated_vals.items():
+                                 #print(f"{key}, {value}")
+                                 if (value):
+                                     setattr(obj, key, value)
+                             obj.save()
+                         except Warden.DoesNotExist:
+                             obj = Warden(
+                             user=user,
+                             name=row[header['Name']].value,
+                             phone_off=str(
+                                 int(row[header['Tel:(Off.)']].value)),
+                             phone_res=str(
+                                 int(row[header['Tel:(Res.)']].value)),
+                             email=emailID,
+                             chamber=row[header['Chamber No.']].value,
+                             hostel=row[header['Function']].value,)
+                             obj.save()
+                             created = True
+                         if created:
+                             count_created = count_created + 1
+                         else:
+                             count = count + 1
+                    except Exception:
+                         message_str + name + " failed"
             message_str = str(count) + " new wardens added."
         else:
             message_str = "No File Uploaded."
@@ -3749,3 +3965,9 @@ def delete_students(request):
 
 def messagefromdean(request):
     return render(request,"messagefromdean.html",{})
+
+# def unread_messages(user):
+#     return user.messages_set.filter(read=False).count()
+#     #replace the messages_set with the appropriate related_name, and also the filter field. (I am assuming it to be "read")
+
+# register.simple_tag(unread_messages)
