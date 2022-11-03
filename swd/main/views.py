@@ -1952,10 +1952,11 @@ def mess_import(request):
                 for i in sheet.get_rows():
                     if str(i[1].value)=="ID":
                         continue
-                    # Format : Name | Bits ID | MESS
+                    # Format : Name | Bits ID | MESS | MONTH(1-12)
                     bid = str(i[1].value)
                     s = Student.objects.get(bitsId=bid)
-                    month = date.today().month + 1
+                    # month = date.today().month + 1
+                    month = int(i[3].value)
                     my = datetime(date.today().year, month, 1)
                     try:
                         messop = MessOption.objects.get(student=s, monthYear= my)
