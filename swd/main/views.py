@@ -336,14 +336,14 @@ def messoption(request):
     bonafides = Bonafide.objects.filter(student=student, reqDate__gte=date.today() - timedelta(days=7))
 
     # MessOptionOpen or None
-    messopen = MessOptionOpen.objects.filter(dateClose__gte=date.today(), dateOpen__lte=date.today()).first() or None
+    messopen_current = MessOptionOpen.objects.filter(dateClose__gte=date.today(), dateOpen__lte=date.today()).first() or None
 
     messoption = None # MessOption or None
     errors = []
 
-    if messopen: # If there is a MessOptionOpen active right now
+    if messopen_current: # If there is a MessOptionOpen active right now
         # Get the student's MessOption
-        messoption = MessOption.objects.filter(student=student, monthYear=messopen.monthYear).first()
+        messoption = MessOption.objects.filter(student=student, monthYear=messopen_current.monthYear).first()
     else:
         # Get the most recent MessOptionOpen
         messopen_last = MessOptionOpen.objects.all().last()
@@ -394,17 +394,17 @@ def messoption(request):
         'daypasss': daypasss,
     }
 
-    if messopen and (not messoption or edit):
+    if messopen_current and (not messoption or edit):
         # If a MessOptionOpen is active and student doesn't have a MessOption / wants to edit it
         # Opens the edit page
         form = MessForm(request.POST)
         context.update({
             'option': 0,
-            'mess': messopen,
+            'mess': messopen_current,
             'form': form,
-            'dateClose': messopen.dateClose,
+            'dateClose': messopen_current.dateClose,
         })
-    elif messopen and messoption:
+    elif messopen_current and messoption:
         # Messopen is active and student already has a MessOption
         # Page shows the MessOption and an edit button
         context.update({
@@ -467,17 +467,22 @@ def messoption(request):
         if (vacations.count() and len(errors) == 0) or (vacations.count() == 0) or (edit and len(errors) == 0):
             # Mess Option Filling
             mess = request.POST.get('mess')
-            if messopen.capacity != None:
-                if MessOption.objects.filter(monthYear=messopen.monthYear, mess=mess).count() < messopen.capacity:
+            
+            # At this point we know the user is trying to do something with the messoption
+            # edit = True if there IS a current messoption, else False
+            edit = True if (messopen_current and messoption and messoption.monthYear == messopen_current.monthYear) else False
+
+            if messopen_current.capacity != None:
+                if MessOption.objects.filter(monthYear=messopen_current.monthYear, mess=mess).count() < messopen_current.capacity:
                     # Mess isn't full, so create the messoption
                     if edit:
                         messoption.student = student
-                        messoption.monthYear = messopen.monthYear
+                        messoption.monthYear = messopen_current.monthYear
                         messoption.mess = mess
                     else:
                         messoption = MessOption(
                             student = student,
-                            monthYear = messopen.monthYear,
+                            monthYear = messopen_current.monthYear,
                             mess = mess
                         )
                     messoption.save()
@@ -490,12 +495,12 @@ def messoption(request):
             else: # In case they gave no capacity, assume it is unlimited
                 if edit:
                     messoption.student = student
-                    messoption.monthYear = messopen.monthYear
+                    messoption.monthYear = messopen_current.monthYear
                     messoption.mess = mess
                 else:
                     messoption = MessOption(
                         student = student,
-                        monthYear = messopen.monthYear,
+                        monthYear = messopen_current.monthYear,
                         mess = mess
                     )
                 messoption.save()
