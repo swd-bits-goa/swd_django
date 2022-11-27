@@ -57,7 +57,7 @@ urlpatterns = [
     url(r'address_dashboard/', views.address_approval_dashboard, name='address_approval_dashboard'),
 
     url(r'^admin/import_cgpa/', views.import_cgpa, name='import_cgpa'),
-
+    url(r'^admin/mess_info/',views.mess_info, name='mess_info'),
     url(r'^admin/add_new_students/', views.add_new_students, name='add_new_students'),
     url(r'^admin/add_new_wardens/', views.add_wardens, name='add_wardens'),
     url(r'^admin/add_new_superintendents/', views.add_superintendents, name='add_superintendents'),

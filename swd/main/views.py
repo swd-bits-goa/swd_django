@@ -1,3 +1,4 @@
+from unicodedata import name
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseForbidden
 from django.contrib.auth import authenticate, login, logout
@@ -1784,10 +1785,61 @@ def sac(request):
     return render(request,"sac.html",{})
     
 def contact(request):
+    sid = HostelSuperintendent.objects.all()
+    wa = Warden.objects.all()
+    sup=[]
+    asup=[]
+    bw=[]
+    gw=[]
+    for s in sid:
+        if s.chamber[1:2]=="H":
+            sup.append(s)
+        else:
+            asup.append(s)
+    for w in wa:
+        if w.hostel != "CH4" and w.hostel != "CH7" and w.hostel != "CH5":
+            bw.append(w)
+        else:
+            gw.append(w)
     context = {
-        'warden' : Warden.objects.all() 
+        'sup': sup,
+        'asup': asup,
+        'bw':bw,
+        'gw':gw
     }
     return render(request,"contact.html",context)
+
+def mess_info(request):
+    """
+    Renders 'mess_info.html' at 'admin/mess_info/'
+    """
+
+    mess_data = {}
+    messoptions = MessOption.objects.all()
+
+    # Count students per mess per month
+    for messoption in messoptions:
+        month_name = messoption.monthYear.strftime('%B')
+        year = messoption.monthYear.strftime('%Y')
+
+        month_year = f"{month_name}, {year}"
+
+        # If there is no entry for this month+year, create a blank one
+        if not month_year in mess_data:
+            mess_data[month_year] = [0, 0, 0]
+
+        if messoption.mess == "A":
+            mess_data[month_year][0] += 1
+        elif messoption.mess=="D":
+            mess_data[month_year][1] += 1
+        elif messoption.mess=="C":
+            mess_data[month_year][2] += 1
+
+    context = {
+        'mess_data': mess_data
+    }
+    
+    return render(request, "mess_info.html", context)
 
 def studentDetails(request,id=None):
     option = get_base_template(request)
@@ -2512,10 +2564,11 @@ def add_wardens(request):
             extension = xl_file.name.rsplit('.', 1)[1]
             if ('xls' != extension):
                 if ('xlsx' != extension):
-                    messages.error(request, "Please upload .xls or .xlsx file only")
+                    messages.error(
+                        request, "Please upload .xls or .xlsx file only")
                     messages.add_message(request,
-                                        message_tag, 
-                                        message_str)
+                                         message_tag,
+                                         message_str)
                     return render(request, "add_students.html", {'header': "Add new wardens"})
 
             fd, tmp = tempfile.mkstemp()
@@ -2523,6 +2576,8 @@ def add_wardens(request):
                 out.write(xl_file.read())
             workbook = xlrd.open_workbook(tmp)
 
+            count_created = 0
+            created = False
             count = 0
             idx = 1
             header = {}
@@ -2537,7 +2592,8 @@ def add_wardens(request):
                         idx = 0
                         continue
                     # create User model first then Student model
-                    emailID = row[header['Email:@goa.bits-pilani.ac.in']].value + "@goa.bits-pilani.ac.in"
+                    emailID = row[header['Email:@goa.bits-pilani.ac.in']
+                                  ].value + "@goa.bits-pilani.ac.in"
                     username = emailID.split('@', 1)[0]
                     password = User.objects.make_random_password()
                     try:
@@ -2551,25 +2607,49 @@ def add_wardens(request):
                             email=emailID,
                             password=password)
 
-                    
-                    warden = Warden.objects.create(
-                        user=user,
-                        name=row[header['Name']].value,
-                        phone_off=str(int(row[header['Tel:(Off.)']].value)),
-                        phone_res=str(int(row[header['Tel:(Res.)']].value)),
-                        email=emailID,
-                        chamber=row[header['Chamber No.']].value,
-                        hostel=row[header['Function']].value,
-                        )
-                    count = count + 1
+                    try:
+                        updated_vals = {
+                            'name': row[header['Name']].value,
+                             'phone_off': str(int(row[header['Tel:(Off.)']].value)),
+                             'phone_res': str(int(row[header['Tel:(Res.)']].value)),
+                             'email': emailID,
+                             'chamber': row[header['Chamber No.']].value,
+                             'hostel': row[header['Function']].value,
+                            }
+                        try:
+                             obj = Warden.objects.get(user=user)
+                             for key, value in updated_vals.items():
+                                 #print(f"{key}, {value}")
+                                 if (value):
+                                     setattr(obj, key, value)
+                             obj.save()
+                        except Warden.DoesNotExist:
+                            obj = Warden(
+                                user=user,
+                                name=row[header['Name']].value,
+                                phone_off=str(
+                                    int(row[header['Tel:(Off.)']].value)),
+                                phone_res=str(
+                                    int(row[header['Tel:(Res.)']].value)),
+                                email=emailID,
+                                chamber=row[header['Chamber No.']].value,
+                                hostel=row[header['Function']].value,)
+                            obj.save()
+                            created = True
+                        if created:
+                            count_created = count_created + 1
+                        else:
+                            count = count + 1
+                    except Exception:
+                        message_str + name + " failed"
             message_str = str(count) + " new wardens added."
         else:
             message_str = "No File Uploaded."
 
     if message_str is not '':
         messages.add_message(request,
-                            message_tag, 
-                            message_str)
+                             message_tag,
+                             message_str)
     return render(request, "add_students.html", {'header': "Add new wardens"})
 
 @user_passes_test(lambda u: u.is_superuser)
