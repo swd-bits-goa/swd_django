@@ -170,6 +170,18 @@ def dashboard(request):
         'items': items
     }
 
+    # Check for hostel documents
+    hostel_documents = []
+    hostelps = HostelPS.objects.filter(student=student).first()
+    if hostelps:
+        # Hostel found, now get documents with that hostel
+        hostel_documents = Document.objects.filter(hostel=hostelps.hostel)
+    if len(hostel_documents) != 0:
+        context.update({
+            'hostel_documents': hostel_documents,
+            'hostelps': hostelps.hostel
+        })
+
     return render(request, "dashboard.html", context)
 
 
@@ -1830,6 +1842,7 @@ def documents(request):
             }
         else:
             student = Student.objects.get(user=request.user)
+            hostelps = HostelPS.objects.get(student=student)
             leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
             daypasss = DayPass.objects.filter(student=student, dateTime__gte=date.today() - timedelta(days=7))
             bonafides = Bonafide.objects.filter(student=student, reqDate__gte=date.today() - timedelta(days=7))
@@ -1884,7 +1897,7 @@ def documents(request):
             context = {
                 'option1' : 'base.html',
                 'student' : student,
-                'queryset' : Document.objects.all().order_by('-pk'),
+                'queryset' : Document.objects.all().order_by('-pk').filter(Q(hostel=hostelps.hostel) | Q(hostel=None)),
                 'option': option,
                 'mess': mess,
                 'balance': balance,

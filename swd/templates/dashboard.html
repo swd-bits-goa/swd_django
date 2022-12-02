@@ -4,6 +4,21 @@
 {% block content %}
 
 <div class="container-fluid ">
+    {% if hostel_documents %}
+    <section class="section--hostel-announcement">
+      <h4 style="color:#F46036; margin: 0; padding: 8px; font-size: 31px">{{ hostelps }} Hostel Announcements</h4>
+      
+      {% for document in hostel_documents %}
+      <p>
+        <div class="card" style="padding:16px;">
+          <a href="{{ document.file.link }}">
+            <div class="card-title" style="font-size: 18px;">{{ document.title|safe }}</div>
+          </a>
+        </div>
+      </p>
+      {% endfor %}
+    </section>
+    {% endif %}
     <h4 style="color:#F46036; margin: 0; padding: 8px; font-size: 31px">Recent Notices</h4>
           {% include 'notice.html' %} 
           {% include 'storeitems.html' %}

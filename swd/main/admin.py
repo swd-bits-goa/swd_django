@@ -51,7 +51,8 @@ class HostelPSAdmin(ExportMixin, admin.ModelAdmin):
 @admin.register(Document)
 class DocumentAdmin(admin.ModelAdmin):
     search_fields = ['title']
-    list_display = ['title']
+    list_display = ['title', 'hostel']
+    list_filter = ['hostel']
 
 @admin.register(Disco)
 class DiscoAdmin(ExportMixin, admin.ModelAdmin):
