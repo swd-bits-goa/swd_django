@@ -1824,7 +1824,7 @@ def studentDetails(request,id=None):
 
 
 @login_required
-def documents(request):
+def notices(request):
     if request.user.is_authenticated:
         if is_warden(request.user):
             warden = Warden.objects.get(user=request.user)
@@ -1905,7 +1905,7 @@ def documents(request):
                 'bonafides': bonafides,
                 'daypasss': daypasss,
             }
-    return render(request,"documents.html",context)
+    return render(request,"notices.html",context)
 
 def latecomer(request):
     if request.user.is_authenticated:
