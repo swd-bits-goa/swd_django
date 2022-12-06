@@ -173,8 +173,14 @@ class LeaveAdmin(ImportExportModelAdmin, admin.ModelAdmin):
         return [f for f in formats if f().can_export()]
 
 @admin.register(Due)
-class DueAdmin(admin.ModelAdmin):
+class DueAdmin(ExportActionModelAdmin, admin.ModelAdmin):
     search_fields = ['student__name','student__bitsId','amount','due_category__name','description','date_added']
     list_display = ('student', 'amount','due_category','date_added',)
+
+    def get_export_formats(self):
+        formats = (
+            base_formats.XLS,
+        )
+        return [f for f in formats if f().can_export()]
 
 admin.site.register(models)
