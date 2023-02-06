@@ -12,13 +12,13 @@
                     {% if vacation %}
                     <span class="card-title">Apply for {{ vacation.get_leave_comment }}</span>
                         <p class="light-blue-text">
-                        <!-- Make sure your vacation dates are between
-                        {{ vacation.allowDateAfter.date }} and {{ vacation.allowDateBefore.date }} -->
+                        Make sure your vacation dates are between
+                        {{ vacation.allowDateAfter.date }} and {{ vacation.allowDateBefore.date }}
 
 
                         <!-- Temporary change, to be reverted when allow date before is determined -->
-                        Make sure your vacation dates are after
-                        {{ vacation.allowDateAfter.date }}
+                        <!-- Make sure your vacation dates are after
+                        {{ vacation.allowDateAfter.date }} -->
                         </p>
                         <p>
                         {% if errors %}
@@ -52,10 +52,10 @@
                             Vacation Leave successfully recorded.
                         </p>
                         <div class="green-text">
-                            <!-- Leave applied from {{ student_vacation.dateTimeStart}} to {{ student_vacation.dateTimeEnd }} -->
+                            Leave applied from {{ student_vacation.dateTimeStart}} to {{ student_vacation.dateTimeEnd }}
 
                             <!-- Temporary change, to be reverted when allow date before is determined -->
-                            Leave applied from {{ student_vacation.dateTimeStart}}
+                            <!-- Leave applied from {{ student_vacation.dateTimeStart}} -->
                         </div>
                         
                         {% else %}
