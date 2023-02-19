@@ -2381,6 +2381,10 @@ def add_new_students(request):
             created = False
             idx = 1
             header = {}
+            # Create a list of objects to be created (For bulk creation)
+            creation_list = []
+            # creation_threshold -> Arbitrary maximum number of objects to be stored in memory before creating in bulk
+            creation_threshold = 150
             for sheet in workbook.sheets():
                 for row in sheet.get_rows():
                     if idx == 1:
@@ -2495,7 +2499,15 @@ def add_new_students(request):
                             parentName=str(row[header['fname']].value)[:50],
                             parentPhone=str(row[header['parent mobno']].value)[:20],
                             parentEmail=str(row[header['parent mail']].value)[:50])
-                            obj.save()
+                            # Add to creation list
+                            creation_list.append(obj)
+                            
+                            if len(creation_list) == creation_threshold:
+                                # Create these student objects in bulk
+                                Student.objects.bulk_create(creation_list)
+                                # print(f">> CREATED IN BULK (at {count_created+1})")
+                                creation_list.clear()
+
                             created = True
                         if created:
                             count_created = count_created + 1
@@ -2503,7 +2515,10 @@ def add_new_students(request):
                             count = count + 1
                     except Exception:
                         message_str + studentID + " failed"
-                            
+
+            # Create these student objects in bulk
+            Student.objects.bulk_create(creation_list)
+
             message_str = str(count_created) + " new students added," + "\n" + str(count) + " students updated."
         else:
             message_str = "No File Uploaded."
@@ -2681,6 +2696,10 @@ def update_hostel(request):
             count = 0
             idx = 1
             header = {}
+            # Create a list of objects to be created (For bulk creation)
+            creation_list = []
+            # creation_threshold -> Arbitrary maximum number of objects to be stored in memory before creating in bulk
+            creation_threshold = 150
             for sheet in workbook.sheets():
                 for row in sheet.get_rows():
                     if idx == 1:
@@ -2739,12 +2758,29 @@ def update_hostel(request):
                                 room = str(row[header['Room']].value)
                         else:
                             room = ''
-                        HostelPS.objects.create(student=student, hostel=new_hostel, room=room, acadstudent=acadstudent, status=status, psStation="")
+
+                        # If a student is there in the sheet but not in the database, ignore
+                        if(student == None):
+                            continue
+
+                        hostelps = HostelPS(student=student, hostel=new_hostel, room=room, acadstudent=acadstudent, status=status, psStation="")
+                        creation_list.append(hostelps)
+                            
+                        if len(creation_list) == creation_threshold:
+                            # Create these hostelps objects in bulk
+                            HostelPS.objects.bulk_create(creation_list)
+                            # print(f">> CREATED IN BULK (at {count_created+1})")
+                            creation_list.clear()
+
                         count = count + 1
                     if message_str is not '':
                         messages.add_message(request,
                             message_tag, 
                             message_str)
+
+            # Create these student objects in bulk
+            HostelPS.objects.bulk_create(creation_list)
+
             message_str = str(count) + " Updated students' hostel"
         else:
             message_str = "No File Uploaded."
