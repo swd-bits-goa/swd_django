@@ -38,6 +38,70 @@ import json
 
 from calendar import monthrange
 
+@user_passes_test(lambda a: a.is_superuser)
+def view_duplicates(request, end_year:str):
+    """
+    Shows duplicate students from year 2000 to the given end_year (default: current year)
+    URL: admin/view_duplicates/<optional end_year>
+    """
+    students = []
+
+    # If the end year isn't given, default to current year
+    if end_year == None:
+        end_year = datetime.now().year
+    # Limit end_year to [2000, <current year>]
+    end_year = max(2000, min(datetime.now().year, int(end_year)))
+
+    years = [2000, int(end_year)+1]
+    for year in range(*years):
+        students.extend(Student.objects.filter(bitsId__startswith=str(year)))
+    
+    # students -> list of Student objects in the given range of years
+
+    id_dict = {}
+    duplicate_list = []
+    nulls = []
+    fields = ['admit', 'bDay']
+    for idx, student in enumerate(students):
+        # If student hasn't been seen before
+        # Add to set of ids and continue
+        if not student.bitsId in id_dict:
+            id_dict[student.bitsId] = idx
+            continue
+    
+        # At this point we know that `student` has been seen before
+
+        s1 = student
+        s2 = students[id_dict[student.bitsId]]
+
+        # Identify which of s1 and s2 is the inferior duplicate
+        inferior = None
+        master = None
+        for field in fields:
+            f1 = getattr(s1, field)
+            f2 = getattr(s2, field)
+            if f1==None and f2==None: continue
+            if f1!=None and f2!=None: continue
+            if f1:
+                master = s1 
+                inferior = s2
+                break
+            master = s2
+            inferior = s1
+            break
+        if inferior == None:
+            # Contingency in case somehow both objects have all fields
+            nulls.append(s1)
+        else:
+            duplicate_list.append([master, inferior])
+
+    # duplicate_list -> list of [master object, inferior object] lists
+
+    return render(request, "view_duplicates.html", {
+        "students": duplicate_list,
+        "start_year": 2000,
+        "end_year": end_year,
+    })
 
 def noPhD(func):
     def check(request, *args, **kwargs):

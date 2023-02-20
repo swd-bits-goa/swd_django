@@ -1,0 +1,28 @@
+{% extends 'indexbase.html' %}
+
+{% block content %}
+
+<div class="bg-green center-align #074d55">
+    <h3><b style="font-weight: 900; text-transform: uppercase;">Duplicate Students</b> {{ start_year }} - {{ end_year }} (<i>{{ students|length }} results</i>)</h3>
+    <p>Put the <b>ending year</b> at the end of the URL (example: /view_duplicates/2014)</p>
+</div>
+
+<table class="centered bordered striped">
+    <tr>
+        <th style="text-align: center">More Details</th>
+        <th style="text-align: center">Less Details (Should be deleted)</th>
+        <th style="text-align: center">Name</th>
+        <th style="text-align: center">ID</th>
+    </tr>
+    
+    {% for student_master,student_inferior in students %}
+    <tr align="center">
+        <td><a href="../main/student/{{student_master.pk}}/change/">{{ student_master.pk }}</a></td>
+        <td><a href="../main/student/{{student_inferior.pk}}/change/">{{ student_inferior.pk }}</a></td>
+        <td>{{ student_master.name }}</td>
+        <td>{{ student_master.bitsId }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}
