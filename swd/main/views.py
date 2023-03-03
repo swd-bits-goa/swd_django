@@ -3236,7 +3236,7 @@ def export_mess_leave(request):
     students = MessOption.objects.filter(mess=mess).values_list("student", flat=True)
 
     # This is a query for getting leaves of these students if they intersect the selected duration
-    query = Q(student__in=students) & (
+    query = Q(student__in=students) & ( 
         Q(dateTimeStart__month__exact=month, dateTimeStart__year__exact=year) |\
         Q(dateTimeEnd__month__exact=month, dateTimeEnd__year__exact=year)
     )

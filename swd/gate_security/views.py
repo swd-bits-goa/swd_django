@@ -155,7 +155,7 @@ def gate_security(request):
                     inout.place = place
                     inout.inCampus = False
                     inout.outDateTime = datetime.now()
-                    inout.inDateTime = None
+                    inout.inDateTime = inout.inDateTime
                     inout.save()
 
                     if leave_check:
@@ -185,7 +185,7 @@ def gate_security(request):
                     inout.place = place
                     inout.inCampus = True
                     inout.inDateTime = datetime.now()
-                    inout.outDateTime = None
+                    inout.outDateTime = inout.outDateTime
                     if inout.onLeave == True:
                         inout.onLeave = False
                         leave.inprocess = False
