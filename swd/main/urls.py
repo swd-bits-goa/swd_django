@@ -78,4 +78,6 @@ urlpatterns = [
     url(r'^admin/get_cor_add', views.get_corr_address, name='get_corr_address'),
     url(r'^admin/delete_students/',views.delete_students, name='delete_students'),
 
+    url(r'^admin/view_duplicates/(?P<end_year>\d+)?/?', views.view_duplicates, name='view_duplicates'),
+
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

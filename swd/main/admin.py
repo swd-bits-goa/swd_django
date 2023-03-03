@@ -129,6 +129,7 @@ delete_students.description = u"Delete Students from Excel"
 @admin.register(Student)
 class StudentAdmin(ExportMixin, admin.ModelAdmin):
     search_fields = ['name', 'bitsId', 'user__username']
+    list_display = ['name', 'bitsId', 'gender', 'phone']
     actions = [add_new_students, delete_students ]
     resource_class = StudentResource
     def get_export_formats(self):
