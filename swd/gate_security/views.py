@@ -10,6 +10,7 @@ from main.templatetags.main_extras import is_hostelsuperintendent, is_warden, is
 import swd.config as config
 from datetime import date, datetime, timedelta, time
 from dateutil import rrule, parser
+from django.core.exceptions import MultipleObjectsReturned
 from django.contrib import messages
 import xlwt
 
@@ -71,6 +72,11 @@ def gate_security(request):
                                 allowDateAfter__lte=datetime.today().date(),
                                 allowDateBefore__gte=datetime.today().date()
                 )
+            except MultipleObjectsReturned:
+                vacationdates = VacationDatesFill.objects.filter(
+                                allowDateAfter__lte=datetime.today().date(),
+                                allowDateBefore__gte=datetime.today().date()
+                ).first()                
             except VacationDatesFill.DoesNotExist:
                 vacationdates = None
             print(vacationdates)
