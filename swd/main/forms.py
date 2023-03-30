@@ -132,19 +132,19 @@ class DayPassForm(forms.ModelForm):
 class VacationLeaveNoMessForm(forms.Form):
     out_date = forms.CharField(label='Out Date', widget=forms.TextInput(attrs={'class': 'datepicker mask'}))
     # <!-- Temporary change, to be reverted when allow date before is determined -->
-    # in_date = forms.CharField(label='In Date', widget=forms.TextInput(attrs={'class': 'datepicker mask'}))
+    in_date = forms.CharField(label='In Date', widget=forms.TextInput(attrs={'class': 'datepicker mask'}))
     
     def clean(self):
         cleaned_data = super(VacationLeaveNoMessForm, self).clean()
         out_date = datetime.strptime(cleaned_data['out_date'], '%d %B, %Y').date()
         # <!-- Temporary change, to be reverted when allow date before is determined -->
-        # in_date = datetime.strptime(cleaned_data['in_date'], '%d %B, %Y').date()
+        in_date = datetime.strptime(cleaned_data['in_date'], '%d %B, %Y').date()
 
-        # if out_date >= in_date:
-        #     self.add_error(
-        #             'in_date',
-        #             "Vacation dates are inconsistent."
-        #     )
+        if out_date >= in_date:
+            self.add_error(
+                    'in_date',
+                    "Vacation dates are inconsistent."
+            )
         return cleaned_data
 
     class Meta:

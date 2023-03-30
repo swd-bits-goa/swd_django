@@ -678,9 +678,9 @@ def vacation_no_mess(request):
         if request.POST:
             form = VacationLeaveNoMessForm(request.POST)
             if form.is_valid():
-                # in_date = datetime.strptime(request.POST.get('in_date'), '%d %B, %Y').date()
+                in_date = datetime.strptime(request.POST.get('in_date'), '%d %B, %Y').date()
                 # <!-- Temporary change, to be reverted when allow date before is determined -->
-                in_date = datetime(2023, 3, 10).date()
+                # in_date = datetime(2023, 3, 10).date()
 
                 time0 = time.min
                 out_date = datetime.strptime(request.POST.get('out_date'), '%d %B, %Y').date()
