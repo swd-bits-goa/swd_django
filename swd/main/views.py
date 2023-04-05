@@ -1860,10 +1860,32 @@ def sac(request):
     return render(request,"sac.html",{})
     
 def contact(request):
-    context = {
-        'warden' : Warden.objects.all() 
-    }
-    return render(request,"contact.html",context)
+     #imagesup = os.listdir("assets/img/superintendents")
+     #print(imagesup)
+     sid = HostelSuperintendent.objects.all()
+     wa = Warden.objects.all()
+     sup = []
+     asup = []
+     bw = []
+     gw = []
+     for s in sid:
+         if s.chamber[1:2] == "H":
+             sup.append(s)
+         else:
+             asup.append(s)
+     for w in wa:
+         if w.hostel != "CH4" and w.hostel != "CH7" and w.hostel != "CH5" and w.hostel!="CH6":
+             bw.append(w)
+         else:
+             gw.append(w)
+     context = {
+         'sup': sup,
+         'asup': asup,
+         'bw': bw,
+         'gw': gw,
+         #'isup':imagesup
+     }
+     return render(request, "contact.html", context)
 
 def studentDetails(request,id=None):
     option = get_base_template(request)
