@@ -1869,12 +1869,13 @@ def contact(request):
      bw = []
      gw = []
      for s in sid:
-         if s.chamber[1:2] == "H":
+         if s.chamber!= None and s.chamber[1:2] == "H":
              sup.append(s)
-         else:
+         elif s.chamber!= None and s.chamber[1:2]!="H":
              asup.append(s)
+              
      for w in wa:
-         if w.hostel != "CH4" and w.hostel != "CH7" and w.hostel != "CH5" and w.hostel!="CH6":
+         if w.hostel!=None and w.hostel != "CH4" and w.hostel != "CH7" and w.hostel != "CH5" and w.hostel!="CH6":
              bw.append(w)
          else:
              gw.append(w)
