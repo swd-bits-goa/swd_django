@@ -38,6 +38,8 @@ import json
 
 from calendar import monthrange
 
+from pytz import timezone
+
 @user_passes_test(lambda a: a.is_superuser)
 def view_duplicates(request, end_year:str):
     """
@@ -3461,8 +3463,8 @@ def leave_export(request):
             row = [
                 obj.bitsId,
                 obj.name,
-                str(i.dateTimeStart.date()),
-                str(i.dateTimeEnd.date()),
+                str(i.dateTimeStart.astimezone(timezone("Asia/Kolkata")).date()),
+                str(i.dateTimeEnd.astimezone(timezone("Asia/Kolkata")).date()),
             ]
             row_num += 1
             for col_num in range(len(row)):
