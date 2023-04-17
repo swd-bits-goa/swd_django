@@ -681,8 +681,6 @@ def vacation_no_mess(request):
             form = VacationLeaveNoMessForm(request.POST)
             if form.is_valid():
                 in_date = datetime.strptime(request.POST.get('in_date'), '%d %B, %Y').date()
-                # <!-- Temporary change, to be reverted when allow date before is determined -->
-                # in_date = datetime(2023, 3, 10).date()
 
                 time0 = time.min
                 out_date = datetime.strptime(request.POST.get('out_date'), '%d %B, %Y').date()
@@ -716,6 +714,9 @@ def vacation_no_mess(request):
         else:
             errors = []
             context['option1'] = 0
+            if vacation_open and vacation_open.forceInDate == True:
+                # If forceInDate is enabled, set in_date to the vacation in-date
+                form.fields["in_date"].initial = vacation_open.allowDateBefore.strftime('%d %B, %Y')
     else:
         if vacation_open is None:
             context['option1'] = 1

@@ -589,7 +589,9 @@ class VacationDatesFill(models.Model):
         blank=True,
         null=True,
         default=None,
-        help_text="Mess Option for the months (if any) near corresponding Vacation")
+        help_text="Mess Option for the months (if any) near corresponding Vacation"
+    )
+    forceInDate = models.BooleanField(default=False, help_text="`allowDateBefore` becomes the default in-date for leaves")
 
     class Meta:
         verbose_name = "Vacation Dates Option"
