@@ -10,6 +10,7 @@ from django.contrib import messages
 from django.utils.timezone import make_aware
 from django.core.mail import send_mail
 from django.conf import settings
+from django.core.files.storage import default_storage
 from tools.utils import gen_random_datetime
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -3864,6 +3865,33 @@ def upload_profile_pictures(request):
                 request, "No folder selected. Please select at least one.")
        
     return render(request, "upload_profile_pictures.html", {})
+
+@user_passes_test(lambda u: u.is_superuser)
+def upload_contact_pictures(request):
+    if request.POST:
+        if request.FILES:
+            error_files = []
+            successfull = 0
+            for filex in request.FILES.getlist('folder'):
+                file_name = filex.name
+                try:
+                    path = default_storage.save(file_name, filex)
+                    successfull+=1
+                except Exception:
+                    error_files.append(file_name.lower())
+            
+            if len(error_files):
+                messages.error(
+                    request,
+                    str(len(error_files)) + " IDs did not match: " + \
+                        ", ".join(error_files))
+            if (successfull):
+                messages.success(request, str(successfull) + " files uploaded.")
+        # else:
+        #     messages.error(
+        #         request, "No folder selected. Please select at least one.")
+       
+    return render(request, "upload_contact_pictures.html", {})
 
 @user_passes_test(lambda u: u.is_superuser)
 def delete_students(request):
