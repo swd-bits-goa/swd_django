@@ -1,12 +1,11 @@
 from django.contrib import admin
 from django.contrib.admin.options import ModelAdmin
 from django.shortcuts import redirect
-from main.models import *
 from django.utils.html import format_html
 import urllib
 from django.http import HttpResponseRedirect, HttpResponse
 import datetime
-from .models import MessBill, Leave
+from .models import *
 from calendar import monthrange
 from import_export import resources
 from import_export.formats import base_formats
@@ -31,7 +30,6 @@ models = [
     AntiRagging,
     DueCategory,
     DuesPublished,
-    VacationDatesFill,
     Security
 ]
 
@@ -53,6 +51,11 @@ class DocumentAdmin(admin.ModelAdmin):
     search_fields = ['title']
     list_display = ['title', 'hostel']
     list_filter = ['hostel']
+
+@admin.register(VacationDatesFill)
+class VacationDatesFillAdmin(admin.ModelAdmin):
+    search_fields = ['description']
+    list_display = ['description', 'dateOpen', 'dateClose']
 
 @admin.register(Disco)
 class DiscoAdmin(ExportMixin, admin.ModelAdmin):

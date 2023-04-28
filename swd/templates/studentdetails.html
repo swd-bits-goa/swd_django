@@ -39,7 +39,11 @@
                 </tr>
                 <tr>
                     <td>Phone</td>
-                    <td>{{ student.phone|floatformat:"0" }}</td>
+                    {% if "/" not in student.phone %}
+                        <td>{{ student.phone|floatformat:"0" }}</td>
+                    {% else %}
+                        <td>{{ student.phone }}</td>
+                    {% endif %}
                 </tr>                
                 <tr>
                     <td>Address</td>
