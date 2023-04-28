@@ -72,6 +72,7 @@ urlpatterns = [
     url(r'^admin/upload_latecomer/', views.upload_latecomer, name='update_latecomer'),
     url(r'^admin/upload_disco/', views.upload_disco, name='update_disco'),
     url(r'^admin/upload_profile_pictures', views.upload_profile_pictures, name="upload_profile_pictures"),
+    url(r'^admin/upload_contact_pictures', views.upload_contact_pictures, name="upload_contact_pictures"),
     url(r'^leave_export/', views.leave_export, name='leave_export'),
     url(r'^leave_import/', views.leave_import, name='leave_import'),
     url(r'^hostel_export/', views.hostel_export, name='hostel_export'),
