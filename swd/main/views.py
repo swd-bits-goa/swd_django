@@ -136,9 +136,13 @@ def index(request):
         except EmptyPage:
             notices = paginator.page(paginator.num_pages)
 
+        sf = Staff.objects.all()
+
         context = {
+            'sf' : sf,
             'queryset' : notices,
         }
+
         return render(request, 'home.html',context)
 
 
@@ -3887,9 +3891,9 @@ def upload_contact_pictures(request):
                         ", ".join(error_files))
             if (successfull):
                 messages.success(request, str(successfull) + " files uploaded.")
-        # else:
-        #     messages.error(
-        #         request, "No folder selected. Please select at least one.")
+        else:
+            messages.error(
+                request, "No folder selected. Please select at least one.")
        
     return render(request, "upload_contact_pictures.html", {})
 

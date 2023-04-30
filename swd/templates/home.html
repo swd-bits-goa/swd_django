@@ -1,5 +1,6 @@
 {% extends 'indexbase.html' %}
 {% load staticfiles %}
+{% load static %}
 {% block content %}
 
 <div class="backdrop-container">
@@ -52,51 +53,17 @@
             <div class="col s12 m12 l12">
                 <h4 style="text-align: center;">Meet Our Staff</h4>
                 <div class="staff-container">
+                {% for s in sf %}
                     <div class="staff">
                         <div class="staff__photo">
-                            <img src="{% static 'img/staff/Namrata Sawant.jpg' %}" alt="">
+                            <img src="{% get_media_prefix %}{{s.name}}.jpg" alt="">
                         </div>
                         <div class="staff__description">
-                            <h5>Ms. Namrata Sawant</h5>
-                            <p>Junior Officer, SWD<br>+91 0832 2580148</p>
+                            <h5>{{s.name}}</h5>
+                            <p>{{s.staffType}}<br>{{s.phone}}</p>
                         </div>
                     </div>
-                    <div class="staff">
-                        <div class="staff__photo">
-                            <img src="{% static 'img/staff/Kalpita Desai.jpg' %}" alt="">
-                        </div>
-                        <div class="staff__description">
-                            <h5>Ms. Kalpita Desai</h5>
-                            <p>Programmer Gr-II, SWD<br>+91 0832 2580148</p>
-                        </div>
-                    </div>
-                    <div class="staff">
-                        <div class="staff__photo">
-                            <img src="{% static 'img/staff/Sunita Prabhudesai.jpg' %}" alt="">
-                        </div>
-                        <div class="staff__description">
-                            <h5>Ms. Sunita Prabhudesai</h5>
-                            <p>Office Assistant, SWD<br>+91 0832 2580157</p>
-                        </div>
-                    </div>
-                    <div class="staff">
-                        <div class="staff__photo">
-                            <img src="{% static 'img/staff/Sonali Naik.jpg' %}" alt="">
-                        </div>
-                        <div class="staff__description">
-                            <h5>Ms. Sonali Naik</h5>
-                            <p>Junior Officer, SWD<br>+91 0832 2580157</p>
-                        </div>
-                    </div>
-                    <div class="staff">
-                        <div class="staff__photo">
-                            <img src="{% static 'img/staff/Santosh Kumar Biswal.jpg' %}" alt="">
-                        </div>
-                        <div class="staff__description">
-                            <h5>Mr. Santosh Biswal</h5>
-                            <p>Operation Assistant, SWD<br>+91 8956271338</p>
-                        </div>
-                    </div>
+                {% endfor %}
                 </div>
             </div>
         </div>
