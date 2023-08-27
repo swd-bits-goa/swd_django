@@ -407,7 +407,18 @@ class MessOptionOpen(models.Model):
     monthYear = models.DateField()
     dateOpen = models.DateField()
     dateClose = models.DateField()
-    capacity = models.IntegerField(null=True)
+    # capacity = models.IntegerField(null=True)
+    capacity_A = models.IntegerField("Capacity for A mess", null=True)
+    capacity_C = models.IntegerField("Capacity for C mess", null=True)
+    capacity_D = models.IntegerField("Capacity for D mess", null=True)
+
+    def get_capacity(self, mess):
+        if not mess in ["A", "C", "D"]: return 0
+        return {
+            "A": self.capacity_A,
+            "C": self.capacity_C,
+            "D": self.capacity_D
+        }[mess]
 
     def __str__(self):
         return str(self.monthYear.month) + ' Open: ' + str(self.dateOpen) + ' Close: ' + str(self.dateClose)

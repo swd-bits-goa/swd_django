@@ -556,8 +556,8 @@ def messoption(request):
             # edit = True if there IS a current messoption, else False
             edit = True if (messopen_current and messoption and messoption.monthYear == messopen_current.monthYear) else False
 
-            if messopen_current.capacity != None:
-                if MessOption.objects.filter(monthYear=messopen_current.monthYear, mess=mess).count() < messopen_current.capacity:
+            if messopen_current.get_capacity(mess) != None:
+                if MessOption.objects.filter(monthYear=messopen_current.monthYear, mess=mess).count() < messopen_current.get_capacity(mess):
                     # Mess isn't full, so create the messoption
                     if edit:
                         messoption.student = student
