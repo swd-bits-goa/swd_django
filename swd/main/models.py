@@ -555,10 +555,24 @@ class Notice(models.Model):
 class Document(models.Model):
     title = models.CharField(max_length=100)
     file = models.ForeignKey(FileAdd, on_delete=models.CASCADE, null=True, blank=True)
-    hostel = models.CharField(max_length=5, choices=HOSTELS, null=True, blank=True) # blank = meant for all hostels
+    hostels = models.TextField("List of hostels", name="hostels", null=True, blank=True)
+
+    def save(self, *args, **kwargs) -> None:
+        # Clean the 'hostels' field
+        import re
+        hostel_list = re.split(r'\s+', self.hostels.upper().replace(",", " "))
+
+        hostel_set = set()
+        for i in hostel_list:
+            if i in ['AH1','AH2','AH3','AH4','AH5','AH6','AH7','AH8','AH9','CH1','CH2','CH3','CH4','CH5','CH6','CH7','DH1','DH2','DH3','DH4','DH5','DH6',]:
+                hostel_set.add(i)
+        
+        self.hostels = ', '.join(hostel_set)
+        
+        super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"(hostel: {self.hostel or 'all'}) {self.title}"
+        return f"{self.title} ({self.hostels or 'all'})"
 
 
 class AntiRagging(models.Model):
