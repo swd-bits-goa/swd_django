@@ -15,9 +15,6 @@
                             Make sure your vacation dates are between {{ vacation.allowDateAfter.date }} and {{ vacation.allowDateBefore.date }}
                         </p>
                         {% if vacation.forceInDate %}
-                        <p class="light-blue-text">
-                            By default the in-date will be set to {{ vacation.allowDateBefore.date }}
-                        </p>
                         {% endif %}
                         <p>
                         {% if errors %}
@@ -59,8 +56,6 @@
                             Vacation Leave successfully recorded.
                         </p>
                         <div class="green-text">
-                            Leave applied from {{ student_vacation.dateTimeStart}} to {{ student_vacation.dateTimeEnd }}
-
                             <!-- Temporary change, to be reverted when allow date before is determined -->
                             <!-- Leave applied from {{ student_vacation.dateTimeStart}} -->
                         </div>
