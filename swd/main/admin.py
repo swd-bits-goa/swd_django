@@ -49,8 +49,8 @@ class HostelPSAdmin(ExportMixin, admin.ModelAdmin):
 @admin.register(Document)
 class DocumentAdmin(admin.ModelAdmin):
     search_fields = ['title']
-    list_display = ['title', 'hostel']
-    list_filter = ['hostel']
+    list_display = ['title', 'hostels']
+    list_filter = ['hostels']
 
 @admin.register(VacationDatesFill)
 class VacationDatesFillAdmin(admin.ModelAdmin):

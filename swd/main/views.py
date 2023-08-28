@@ -246,7 +246,8 @@ def dashboard(request):
     hostelps = HostelPS.objects.filter(student=student).first()
     if hostelps:
         # Hostel found, now get documents with that hostel
-        hostel_documents = Document.objects.filter(hostel=hostelps.hostel)
+        hostel_document_query = Q(hostels__contains=hostelps.hostel) | Q(hostels = '')
+        hostel_documents = Document.objects.filter(hostel_document_query)
     if len(hostel_documents) != 0:
         context.update({
             'hostel_documents': hostel_documents,
@@ -555,8 +556,8 @@ def messoption(request):
             # edit = True if there IS a current messoption, else False
             edit = True if (messopen_current and messoption and messoption.monthYear == messopen_current.monthYear) else False
 
-            if messopen_current.capacity != None:
-                if MessOption.objects.filter(monthYear=messopen_current.monthYear, mess=mess).count() < messopen_current.capacity:
+            if messopen_current.get_capacity(mess) != None:
+                if MessOption.objects.filter(monthYear=messopen_current.monthYear, mess=mess).count() < messopen_current.get_capacity(mess):
                     # Mess isn't full, so create the messoption
                     if edit:
                         messoption.student = student
