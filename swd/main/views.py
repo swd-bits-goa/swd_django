@@ -1993,7 +1993,7 @@ def notices(request):
             context = {
                 'option1' : 'base.html',
                 'student' : student,
-                'queryset' : Document.objects.all().order_by('-pk').filter(Q(hostel=hostelps.hostel) | Q(hostel=None)),
+                'queryset' : Document.objects.all().order_by('-pk').filter(Q(hostels__contains=hostelps.hostel) | Q(hostel=None)),
                 'option': option,
                 'mess': mess,
                 'balance': balance,
