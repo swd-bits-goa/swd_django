@@ -10,6 +10,7 @@ from django.contrib import messages
 from django.utils.timezone import make_aware
 from django.core.mail import send_mail
 from django.conf import settings
+from django.core.files.storage import default_storage
 from tools.utils import gen_random_datetime
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -38,6 +39,72 @@ import json
 
 from calendar import monthrange
 
+from pytz import timezone
+
+@user_passes_test(lambda a: a.is_superuser)
+def view_duplicates(request, end_year:str):
+    """
+    Shows duplicate students from year 2000 to the given end_year (default: current year)
+    URL: admin/view_duplicates/<optional end_year>
+    """
+    students = []
+
+    # If the end year isn't given, default to current year
+    if end_year == None:
+        end_year = datetime.now().year
+    # Limit end_year to [2000, <current year>]
+    end_year = max(2000, min(datetime.now().year, int(end_year)))
+
+    years = [2000, int(end_year)+1]
+    for year in range(*years):
+        students.extend(Student.objects.filter(bitsId__startswith=str(year)))
+    
+    # students -> list of Student objects in the given range of years
+
+    id_dict = {}
+    duplicate_list = []
+    nulls = []
+    fields = ['admit', 'bDay']
+    for idx, student in enumerate(students):
+        # If student hasn't been seen before
+        # Add to set of ids and continue
+        if not student.bitsId in id_dict:
+            id_dict[student.bitsId] = idx
+            continue
+    
+        # At this point we know that `student` has been seen before
+
+        s1 = student
+        s2 = students[id_dict[student.bitsId]]
+
+        # Identify which of s1 and s2 is the inferior duplicate
+        inferior = None
+        master = None
+        for field in fields:
+            f1 = getattr(s1, field)
+            f2 = getattr(s2, field)
+            if f1==None and f2==None: continue
+            if f1!=None and f2!=None: continue
+            if f1:
+                master = s1 
+                inferior = s2
+                break
+            master = s2
+            inferior = s1
+            break
+        if inferior == None:
+            # Contingency in case somehow both objects have all fields
+            nulls.append(s1)
+        else:
+            duplicate_list.append([master, inferior])
+
+    # duplicate_list -> list of [master object, inferior object] lists
+
+    return render(request, "view_duplicates.html", {
+        "students": duplicate_list,
+        "start_year": 2000,
+        "end_year": end_year,
+    })
 
 def noPhD(func):
     def check(request, *args, **kwargs):
@@ -69,9 +136,13 @@ def index(request):
         except EmptyPage:
             notices = paginator.page(paginator.num_pages)
 
+        sf = Staff.objects.all()
+
         context = {
+            'sf' : sf,
             'queryset' : notices,
         }
+
         return render(request, 'home.html',context)
 
 
@@ -175,7 +246,8 @@ def dashboard(request):
     hostelps = HostelPS.objects.filter(student=student).first()
     if hostelps:
         # Hostel found, now get documents with that hostel
-        hostel_documents = Document.objects.filter(hostel=hostelps.hostel)
+        hostel_document_query = Q(hostels__contains=hostelps.hostel)
+        hostel_documents = Document.objects.filter(hostel_document_query)
     if len(hostel_documents) != 0:
         context.update({
             'hostel_documents': hostel_documents,
@@ -484,8 +556,8 @@ def messoption(request):
             # edit = True if there IS a current messoption, else False
             edit = True if (messopen_current and messoption and messoption.monthYear == messopen_current.monthYear) else False
 
-            if messopen_current.capacity != None:
-                if MessOption.objects.filter(monthYear=messopen_current.monthYear, mess=mess).count() < messopen_current.capacity:
+            if messopen_current.get_capacity(mess) != None:
+                if MessOption.objects.filter(monthYear=messopen_current.monthYear, mess=mess).count() < messopen_current.get_capacity(mess):
                     # Mess isn't full, so create the messoption
                     if edit:
                         messoption.student = student
@@ -615,8 +687,6 @@ def vacation_no_mess(request):
             form = VacationLeaveNoMessForm(request.POST)
             if form.is_valid():
                 in_date = datetime.strptime(request.POST.get('in_date'), '%d %B, %Y').date()
-                # <!-- Temporary change, to be reverted when allow date before is determined -->
-                # in_date = datetime(2023, 1, 3).date()
 
                 time0 = time.min
                 out_date = datetime.strptime(request.POST.get('out_date'), '%d %B, %Y').date()
@@ -650,6 +720,9 @@ def vacation_no_mess(request):
         else:
             errors = []
             context['option1'] = 0
+            if vacation_open and vacation_open.forceInDate == True:
+                # If forceInDate is enabled, set in_date to the vacation in-date
+                form.fields["in_date"].initial = vacation_open.allowDateBefore.strftime('%d %B, %Y')
     else:
         if vacation_open is None:
             context['option1'] = 1
@@ -1796,10 +1869,33 @@ def sac(request):
     return render(request,"sac.html",{})
     
 def contact(request):
-    context = {
-        'warden' : Warden.objects.all() 
-    }
-    return render(request,"contact.html",context)
+     #imagesup = os.listdir("assets/img/superintendents")
+     #print(imagesup)
+     sid = HostelSuperintendent.objects.all()
+     wa = Warden.objects.all()
+     sup = []
+     asup = []
+     bw = []
+     gw = []
+     for s in sid:
+         if s.chamber!= None and s.chamber[1:2] == "H":
+             sup.append(s)
+         elif s.chamber!= None and s.chamber[1:2]!="H":
+             asup.append(s)
+              
+     for w in wa:
+         if w.hostel!=None and w.hostel != "CH4" and w.hostel != "CH7" and w.hostel != "CH5" and w.hostel!="CH6":
+             bw.append(w)
+         else:
+             gw.append(w)
+     context = {
+         'sup': sup,
+         'asup': asup,
+         'bw': bw,
+         'gw': gw,
+         #'isup':imagesup
+     }
+     return render(request, "contact.html", context)
 
 def studentDetails(request,id=None):
     option = get_base_template(request)
@@ -1897,7 +1993,7 @@ def notices(request):
             context = {
                 'option1' : 'base.html',
                 'student' : student,
-                'queryset' : Document.objects.all().order_by('-pk').filter(Q(hostel=hostelps.hostel) | Q(hostel=None)),
+                'queryset' : Document.objects.all().order_by('-pk').filter(Q(hostels__contains=hostelps.hostel) | Q(hostels=None)),
                 'option': option,
                 'mess': mess,
                 'balance': balance,
@@ -2381,6 +2477,10 @@ def add_new_students(request):
             created = False
             idx = 1
             header = {}
+            # Create a list of objects to be created (For bulk creation)
+            creation_list = []
+            # creation_threshold -> Arbitrary maximum number of objects to be stored in memory before creating in bulk
+            creation_threshold = 150
             for sheet in workbook.sheets():
                 for row in sheet.get_rows():
                     if idx == 1:
@@ -2495,7 +2595,15 @@ def add_new_students(request):
                             parentName=str(row[header['fname']].value)[:50],
                             parentPhone=str(row[header['parent mobno']].value)[:20],
                             parentEmail=str(row[header['parent mail']].value)[:50])
-                            obj.save()
+                            # Add to creation list
+                            creation_list.append(obj)
+                            
+                            if len(creation_list) == creation_threshold:
+                                # Create these student objects in bulk
+                                Student.objects.bulk_create(creation_list)
+                                # print(f">> CREATED IN BULK (at {count_created+1})")
+                                creation_list.clear()
+
                             created = True
                         if created:
                             count_created = count_created + 1
@@ -2503,7 +2611,10 @@ def add_new_students(request):
                             count = count + 1
                     except Exception:
                         message_str + studentID + " failed"
-                            
+
+            # Create these student objects in bulk
+            Student.objects.bulk_create(creation_list)
+
             message_str = str(count_created) + " new students added," + "\n" + str(count) + " students updated."
         else:
             message_str = "No File Uploaded."
@@ -2681,6 +2792,10 @@ def update_hostel(request):
             count = 0
             idx = 1
             header = {}
+            # Create a list of objects to be created (For bulk creation)
+            creation_list = []
+            # creation_threshold -> Arbitrary maximum number of objects to be stored in memory before creating in bulk
+            creation_threshold = 150
             for sheet in workbook.sheets():
                 for row in sheet.get_rows():
                     if idx == 1:
@@ -2739,12 +2854,29 @@ def update_hostel(request):
                                 room = str(row[header['Room']].value)
                         else:
                             room = ''
-                        HostelPS.objects.create(student=student, hostel=new_hostel, room=room, acadstudent=acadstudent, status=status, psStation="")
+
+                        # If a student is there in the sheet but not in the database, ignore
+                        if(student == None):
+                            continue
+
+                        hostelps = HostelPS(student=student, hostel=new_hostel, room=room, acadstudent=acadstudent, status=status, psStation="")
+                        creation_list.append(hostelps)
+                            
+                        if len(creation_list) == creation_threshold:
+                            # Create these hostelps objects in bulk
+                            HostelPS.objects.bulk_create(creation_list)
+                            # print(f">> CREATED IN BULK (at {count_created+1})")
+                            creation_list.clear()
+
                         count = count + 1
                     if message_str is not '':
                         messages.add_message(request,
                             message_tag, 
                             message_str)
+
+            # Create these student objects in bulk
+            HostelPS.objects.bulk_create(creation_list)
+
             message_str = str(count) + " Updated students' hostel"
         else:
             message_str = "No File Uploaded."
@@ -3061,6 +3193,57 @@ def update_ids(request):
     return render(request, "add_students.html", {'header': "Update IDs"})
 
 @user_passes_test(lambda u: u.is_superuser)
+def update_names(request):
+    message_str = ''
+    message_tag = messages.INFO
+    if request.POST:
+        if request.FILES:
+            # Read Excel File into a temp file
+            xl_file = request.FILES['xl_file']
+            extension = xl_file.name.rsplit('.', 1)[1]
+            if ('xls' != extension):
+                if ('xlsx' != extension):
+                    messages.error(request, "Please upload .xls or .xlsx file only")
+                    messages.add_message(request,
+                                        message_tag, 
+                                        message_str)
+                    return render(request, "add_students.html", {'header': "Update Names"})
+
+            fd, tmp = tempfile.mkstemp()
+            with os.fdopen(fd, 'wb') as out:
+                out.write(xl_file.read())
+            workbook = xlrd.open_workbook(tmp)
+
+            count = 0
+            idx = 1
+            header = {}
+            for sheet in workbook.sheets():
+                for row in sheet.get_rows():
+                    if idx == 1:
+                        col_no = 0
+                        for cell in row:
+                            # Store the column names in dictionary
+                            header[str(cell.value)] = col_no
+                            col_no = col_no + 1
+                        idx = 0
+                        continue
+                    
+                    Student.objects.filter(
+                        bitsId=row[header['studentID']].value
+                        ).update(name=str(row[header['Name']].value))
+                    
+                    count = count + 1
+            message_str = str(count) + " Updated students' names"
+        else:
+            message_str = "No File Uploaded."
+
+    if message_str is not '':
+        messages.add_message(request,
+                            message_tag, 
+                            message_str)
+    return render(request, "add_students.html", {'header': "Update Names"})
+
+@user_passes_test(lambda u: u.is_superuser)
 def update_ps(request):
     message_str = ''
     message_tag = messages.INFO
@@ -3136,7 +3319,7 @@ def export_mess_leave(request):
     students = MessOption.objects.filter(mess=mess).values_list("student", flat=True)
 
     # This is a query for getting leaves of these students if they intersect the selected duration
-    query = Q(student__in=students) & (
+    query = Q(student__in=students) & ( 
         Q(dateTimeStart__month__exact=month, dateTimeStart__year__exact=year) |\
         Q(dateTimeEnd__month__exact=month, dateTimeEnd__year__exact=year)
     )
@@ -3338,8 +3521,8 @@ def leave_export(request):
             row = [
                 obj.bitsId,
                 obj.name,
-                str(i.dateTimeStart.date()),
-                str(i.dateTimeEnd.date()),
+                str(i.dateTimeStart.astimezone(timezone("Asia/Kolkata")).date()),
+                str(i.dateTimeEnd.astimezone(timezone("Asia/Kolkata")).date()),
             ]
             row_num += 1
             for col_num in range(len(row)):
@@ -3687,6 +3870,33 @@ def upload_profile_pictures(request):
                 request, "No folder selected. Please select at least one.")
        
     return render(request, "upload_profile_pictures.html", {})
+
+@user_passes_test(lambda u: u.is_superuser)
+def upload_contact_pictures(request):
+    if request.POST:
+        if request.FILES:
+            error_files = []
+            successfull = 0
+            for filex in request.FILES.getlist('folder'):
+                file_name = filex.name
+                try:
+                    path = default_storage.save(file_name, filex)
+                    successfull+=1
+                except Exception:
+                    error_files.append(file_name.lower())
+            
+            if len(error_files):
+                messages.error(
+                    request,
+                    str(len(error_files)) + " IDs did not match: " + \
+                        ", ".join(error_files))
+            if (successfull):
+                messages.success(request, str(successfull) + " files uploaded.")
+        else:
+            messages.error(
+                request, "No folder selected. Please select at least one.")
+       
+    return render(request, "upload_contact_pictures.html", {})
 
 @user_passes_test(lambda u: u.is_superuser)
 def delete_students(request):

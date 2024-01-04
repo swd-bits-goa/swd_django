@@ -12,14 +12,13 @@
                     {% if vacation %}
                     <span class="card-title">Apply for {{ vacation.get_leave_comment }}</span>
                         <p class="light-blue-text">
-                        Make sure your vacation dates are between
-                        {{ vacation.allowDateAfter.date }} and {{ vacation.allowDateBefore.date }}
-
-
-                        <!-- Temporary change, to be reverted when allow date before is determined -->
-                        <!-- Make sure your vacation dates are after
-                        {{ vacation.allowDateAfter.date }} -->
+                            Make sure your vacation dates are between {{ vacation.allowDateAfter.date }} and {{ vacation.allowDateBefore.date }}
                         </p>
+                        {% if vacation.forceInDate %}
+                        <p class="light-blue-text">
+                            By default the in-date will be set to {{ vacation.allowDateBefore.date }}
+                        </p>
+                        {% endif %}
                         <p>
                         {% if errors %}
                             {% for e in errors %}
@@ -36,9 +35,17 @@
                             {% csrf_token %}
                             <div class="col-md-12">
                                 {% for field in form %}
-                                <div class="input-field col s12">
-                                    {{ field }} {{ field.label_tag }}
-                                </div>
+
+                                <!-- Django templates don't allow parentheses -->
+                                <!-- if not (field.name == "in_date" and vacation.forceInDate)-->
+                                {% if field.name != "in_date" or not vacation.forceInDate %}
+                                    <div class="input-field col s12">
+                                        {{ field }} {{ field.label_tag }}
+                                    </div>
+                                {% else %}
+                                    {{ field.as_hidden }}
+                                {% endif %}
+
                                 {% endfor %}
                             </div>
                             <div class="col-xs-4">
@@ -80,9 +87,17 @@
                                             </div>
                                         {% endfor %}
                                         {% endif %}
-                                        <div class="input-field col s12">
-                                            {{ field }} {{ field.label_tag }}
-                                    </div>
+
+                                        <!-- Django templates don't allow parentheses -->
+                                        <!-- if not (field.name == "in_date" and vacation.forceInDate)-->
+                                        {% if field.name != "in_date" or not vacation.forceInDate %}
+                                            <div class="input-field col s12">
+                                                {{ field }} {{ field.label_tag }}
+                                            </div>
+                                        {% else %}
+                                            {{ field.as_hidden }}
+                                        {% endif %}
+
                                     {% endfor %}
                                 </div>
                                 <div class="col-xs-4">

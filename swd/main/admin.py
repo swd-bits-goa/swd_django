@@ -1,12 +1,11 @@
 from django.contrib import admin
 from django.contrib.admin.options import ModelAdmin
 from django.shortcuts import redirect
-from main.models import *
 from django.utils.html import format_html
 import urllib
 from django.http import HttpResponseRedirect, HttpResponse
 import datetime
-from .models import MessBill, Leave
+from .models import *
 from calendar import monthrange
 from import_export import resources
 from import_export.formats import base_formats
@@ -31,7 +30,6 @@ models = [
     AntiRagging,
     DueCategory,
     DuesPublished,
-    VacationDatesFill,
     Security
 ]
 
@@ -51,8 +49,13 @@ class HostelPSAdmin(ExportMixin, admin.ModelAdmin):
 @admin.register(Document)
 class DocumentAdmin(admin.ModelAdmin):
     search_fields = ['title']
-    list_display = ['title', 'hostel']
-    list_filter = ['hostel']
+    list_display = ['title', 'hostels']
+    list_filter = ['hostels']
+
+@admin.register(VacationDatesFill)
+class VacationDatesFillAdmin(admin.ModelAdmin):
+    search_fields = ['description']
+    list_display = ['description', 'dateOpen', 'dateClose']
 
 @admin.register(Disco)
 class DiscoAdmin(ExportMixin, admin.ModelAdmin):
@@ -129,6 +132,7 @@ delete_students.description = u"Delete Students from Excel"
 @admin.register(Student)
 class StudentAdmin(ExportMixin, admin.ModelAdmin):
     search_fields = ['name', 'bitsId', 'user__username']
+    list_display = ['name', 'bitsId', 'gender', 'phone']
     actions = [add_new_students, delete_students ]
     resource_class = StudentResource
     def get_export_formats(self):
