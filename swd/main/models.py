@@ -114,6 +114,8 @@ HOSTELS = (
 class Warden(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=50, null=True, blank=True)
+    profile_picture = models.FileField(
+        upload_to='../media', blank=True, null=True)
     chamber = models.CharField(max_length=15, null=True, blank=True)
     residence = models.CharField(max_length=10, null=True, blank=True)
     phone_off = models.CharField(max_length=15, null=True, blank=True)
@@ -349,7 +351,7 @@ class Leave(models.Model):
     corrAddress = models.TextField()
     corrPhone = models.CharField(max_length=15)
     approvedBy = models.ForeignKey(
-        'Warden', blank=True, null=True, on_delete="PROTECT")
+        'Warden', blank=True, null=True, on_delete=models.PROTECT)
     approved = models.BooleanField(default=0, blank=True)
     disapproved = models.BooleanField(default=0, blank=True)
     inprocess = models.BooleanField(default=0, blank=True)
@@ -373,7 +375,7 @@ class DayPass(models.Model):
     inTime = models.DateTimeField(null=True, blank=False)
     corrAddress = models.TextField()
     approvedBy = models.ForeignKey(
-        'HostelSuperintendent', blank=True, null=True, on_delete="PROTECT")
+        'HostelSuperintendent', blank=True, null=True, on_delete=models.PROTECT)
     approved = models.BooleanField(default=0, blank=True)
     disapproved = models.BooleanField(default=0, blank=True)
     inprocess = models.BooleanField(default=0, blank=True)
