@@ -1885,7 +1885,7 @@ def contact(request):
              asup.append(s)
               
      for w in wa:
-         if w.hostel!=None and w.hostel != "CH4" and w.hostel != "CH7" and w.hostel != "CH5" and w.hostel!="CH6":
+         if w.hostel!=None and w.hostel != "CH3" and w.hostel != "CH4" and w.hostel != "CH7" and w.hostel != "CH5" and w.hostel!="CH6":
              bw.append(w)
          else:
              gw.append(w)
