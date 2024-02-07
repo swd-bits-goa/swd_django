@@ -9,6 +9,7 @@ from datetime import datetime
 from datetime import date
 from django.conf import settings
 import json
+from django.core.files.storage import FileSystemStorage
 
 
 try:
@@ -111,11 +112,19 @@ HOSTELS = (
 )
 
 
+class OverwriteStorage(FileSystemStorage):
+    
+    def _save(self, name, content):
+        self.delete(name)
+        return super(OverwriteStorage, self)._save(name, content)
+
+    def get_available_name(self, name, max_length=None):
+        return name
+
 class Warden(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=50, null=True, blank=True)
-    profile_picture = models.FileField(
-        upload_to='../media', blank=True, null=True)
+    profile_picture = models.ImageField(storage=OverwriteStorage(), blank=True, null=True)
     chamber = models.CharField(max_length=15, null=True, blank=True)
     residence = models.CharField(max_length=10, null=True, blank=True)
     phone_off = models.CharField(max_length=15, null=True, blank=True)

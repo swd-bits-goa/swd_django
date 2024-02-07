@@ -10,7 +10,8 @@ from django.contrib import messages
 from django.utils.timezone import make_aware
 from django.core.mail import send_mail
 from django.conf import settings
-from django.core.files.storage import default_storage
+from django.core.files.storage import default_storage, FileSystemStorage
+from main.storage import no_duplicate_storage
 from tools.utils import gen_random_datetime
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -3880,7 +3881,7 @@ def upload_contact_pictures(request):
             for filex in request.FILES.getlist('folder'):
                 file_name = filex.name
                 try:
-                    path = default_storage.save(file_name, filex)
+                    path = no_duplicate_storage.save(file_name, filex)
                     successfull+=1
                 except Exception:
                     error_files.append(file_name.lower())
