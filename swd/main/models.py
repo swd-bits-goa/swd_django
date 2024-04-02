@@ -66,6 +66,7 @@ ME = {
     'H106': 'M.E. Mechanical',
     'H151': 'M.E. Sanitation Science, Technology and Management',
     'H152': 'M.Phil. In Liberal Studies',
+    'H124': 'M.E. Communication Engineering',
 }
 
 YEARNAMES = {
