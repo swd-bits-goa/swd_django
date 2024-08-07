@@ -51,6 +51,7 @@ BRANCH = {
     'B4': 'M.Sc. Mathematics',
     'B5': 'M.Sc.  Physics',
     'AA': 'B.E. Electronics and Communication Engineering',
+    'AD': 'B.E. Mathematics and Computing Engineering',
     'PH': 'PhD.',
     'H1': 'M.E. Computer Science',
 }
@@ -67,6 +68,7 @@ ME = {
     'H151': 'M.E. Sanitation Science, Technology and Management',
     'H152': 'M.Phil. In Liberal Studies',
     'H124': 'M.E. Communication Engineering',
+    'H155': 'M.E Environmental Engineering',
 }
 
 YEARNAMES = {
@@ -283,7 +285,7 @@ class Bonafide(models.Model):
         res = HostelPS.objects.get(student=self.student)
         branch = BRANCH[firstDeg]
         dual_degree_student = False
-        if secondDeg != 'PS' and firstDeg != 'H1' and firstDeg != 'PH':
+        if secondDeg != 'PS' and secondDeg != 'IS' and secondDeg != 'UB' and secondDeg != 'RM' and firstDeg != 'H1' and firstDeg != 'PH':
             branch = branch + ' and ' + BRANCH[secondDeg]
             dual_degree_student = True
         if firstDeg == 'H1':
