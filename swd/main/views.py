@@ -3506,6 +3506,7 @@ def leave_export(request):
         columns = [
             (u"studentID", 6000),
             (u"Name", 6000),
+            (u"reason", 6000),
             (u"Start Date", 6000),
             (u"End Date", 6000),
            ]
@@ -3522,6 +3523,7 @@ def leave_export(request):
             row = [
                 obj.bitsId,
                 obj.name,
+                i.reason,
                 str(i.dateTimeStart.astimezone(timezone("Asia/Kolkata")).date()),
                 str(i.dateTimeEnd.astimezone(timezone("Asia/Kolkata")).date()),
             ]
