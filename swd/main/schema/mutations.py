@@ -33,7 +33,6 @@ class ApplyLeave(graphene.Mutation):
         reason = graphene.String(required=True)
         corrAddress = graphene.String(required=True)
         corrPhone = graphene.String(required=True)
-        consent = graphene.String(required=True)
 
 # CONSENT_CHOICES
 # Letter

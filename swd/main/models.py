@@ -359,7 +359,6 @@ class Leave(models.Model):
     dateTimeStart = models.DateTimeField()
     dateTimeEnd = models.DateTimeField()
     reason = models.TextField()
-    consent = models.CharField(max_length=10, choices=CONSENT_CHOICES)
     corrAddress = models.TextField()
     corrPhone = models.CharField(max_length=15)
     approvedBy = models.ForeignKey(
