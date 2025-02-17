@@ -69,6 +69,7 @@ urlpatterns = [
     url(r'^admin/update_ps/', views.update_ps, name='update_ps'),
     url(r'^admin/update_address/', views.update_address, name='update_address'),
     url(r'^admin/update_bank/', views.update_bank_account, name='update_bank'),
+    url(r'^admin/update_parentemail/', views.update_parent_email, name='update_parentemail'),
     url(r'^admin/upload_latecomer/', views.upload_latecomer, name='update_latecomer'),
     url(r'^admin/upload_disco/', views.upload_disco, name='update_disco'),
     url(r'^admin/upload_profile_pictures', views.upload_profile_pictures, name="upload_profile_pictures"),

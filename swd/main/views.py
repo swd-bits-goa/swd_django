@@ -3488,6 +3488,60 @@ def update_bank_account(request):
                             message_str)
     return render(request, "add_students.html", {'header': "Update Bank account"})
 
+@user_passes_test(lambda u: u.is_superuser)
+def update_parent_email(request):
+    message_str = ''
+    message_tag = messages.INFO
+    if request.POST:
+        if request.FILES:
+            # Read Excel File into a temp file
+            xl_file = request.FILES['xl_file']
+            extension = xl_file.name.rsplit('.', 1)[1]
+            if ('xls' != extension):
+                if ('xlsx' != extension):
+                    messages.error(request, "Please upload .xls or .xlsx file only")
+                    messages.add_message(request,
+                                        message_tag, 
+                                        message_str)
+                    return render(request, "add_students.html", {'header': "Update Parent Email"})
+
+            fd, tmp = tempfile.mkstemp()
+            with os.fdopen(fd, 'wb') as out:
+                out.write(xl_file.read())
+            workbook = xlrd.open_workbook(tmp)
+
+            count = 0
+            idx = 1
+            header = {}
+            for sheet in workbook.sheets():
+                for row in sheet.get_rows():
+                    if idx == 1:
+                        col_no = 0
+                        for cell in row:
+                            # Store the column names in dictionary
+                            header[str(cell.value)] = col_no
+                            col_no = col_no + 1
+                        idx = 0
+                        continue
+                    # create User model first then Student model
+                    try:
+                        student = Student.objects.get(bitsId=row[header['studentID']].value)
+                        student.parentEmail = str(row[header['parentEmail']].value)
+                        student.save()
+                        count+=1
+                    except Exception:
+                        message_str + "student " + row[header['studentID']].value + " not in database"
+                    
+            message_str = str(count) + " Updated Parent Email"
+        else:
+            message_str = "No File Uploaded."
+
+    if message_str is not '':
+        messages.add_message(request,
+                            message_tag, 
+                            message_str)
+    return render(request, "add_students.html", {'header': "Update Parent Email"})
+
 @user_passes_test(lambda u: u.is_staff)
 def leave_export(request):
     if request.POST:
