@@ -350,7 +350,6 @@ def create_leaves(student_list):
                 dateTimeStart=timezone.now() + datetime.timedelta(days=1),
                 dateTimeEnd=timezone.now() + datetime.timedelta(days=5),
                 reason='Random Event Description For Leave Application',
-                consent='Email',
                 corrAddress='Earth',
                 corrPhone=fake_number_generator(),
                 approvedBy=warden,
