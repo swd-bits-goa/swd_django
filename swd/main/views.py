@@ -834,12 +834,30 @@ def leave(request):
                 leaveform.save()
                 if config.EMAIL_PROD:
                     email_to=[Warden.objects.get(hostel=HostelPS.objects.get(student=student).hostel).email]
+                    email_to_parent = [Student.parentEmail]
                 else:
-                    email_to=["spammailashad@gmail.com"]                                                                     # For testing
+                    email_to=["div060916@gmail.com"]                                                                     # For testing
+                    email_to_parent=["div060916@gmail.com"]
                 mailObj = Leave.objects.latest('id')
                 mail_subject = "New Leave ID: "+ str(mailObj.id)
                 if mailObj.student.parentEmail is None:
-                    parentEmail = "No parent mail found"
+                    messages.error(
+                    request,
+                    "Could not apply leave as parent's email was not found. "
+                    "Please contact SWD to update the parent's email before applying for leave."
+                     )
+                    context = {
+                    'option': option,
+                    'mess': mess,
+                    'leaves': leaves,
+                    'bonafides': bonafides,
+                    'balance': balance,
+                    'daypasss': daypasss,
+                    'option1': 2, 
+                    'form': form,
+                    'student': student
+                        }
+                    return render(request, "leave.html", dict(context, **leaveContext))
                 else:
                     parentEmail = mailObj.student.parentEmail
                 if mailObj.student.parentName is None:
@@ -853,8 +871,18 @@ def leave(request):
                     
                 mail_message = "Leave Application applied by " + mailObj.student.name + " with leave id: " + str(mailObj.id) + ".\n"
                 mail_message = mail_message + "Parent name: " + parentName + "\nParent Email: " + parentEmail + "\nParent Phone: " + parentPhone
-                mail_message = mail_message + "\nConsent type: " + mailObj.consent
+
+                mail_message_to_parent = "Leave applied by "+ mailObj.student.name + " with leave id: " + str(mailObj.id) + ".\n"
+                mail_message_to_parent= mail_message_to_parent + "from " + dateTimeStart + "to" + dateTimeEnd
+
+                mail_subject_to_parent = "Leave applied by" + mailObj.student.name
+
+
                 send_mail(mail_subject, mail_message, settings.EMAIL_HOST_USER, email_to, fail_silently=False)
+
+                #email to parent
+
+                send_mail(mail_subject_to_parent, mail_message_to_parent, settings.EMAIL_HOST_USER, email_to_parent, fail_silently=False)
 
                 context = {
                     'option': option,
@@ -3488,6 +3516,60 @@ def update_bank_account(request):
                             message_str)
     return render(request, "add_students.html", {'header': "Update Bank account"})
 
+@user_passes_test(lambda u: u.is_superuser)
+def update_parent_email(request):
+    message_str = ''
+    message_tag = messages.INFO
+    if request.POST:
+        if request.FILES:
+            # Read Excel File into a temp file
+            xl_file = request.FILES['xl_file']
+            extension = xl_file.name.rsplit('.', 1)[1]
+            if ('xls' != extension):
+                if ('xlsx' != extension):
+                    messages.error(request, "Please upload .xls or .xlsx file only")
+                    messages.add_message(request,
+                                        message_tag, 
+                                        message_str)
+                    return render(request, "add_students.html", {'header': "Update Parent Email"})
+
+            fd, tmp = tempfile.mkstemp()
+            with os.fdopen(fd, 'wb') as out:
+                out.write(xl_file.read())
+            workbook = xlrd.open_workbook(tmp)
+
+            count = 0
+            idx = 1
+            header = {}
+            for sheet in workbook.sheets():
+                for row in sheet.get_rows():
+                    if idx == 1:
+                        col_no = 0
+                        for cell in row:
+                            # Store the column names in dictionary
+                            header[str(cell.value)] = col_no
+                            col_no = col_no + 1
+                        idx = 0
+                        continue
+                    # create User model first then Student model
+                    try:
+                        student = Student.objects.get(bitsId=row[header['studentID']].value)
+                        student.parentEmail = str(row[header['parentEmail']].value)
+                        student.save()
+                        count+=1
+                    except Exception:
+                        message_str + "student " + row[header['studentID']].value + " not in database"
+                    
+            message_str = str(count) + " Updated Parent Email"
+        else:
+            message_str = "No File Uploaded."
+
+    if message_str is not '':
+        messages.add_message(request,
+                            message_tag, 
+                            message_str)
+    return render(request, "add_students.html", {'header': "Update Parent Email"})
+
 @user_passes_test(lambda u: u.is_staff)
 def leave_export(request):
     if request.POST:
@@ -3628,7 +3710,6 @@ def leave_import(request):
                         addr = row[header['addr']].value
                         ph = row[header['ph']].value
                         comment = row[header['comment']].value
-                        consent = row[header['consent']].value
                     except Exception:
                         message_str + "student " + row[header['loginID']].value + " not in database"
                     rev_sdate = datetime(*xlrd.xldate_as_tuple(sdate, 0)).date()
