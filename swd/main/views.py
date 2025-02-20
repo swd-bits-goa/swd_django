@@ -837,7 +837,7 @@ def leave(request):
                 leaveform.save()
                 if config.EMAIL_PROD:
                     email_to=[Warden.objects.get(hostel=HostelPS.objects.get(student=student).hostel).email]
-                    email_to_parent = [Student.parentEmail]
+                    email_to_parent= [student.parentEmail]
                 else:
                     email_to=["div060916@gmail.com"]                                                                     # For testing
                     email_to_parent=["div060916@gmail.com"]
