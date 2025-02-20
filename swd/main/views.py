@@ -838,6 +838,7 @@ def leave(request):
                 if config.EMAIL_PROD:
                     email_to=[Warden.objects.get(hostel=HostelPS.objects.get(student=student).hostel).email]
                     email_to_parent= [student.parentEmail]
+                    email_to_suprintendent = [HostelSuperintendent.objects.get(hostel=HostelPS.objects.get(student=student).hostel).email]
                 else:
                     email_to=["div060916@gmail.com"]                                                                     # For testing
                     email_to_parent=["div060916@gmail.com"]
@@ -875,8 +876,13 @@ def leave(request):
                 mail_message = "Leave Application applied by " + mailObj.student.name + " with leave id: " + str(mailObj.id) + ".\n"
                 mail_message = mail_message + "Parent name: " + parentName + "\nParent Email: " + parentEmail + "\nParent Phone: " + parentPhone
 
-                mail_message_to_parent = "Leave applied by "+ mailObj.student.name + " with leave id: " + str(mailObj.id) + ".\n"
-                mail_message_to_parent= mail_message_to_parent + "from " + strdateTimeStart + "to" + strdateTimeEnd
+                mail_message_to_parent = "Your ward has apploed for the leave"+ mailObj.student.name + ".\n"
+                mail_message_to_parent= mail_message_to_parent + "from " + strdateTimeStart + "to" + strdateTimeEnd + ".\n"
+                mail_message_to_parent = "The warden/Hostel Superintendent will approve the leave as per the eligibility" + "\n"
+                mail_message_to_parent = "If you have any objection, kindly advise your ward accordingly or reach out to the warden at" + email_to + "\n"
+                mail_message_to_parent = "or" + email_to_suprintendent + " for cancellation of leave immediately." + "\n"
+                mail_message_to_parent = "Regards," + "\n"
+                mail_message_to_parent = "SWD"
 
                 mail_subject_to_parent = "Leave applied by" + mailObj.student.name
 
