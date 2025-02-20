@@ -877,12 +877,12 @@ def leave(request):
                 mail_message = mail_message + "Parent name: " + parentName + "\nParent Email: " + parentEmail + "\nParent Phone: " + parentPhone
 
                 mail_message_to_parent = "Your ward has apploed for the leave"+ mailObj.student.name + ".\n"
-                mail_message_to_parent= mail_message_to_parent + "from " + strdateTimeStart + "to" + strdateTimeEnd + ".\n"
-                mail_message_to_parent = "The warden/Hostel Superintendent will approve the leave as per the eligibility" + "\n"
-                mail_message_to_parent = "If you have any objection, kindly advise your ward accordingly or reach out to the warden at" + email_to[0] + "\n"
-                mail_message_to_parent = "for cancellation of leave immediately." + "\n"
-                mail_message_to_parent = "Regards," + "\n"
-                mail_message_to_parent = "SWD"
+                mail_message_to_parent = mail_message_to_parent + "from " + strdateTimeStart + "to" + strdateTimeEnd + ".\n"
+                mail_message_to_parent = mail_message_to_parent+ "The warden/Hostel Superintendent will approve the leave as per the eligibility" + ".\n"
+                mail_message_to_parent = mail_message_to_parent+ "If you have any objection, kindly advise your ward accordingly or reach out to the warden at" + email_to[0] + ".\n"
+                mail_message_to_parent = mail_message_to_parent+ "for cancellation of leave immediately." + ".\n"
+                mail_message_to_parent = mail_message_to_parent+ "Regards," + ".\n"
+                mail_message_to_parent = mail_message_to_parent+ "SWD"
 
                 mail_subject_to_parent = "Leave applied by" + mailObj.student.name
 
