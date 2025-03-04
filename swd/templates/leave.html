@@ -1,5 +1,5 @@
-{% extends 'base.html' %} {% block content %}
-
+{% extends 'base.html' %}
+{% block content %}
 
 <div>
     <div class="section">
@@ -20,10 +20,20 @@
                                 </div>
                                 {% endfor %}
                             </div>
+
+                            <!-- Declaration Text -->
+                            <div class="col-xs-12" style="margin-bottom: 20px;">
+                                <p class="red-text" style="font-weight:bold; font-size: 18px;">
+                                    I hereby declare that I have taken permission from my parents for the said leave.
+                                </p>
+                            </div>
+
+                            <!-- Submit Button -->
                             <div class="col-xs-4">
                                 <button class="btn desert-yellow waves-light waves-effect" type="submit">SUBMIT</button>
                             </div>
                         </form>
+
                         {% elif option1 == 1 %}
                         <p>Leave Successfully applied. Please wait for approval</p>
                         <p>Leave applied from {{ dateStart }}({{ timeStart }}) to {{ dateEnd }}({{ timeEnd }})</p>
@@ -37,7 +47,6 @@
                         {% endif %}
                         <div class=red-text>
                             <p>There was a problem with form submission. Please refill.</p>
-                            <h1></h1>
                         </div>
                         <form method="POST">
                             {% csrf_token %}
@@ -55,6 +64,15 @@
                                 </div>
                                 {% endfor %}
                             </div>
+
+                            <!-- Declaration Text -->
+                            <div class="col-xs-12" style="margin-bottom: 20px;">
+                                <p class="red-text" style="font-weight:bold; font-size: 18px;">
+                                    I hereby declare that I have taken permission from my parents for the said leave application.
+                                </p>
+                            </div>
+
+                            <!-- Submit Button -->
                             <div class="col-xs-4">
                                 <button class="btn btn-block bg-green waves-effect" type="submit">SUBMIT</button>
                             </div>
@@ -84,7 +102,7 @@
                                     <td class="center-align">{{ leave.dateTimeStart|date:"d/M/y" }} ---
                                         {{ leave.dateTimeEnd|date:"d/M/y" }}</td>
                                     <td class="center-align badge-container">
-                                        {% if leave.approved == 1%}
+                                        {% if leave.approved == 1 %}
                                         <span class="new badge green comm" data-badge-caption="Approved"></span>
                                         {% elif leave.disapproved == 1 %}
                                         <span class="new badge red comm" data-badge-caption="Not Approved"></span>
@@ -101,7 +119,6 @@
                 </div>
             </div>
 
-
         </div>
     </div>
     <br><br>
@@ -109,8 +126,6 @@
 
 <script>
     // Patch fix for datepicker
-    // Frontend devs -> please fix this issue asap. This is a temp patch.
-    // Mehul Mohan
     document.querySelectorAll('input.mask').forEach(node => {
         const maskedDiv = document.createElement('div')
         maskedDiv.onclick = () => { setTimeout(() => { console.log('clicked'); node.click() }, 50) }
@@ -119,7 +134,7 @@
         node.parentNode.appendChild(maskedDiv)
     })
 
-    // Patch for when user gets impatient and clicks the submit button multiple times
+    // Patch for submit button being clicked multiple times
     document.querySelector("button[type='submit']").onclick = function(event) {
         is_form_valid = true
         // Check if each input element is valid

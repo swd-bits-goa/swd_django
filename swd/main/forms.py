@@ -68,7 +68,6 @@ class LeaveForm(forms.ModelForm):
             'corrAddress': forms.Textarea(attrs={'class': 'materialize-textarea validate'}),
         }
         labels = {
-            'consent': _('Parent Consent Type'),
             'corrAddress': _('Address for Correspondence during Leave'),
             'corrPhone': _('Contact No. during Leave'),
         }
