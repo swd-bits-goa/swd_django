@@ -881,10 +881,12 @@ def leave(request):
                 mail_message_to_parent = mail_message_to_parent+ "The warden will approve the leave as per the eligibility" + ".\n"
                 mail_message_to_parent = mail_message_to_parent+ "If you have any objection, kindly advise your ward accordingly or reach out to the warden at " + email_to[0] + ".\n"
                 mail_message_to_parent = mail_message_to_parent+ "for cancellation of leave immediately." + "\n"
+                mail_message_to_parent = mail_message_to_parent+ "You are strictly advised to reply to the respective Hostel warden mentioned in the mail " + email_to[0] + ".\n"
+                mail_message_to_parent = mail_message_to_parent+ "Also, please make sure you mail to the warden only incase if you have an objection with the said leave"
                 mail_message_to_parent = mail_message_to_parent+ "Regards," + "\n"
                 mail_message_to_parent = mail_message_to_parent+ "SWD"
 
-                mail_subject_to_parent = "Leave applied by" + mailObj.student.name
+                mail_subject_to_parent = "Leave applied by " + mailObj.student.name
 
 
                 send_mail(mail_subject, mail_message, settings.EMAIL_HOST_USER, email_to, fail_silently=False)
