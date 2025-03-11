@@ -876,7 +876,7 @@ def leave(request):
                 mail_message = "Leave Application applied by " + mailObj.student.name + " with leave id: " + str(mailObj.id) + ".\n"
                 mail_message = mail_message + "Parent name: " + parentName + "\nParent Email: " + parentEmail + "\nParent Phone: " + parentPhone
 
-                mail_message_to_parent = "Your ward has applied for the leave "+ mailObj.student.name + ".\n"
+                mail_message_to_parent = "Your ward " + mailObj.student.name "has applied for the leave " + ".\n"
                 mail_message_to_parent = mail_message_to_parent + "from " + strdateTimeStart + " to " + strdateTimeEnd + ".\n"
                 mail_message_to_parent = mail_message_to_parent+ "The warden will approve the leave as per the eligibility" + ".\n"
                 mail_message_to_parent = mail_message_to_parent+ "If you have any objection, kindly advise your ward accordingly or reach out to the warden at " + email_to[0] + ".\n"
