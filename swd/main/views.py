@@ -876,15 +876,18 @@ def leave(request):
                 mail_message = "Leave Application applied by " + mailObj.student.name + " with leave id: " + str(mailObj.id) + ".\n"
                 mail_message = mail_message + "Parent name: " + parentName + "\nParent Email: " + parentEmail + "\nParent Phone: " + parentPhone
 
-                mail_message_to_parent = "Your ward has applied for the leave "+ mailObj.student.name + ".\n"
+                mail_message_to_parent = "Your ward " + mailObj.student.name + " has applied for the leave.\n"
                 mail_message_to_parent = mail_message_to_parent + "from " + strdateTimeStart + " to " + strdateTimeEnd + ".\n"
-                mail_message_to_parent = mail_message_to_parent+ "The warden will approve the leave as per the eligibility" + ".\n"
-                mail_message_to_parent = mail_message_to_parent+ "If you have any objection, kindly advise your ward accordingly or reach out to the warden at " + email_to[0] + ".\n"
-                mail_message_to_parent = mail_message_to_parent+ "for cancellation of leave immediately." + "\n"
-                mail_message_to_parent = mail_message_to_parent+ "Regards," + "\n"
-                mail_message_to_parent = mail_message_to_parent+ "SWD"
+                mail_message_to_parent = mail_message_to_parent + "The warden will approve the leave as per the eligibility.\n"
+                mail_message_to_parent = mail_message_to_parent + "If you have any objection, kindly advise your ward accordingly or reach out to the warden at " + email_to[0] + ".\n"
+                mail_message_to_parent = mail_message_to_parent + "for cancellation of leave immediately.\n"
+                mail_message_to_parent = mail_message_to_parent + "You are kindly advised to not reply to this email directly but contact the respective Hostel warden " + email_to[0] + " only, if any changes are needed in this leave request.\n"
+                #mail_message_to_parent = mail_message_to_parent + "Also, please make sure you mail to the warden only in case you have an objection with the said leave.\n"
+                mail_message_to_parent = mail_message_to_parent + "With best regards,\n"
+                mail_message_to_parent = mail_message_to_parent + "SWD Team"
+                
+                mail_subject_to_parent = "Leave applied by " + mailObj.student.name
 
-                mail_subject_to_parent = "Leave applied by" + mailObj.student.name
 
 
                 send_mail(mail_subject, mail_message, settings.EMAIL_HOST_USER, email_to, fail_silently=False)
