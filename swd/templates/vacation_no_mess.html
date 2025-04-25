@@ -10,6 +10,8 @@
                     <span class="card-title">
                         {% if student_vacation and not request.GET.edit %}
                             Your Submitted {{ vacation.get_leave_comment }} Details
+                        {% elif is_editing %}
+                             Edit Your {{ vacation.get_leave_comment }} Out Date
                         {% else %}
                             Apply for {{ vacation.get_leave_comment }}
                         {% endif %}
@@ -17,16 +19,11 @@
                         <p class="light-blue-text">
                             Make sure your vacation dates are between {{ vacation.allowDateAfter.date }} and {{ vacation.allowDateBefore.date }}
                         </p>
-                        {% if vacation.forceInDate %}
-                        <p class="light-blue-text">
-                            {% comment %} Adjust message slightly if editing {% endcomment %}
-                            {% if not student_vacation or request.GET.edit %}
-                                The in-date must be {{ vacation.allowDateBefore.date }}
-                            {% else %}
-                                Your in-date was set to {{ vacation.allowDateBefore.date }}
-                            {% endif %}
-                        </p>
+                        {% if is_editing %}
+                         <p class="orange-text text-darken-1">You can only change the Out Date. The In Date is fixed.</p>
                         {% endif %}
+                        {% comment %} Removed forceInDate check here as it's handled by view/form now {% endcomment %}
+
                         <p>
                         {% if errors %}
                             {% for e in errors %}
@@ -43,26 +40,37 @@
                             {% csrf_token %}
                             <div class="col-md-12">
                                 {% for field in form %}
-                                {% comment %} Handle forceInDate logic - hide if forced AND not editing an existing entry {% endcomment %}
-                                {% if field.name != "in_date" or not vacation.forceInDate %}
+                                    {% comment %} Display errors for the specific field {% endcomment %}
+                                     {% if form.errors and field.name in form.errors %}
+                                        {% for error in field.errors %}
+                                            <div class="red-text alert alert-danger">
+                                                <strong>{{ field.label }}: {{ error|escape }}</strong>
+                                            </div>
+                                        {% endfor %}
+                                     {% endif %}
+
+                                     {% comment %} Render the field - disabled state handled by form widget {% endcomment %}
                                     <div class="input-field col s12">
                                         {{ field }} {{ field.label_tag }}
+                                        {% if field.name == 'in_date' and is_editing %}
+                                            <span class="helper-text">In Date cannot be changed</span>
+                                        {% endif %}
                                     </div>
-                                {% else %}
-                                    {% comment %} Show the field if editing, otherwise hide it {% endcomment %}
-                                    {% if request.GET.edit %}
-                                    <div class="input-field col s12">
-                                        {{ field }} {{ field.label_tag }} (Must be {{ vacation.allowDateBefore.date }})
-                                    </div>
-                                    {% else %}
-                                    {{ field.as_hidden }}
-                                    {% endif %}
-                                {% endif %}
                                 {% endfor %}
+
+                                {% comment %} Display non-field errors (like the clean method error) {% endcomment %}
+                                {% if form.non_field_errors %}
+                                     {% for error in form.non_field_errors %}
+                                         <div class="red-text alert alert-danger">
+                                             <strong>{{ error|escape }}</strong>
+                                         </div>
+                                     {% endfor %}
+                                {% endif %}
+
                             </div>
                             <div class="col-xs-4">
                                 <button class="btn desert-yellow waves-light waves-effect" type="submit">SUBMIT</button>
-                                {% if student_vacation %}
+                                {% if is_editing %} {# Changed condition to use is_editing flag #}
                                     <a href="{% url 'vacation_no_mess' %}" class="btn grey waves-light waves-effect">CANCEL EDIT</a>
                                 {% endif %}
                             </div>
@@ -70,8 +78,8 @@
 
                         {% comment %} option1 == 1 means success or already submitted (or no vacation open) {% endcomment %}
                         {% elif option1 == 1 %}
-
-                            {% if student_vacation %}
+                            {# ... (Keep existing success message/Edit button logic as before) ... #}
+                             {% if student_vacation %}
                                 <p>
                                     Vacation Leave successfully recorded.
                                 </p>
@@ -79,10 +87,8 @@
                                     Leave applied from {{ student_vacation.dateTimeStart|date:"d F, Y"}} to {{ student_vacation.dateTimeEnd|date:"d F, Y" }}
                                 </div>
                                 <br>
-                                {% comment %} Add Edit Button - Link includes a GET parameter {% endcomment %}
-                                <a href="?edit=true" class="btn waves-light waves-effect">Edit Dates</a>
+                                <a href="?edit=true" class="btn waves-light waves-effect">Edit Out Date</a> {# Changed button text #}
                             {% else %}
-                                {% comment %} Display the original "No vacations nearby" or other messages if needed {% endcomment %}
                                 {% for e in errors %}
                                     <div class="red-text alert alert-danger">
                                         <strong>{{ e|escape }}</strong>
@@ -90,52 +96,43 @@
                                 {% endfor %}
                             {% endif %}
 
-
-                        {% comment %} option1 == 2 means submission failed validation {% endcomment %}
+                        {% comment %} option1 == 2 means submission failed validation (handled by form display now) {% endcomment %}
                         {% else %}
-
-                            {% if form.errors %}
-                                {% for error in form.non_field_errors %}
-                                    <div class="red-text alert alert-danger">
-                                        <strong>{{ error|escape }}</strong>
-                                    </div>
-                                {% endfor %}
-                            {% endif %}
-                            <form method="POST">
+                             {# This block might be redundant now if errors are shown with option1=0 #}
+                             <p class="red-text">There was an error with your submission. Please check the form below.</p>
+                             <form method="POST"> {# Repeat form structure to show errors #}
                                 {% csrf_token %}
                                 <div class="col-md-12">
-                                    {% for field in form %}
-                                        {% if form.errors %}
-                                        {% for error in field.errors %}
-                                            <div class="red-text alert alert-danger">
-                                                <strong>{{ error|escape }}</strong>
-                                            </div>
-                                        {% endfor %}
-                                        {% endif %}
-                                        {% comment %} Handle forceInDate logic - hide if forced AND not editing an existing entry {% endcomment %}
-                                        {% if field.name != "in_date" or not vacation.forceInDate %}
-                                            <div class="input-field col s12">
-                                                {{ field }} {{ field.label_tag }}
-                                            </div>
-                                        {% else %}
-                                            {% comment %} Show the field if editing, otherwise hide it {% endcomment %}
-                                            {% if request.GET.edit %}
-                                            <div class="input-field col s12">
-                                                {{ field }} {{ field.label_tag }} (Must be {{ vacation.allowDateBefore.date }})
-                                            </div>
-                                            {% else %}
-                                            {{ field.as_hidden }}
+                                     {% for field in form %}
+                                         {% if form.errors and field.name in form.errors %}
+                                            {% for error in field.errors %}
+                                                <div class="red-text alert alert-danger">
+                                                    <strong>{{ field.label }}: {{ error|escape }}</strong>
+                                                </div>
+                                            {% endfor %}
+                                         {% endif %}
+                                        <div class="input-field col s12">
+                                            {{ field }} {{ field.label_tag }}
+                                            {% if field.name == 'in_date' and is_editing %}
+                                                <span class="helper-text">In Date cannot be changed</span>
                                             {% endif %}
-                                        {% endif %}
+                                        </div>
                                     {% endfor %}
+                                     {% if form.non_field_errors %}
+                                         {% for error in form.non_field_errors %}
+                                             <div class="red-text alert alert-danger">
+                                                 <strong>{{ error|escape }}</strong>
+                                             </div>
+                                         {% endfor %}
+                                     {% endif %}
                                 </div>
                                 <div class="col-xs-4">
                                     <button class="btn btn-block bg-green waves-effect" type="submit">SUBMIT</button>
-                                    {% if student_vacation %}
+                                     {% if is_editing %}
                                          <a href="{% url 'vacation_no_mess' %}" class="btn grey waves-light waves-effect">CANCEL EDIT</a>
-                                    {% endif %}
+                                     {% endif %}
                                 </div>
-                            </form>
+                             </form>
                         {% endif %}
                     </div>
                     {% else %}

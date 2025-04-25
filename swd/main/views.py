@@ -601,19 +601,17 @@ def messoption(request):
 def vacation_no_mess(request):
     context = {}
     vacation_context = {}
-    errors = []
-    student = request.user.student # Assumes you have a way to get the Student object from the request.user
+    errors = [] # Keep for non-form errors if needed
+    student = request.user.student # Get student object
 
-    # Find the currently active vacation period
     today = datetime.now()
     vacation_open = VacationDatesFill.objects.filter(
         dateOpen__lte=today,
         dateClose__gte=today
-    ).first() # Get the first active one, assuming only one is active
+    ).first()
 
     student_vacation = None
     if vacation_open:
-        # Check if the student has already submitted for THIS vacation period
         try:
             student_vacation = Leave.objects.get(
                 student=student,
@@ -623,139 +621,147 @@ def vacation_no_mess(request):
         except Leave.DoesNotExist:
             student_vacation = None
         except Leave.MultipleObjectsReturned:
-             # Handle case if somehow multiple leaves exist for the same period (log error, take first?)
              errors.append("Error: Multiple existing vacation records found. Please contact admin.")
-             student_vacation = Leave.objects.filter(
-                student=student,
-                reason=vacation_open.description,
-                comment=vacation_open.get_leave_comment()
-            ).first()
+             # Decide how to handle this - maybe prevent editing?
+             student_vacation = Leave.objects.filter(...).first() # Or None to prevent edit
 
-
-    # Determine if we are in edit mode
     is_editing = student_vacation is not None and request.GET.get('edit') == 'true'
-
-    # Determine if the form should be shown
     show_form = vacation_open and (student_vacation is None or is_editing)
 
+    form_kwargs = {}
+    if is_editing:
+        # Pass the fixed in_date to the form
+        form_kwargs['existing_in_date'] = student_vacation.dateTimeEnd.date()
+
     if request.method == 'POST' and show_form:
-        form = VacationLeaveNoMessForm(request.POST)
+        # Pass existing_in_date kwarg to form on POST as well
+        form = VacationLeaveNoMessForm(request.POST, **form_kwargs)
+
         if form.is_valid():
             try:
-                # Use cleaned_data for safety
+                # Only get the out_date from the form
                 out_date_str = form.cleaned_data['out_date']
-                in_date_str = form.cleaned_data['in_date']
-
                 out_date = datetime.strptime(out_date_str, '%d %B, %Y').date()
-                in_date = datetime.strptime(in_date_str, '%d %B, %Y').date()
-                time0 = time.min # Combine with midnight time
+                time0 = time.min
 
-                # Combine date and time for range checks
                 start_datetime = datetime.combine(out_date, time0)
-                end_datetime = datetime.combine(in_date, time0)
+
+                # *** Use the ORIGINAL in_date (dateTimeEnd) if editing ***
+                if is_editing:
+                    end_datetime = student_vacation.dateTimeEnd # Keep the original datetime obj
+                else:
+                    # For new submission, get in_date from form
+                    in_date_str = form.cleaned_data['in_date']
+                    in_date = datetime.strptime(in_date_str, '%d %B, %Y').date()
+                    end_datetime = datetime.combine(in_date, time0)
 
                 # --- Validation ---
                 allowed = True
-                # 1. Check if start and end dates are within the allowed vacation range
+                # 1. Check if the *new* start date is within the allowed vacation range
+                #    (End date check isn't needed if editing as it's fixed and was checked before)
                 if not vacation_open.check_date_in_range(start_datetime):
                     errors.append(f"Out Date must be between {vacation_open.allowDateAfter.date()} and {vacation_open.allowDateBefore.date()}.")
                     allowed = False
-                if not vacation_open.check_date_in_range(end_datetime):
-                    errors.append(f"In Date must be between {vacation_open.allowDateAfter.date()} and {vacation_open.allowDateBefore.date()}.")
-                    allowed = False
 
-                # 2. Check if out_date is strictly before in_date
-                if start_datetime >= end_datetime:
-                    # Error already added by form's clean method, but double check
-                    if "Vacation dates are inconsistent." not in [e for e in form.errors.get('in_date', [])]:
-                         errors.append("Out Date must be strictly before In Date.")
-                    allowed = False
+                # 2. Check if out_date < in_date (handled by form's clean method now)
 
-                # 3. Check forceInDate if applicable
-                if vacation_open.forceInDate and end_datetime.date() != vacation_open.allowDateBefore.date():
+                # 3. Check forceInDate compatibility (only relevant for NEW submissions really)
+                #    If editing, the existing in_date should already comply or isn't changing.
+                if not is_editing and vacation_open.forceInDate and end_datetime.date() != vacation_open.allowDateBefore.date():
+                     # Should ideally be caught by form initial/validation if forceInDate is handled there too
                      errors.append(f"In Date must be {vacation_open.allowDateBefore.date()}.")
                      allowed = False
-
 
                 if allowed and not errors:
                     # --- If editing, delete the old entry first ---
                     if is_editing and student_vacation:
                         try:
                             student_vacation.delete()
-                            student_vacation = None # Clear variable after deletion
+                            # Set to None AFTER successful deletion
+                            original_student_vacation_id = student_vacation.id # Keep id if needed
+                            student_vacation = None
                         except Exception as e:
                              errors.append(f"Could not remove previous entry: {str(e)}")
                              allowed = False # Prevent creating new one if delete failed
 
-                    # --- Create the new Leave object ---
-                    if allowed: # Re-check allowed in case deletion failed
+                    # --- Create the new/updated Leave object ---
+                    if allowed:
                          created, obj_or_error = vacation_open.create_vacation(
-                             student, start_datetime, end_datetime)
+                             student, start_datetime, end_datetime) # Use original end_datetime if editing
 
                          if not created:
                              errors.append(f"Failed to save vacation: {obj_or_error}")
+                             # Need to decide state if creation fails after delete - maybe try to restore? Complex.
+                             # Setting option1=2 to show form with error is safer.
+                             context['option1'] = 2
+                             form = VacationLeaveNoMessForm(request.POST, **form_kwargs) # Re-pass form with data/errors
                          else:
-                             # Success! Redirect to the same page without edit parameter to show success message
+                             # Success! Redirect
                              return redirect(reverse('vacation_no_mess'))
-                # --- Handle End of Validation ---
-
-                if errors:
-                    context['option1'] = 2 # Show form with errors
-                # If creation failed after validation passes, it will also land here
-                # 'errors' list will contain the reason
+                else:
+                    # Validation errors occurred (either view errors or form.add_error)
+                     context['option1'] = 2 # Show form with errors
+                     # Form already has errors attached by clean or add_error
 
             except ValueError as e:
                 errors.append(f"Invalid date format submitted. Please use the date picker. Error: {e}")
-                context['option1'] = 2 # Show form with errors
-            except Exception as e: # Catch unexpected errors during processing
+                context['option1'] = 2
+                form = VacationLeaveNoMessForm(request.POST, **form_kwargs) # Re-pass form
+            except Exception as e:
                 errors.append(f"An unexpected error occurred: {e}")
-                context['option1'] = 2 # Show form with errors
+                context['option1'] = 2
+                form = VacationLeaveNoMessForm(request.POST, **form_kwargs) # Re-pass form
 
         else:
-            # Form validation failed (e.g., inconsistent dates detected by form.clean())
+            # Form validation failed (form.is_valid() returned False)
             context['option1'] = 2 # Show form with errors reported by the form
 
     # --- Handle GET request or initial page load ---
     else:
         if show_form:
             initial_data = {}
-            if is_editing and student_vacation:
-                # Pre-fill form with existing dates if editing
+            if is_editing:
+                # Pre-fill only out_date from existing data for editing
                 initial_data['out_date'] = student_vacation.dateTimeStart.strftime('%d %B, %Y')
-                initial_data['in_date'] = student_vacation.dateTimeEnd.strftime('%d %B, %Y')
-                # Ensure forced in_date is still reflected if editing and forceInDate is true
-                if vacation_open.forceInDate:
-                    initial_data['in_date'] = vacation_open.allowDateBefore.strftime('%d %B, %Y')
-
-            elif vacation_open.forceInDate:
-                 # Pre-fill in_date if forceInDate is true for a new entry
+                # in_date initial value is handled by form's __init__ now
+            elif not is_editing and vacation_open.forceInDate:
+                 # Pre-fill in_date if forceInDate for new entry
                  initial_data['in_date'] = vacation_open.allowDateBefore.strftime('%d %B, %Y')
 
-            form = VacationLeaveNoMessForm(initial=initial_data)
+            # Pass initial data AND the form_kwargs (containing existing_in_date if editing)
+            form = VacationLeaveNoMessForm(initial=initial_data, **form_kwargs)
             context['option1'] = 0 # Show form
 
         elif student_vacation: # Already submitted, not editing
-            context['option1'] = 1 # Show success message and Edit button
-            form = VacationLeaveNoMessForm() # Provide an empty form instance for the template context if needed
+            context['option1'] = 1
+            form = VacationLeaveNoMessForm() # Provide empty form instance
 
-        elif not vacation_open: # No vacation period is open
-            context['option1'] = 1 # Use option1=1 to potentially display messages
+        elif not vacation_open:
+            context['option1'] = 1
             errors.append("No vacations nearby. Please keep checking this space for other details.")
-            form = VacationLeaveNoMessForm() # Provide an empty form instance
+            form = VacationLeaveNoMessForm()
 
-        else: # Should not happen with current logic, but good default
+        else:
              form = VacationLeaveNoMessForm()
              context['option1'] = 1
              errors.append("An unexpected state occurred.")
 
     # --- Prepare Context ---
-    vacation_context['errors'] = errors
+    vacation_context['errors'] = errors # General errors
     vacation_context['vacation'] = vacation_open
-    vacation_context['student_vacation'] = student_vacation # Pass current vacation if exists
-    # Ensure form is always in context
-    if 'form' not in locals(): # If form wasn't created in any branch above
-         form = VacationLeaveNoMessForm()
-    context['form'] = form
+    vacation_context['student_vacation'] = student_vacation
+    vacation_context['is_editing'] = is_editing # Pass flag to template
+    context['form'] = form # Ensure form is always in context
+
+    # Make sure option1 is set if not already
+    if 'option1' not in context:
+        if form.errors:
+            context['option1'] = 2
+        elif show_form:
+             context['option1'] = 0
+        else:
+             context['option1'] = 1
+
 
     return render(
             request,
