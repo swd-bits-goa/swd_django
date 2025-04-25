@@ -129,27 +129,72 @@ class DayPassForm(forms.ModelForm):
 
 
 class VacationLeaveNoMessForm(forms.Form):
-    out_date = forms.CharField(label='Out Date', widget=forms.TextInput(attrs={'class': 'datepicker mask'}))
-    # <!-- Temporary change, to be reverted when allow date before is determined -->
-    in_date = forms.CharField(label='In Date', widget=forms.TextInput(attrs={'class': 'datepicker mask'}))
-    
+    out_date = forms.CharField(
+        label='Out Date',
+        widget=forms.TextInput(attrs={'class': 'datepicker mask'})
+    )
+    in_date = forms.CharField(
+        label='In Date',
+        widget=forms.TextInput(attrs={'class': 'datepicker mask'}),
+        required=True # Keep required for new submissions
+    )
+
+    def __init__(self, *args, **kwargs):
+        # Pop custom kwargs before calling super
+        self.existing_in_date = kwargs.pop('existing_in_date', None)
+        self.is_editing = self.existing_in_date is not None
+
+        super(VacationLeaveNoMessForm, self).__init__(*args, **kwargs)
+
+        # If editing, disable the in_date field and set its initial value
+        if self.is_editing:
+            self.fields['in_date'].widget.attrs['disabled'] = True
+            self.fields['in_date'].initial = self.existing_in_date.strftime('%d %B, %Y')
+            self.fields['in_date'].required = False # Not required from submission when disabled
+
+        # Ensure initial data provided by the view overrides the default if editing
+        if self.is_editing and 'initial' in kwargs:
+             initial = kwargs.get('initial', {})
+             if 'in_date' in initial:
+                  # Even if view provides initial, override with the fixed date and keep disabled
+                  self.fields['in_date'].initial = self.existing_in_date.strftime('%d %B, %Y')
+
+
     def clean(self):
         cleaned_data = super(VacationLeaveNoMessForm, self).clean()
-        out_date = datetime.strptime(cleaned_data['out_date'], '%d %B, %Y').date()
-        # <!-- Temporary change, to be reverted when allow date before is determined -->
-        in_date = datetime.strptime(cleaned_data['in_date'], '%d %B, %Y').date()
+        out_date_str = cleaned_data.get('out_date')
+        in_date_for_validation = None
 
-        if out_date >= in_date:
-            self.add_error(
-                    'in_date',
-                    "Vacation dates are inconsistent."
-            )
+        if not out_date_str:
+            # If out_date is missing, let standard validation handle it
+            return cleaned_data
+
+        try:
+            # Always parse the submitted out_date
+            out_date = datetime.strptime(out_date_str, '%d %B, %Y').date()
+
+            # Determine the in_date to use for validation
+            if self.is_editing:
+                in_date_for_validation = self.existing_in_date # Use the fixed date passed during init
+            else:
+                # For new submissions, get in_date from cleaned_data
+                in_date_str = cleaned_data.get('in_date')
+                if in_date_str:
+                    in_date_for_validation = datetime.strptime(in_date_str, '%d %B, %Y').date()
+                # If in_date_str is missing, required=True should handle it before clean
+
+            # Perform validation only if we have both dates
+            if in_date_for_validation and out_date >= in_date_for_validation:
+                self.add_error(
+                    'out_date', # Add error to out_date as in_date is fixed/not changeable by user here
+                    "Out Date must be strictly before the In Date."
+                )
+
+        except ValueError:
+             # Handle potential parsing errors if needed, though CharField helps
+             self.add_error('out_date', "Invalid date format.") # Or specific field
+             if not self.is_editing:
+                 self.add_error('in_date', "Invalid date format.")
+
         return cleaned_data
-
-    class Meta:
-        model = Leave
-        exclude = ['dateTimeStart', 'dateTimeEnd', 'student',
-                   'approvedBy', 'approved', 'disapproved',
-                   'inprocess', 'comment', 'corrPhone',
-                   'reason', 'corrAddress', 'consent', 'document']
 
