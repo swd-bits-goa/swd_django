@@ -596,15 +596,14 @@ def messoption(request):
 
     return render(request, "mess.html", context)
 
-
 @login_required
 def vacation_no_mess(request):
     context = {}
     vacation_context = {}
-    errors = [] # Keep for non-form errors if needed
-    student = request.user.student # Get student object
+    errors = []
+    student = request.user.student
 
-    today = datetime.now()
+    today = datetime.now().date() # Compare dates only
     vacation_open = VacationDatesFill.objects.filter(
         dateOpen__lte=today,
         dateClose__gte=today
@@ -613,6 +612,7 @@ def vacation_no_mess(request):
     student_vacation = None
     if vacation_open:
         try:
+            # Find existing leave based on student and the *specific* vacation period description
             student_vacation = Leave.objects.get(
                 student=student,
                 reason=vacation_open.description,
@@ -621,65 +621,57 @@ def vacation_no_mess(request):
         except Leave.DoesNotExist:
             student_vacation = None
         except Leave.MultipleObjectsReturned:
-             errors.append("Error: Multiple existing vacation records found. Please contact admin.")
-             # Decide how to handle this - maybe prevent editing?
-             student_vacation = Leave.objects.filter(...).first() # Or None to prevent edit
+            errors.append("Error: Multiple existing vacation records found for this period. Please contact admin.")
+            # Prevent submission/editing if multiple exist for safety
+            student_vacation = Leave.objects.filter(
+                student=student,
+                reason=vacation_open.description,
+                comment=vacation_open.get_leave_comment()
+            ).first() # Still assign to show details maybe, but block changes later
 
     is_editing = student_vacation is not None and request.GET.get('edit') == 'true'
-    show_form = vacation_open and (student_vacation is None or is_editing)
+    # Show form if a vacation period is open AND (no leave exists OR user is editing)
+    # AND no multiple records error occurred
+    show_form = vacation_open and (student_vacation is None or is_editing) and "Multiple existing vacation records" not in str(errors)
 
-    form_kwargs = {}
-    if is_editing:
-        # Pass the fixed in_date to the form
-        form_kwargs['existing_in_date'] = student_vacation.dateTimeEnd.date()
+    # Determine the required in_date from the admin setting
+    required_in_date = None
+    if vacation_open:
+        required_in_date = vacation_open.allowDateBefore.date()
 
-    if request.method == 'POST' and show_form:
-        # Pass existing_in_date kwarg to form on POST as well
-        form = VacationLeaveNoMessForm(request.POST, **form_kwargs)
+    if request.method == 'POST' and show_form and required_in_date:
+        form = VacationLeaveNoMessForm(request.POST)
 
         if form.is_valid():
             try:
-                # Only get the out_date from the form
                 out_date_str = form.cleaned_data['out_date']
                 out_date = datetime.strptime(out_date_str, '%d %B, %Y').date()
                 time0 = time.min
 
                 start_datetime = datetime.combine(out_date, time0)
-
-                # *** Use the ORIGINAL in_date (dateTimeEnd) if editing ***
-                if is_editing:
-                    end_datetime = student_vacation.dateTimeEnd # Keep the original datetime obj
-                else:
-                    # For new submission, get in_date from form
-                    in_date_str = form.cleaned_data['in_date']
-                    in_date = datetime.strptime(in_date_str, '%d %B, %Y').date()
-                    end_datetime = datetime.combine(in_date, time0)
+                # The end_datetime is ALWAYS determined by the admin setting
+                end_datetime = datetime.combine(required_in_date, time0)
 
                 # --- Validation ---
                 allowed = True
-                # 1. Check if the *new* start date is within the allowed vacation range
-                #    (End date check isn't needed if editing as it's fixed and was checked before)
+                # 1. Check if the out_date is within the allowed vacation range
                 if not vacation_open.check_date_in_range(start_datetime):
-                    errors.append(f"Out Date must be between {vacation_open.allowDateAfter.date()} and {vacation_open.allowDateBefore.date()}.")
+                    form.add_error('out_date', f"Out Date must be between {vacation_open.allowDateAfter.date()} and {vacation_open.allowDateBefore.date()}.")
                     allowed = False
 
-                # 2. Check if out_date < in_date (handled by form's clean method now)
+                # 2. Check if out_date < in_date (required_in_date)
+                if out_date >= required_in_date:
+                    form.add_error('out_date', f"Out Date must be strictly before the In Date ({required_in_date.strftime('%d %B, %Y')}).")
+                    allowed = False
 
-                # 3. Check forceInDate compatibility (only relevant for NEW submissions really)
-                #    If editing, the existing in_date should already comply or isn't changing.
-                if not is_editing and vacation_open.forceInDate and end_datetime.date() != vacation_open.allowDateBefore.date():
-                     # Should ideally be caught by form initial/validation if forceInDate is handled there too
-                     errors.append(f"In Date must be {vacation_open.allowDateBefore.date()}.")
-                     allowed = False
+                # 3. forceInDate check is implicitly handled because we ALWAYS use allowDateBefore
 
-                if allowed and not errors:
+                if allowed and not form.errors:
                     # --- If editing, delete the old entry first ---
                     if is_editing and student_vacation:
                         try:
                             student_vacation.delete()
-                            # Set to None AFTER successful deletion
-                            original_student_vacation_id = student_vacation.id # Keep id if needed
-                            student_vacation = None
+                            student_vacation = None # Clear variable after deletion
                         except Exception as e:
                              errors.append(f"Could not remove previous entry: {str(e)}")
                              allowed = False # Prevent creating new one if delete failed
@@ -687,30 +679,29 @@ def vacation_no_mess(request):
                     # --- Create the new/updated Leave object ---
                     if allowed:
                          created, obj_or_error = vacation_open.create_vacation(
-                             student, start_datetime, end_datetime) # Use original end_datetime if editing
+                             student, start_datetime, end_datetime)
 
                          if not created:
+                             # Add error to form or general errors list
                              errors.append(f"Failed to save vacation: {obj_or_error}")
-                             # Need to decide state if creation fails after delete - maybe try to restore? Complex.
-                             # Setting option1=2 to show form with error is safer.
-                             context['option1'] = 2
-                             form = VacationLeaveNoMessForm(request.POST, **form_kwargs) # Re-pass form with data/errors
+                             context['option1'] = 2 # Show form with error
+                             # Re-populate form with submitted data
+                             form = VacationLeaveNoMessForm(request.POST)
                          else:
                              # Success! Redirect
                              return redirect(reverse('vacation_no_mess'))
                 else:
-                    # Validation errors occurred (either view errors or form.add_error)
-                     context['option1'] = 2 # Show form with errors
-                     # Form already has errors attached by clean or add_error
+                    # Validation errors occurred (added using form.add_error)
+                    context['option1'] = 2 # Show form with errors
 
             except ValueError as e:
                 errors.append(f"Invalid date format submitted. Please use the date picker. Error: {e}")
                 context['option1'] = 2
-                form = VacationLeaveNoMessForm(request.POST, **form_kwargs) # Re-pass form
+                form = VacationLeaveNoMessForm(request.POST) # Re-pass form
             except Exception as e:
                 errors.append(f"An unexpected error occurred: {e}")
                 context['option1'] = 2
-                form = VacationLeaveNoMessForm(request.POST, **form_kwargs) # Re-pass form
+                form = VacationLeaveNoMessForm(request.POST) # Re-pass form
 
         else:
             # Form validation failed (form.is_valid() returned False)
@@ -718,42 +709,40 @@ def vacation_no_mess(request):
 
     # --- Handle GET request or initial page load ---
     else:
+        # Instantiate the form
         if show_form:
             initial_data = {}
-            if is_editing:
+            if is_editing and student_vacation:
                 # Pre-fill only out_date from existing data for editing
                 initial_data['out_date'] = student_vacation.dateTimeStart.strftime('%d %B, %Y')
-                # in_date initial value is handled by form's __init__ now
-            elif not is_editing and vacation_open.forceInDate:
-                 # Pre-fill in_date if forceInDate for new entry
-                 initial_data['in_date'] = vacation_open.allowDateBefore.strftime('%d %B, %Y')
 
-            # Pass initial data AND the form_kwargs (containing existing_in_date if editing)
-            form = VacationLeaveNoMessForm(initial=initial_data, **form_kwargs)
+            form = VacationLeaveNoMessForm(initial=initial_data)
             context['option1'] = 0 # Show form
-
         elif student_vacation: # Already submitted, not editing
             context['option1'] = 1
-            form = VacationLeaveNoMessForm() # Provide empty form instance
-
+            form = VacationLeaveNoMessForm() # Provide empty form instance for context
         elif not vacation_open:
-            context['option1'] = 1
-            errors.append("No vacations nearby. Please keep checking this space for other details.")
-            form = VacationLeaveNoMessForm()
-
+            context['option1'] = 1 # Use 1 for consistency, message handled below
+            errors.append("There are currently no open vacation application periods.")
+            form = VacationLeaveNoMessForm() # Provide empty form instance
         else:
+            # Catch-all for other states (e.g., multiple records error)
              form = VacationLeaveNoMessForm()
-             context['option1'] = 1
-             errors.append("An unexpected state occurred.")
+             context['option1'] = 1 # Don't show form, rely on errors list
+             if not errors: # Add a generic message if no specific error was added
+                 errors.append("Vacation application cannot be submitted at this time.")
+
 
     # --- Prepare Context ---
     vacation_context['errors'] = errors # General errors
     vacation_context['vacation'] = vacation_open
     vacation_context['student_vacation'] = student_vacation
-    vacation_context['is_editing'] = is_editing # Pass flag to template
+    vacation_context['is_editing'] = is_editing
+    # Pass the determined In Date to the template for display if needed
+    vacation_context['required_in_date'] = required_in_date
     context['form'] = form # Ensure form is always in context
 
-    # Make sure option1 is set if not already
+    # Make sure option1 is set if not already (e.g., if POST fails validation)
     if 'option1' not in context:
         if form.errors:
             context['option1'] = 2
@@ -768,7 +757,6 @@ def vacation_no_mess(request):
             "vacation_no_mess.html",
             dict(context, **vacation_context)
     )
-
 
 @login_required
 @noPhD
