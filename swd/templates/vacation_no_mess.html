@@ -17,10 +17,8 @@
                         {% endif %}
                     </span>
                         <p class="light-blue-text">
-                            Make sure your vacation dates are between {{ vacation.allowDateAfter.date }} and {{ vacation.allowDateBefore.date }}
-                        </p>
+                            Make sure your vacation date is after {{ vacation.allowDateAfter.date }}
                         {% if is_editing %}
-                         <p class="orange-text text-darken-1">You can only change the Out Date. The In Date is fixed.</p>
                         {% endif %}
                         {% comment %} Removed forceInDate check here as it's handled by view/form now {% endcomment %}
 
@@ -84,7 +82,7 @@
                                     Vacation Leave successfully recorded.
                                 </p>
                                 <div class="green-text">
-                                    Leave applied from {{ student_vacation.dateTimeStart|date:"d F, Y"}} to {{ student_vacation.dateTimeEnd|date:"d F, Y" }}
+                                    Vacation applied from {{ student_vacation.dateTimeStart|date:"d F, Y"}}
                                 </div>
                                 <br>
                                 <a href="?edit=true" class="btn waves-light waves-effect">Edit Out Date</a> {# Changed button text #}
