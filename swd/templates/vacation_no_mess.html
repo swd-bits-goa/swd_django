@@ -1,24 +1,27 @@
 {% extends 'base.html' %}
-
 {% block content %}
-
 <div>
     <div class="section">
-        <!--   Icon Section   -->
         <div class="row">
             <div class="col s12 l6">
                 <div class="card">
                     <div class="card-content">
                     {% if vacation %}
-                    <span class="card-title">Apply for {{ vacation.get_leave_comment }}</span>
-                        <p class="light-blue-text">
-                            Make sure your vacation dates are between {{ vacation.allowDateAfter.date }} and {{ vacation.allowDateBefore.date }}
-                        </p>
-                        {% if vacation.forceInDate %}
-                        <p class="light-blue-text">
-                            By default the in-date will be set to {{ vacation.allowDateBefore.date }}
-                        </p>
+                    <span class="card-title">
+                        {% if student_vacation and not request.GET.edit %}
+                            Your Submitted {{ vacation.get_leave_comment }} Details
+                        {% elif is_editing %}
+                             Edit Your {{ vacation.get_leave_comment }} Out Date
+                        {% else %}
+                            Apply for {{ vacation.get_leave_comment }}
                         {% endif %}
+                    </span>
+                        <p class="light-blue-text">
+                            Make sure your vacation date is after {{ vacation.allowDateAfter.date }}
+                        {% if is_editing %}
+                        {% endif %}
+                        {% comment %} Removed forceInDate check here as it's handled by view/form now {% endcomment %}
+
                         <p>
                         {% if errors %}
                             {% for e in errors %}
@@ -28,93 +31,117 @@
                             {% endfor %}
                         {% endif %}
                         </p>
-
+                        {% comment %} option1 == 0 means show the form (either new or editing) {% endcomment %}
                         {% if option1 == 0 %}
-                        
+
                         <form method="POST">
                             {% csrf_token %}
                             <div class="col-md-12">
                                 {% for field in form %}
+                                    {% comment %} Display errors for the specific field {% endcomment %}
+                                     {% if form.errors and field.name in form.errors %}
+                                        {% for error in field.errors %}
+                                            <div class="red-text alert alert-danger">
+                                                <strong>{{ field.label }}: {{ error|escape }}</strong>
+                                            </div>
+                                        {% endfor %}
+                                     {% endif %}
 
-                                <!-- Django templates don't allow parentheses -->
-                                <!-- if not (field.name == "in_date" and vacation.forceInDate)-->
-                                {% if field.name != "in_date" or not vacation.forceInDate %}
+                                     {% comment %} Render the field - disabled state handled by form widget {% endcomment %}
                                     <div class="input-field col s12">
                                         {{ field }} {{ field.label_tag }}
+                                        {% if field.name == 'in_date' and is_editing %}
+                                            <span class="helper-text">In Date cannot be changed</span>
+                                        {% endif %}
                                     </div>
-                                {% else %}
-                                    {{ field.as_hidden }}
+                                {% endfor %}
+
+                                {% comment %} Display non-field errors (like the clean method error) {% endcomment %}
+                                {% if form.non_field_errors %}
+                                     {% for error in form.non_field_errors %}
+                                         <div class="red-text alert alert-danger">
+                                             <strong>{{ error|escape }}</strong>
+                                         </div>
+                                     {% endfor %}
                                 {% endif %}
 
-                                {% endfor %}
                             </div>
                             <div class="col-xs-4">
                                 <button class="btn desert-yellow waves-light waves-effect" type="submit">SUBMIT</button>
+                                {% if is_editing %} {# Changed condition to use is_editing flag #}
+                                    <a href="{% url 'vacation_no_mess' %}" class="btn grey waves-light waves-effect">CANCEL EDIT</a>
+                                {% endif %}
                             </div>
                         </form>
 
+                        {% comment %} option1 == 1 means success or already submitted (or no vacation open) {% endcomment %}
                         {% elif option1 == 1 %}
-                        
-                        <p>
-                            Vacation Leave successfully recorded.
-                        </p>
-                        <div class="green-text">
-                            Leave applied from {{ student_vacation.dateTimeStart}} to {{ student_vacation.dateTimeEnd }}
-
-                            <!-- Temporary change, to be reverted when allow date before is determined -->
-                            <!-- Leave applied from {{ student_vacation.dateTimeStart}} -->
-                        </div>
-                        
-                        {% else %}
-                        
-                            {% if form.errors %}
-                                {% for error in form.non_field_errors %}
+                            {# ... (Keep existing success message/Edit button logic as before) ... #}
+                             {% if student_vacation %}
+                                <p>
+                                    Vacation Leave successfully recorded.
+                                </p>
+                                <div class="green-text">
+                                    Vacation applied from {{ student_vacation.dateTimeStart|date:"d F, Y"}}
+                                </div>
+                                <br>
+                                <a href="?edit=true" class="btn waves-light waves-effect">Edit Out Date</a> {# Changed button text #}
+                            {% else %}
+                                {% for e in errors %}
                                     <div class="red-text alert alert-danger">
-                                        <strong>{{ error|escape }}</strong>
+                                        <strong>{{ e|escape }}</strong>
                                     </div>
                                 {% endfor %}
                             {% endif %}
 
-
-                            <form method="POST">
+                        {% comment %} option1 == 2 means submission failed validation (handled by form display now) {% endcomment %}
+                        {% else %}
+                             {# This block might be redundant now if errors are shown with option1=0 #}
+                             <p class="red-text">There was an error with your submission. Please check the form below.</p>
+                             <form method="POST"> {# Repeat form structure to show errors #}
                                 {% csrf_token %}
                                 <div class="col-md-12">
-                                    {% for field in form %}
-                                        {% if form.errors %}
-                                        {% for error in field.errors %}
-                                            <div class="red-text alert alert-danger">
-                                                <strong>{{ error|escape }}</strong>
-                                            </div>
-                                        {% endfor %}
-                                        {% endif %}
-
-                                        <!-- Django templates don't allow parentheses -->
-                                        <!-- if not (field.name == "in_date" and vacation.forceInDate)-->
-                                        {% if field.name != "in_date" or not vacation.forceInDate %}
-                                            <div class="input-field col s12">
-                                                {{ field }} {{ field.label_tag }}
-                                            </div>
-                                        {% else %}
-                                            {{ field.as_hidden }}
-                                        {% endif %}
-
+                                     {% for field in form %}
+                                         {% if form.errors and field.name in form.errors %}
+                                            {% for error in field.errors %}
+                                                <div class="red-text alert alert-danger">
+                                                    <strong>{{ field.label }}: {{ error|escape }}</strong>
+                                                </div>
+                                            {% endfor %}
+                                         {% endif %}
+                                        <div class="input-field col s12">
+                                            {{ field }} {{ field.label_tag }}
+                                            {% if field.name == 'in_date' and is_editing %}
+                                                <span class="helper-text">In Date cannot be changed</span>
+                                            {% endif %}
+                                        </div>
                                     {% endfor %}
+                                     {% if form.non_field_errors %}
+                                         {% for error in form.non_field_errors %}
+                                             <div class="red-text alert alert-danger">
+                                                 <strong>{{ error|escape }}</strong>
+                                             </div>
+                                         {% endfor %}
+                                     {% endif %}
                                 </div>
                                 <div class="col-xs-4">
                                     <button class="btn btn-block bg-green waves-effect" type="submit">SUBMIT</button>
+                                     {% if is_editing %}
+                                         <a href="{% url 'vacation_no_mess' %}" class="btn grey waves-light waves-effect">CANCEL EDIT</a>
+                                     {% endif %}
                                 </div>
-                            </form>
+                             </form>
                         {% endif %}
                     </div>
                     {% else %}
-                    Nothing's Here
+                     <span class="card-title">Vacation Application</span>
+                     <p class="red-text">There are currently no open vacation application periods.</p>
                     {% endif %}
                 </div>
             </div>
         </div>
     </div>
 </div>
-
 <script>
     // Patch fix for datepicker
     // Frontend devs -> please fix this issue asap. This is a temp patch.
@@ -126,17 +153,30 @@
         node.parentNode.classList.add('masked-parent-field')
         node.parentNode.appendChild(maskedDiv)
     })
-</script>
 
+    // Initialize datepickers if Materialize CSS is used
+    document.addEventListener('DOMContentLoaded', function() {
+        var elems = document.querySelectorAll('.datepicker');
+        var options = {
+            format: 'dd mmmm, yyyy', // Match the format used in view/form
+            autoClose: true
+        };
+        M.Datepicker.init(elems, options);
+     });
+
+</script>
 <style>
+    /* Keep existing styles */
     .comm {
         width: 100px;
     }
-
     .badge-container {
         width: 35%;
         padding-right: 9%;
     }
+    /* Style for masked datepicker */
+    .masked-parent-field {
+        position: relative;
+    }
 </style>
-
 {% endblock %}
