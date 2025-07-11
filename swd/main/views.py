@@ -1864,7 +1864,8 @@ def search(request):
                 return render(request, "search_logged_in.html", dict(context, **postContext))
             else:
                 return render(request, "search.html", dict(context, **postContext))
-        students = Student.objects.filter(Q(name__icontains=name) & Q(bitsId__icontains=bitsId) & Q(bitsId__contains=branch) & Q(hostelps__hostel__contains=hostel) & Q(hostelps__room__contains=room))
+        branchRegex = rf'^....{branch}|^......{branch}'
+        students = Student.objects.filter(Q(name__icontains=name) & Q(bitsId__icontains=bitsId) & (Q(bitsId__regex=branchRegex) if branch else Q()) & Q(hostelps__hostel__icontains=hostel) & Q(hostelps__room__icontains=room))
         searchstr = {}
 
         if name is not "":
