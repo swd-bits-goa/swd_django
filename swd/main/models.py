@@ -56,7 +56,7 @@ BRANCH = {
     'B7': 'M.Sc. Semiconductor & Nanoscience',
     'AC': 'B.E. Electronics and Computer Engineering',
     'PH': 'PhD.',
-    'HD': 'M.E.',
+    'H1': 'M.E.',
 }
 
 ME = {
