@@ -4237,7 +4237,6 @@ def order_form(request, bundle_id):
     """
     try:
 
-        print("Order form called")
         # Get current student information
         student = Student.objects.get(user=request.user)
         
@@ -4261,7 +4260,6 @@ def order_form(request, bundle_id):
             'approvalStatus': 'approved',
             'visibility': True
         })
-        print(bundle)
         if not bundle:
             messages.error(request, 'Bundle not found or not available for ordering.')
             return redirect('store')
@@ -4277,15 +4275,11 @@ def order_form(request, bundle_id):
         # Handle form submission
         if request.method == 'POST':
             # Check if it's JSON data
-            print(f"Content-Type: {request.content_type}")
-            print(f"Request body: {request.body}")
             
             if request.content_type == 'application/json':
                 try:
                     data = json.loads(request.body)
-                    print(f"Parsed JSON data: {data}")
                 except json.JSONDecodeError as e:
-                    print(f"JSON decode error: {e}")
                     return JsonResponse({
                         'success': False,
                         'message': 'Invalid JSON data'
@@ -4359,28 +4353,21 @@ def order_form(request, bundle_id):
                     'combos': combos_data,
                     'totalPrice': total_price,
                     'status': 'pending',
-                    'createdAt': datetime.now(timezone.utc),
-                    'updatedAt': datetime.now(timezone.utc)
                 }
                 
                 try:
-                    print(f"Attempting to insert order data: {order_data}")
                     result = orders_collection.insert_one(order_data)
-                    print(f"MongoDB insert result: {result}")
                     if result.inserted_id:
-                        print(f"Order created successfully with ID: {result.inserted_id}")
                         return JsonResponse({
                             'success': True,
                             'message': f'Order placed successfully! Order ID: {str(result.inserted_id)}'
                         })
                     else:
-                        print("MongoDB insert returned no inserted_id")
                         return JsonResponse({
                             'success': False,
                             'message': 'Failed to create order. Please try again.'
                         }, status=500)
                 except Exception as e:
-                    print(f"MongoDB insert error: {e}")
                     return JsonResponse({
                         'success': False,
                         'message': f'Database error while creating order: {str(e)}'
