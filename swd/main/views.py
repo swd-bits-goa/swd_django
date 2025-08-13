@@ -14,6 +14,8 @@ from django.conf import settings
 from django.core.files.storage import default_storage, FileSystemStorage
 from main.storage import no_duplicate_storage
 from tools.utils import gen_random_datetime
+import pymongo
+from django.conf import settings
 
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -1548,6 +1550,25 @@ def store(request):
     tees = TeeAdd.objects.filter(available=True).order_by('-pk')
     items = ItemAdd.objects.filter(available=True)
     teesj = TeeAdd.objects.filter(available=True).values_list('title')
+    
+    # Fetch clubs from MongoDB
+    clubs = []
+    try:
+        # Connect to MongoDB
+        client = pymongo.MongoClient(settings.MONGODB_URI, serverSelectionTimeoutMS=5000)
+        db = client.merchportal
+        users_collection = db.users
+        
+        # Find all users with role 'club'
+        clubs_cursor = users_collection.find({"role": "club"})
+        clubs = list(clubs_cursor)
+        
+        # Close the connection
+        client.close()
+        print(f"Successfully fetched {len(clubs)} clubs from MongoDB")
+    except Exception as e:
+        print(f"Error connecting to MongoDB: {e}")
+        clubs = []
 
     try:
         lasted = DuesPublished.objects.latest('date_published').date_published
@@ -1602,6 +1623,7 @@ def store(request):
         'student': student,
         'tees': tees,
         'items': items,
+        'clubs': clubs,
         'option': option,
         'balance': balance,
         'mess': mess,
