@@ -522,7 +522,7 @@
     $("#modalinfo").html(`
         <div class="row">
             <div class="col s12 l5">
-                <img src="/media/` + items[info][2] + `">
+                <img src='items[info][2]'>
             </div>
             <div class="col s12 l7">
                 <form method="POST" action="/store/" id="itemForm">
@@ -635,7 +635,7 @@
         var formHtml = `
         <div class="row">
             <div class="col s12 l5">
-                <img src="/media/${tee[2]}" class="responsive-img">
+                <img src="${tee[2]}" class="responsive-img">
             </div>
             <div class="col s12 l7">
                 <form method="POST" action="/store/" id="teeForm">
