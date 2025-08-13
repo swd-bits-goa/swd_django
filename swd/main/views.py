@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.urls import reverse
 from .models import *
 from django.views.decorators.csrf import csrf_protect
-from datetime import date, time, datetime, timedelta
+from datetime import date, time, datetime, timedelta, timezone
 from .forms import MessBillForm, MessForm, LeaveForm, BonafideForm, DayPassForm, VacationLeaveNoMessForm
 from django.contrib import messages
 from django.utils.timezone import make_aware
@@ -14,8 +14,6 @@ from django.conf import settings
 from django.core.files.storage import default_storage, FileSystemStorage
 from main.storage import no_duplicate_storage
 from tools.utils import gen_random_datetime
-import pymongo
-from django.conf import settings
 
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -45,6 +43,16 @@ import json
 from calendar import monthrange
 
 from pytz import timezone
+
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+from rest_framework import status
+from django.core.exceptions import ValidationError
+from django.db import transaction
+import json
+import pymongo
+from bson import ObjectId
 
 @user_passes_test(lambda a: a.is_superuser)
 def view_duplicates(request, end_year:str):
@@ -1533,7 +1541,7 @@ def import_mess_bill(request):
                             os.remove(tmp)
                             return HttpResponse("Make sure the the sheet ({}) have proper header rows.".format(sheet.name))
 
-            os.remove(tmp)
+            os.remove(tmp)  
             if failed == '':
                 failed = str(0)
             return HttpResponse(str(tot_dues_added) + " Dues successfully added.<br>" + failed + " bitsIDs not found in database")
@@ -1551,24 +1559,86 @@ def store(request):
     items = ItemAdd.objects.filter(available=True)
     teesj = TeeAdd.objects.filter(available=True).values_list('title')
     
+    # Check if a specific club is requested
+    selected_club = None
+    club_username = request.GET.get('club')
+    
     # Fetch clubs from MongoDB
     clubs = []
     try:
-        # Connect to MongoDB
-        client = pymongo.MongoClient(settings.MONGODB_URI, serverSelectionTimeoutMS=5000)
+        from swd.config import MONGODB_URI
+        client = pymongo.MongoClient(MONGODB_URI)
         db = client.merchportal
-        users_collection = db.users
+        clubs_collection = db.users
         
-        # Find all users with role 'club'
-        clubs_cursor = users_collection.find({"role": "club"})
-        clubs = list(clubs_cursor)
+        # Fetch all clubs (users with role 'club')
+        clubs = list(clubs_collection.find({'role': 'club'}, {
+            '_id': 1,
+            'username': 1,
+            'clubName': 1,
+            'createdAt': 1
+        }))
         
-        # Close the connection
+        # Fetch merch bundles for each club
+        merch_bundles_collection = db.merchbundles
+        
+        # Convert ObjectId to string for JSON serialization and add merch bundles
+        clubs_with_bundles = []
+        all_merch_bundles = []
+        
+        for club in clubs:
+            club_id_str = str(club['_id'])
+            club['_id'] = club_id_str
+            if 'createdAt' in club:
+                club['createdAt'] = club['createdAt'].strftime('%Y-%m-%d')
+            
+            # Fetch approved and visible merch bundles for this club
+            # Try both ObjectId and string versions of club ID
+            club_bundles = list(merch_bundles_collection.find({
+                '$or': [
+                    {'club': ObjectId(club_id_str)},
+                    {'club': club_id_str}
+                ],
+                'approvalStatus': 'approved',
+                'visibility': True
+            }, {
+                '_id': 1,
+                'title': 1,
+                'description': 1,
+                'merchItems': 1,
+                'combos': 1,
+                'createdAt': 1
+            }))
+            
+            # Convert ObjectIds to strings
+            for bundle in club_bundles:
+                bundle['id'] = str(bundle['_id'])  # Use 'id' instead of '_id' for template compatibility
+                if 'createdAt' in bundle:
+                    bundle['createdAt'] = bundle['createdAt'].strftime('%Y-%m-%d')
+                # Add club info to bundle for display
+                bundle['clubName'] = club.get('clubName', club['username'])
+                bundle['clubUsername'] = club['username']
+            
+            club['merchBundles'] = club_bundles
+            
+            # Check if this is the selected club
+            if club_username and club['username'] == club_username:
+                selected_club = club
+            
+            # Only include clubs that have merch bundles
+            if club_bundles:
+                clubs_with_bundles.append(club)
+                all_merch_bundles.extend(club_bundles)
+        
+        # Replace clubs with only those that have bundles
+        clubs = clubs_with_bundles
+        
         client.close()
-        print(f"Successfully fetched {len(clubs)} clubs from MongoDB")
+        
     except Exception as e:
-        print(f"Error connecting to MongoDB: {e}")
+        print(f"Error fetching clubs: {e}")
         clubs = []
+        error = "Unable to load clubs at the moment"
 
     try:
         lasted = DuesPublished.objects.latest('date_published').date_published
@@ -1624,6 +1694,9 @@ def store(request):
         'tees': tees,
         'items': items,
         'clubs': clubs,
+        'selected_club': selected_club,
+        'all_merch_bundles': all_merch_bundles if 'all_merch_bundles' in locals() else [],
+        'error': error if 'error' in locals() else None,
         'option': option,
         'balance': balance,
         'mess': mess,
@@ -1634,19 +1707,64 @@ def store(request):
 
     if request.POST:
         if request.POST.get('what') == 'item':
-            itemno = ItemAdd.objects.get(id=int(request.POST.get('info')))
-            bought = False;
-            if ItemBuy.objects.filter(student=student,item=itemno).exists():
-                bought = True
-            else:
-                bought = False
-            if bought == True:
-                messages.add_message(request, messages.INFO,"You have already paid for "+ itemno.title,extra_tags='orange')
-            elif itemno.available == True:
-                itembuy = ItemBuy.objects.create(item = itemno, student=student)
-                messages.add_message(request, messages.INFO, itemno.title + ' item bought. Thank you for purchasing. Headover to DUES to check your purchases.', extra_tags='green')
-            else:
-                messages.add_message(request, messages.INFO,  'Item not available', extra_tags='red')
+            try:
+                itemno = ItemAdd.objects.get(id=int(request.POST.get('info')))
+                size = request.POST.get('sizes', '')
+                quantity = int(request.POST.get('quantity', 1))
+                
+                # Validate quantity
+                if quantity < 1:
+                    messages.add_message(request, messages.ERROR, 'Quantity must be at least 1', extra_tags='red')
+                    return render(request, "store.html", context)
+                
+                # Check if item is available
+                if not itemno.available:
+                    messages.add_message(request, messages.ERROR, 'Item not available', extra_tags='red')
+                    return render(request, "store.html", context)
+                
+                # Check if size is required but not provided
+                if itemno.sizes and not size:
+                    messages.add_message(request, messages.ERROR, 'Please select a size', extra_tags='red')
+                    return render(request, "store.html", context)
+                
+                # Check if item with same size already purchased
+                # Note: This is a simplified check - you might want to adjust based on your requirements
+                existing_purchase = ItemBuy.objects.filter(student=student, item=itemno).first()
+                if existing_purchase:
+                    messages.add_message(
+                        request, 
+                        messages.INFO,
+                        f"You have already purchased {itemno.title}",
+                        extra_tags='orange'
+                    )
+                else:
+                    # Create purchase record for each quantity
+                    for _ in range(quantity):
+                        ItemBuy.objects.create(
+                            item=itemno,
+                            student=student,
+                            size=size if size else None
+                        )
+                    
+                    messages.add_message(
+                        request,
+                        messages.SUCCESS,
+                        f'Successfully purchased {quantity} {itemno.title}(s). Thank you for your purchase!',
+                        extra_tags='green'
+                    )
+                
+            except ItemAdd.DoesNotExist:
+                messages.add_message(request, messages.ERROR, 'Invalid item', extra_tags='red')
+            except ValueError:
+                messages.add_message(request, messages.ERROR, 'Invalid quantity', extra_tags='red')
+            except Exception as e:
+                print(f"Error processing purchase: {e}")
+                messages.add_message(
+                    request,
+                    messages.ERROR,
+                    'An error occurred while processing your purchase. Please try again.',
+                    extra_tags='red'
+                )
         if request.POST.get('what') == 'tee':
             teeno = TeeAdd.objects.get(id=int(request.POST.get('info')))
             bought = False;
@@ -4110,3 +4228,493 @@ def delete_students(request):
 
 def messagefromdean(request):
     return render(request,"messagefromdean.html",{})
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def create_merch_order(request, bundle_id):
+    """
+    Create a new merch order for a specific bundle using MongoDB
+    """
+    try:
+        # Connect to MongoDB
+        from swd.config import MONGODB_URI
+        client = pymongo.MongoClient(MONGODB_URI)
+        db = client.merchportal
+        merch_bundles_collection = db.merchbundles
+        orders_collection = db.orders
+
+        # Validate bundle exists and is available for ordering
+        try:
+            bundle_object_id = ObjectId(bundle_id)
+        except:
+            return Response({
+                'success': False,
+                'message': 'Invalid bundle ID'
+            }, status=status.HTTP_400_BAD_REQUEST)
+            
+        bundle = merch_bundles_collection.find_one({
+            '_id': bundle_object_id,
+            'approvalStatus': 'approved',
+            'visibility': True
+        })
+
+        if not bundle:
+            return Response({
+                'success': False,
+                'message': 'Bundle not found or not available for ordering'
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        # Validate request data
+        student_bits_id = request.data.get('studentBITSID')
+        student_name = request.data.get('studentName')
+        student_email = request.data.get('studentEmail')
+        
+        # Handle both JSON and form data
+        items_data = request.data.get('items', [])
+        combos_data = request.data.get('combos', [])
+        
+        # If items/combos are JSON strings, parse them
+        if isinstance(items_data, str):
+            try:
+                items_data = json.loads(items_data)
+            except json.JSONDecodeError:
+                return Response({
+                    'success': False,
+                    'message': 'Invalid items data format'
+                }, status=status.HTTP_400_BAD_REQUEST)
+        
+        if isinstance(combos_data, str):
+            try:
+                combos_data = json.loads(combos_data)
+            except json.JSONDecodeError:
+                return Response({
+                    'success': False,
+                    'message': 'Invalid combos data format'
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+        if not all([student_bits_id, student_name, student_email]):
+            return Response({
+                'success': False,
+                'message': 'Missing required fields: studentBITSID, studentName, studentEmail'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        if not items_data and not combos_data:
+            return Response({
+                'success': False,
+                'message': 'At least one item or combo is required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Check if student already has an order for this bundle
+        existing_order = orders_collection.find_one({
+            'studentBITSID': student_bits_id,
+            'bundle': bundle_object_id
+        })
+
+        if existing_order:
+            return Response({
+                'success': False,
+                'message': 'You have already placed an order for this bundle'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Validate items and combos, calculate total price
+        total_price = 0
+        all_items = []
+
+        # Get valid item names from bundle
+        bundle_item_names = [item['name'] for item in bundle.get('merchItems', [])]
+        bundle_combo_names = [combo['name'] for combo in bundle.get('combos', [])]
+
+        # Process individual merch items
+        for item_data in items_data:
+            merch_name = item_data.get('merchName')
+            size = item_data.get('size')
+            quantity = item_data.get('quantity')
+            price = item_data.get('price')
+
+            if not all([merch_name, size, quantity, price]):
+                return Response({
+                    'success': False,
+                    'message': 'Each item must have merchName, size, quantity, and price'
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            if merch_name not in bundle_item_names:
+                return Response({
+                    'success': False,
+                    'message': f'Invalid merch item: {merch_name}'
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            if not isinstance(quantity, int) or quantity < 1 or quantity > 10:
+                return Response({
+                    'success': False,
+                    'message': 'Quantity must be between 1 and 10'
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            if not isinstance(price, (int, float)) or price < 0:
+                return Response({
+                    'success': False,
+                    'message': 'Price must be a positive number'
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            # Validate price against bundle
+            bundle_item = next((i for i in bundle.get('merchItems', []) if i['name'] == merch_name), None)
+            if bundle_item and float(price) != float(bundle_item['price']):
+                return Response({
+                    'success': False,
+                    'message': f'Invalid price for item: {merch_name}'
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            total_price += float(price) * quantity
+            all_items.append(item_data)
+
+        # Process combos
+        for combo_data in combos_data:
+            combo_name = combo_data.get('comboName')
+            quantity = combo_data.get('quantity')
+            price = combo_data.get('price')
+            combo_items = combo_data.get('items', [])
+
+            if not all([combo_name, quantity, price]):
+                return Response({
+                    'success': False,
+                    'message': 'Each combo must have comboName, quantity, and price'
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            if combo_name not in bundle_combo_names:
+                return Response({
+                    'success': False,
+                    'message': f'Invalid combo: {combo_name}'
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            if not isinstance(quantity, int) or quantity < 1 or quantity > 10:
+                return Response({
+                    'success': False,
+                    'message': 'Quantity must be between 1 and 10'
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            if not isinstance(price, (int, float)) or price < 0:
+                return Response({
+                    'success': False,
+                    'message': 'Price must be a positive number'
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            # Validate combo items
+            bundle_combo = next((c for c in bundle.get('combos', []) if c['name'] == combo_name), None)
+            if not bundle_combo:
+                return Response({
+                    'success': False,
+                    'message': f'Combo not found: {combo_name}'
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            # Validate price against bundle
+            if float(price) != float(bundle_combo['comboPrice']):
+                return Response({
+                    'success': False,
+                    'message': f'Invalid price for combo: {combo_name}'
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            # Validate combo items
+            for combo_item in combo_items:
+                item_name = combo_item.get('itemName')
+                size = combo_item.get('size')
+                
+                if not all([item_name, size]):
+                    return Response({
+                        'success': False,
+                        'message': 'Each combo item must have itemName and size'
+                    }, status=status.HTTP_400_BAD_REQUEST)
+
+                if item_name not in bundle_combo['items']:
+                    return Response({
+                        'success': False,
+                        'message': f'Invalid item in combo {combo_name}: {item_name}'
+                    }, status=status.HTTP_400_BAD_REQUEST)
+
+            total_price += float(price) * quantity
+            
+            # Add combo as an item with detailed information
+            combo_item_data = {
+                'merchName': combo_name,
+                'size': ', '.join([f"{item['itemName']} ({item['size']})" for item in combo_items]),
+                'quantity': quantity,
+                'price': price
+            }
+            all_items.append(combo_item_data)
+
+        # Create order in MongoDB
+        order_data = {
+            'studentBITSID': student_bits_id,
+            'studentName': student_name,
+            'studentEmail': student_email,
+            'bundle': bundle_object_id,
+            'items': all_items,
+            'totalPrice': total_price,
+            'createdAt': datetime.utcnow(),
+            'updatedAt': datetime.utcnow()
+        }
+
+        result = orders_collection.insert_one(order_data)
+        order_data['_id'] = str(result.inserted_id)
+
+        # Close MongoDB connection
+        client.close()
+
+        return Response({
+            'success': True,
+            'message': 'Order created successfully',
+            'data': {
+                'order': {
+                    'id': str(result.inserted_id),
+                    'studentBITSID': order_data['studentBITSID'],
+                    'studentName': order_data['studentName'],
+                    'studentEmail': order_data['studentEmail'],
+                    'bundle': bundle_id,
+                    'totalPrice': order_data['totalPrice'],
+                    'createdAt': order_data['createdAt'].isoformat()
+                }
+            }
+        }, status=status.HTTP_201_CREATED)
+
+    except Exception as e:
+        return Response({
+            'success': False,
+            'message': 'Server error while creating order',
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+def order_form(request, bundle_id):
+    """
+    Display order form for a specific merch bundle and handle form submission
+    """
+    try:
+        # Get current student information
+        student = Student.objects.get(user=request.user)
+        
+        # Connect to MongoDB
+        from swd.config import MONGODB_URI
+        client = pymongo.MongoClient(MONGODB_URI)
+        db = client.merchportal
+        merch_bundles_collection = db.merchbundles
+        users_collection = db.users
+        orders_collection = db.orders
+        
+        # Validate bundle exists and is available for ordering
+        try:
+            bundle_object_id = ObjectId(bundle_id)
+        except:
+            messages.error(request, 'Invalid bundle ID.')
+            return redirect('store')
+            
+        bundle = merch_bundles_collection.find_one({
+            '_id': bundle_object_id,
+            'approvalStatus': 'approved',
+            'visibility': True
+        })
+        
+        if not bundle:
+            messages.error(request, 'Bundle not found or not available for ordering.')
+            return redirect('store')
+        
+        # Get club information
+        club = users_collection.find_one({'_id': bundle['club']})
+        
+        # Convert ObjectId to string for template compatibility
+        bundle['id'] = str(bundle['_id'])
+        if 'createdAt' in bundle:
+            bundle['createdAt'] = bundle['createdAt'].strftime('%Y-%m-%d')
+        
+        # Handle form submission
+        if request.method == 'POST':
+            try:
+                # Parse form data
+                student_bits_id = request.POST.get('studentBITSID')
+                student_name = request.POST.get('studentName')
+                student_email = request.POST.get('studentEmail')
+                
+                # Validate required fields
+                if not all([student_bits_id, student_name, student_email]):
+                    messages.error(request, 'Please fill in all required student information.')
+                    raise ValueError('Missing required fields')
+                
+                # Parse items and combos from form data
+                items_data = []
+                combos_data = []
+                form_data = request.POST.dict()
+                
+                # Extract items from form data
+                item_indices = set()
+                for key in form_data.keys():
+                    if key.startswith('items[') and '][merchName]' in key:
+                        index = key.split('[')[1].split(']')[0]
+                        item_indices.add(index)
+                
+                for index in item_indices:
+                    merch_name = form_data.get(f'items[{index}][merchName]')
+                    size = form_data.get(f'items[{index}][size]')
+                    quantity = form_data.get(f'items[{index}][quantity]')
+                    price = form_data.get(f'items[{index}][price]')
+                    
+                    if merch_name and size and quantity and price:
+                        try:
+                            quantity = int(quantity)
+                            price = float(price)
+                            if quantity > 0 and price >= 0:
+                                items_data.append({
+                                    'merchName': merch_name,
+                                    'size': size,
+                                    'quantity': quantity,
+                                    'price': price,
+                                    'type': 'item'
+                                })
+                        except (ValueError, TypeError):
+                            continue
+                
+                # Extract combos from form data
+                combo_indices = set()
+                for key in form_data.keys():
+                    if key.startswith('combos[') and '][comboName]' in key:
+                        index = key.split('[')[1].split(']')[0]
+                        combo_indices.add(index)
+                
+                for index in combo_indices:
+                    combo_name = form_data.get(f'combos[{index}][comboName]')
+                    quantity = form_data.get(f'combos[{index}][quantity]')
+                    price = form_data.get(f'combos[{index}][price]')
+                    
+                    if combo_name and quantity and price:
+                        try:
+                            quantity = int(quantity)
+                            price = float(price)
+                            if quantity > 0 and price >= 0:
+                                # Extract combo items
+                                combo_items = []
+                                item_indices = set()
+                                for key in form_data.keys():
+                                    if key.startswith(f'combos[{index}][items][') and '][itemName]' in key:
+                                        item_idx = key.split('[')[3].split(']')[0]
+                                        item_indices.add(item_idx)
+                                
+                                for item_idx in item_indices:
+                                    item_name = form_data.get(f'combos[{index}][items][{item_idx}][itemName]')
+                                    size = form_data.get(f'combos[{index}][items][{item_idx}][size]', 'One Size')
+                                    if item_name:
+                                        combo_items.append({
+                                            'itemName': item_name,
+                                            'size': size
+                                        })
+                                
+                                combos_data.append({
+                                    'comboName': combo_name,
+                                    'quantity': quantity,
+                                    'price': price,
+                                    'items': combo_items,
+                                    'type': 'combo'
+                                })
+                        except (ValueError, TypeError) as e:
+                            print(f"Error processing combo: {e}")
+                            continue
+                
+                if not items_data and not combos_data:
+                    messages.error(request, 'Please select at least one item or combo to order.')
+                    raise ValueError('No items or combos selected')
+                
+                # Check if student already has an order for this bundle
+                existing_order = orders_collection.find_one({
+                    'studentBITSID': student_bits_id,
+                    'bundle': bundle_object_id
+                })
+                
+                if existing_order:
+                    messages.error(request, 'You have already placed an order for this bundle.')
+                    raise ValueError('Duplicate order')
+                
+                # Validate items and combos, and calculate total price
+                total_price = 0
+                bundle_item_names = [item['name'] for item in bundle.get('merchItems', [])]
+                bundle_combo_names = [combo['name'] for combo in bundle.get('combos', [])]
+                
+                # Process individual items
+                for item_data in items_data:
+                    merch_name = item_data['merchName']
+                    if merch_name not in bundle_item_names:
+                        messages.error(request, f'Invalid merch item: {merch_name}')
+                        raise ValueError(f'Invalid item: {merch_name}')
+                    
+                    # Validate price against bundle
+                    item = next((i for i in bundle.get('merchItems', []) if i['name'] == merch_name), None)
+                    if item and float(item_data['price']) != float(item['price']):
+                        messages.error(request, f'Invalid price for item: {merch_name}')
+                        raise ValueError('Price mismatch for item')
+                    total_price += float(item_data['price']) * item_data['quantity']
+                
+                # Process combos
+                for combo_data in combos_data:
+                    combo_name = combo_data['comboName']
+                    if combo_name not in bundle_combo_names:
+                        messages.error(request, f'Invalid combo: {combo_name}')
+                        raise ValueError(f'Invalid combo: {combo_name}')
+                    
+                    # Validate price against bundle
+                    combo = next((c for c in bundle.get('combos', []) if c['name'] == combo_name), None)
+                    if not combo:
+                        messages.error(request, f'Combo not found in bundle: {combo_name}')
+                        raise ValueError(f'Combo not found: {combo_name}')
+                        
+                    if float(combo_data['price']) != float(combo.get('comboPrice', 0)):
+                        messages.error(request, f'Invalid price for combo: {combo_name}')
+                        raise ValueError('Price mismatch for combo')
+                        
+                    # Validate combo items
+                    if not combo_data.get('items'):
+                        messages.error(request, f'No items in combo: {combo_name}')
+                        raise ValueError(f'Empty combo: {combo_name}')
+                        
+                    total_price += float(combo_data['price']) * combo_data['quantity']
+                
+                # Create order in MongoDB
+                order_data = {
+                    'studentBITSID': student_bits_id,
+                    'studentName': student_name,
+                    'studentEmail': student_email,
+                    'bundle': bundle_object_id,
+                    'items': items_data,
+                    'combos': combos_data,
+                    'totalPrice': total_price,
+                    'status': 'pending',
+                    'createdAt': datetime.utcnow(),
+                    'updatedAt': datetime.utcnow()
+                }
+                
+                result = orders_collection.insert_one(order_data)
+                
+                messages.success(request, f'Order placed successfully! Order ID: {str(result.inserted_id)}')
+                return redirect('store')
+                
+            except ValueError as e:
+                # Error already handled with messages
+                pass
+            except Exception as e:
+                messages.error(request, f'Error placing order: {str(e)}')
+        
+        # Close MongoDB connection
+        client.close()
+        
+        context = {
+            'bundle': bundle,
+            'club': club,
+            'student': {
+                'bitsId': student.bitsId,
+                'name': student.name,
+                'email': student.user.email
+            }
+        }
+        
+        return render(request, 'order_form.html', context)
+        
+    except Student.DoesNotExist:
+        messages.error(request, 'Student information not found.')
+        return redirect('store')
+    except Exception as e:
+        messages.error(request, f'Error loading order form: {str(e)}')
+        return redirect('store')
+

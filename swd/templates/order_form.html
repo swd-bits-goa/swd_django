@@ -1,0 +1,804 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container-fluid">
+    {% if messages %}
+    {% for message in messages %}
+    <span class="new badge {{ message.tags }}" data-badge-caption="{{ message }}"></span>
+    {% endfor %}
+    {% endif %}
+    
+    <!-- Back to Store Button -->
+    <div class="section">
+        <a href="{% url 'store' %}" class="btn waves-effect waves-light" style="background-color: #F46036;">
+            <i class="material-icons left">arrow_back</i>Back to Store
+        </a>
+    </div>
+    
+    {% if bundle %}
+    <div class="section">
+        <div class="row">
+            <div class="col s12">
+                <div class="card order-form-card">
+                    <div class="card-content">
+                        <div class="bundle-header">
+                            <h4 style="color:#F46036; margin: 0; padding: 8px; font-size: 28px">{{ bundle.title }}</h4>
+                            <p class="club-name">{{ club.clubName|default:club.username }}</p>
+                            {% if bundle.description %}
+                            <p class="bundle-description">{{ bundle.description }}</p>
+                            {% endif %}
+                        </div>
+                        
+                        <form method="POST" action="{% url 'order_form' bundle.id %}" id="orderForm">
+                            {% csrf_token %}
+                            
+                            <!-- Size Charts Section -->
+                            {% if bundle.sizeCharts %}
+                            <div class="size-charts-section">
+                                <h5 style="color:#F46036; margin: 30px 0 15px 0;">Size Charts</h5>
+                                <div class="row">
+                                    {% for size_chart in bundle.sizeCharts %}
+                                    <div class="col s12 m6 l4">
+                                        <div class="size-chart-card">
+                                            <div class="size-chart-image">
+                                                <img src={{size_chart}} alt="Size Chart" class="responsive-img">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            <!-- Student Information -->
+                            <div class="student-info-section">
+                                <h5 style="color:#F46036; margin: 20px 0 15px 0;">Student Information</h5>
+                                <div class="row">
+                                    <div class="input-field col s12 m4">
+                                        <input id="studentBITSID" name="studentBITSID" type="text" class="validate" required value="{{ student.bitsId|default:'' }}">
+                                        <label for="studentBITSID">BITS ID</label>
+                                    </div>
+                                    <div class="input-field col s12 m4">
+                                        <input id="studentName" name="studentName" type="text" class="validate" required value="{{ student.name|default:'' }}">
+                                        <label for="studentName">Full Name</label>
+                                    </div>
+                                    <div class="input-field col s12 m4">
+                                        <input id="studentEmail" name="studentEmail" type="email" class="validate" required value="{{ student.email|default:'' }}">
+                                        <label for="studentEmail">Email</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Merch Items Section -->
+                            {% if bundle.merchItems %}
+                            <div class="merch-items-section">
+                                <h5 style="color:#F46036; margin: 30px 0 15px 0;">Merch Items</h5>
+                                <div class="row">
+                                    {% for item in bundle.merchItems %}
+                                    <div class="col s12 m6 l4">
+                                        <div class="merch-item-card">
+                                            {% if item.image %}
+                                            <div class="item-image">
+                                                <img src="{{ item.image }}" alt="{{ item.name }}" class="responsive-img">
+                                            </div>
+                                            {% endif %}
+                                            <div class="item-header">
+                                                <h6>{{ item.name }}</h6>
+                                                <span class="price">₹{{ item.price }}</span>
+                                            </div>
+                                            {% if item.description %}
+                                            <p class="item-description">{{ item.description }}</p>
+                                            {% endif %}
+                                            
+                                            <div class="item-options">
+                                                <!-- Size dropdown for individual merch items -->
+                                                <div class="input-field">
+                                                    <select name="items[{{ forloop.counter0 }}][size]" class="item-size" required>
+                                                        <option value="" disabled selected>Choose size</option>
+                                                        <option value="XXXS">XXXS</option>
+                                                        <option value="XXS">XXS</option>
+                                                        <option value="XS">XS</option>
+                                                        <option value="S">S</option>
+                                                        <option value="M">M</option>
+                                                        <option value="L">L</option>
+                                                        <option value="XL">XL</option>
+                                                        <option value="XXL">XXL</option>
+                                                        <option value="3XL">3XL</option>
+                                                        <option value="4XL">4XL</option>
+                                                        <option value="5XL">5XL</option>
+                                                    </select>
+                                                    <label>Size</label>
+                                                </div>
+                                                
+                                                <div class="input-field">
+                                                    <input id="quantity_{{ forloop.counter0 }}" name="items[{{ forloop.counter0 }}][quantity]" type="number" min="0" max="10" class="validate item-quantity" value="0">
+                                                    <label for="quantity_{{ forloop.counter0 }}">Quantity (0-10)</label>
+                                                </div>
+                                                
+                                                <input type="hidden" name="items[{{ forloop.counter0 }}][merchName]" value="{{ item.name }}">
+                                                <input type="hidden" name="items[{{ forloop.counter0 }}][price]" value="{{ item.price }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            <!-- Combos Section -->
+                            {% if bundle.combos %}
+                            <div class="combos-section">
+                                <h5 style="color:#F46036; margin: 30px 0 15px 0;">Combos</h5>
+                                <div class="row">
+                                    {% for combo in bundle.combos %}
+                                    <div class="col s12 m6 l4">
+                                        <div class="combo-card">
+                                            <div class="combo-header">
+                                                <h6>{{ combo.name }}</h6>
+                                                <span class="price">₹{{ combo.comboPrice }}</span>
+                                            </div>
+                                            {% if combo.description %}
+                                            <p class="combo-description">{{ combo.description }}</p>
+                                            {% endif %}
+                                            
+                                            <div class="combo-options">
+                                                <!-- Individual item selection for combos -->
+                                                {% if combo.items %}
+                                                <div class="combo-items-selection">
+                                                    <label class="combo-items-label">Select Items:</label>
+                                                    {% for item_name in combo.items %}
+                                                    <div class="combo-item-option">
+                                                        <div class="input-field">
+                                                            <select name="combos[{{ forloop.parentloop.counter0 }}][items][{{ forloop.counter0 }}][size]" class="combo-item-size" required>
+                                                                <option value="" disabled selected>Choose size for {{ item_name }}</option>
+                                                                <option value="XXXS">XXXS</option>
+                                                                <option value="XXS">XXS</option>
+                                                                <option value="XS">XS</option>
+                                                                <option value="S">S</option>
+                                                                <option value="M">M</option>
+                                                                <option value="L">L</option>
+                                                                <option value="XL">XL</option>
+                                                                <option value="XXL">XXL</option>
+                                                                <option value="3XL">3XL</option>
+                                                                <option value="4XL">4XL</option>
+                                                                <option value="5XL">5XL</option>
+                                                            </select>
+                                                            <label>{{ item_name }} - Size</label>
+                                                        </div>
+                                                        <input type="hidden" name="combos[{{ forloop.parentloop.counter0 }}][items][{{ forloop.counter0 }}][itemName]" value="{{ item_name }}">
+                                                    </div>
+                                                    {% endfor %}
+                                                </div>
+                                                {% endif %}
+                                                
+                                                <div class="input-field">
+                                                    <input id="combo_quantity_{{ forloop.counter0 }}" name="combos[{{ forloop.counter0 }}][quantity]" type="number" min="0" max="10" class="validate combo-quantity" value="0">
+                                                    <label for="combo_quantity_{{ forloop.counter0 }}">Quantity (0-10)</label>
+                                                </div>
+                                                
+                                                <input type="hidden" name="combos[{{ forloop.counter0 }}][comboName]" value="{{ combo.name }}">
+                                                <input type="hidden" name="combos[{{ forloop.counter0 }}][price]" value="{{ combo.comboPrice }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            <!-- Order Summary -->
+                            <div class="order-summary">
+                                <h5 style="color:#F46036; margin: 30px 0 15px 0;">Order Summary</h5>
+                                <div class="summary-content">
+                                    <div class="row">
+                                        <div class="col s12 m8">
+                                            <div id="order-items-list">
+                                                <!-- Order items will be populated by JavaScript -->
+                                            </div>
+                                        </div>
+                                        <div class="col s12 m4">
+                                            <div class="total-section">
+                                                <h6>Total Amount: <span id="total-amount">₹0</span></h6>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Terms and Submit -->
+                            <div class="order-submit">
+                                <p>
+                                    <input id="agree" type="checkbox" class="filled-in" required/>
+                                    <label for="agree">I agree to place this order and understand that the amount will be deducted from my account</label>
+                                </p>
+                                <div class="submit-section">
+                                    <button type="submit" id="place-order" class="btn waves-effect waves-light disabled" style="background-color: #F46036;">
+                                        <i class="material-icons left">shopping_cart</i>Place Order
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="section">
+        <div class="card-panel red lighten-4">
+            <span class="red-text text-darken-2">
+                <i class="material-icons left">error</i>
+                Bundle not found or not available for ordering.
+            </span>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    .order-form-card {
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+    }
+    
+    .bundle-header {
+        text-align: center;
+        padding: 30px;
+        background: linear-gradient(135deg, #F46036 0%, #e74c3c 100%);
+        color: white;
+        margin: -25px -25px 25px -25px;
+    }
+    
+    .bundle-header h4 {
+        color: white !important;
+        margin-bottom: 10px !important;
+    }
+    
+    .club-name {
+        font-size: 18px;
+        margin: 10px 0;
+        opacity: 0.9;
+    }
+    
+    .bundle-description {
+        font-size: 16px;
+        line-height: 1.6;
+        margin: 15px 0 0 0;
+        opacity: 0.95;
+    }
+    
+    .student-info-section {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 20px 0;
+    }
+    
+    .size-charts-section, .merch-items-section, .combos-section {
+        margin: 30px 0;
+    }
+    
+    .size-chart-card {
+        background: white;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 2px solid #F46036;
+        box-shadow: 0 4px 15px rgba(244, 96, 54, 0.1);
+        transition: all 0.3s ease;
+    }
+    
+    .size-chart-card:hover {
+        box-shadow: 0 6px 20px rgba(244, 96, 54, 0.2);
+        transform: translateY(-2px);
+    }
+    
+    .size-chart-image {
+        text-align: center;
+    }
+    
+    .size-chart-image img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 4px;
+    }
+    
+    .merch-item-card, .combo-card {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+    }
+    
+    .merch-item-card:hover, .combo-card:hover {
+        border-color: #F46036;
+        box-shadow: 0 4px 15px rgba(244, 96, 54, 0.2);
+    }
+    
+    .item-image {
+        text-align: center;
+        margin-bottom: 15px;
+    }
+    
+    .item-image img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .item-header, .combo-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #F46036;
+    }
+    
+    .item-header h6, .combo-header h6 {
+        color: #F46036;
+        font-weight: 600;
+        margin: 0;
+        font-size: 18px;
+    }
+    
+    .price {
+        background: #F46036;
+        color: white;
+        padding: 5px 12px;
+        border-radius: 15px;
+        font-weight: 600;
+        font-size: 14px;
+    }
+    
+    .item-description, .combo-description {
+        color: #666;
+        font-size: 14px;
+        line-height: 1.5;
+        margin: 10px 0;
+    }
+    
+    .item-options, .combo-options {
+        margin-top: 15px;
+    }
+    
+    .item-options .input-field, .combo-options .input-field {
+        margin-bottom: 15px;
+    }
+    
+    .combo-items-selection {
+        background: #f0f0f0;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        border: 1px solid #ddd;
+    }
+    
+    .combo-items-label {
+        display: block;
+        font-weight: 600;
+        color: #F46036;
+        margin-bottom: 10px;
+        font-size: 14px;
+    }
+    
+    .combo-item-option {
+        margin-bottom: 10px;
+        padding: 10px;
+        background: white;
+        border-radius: 6px;
+        border: 1px solid #e0e0e0;
+    }
+    
+    .combo-item-option:last-child {
+        margin-bottom: 0;
+    }
+    
+    .order-summary {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 30px 0;
+    }
+    
+    .summary-content {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        border: 2px solid #F46036;
+    }
+    
+    .total-section {
+        text-align: center;
+        padding: 20px;
+        background: #F46036;
+        color: white;
+        border-radius: 8px;
+    }
+    
+    .total-section h6 {
+        color: white !important;
+        margin: 0;
+        font-size: 20px;
+    }
+    
+    .order-submit {
+        text-align: center;
+        padding: 30px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        margin: 30px 0;
+    }
+    
+    .submit-section {
+        margin-top: 20px;
+    }
+    
+    .submit-section .btn {
+        padding: 0 40px;
+        height: 50px;
+        line-height: 50px;
+        font-size: 16px;
+        border-radius: 25px;
+        text-transform: none;
+        font-weight: 600;
+        box-shadow: 0 4px 15px rgba(244, 96, 54, 0.3);
+        transition: all 0.3s ease;
+    }
+    
+    .submit-section .btn:hover:not(.disabled) {
+        box-shadow: 0 6px 20px rgba(244, 96, 54, 0.4);
+        transform: translateY(-2px);
+    }
+    
+    .order-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .order-item:last-child {
+        border-bottom: none;
+    }
+    
+    .order-item-name {
+        font-weight: 600;
+        color: #F46036;
+    }
+    
+    .order-item-details {
+        color: #666;
+        font-size: 14px;
+    }
+    
+    .order-item-price {
+        font-weight: 600;
+        color: #333;
+    }
+    
+    @media only screen and (max-width: 600px) {
+        .bundle-header {
+            padding: 20px;
+        }
+        
+        .bundle-header h4 {
+            font-size: 24px !important;
+        }
+        
+        .size-chart-card {
+            padding: 10px;
+        }
+        
+        .merch-item-card, .combo-card {
+            padding: 15px;
+        }
+        
+        .item-header, .combo-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        
+        .item-image {
+            margin-bottom: 10px;
+        }
+    }
+</style>
+
+<script>
+    $(document).ready(function() {
+        $('select').material_select();
+        
+        // Initialize order summary
+        updateOrderSummary();
+        
+        // Add event listeners for quantity changes
+        $('.item-quantity, .combo-quantity').on('change', function() {
+            updateOrderSummary();
+        });
+        
+        // Add event listeners for size changes
+        $('.item-size, .combo-item-size').on('change', function() {
+            updateOrderSummary();
+        });
+        
+        // Handle agreement checkbox
+        $('#agree').change(function() {
+            if ($(this).prop('checked')) {
+                $('#place-order').removeClass('disabled');
+            } else {
+                $('#place-order').addClass('disabled');
+            }
+        });
+        
+        // Function to validate the order form
+        function validateOrderForm() {
+            let isValid = true;
+            let hasItems = false;
+            
+            // Validate regular items
+            $('.merch-item-card').each(function() {
+                const $quantityInput = $(this).find('.item-quantity');
+                const quantity = parseInt($quantityInput.val()) || 0;
+                
+                if (quantity > 0) {
+                    hasItems = true;
+                    const $sizeSelect = $(this).find('select[required]');
+                    if ($sizeSelect.length && !$sizeSelect.val()) {
+                        isValid = false;
+                        $sizeSelect.addClass('invalid');
+                    }
+                }
+            });
+            
+            // Validate combos
+            $('.combo-card').each(function() {
+                const $quantityInput = $(this).find('.combo-quantity');
+                const quantity = parseInt($quantityInput.val()) || 0;
+                
+                if (quantity > 0) {
+                    hasItems = true;
+                    let comboHasError = false;
+                    
+                    // Check all required size selects in this combo
+                    $(this).find('.combo-item-size').each(function() {
+                        if (!$(this).val()) {
+                            isValid = false;
+                            comboHasError = true;
+                            $(this).addClass('invalid');
+                        } else {
+                            $(this).removeClass('invalid');
+                        }
+                    });
+                    
+                    // Add error class to combo card if any size is missing
+                    if (comboHasError) {
+                        $(this).addClass('has-error');
+                    } else {
+                        $(this).removeClass('has-error');
+                    }
+                }
+            });
+            
+            if (!hasItems) {
+                M.toast({html: 'Please add at least one item to your order', classes: 'red'});
+                return false;
+            }
+            
+            if (!$('#agree').prop('checked')) {
+                M.toast({html: 'Please agree to the terms before placing your order', classes: 'red'});
+                return false;
+            }
+            
+            return isValid;
+        }
+        
+        // Handle form submission
+        $('#orderForm').on('submit', function(e) {
+            e.preventDefault();
+            
+            // Validate the form
+            if (!validateOrderForm()) {
+                return false;
+            }
+            
+            // Show loading state
+            const $submitBtn = $('#place-order');
+            const originalBtnText = $submitBtn.html();
+            $submitBtn.addClass('disabled').html('<i class="fa fa-spinner fa-spin"></i> Processing...');
+            
+            try {
+                // Collect items data
+                const items = [];
+                $('.merch-item-card').each(function(index) {
+                    const quantity = parseInt($(this).find('.item-quantity').val()) || 0;
+                    if (quantity > 0) {
+                        const price = parseFloat($(this).find('input[name*="[price]"]').val()) || 0;
+                        const name = $(this).find('input[name*="[merchName]"]').val();
+                        const size = $(this).find('.item-size').val() || 'One Size';
+                        
+                        items.push({
+                            merchName: name,
+                            size: size,
+                            quantity: quantity,
+                            price: price
+                        });
+                    }
+                });
+                
+                // Collect combos data
+                const combos = [];
+                $('.combo-card').each(function(index) {
+                    const quantity = parseInt($(this).find('.combo-quantity').val()) || 0;
+                    if (quantity > 0) {
+                        const price = parseFloat($(this).find('input[name*="[price]"]').val()) || 0;
+                        const comboName = $(this).find('input[name*="[comboName]"]').val();
+                        
+                        const comboItems = [];
+                        $(this).find('.combo-item-size').each(function() {
+                            const itemName = $(this).closest('.combo-item-option').find('input[name*="[itemName]"]').val();
+                            const size = $(this).val() || 'One Size';
+                            comboItems.push({
+                                itemName: itemName,
+                                size: size
+                            });
+                        });
+                        
+                        combos.push({
+                            comboName: comboName,
+                            quantity: quantity,
+                            price: price,
+                            items: comboItems
+                        });
+                    }
+                });
+                
+                // Create form data with all form fields
+                const form = document.getElementById('orderForm');
+                const formData = new FormData(form);
+                
+                // Add items and combos as form data
+                items.forEach((item, index) => {
+                    formData.append(`items[${index}][merchName]`, item.merchName);
+                    formData.append(`items[${index}][size]`, item.size);
+                    formData.append(`items[${index}][quantity]`, item.quantity);
+                    formData.append(`items[${index}][price]`, item.price);
+                });
+                
+                combos.forEach((combo, comboIndex) => {
+                    formData.append(`combos[${comboIndex}][comboName]`, combo.comboName);
+                    formData.append(`combos[${comboIndex}][quantity]`, combo.quantity);
+                    formData.append(`combos[${comboIndex}][price]`, combo.price);
+                    
+                    combo.items.forEach((item, itemIndex) => {
+                        formData.append(`combos[${comboIndex}][items][${itemIndex}][itemName]`, item.itemName);
+                        formData.append(`combos[${comboIndex}][items][${itemIndex}][size]`, item.size);
+                    });
+                });
+                
+                // Submit the form with the combined data
+                fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    credentials: 'same-origin'
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => { throw err; });
+                    }
+                    return response;
+                })
+                .then(() => {
+                    // On success, redirect to store page with success message
+                    window.location.href = '{% url "store" %}';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    const errorMessage = error.message || 'An error occurred while submitting your order';
+                    M.toast({html: errorMessage, classes: 'red'});
+                    $submitBtn.removeClass('disabled').html(originalBtnText);
+                });
+                
+            } catch (error) {
+                console.error('Error processing order:', error);
+                M.toast({html: 'An error occurred while processing your order. Please try again.', classes: 'red'});
+                $submitBtn.removeClass('disabled').html(originalBtnText);
+            }
+        });
+        
+        // Handle place order button click (in case form submission is triggered by button)
+        $('#place-order').on('click', function(e) {
+            if (!$(this).hasClass('disabled')) {
+                $('#orderForm').submit();
+            }
+        });
+    });
+    
+    function updateOrderSummary() {
+        let totalAmount = 0;
+        let orderItems = [];
+        
+        // Process merch items
+        $('.merch-item-card').each(function(index) {
+            const quantity = parseInt($(this).find('.item-quantity').val()) || 0;
+            const price = parseFloat($(this).find('input[name*="[price]"]').val()) || 0;
+            const name = $(this).find('input[name*="[merchName]"]').val();
+            const size = $(this).find('.item-size').val() || 'One Size';
+            
+            if (quantity > 0) {
+                const itemTotal = quantity * price;
+                totalAmount += itemTotal;
+                orderItems.push({
+                    name: name,
+                    size: size,
+                    quantity: quantity,
+                    price: price,
+                    total: itemTotal
+                });
+            }
+        });
+        
+        // Process combos
+        $('.combo-card').each(function(index) {
+            const quantity = parseInt($(this).find('.combo-quantity').val()) || 0;
+            const price = parseFloat($(this).find('input[name*="[price]"]').val()) || 0;
+            const comboName = $(this).find('input[name*="[comboName]"]').val();
+            
+            if (quantity > 0) {
+                const itemTotal = quantity * price;
+                totalAmount += itemTotal;
+                
+                // Get individual items in the combo
+                const comboItems = [];
+                $(this).find('.combo-item-size').each(function() {
+                    const itemName = $(this).closest('.combo-item-option').find('input[name*="[itemName]"]').val();
+                    const size = $(this).val();
+                    if (size) {
+                        comboItems.push(`${itemName} (${size})`);
+                    }
+                });
+                
+                orderItems.push({
+                    name: comboName,
+                    size: comboItems.join(', '),
+                    quantity: quantity,
+                    price: price,
+                    total: itemTotal
+                });
+            }
+        });
+        
+        // Update order items list
+        let itemsHtml = '';
+        orderItems.forEach(function(item) {
+            itemsHtml += `
+                <div class="order-item">
+                    <div>
+                        <div class="order-item-name">${item.name}</div>
+                        <div class="order-item-details">Size: ${item.size} | Quantity: ${item.quantity}</div>
+                    </div>
+                    <div class="order-item-price">₹${item.total}</div>
+                </div>
+            `;
+        });
+        
+        if (orderItems.length === 0) {
+            itemsHtml = '<p style="color: #666; text-align: center;">No items selected</p>';
+        }
+        
+        $('#order-items-list').html(itemsHtml);
+        $('#total-amount').text('₹' + totalAmount.toFixed(2));
+    }
+</script>
+{% endblock %}
+

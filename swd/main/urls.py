@@ -31,6 +31,7 @@ urlpatterns = [
     url(r'^hostelsuperintendent/([0-9]+)/$', views.hostelsuperintendentdaypassapprove, name="hostelsuperintendentdaypassapprove"),
     url(r'^daypass/', views.daypass, name="daypass"),
     url(r'^store/', views.store, name="store"),
+    url(r'^order_form/(?P<bundle_id>[^/]+)/$', views.order_form, name="order_form"),
     url(r'^dues/', views.dues, name="dues"),
     url(r'^notices/', views.notices, name="notices"),
     url(r'^search/', views.search, name="search"),
