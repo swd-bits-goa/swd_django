@@ -4244,17 +4244,14 @@ def order_form(request, bundle_id):
         # Connect to MongoDB
         from swd.config import MONGODB_URI
         client = pymongo.MongoClient(MONGODB_URI, serverSelectionTimeoutMS=5000)
-        print("MongoDB connection successful")
         db = client.merchportal
         merch_bundles_collection = db.merchbundles
         users_collection = db.users
         orders_collection = db.orders
         
-        
+        # Validate bundle exists and is available for ordering
         try:
             bundle_object_id = ObjectId(bundle_id)
-
-            print("valid bundle id")
         except:
             messages.error(request, 'Invalid bundle ID.')
             return redirect('store')
@@ -4264,7 +4261,7 @@ def order_form(request, bundle_id):
             'approvalStatus': 'approved',
             'visibility': True
         })
-        print("this is bundle")
+        print(bundle)
         if not bundle:
             messages.error(request, 'Bundle not found or not available for ordering.')
             return redirect('store')
@@ -4280,13 +4277,15 @@ def order_form(request, bundle_id):
         # Handle form submission
         if request.method == 'POST':
             # Check if it's JSON data
-            
+            print(f"Content-Type: {request.content_type}")
+            print(f"Request body: {request.body}")
             
             if request.content_type == 'application/json':
                 try:
                     data = json.loads(request.body)
-
+                    print(f"Parsed JSON data: {data}")
                 except json.JSONDecodeError as e:
+                    print(f"JSON decode error: {e}")
                     return JsonResponse({
                         'success': False,
                         'message': 'Invalid JSON data'
@@ -4318,10 +4317,10 @@ def order_form(request, bundle_id):
                     'studentBITSID': student_bits_id,
                     'bundle': bundle_object_id
                 })
-                print("existing order: ", existing_order)
+                
                 if existing_order:
                     return JsonResponse({
-                        'success': False,   
+                        'success': False,
                         'message': 'You have already placed an order for this bundle.'
                     }, status=400)
                 
@@ -4351,8 +4350,6 @@ def order_form(request, bundle_id):
                     total_price += float(combo_data.get('price', 0)) * combo_data.get('quantity', 0)
                 
                 # Create order in MongoDB
-
-                print("Creating order data")
                 order_data = {
                     'studentBITSID': student_bits_id,
                     'studentName': student_name,
@@ -4361,10 +4358,11 @@ def order_form(request, bundle_id):
                     'items': items_data,
                     'combos': combos_data,
                     'totalPrice': total_price,
-                   
-                    
+                    'status': 'pending',
+                    'createdAt': datetime.now(timezone.utc),
+                    'updatedAt': datetime.now(timezone.utc)
                 }
-                print("Order data: ", order_data)
+                
                 try:
                     print(f"Attempting to insert order data: {order_data}")
                     result = orders_collection.insert_one(order_data)
