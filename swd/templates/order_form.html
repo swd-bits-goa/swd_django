@@ -459,23 +459,23 @@
 </style>
 
 <script>
-    $(document).ready(function() {
-        // Initialize Materialize components
-        $('select').material_select();
-        
-        // Update order summary when quantities change
-        $('.item-quantity, .combo-quantity').on('change', function() {
-            updateOrderSummary();
-        });
-        
-        // Handle agreement checkbox
-        $('#agree').change(function() {
-            if ($(this).prop('checked')) {
-                $('#place-order').removeClass('disabled');
-            } else {
-                $('#place-order').addClass('disabled');
-            }
-        });
+    $(document).ready(function () {
+            // Initialize Materialize components
+            $('select').material_select(); // Use formSelect() instead of material_select() for Materialize v1.0 and above
+
+            // Update order summary when quantities or sizes change
+            $('.item-quantity, .combo-quantity, .item-size, .combo-item-size').on('change', function () {
+                updateOrderSummary();
+            });
+
+            // Handle agreement checkbox
+            $('#agree').change(function () {
+                if ($(this).prop('checked')) {
+                    $('#place-order').removeClass('disabled');
+                } else {
+                    $('#place-order').addClass('disabled');
+                }
+            });
         
         // Form submission
         $('#orderForm').on('submit', function(e) {
@@ -505,8 +505,8 @@
                 if (quantity > 0) {
                     const price = parseFloat($(this).find('input[name*="[price]"]').val()) || 0;
                     const name = $(this).find('input[name*="[merchName]"]').val();
-                    const size = $(this).find('.item-size').val() || 'One Size';
-                    
+                    const size = $(this).find('select.item-size').val() || 'One Size'; // changed line
+
                     formData.items.push({
                         merchName: name,
                         size: size,
@@ -605,12 +605,12 @@
         let orderItems = [];
         
         // Process merch items
-        $('.merch-item-card').each(function(index) {
+        $('.merch-item-card').each(function (index) {
             const quantity = parseInt($(this).find('.item-quantity').val()) || 0;
             const price = parseFloat($(this).find('input[name*="[price]"]').val()) || 0;
             const name = $(this).find('input[name*="[merchName]"]').val();
-            const size = $(this).find('.item-size').val() || 'One Size';
-            
+            const size = $(this).find('select.item-size').val() || 'One Size'; // changed line
+
             if (quantity > 0) {
                 const itemTotal = quantity * price;
                 totalAmount += itemTotal;
