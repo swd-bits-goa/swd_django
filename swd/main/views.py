@@ -4272,6 +4272,18 @@ def order_form(request, bundle_id):
         if 'createdAt' in bundle:
             bundle['createdAt'] = bundle['createdAt'].strftime('%Y-%m-%d')
         
+        # Check on GET if student already has an order for this bundle
+        has_existing_order = False
+        try:
+            existing_order_get = orders_collection.find_one({
+                'studentBITSID': student.bitsId,
+                'bundle': bundle_object_id
+            })
+            has_existing_order = existing_order_get is not None
+        except Exception:
+            # Fail safe: if the check fails, allow proceeding to form; POST will still validate
+            has_existing_order = False
+
         # Handle form submission
         if request.method == 'POST':
             # Check if it's JSON data
@@ -4395,7 +4407,8 @@ def order_form(request, bundle_id):
                 'bitsId': student.bitsId,
                 'name': student.name,
                 'email': student.user.email
-            }
+            },
+            'has_existing_order': has_existing_order
         }
         
         return render(request, 'order_form.html', context)
