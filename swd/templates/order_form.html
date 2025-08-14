@@ -487,9 +487,11 @@
             }
             
             // Show loading state
-            const $submitBtn = $('#place-order');
-            $submitBtn.addClass('disabled').html('<i class="material-icons left">hourglass_empty</i>Processing...');
-            
+            const $submitBtn = $('#place-order');  // Define it here once
+            $submitBtn.html('<i class="material-icons left">hourglass_empty</i> Placing Order...')
+                        .addClass('disabled')
+                        .css('background-color', '#F46036');
+
             // Collect form data as JSON
             const formData = {
                 studentBITSID: $('#studentBITSID').val(),
@@ -553,21 +555,33 @@
                     'X-CSRFToken': $('[name=csrfmiddlewaretoken]').val()
                 },
                 success: function(response) {
+                    console.log('Response received:', response);  // Add this for debugging
                     if (response.success) {
-                        M.toast({html: response.message, classes: 'green'});
+                        console.log('Order placed successfully:', response);  // Debug log
+                        
+                        // Here we're using the $submitBtn that was defined above
+                        $submitBtn.removeClass('disabled')
+                                .html('<i class="material-icons left">check_circle</i>Order Placed')
+                                .css('background-color', '#4CAF50');
+                        
+                        console.log('Setting timeout for redirect to /dashboard/');  // Debug log
                         setTimeout(function() {
-                            window.location.href = '/store/';
+                            console.log('Redirecting now...');  // Debug log
+                            window.location.href = '/dashboard/';
                         }, 2000);
                     } else {
-                        M.toast({html: response.message, classes: 'red'});
                         $submitBtn.removeClass('disabled').html('<i class="material-icons left">shopping_cart</i>Place Order');
                     }
                 },
                 error: function(xhr, status, error) {
                     console.error('Error:', xhr.responseText);
-                    M.toast({html: 'An error occurred while placing your order. Please try again.', classes: 'red'});
                     $submitBtn.removeClass('disabled').html('<i class="material-icons left">shopping_cart</i>Place Order');
                 }
+            }).then(() => {
+                console.log('AJAX request completed');  // Debug log
+            }).catch(error => {
+                console.error('AJAX request failed:', error);  // Debug log
+
             });
         });
         
