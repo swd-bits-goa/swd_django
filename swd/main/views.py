@@ -4240,7 +4240,6 @@ def order_form(request, bundle_id):
         # Get current student information
         student = Student.objects.get(user=request.user)
         
-        # Connect to MongoDB
         from swd.config import MONGODB_URI
         client = pymongo.MongoClient(MONGODB_URI, serverSelectionTimeoutMS=5000)
         db = client.merchportal
@@ -4248,7 +4247,6 @@ def order_form(request, bundle_id):
         users_collection = db.users
         orders_collection = db.orders
         
-        # Validate bundle exists and is available for ordering
         try:
             bundle_object_id = ObjectId(bundle_id)
         except:
@@ -4264,15 +4262,12 @@ def order_form(request, bundle_id):
             messages.error(request, 'Bundle not found or not available for ordering.')
             return redirect('store')
         
-        # Get club information
         club = users_collection.find_one({'_id': bundle['club']})
         
-        # Convert ObjectId to string for template compatibility
         bundle['id'] = str(bundle['_id'])
         if 'createdAt' in bundle:
             bundle['createdAt'] = bundle['createdAt'].strftime('%Y-%m-%d')
         
-        # Check on GET if student already has an order for this bundle
         has_existing_order = False
         try:
             existing_order_get = orders_collection.find_one({
@@ -4281,12 +4276,9 @@ def order_form(request, bundle_id):
             })
             has_existing_order = existing_order_get is not None
         except Exception:
-            # Fail safe: if the check fails, allow proceeding to form; POST will still validate
             has_existing_order = False
 
-        # Handle form submission
         if request.method == 'POST':
-            # Check if it's JSON data
             
             if request.content_type == 'application/json':
                 try:
@@ -4297,7 +4289,6 @@ def order_form(request, bundle_id):
                         'message': 'Invalid JSON data'
                     }, status=400)
                 
-                # Get student information from JSON
                 student_bits_id = data.get('studentBITSID')
                 student_name = data.get('studentName')
                 student_email = data.get('studentEmail')
@@ -4317,6 +4308,71 @@ def order_form(request, bundle_id):
                         'success': False,
                         'message': 'Please select at least one item or combo to order.'
                     }, status=400)
+                
+                # Validate data structure for items
+                for item_data in items_data:
+                    required_fields = ['merchName', 'quantity', 'price', 'hasNick']
+                    for field in required_fields:
+                        if field not in item_data:
+                            return JsonResponse({
+                                'success': False,
+                                'message': f'Missing required field "{field}" in item data'
+                            }, status=400)
+                    
+                    # Validate quantity
+                    try:
+                        quantity = int(item_data.get('quantity', 0))
+                        if quantity <= 0:
+                            return JsonResponse({
+                                'success': False,
+                                'message': f'Quantity must be greater than 0 for {item_data.get("merchName")}'
+                            }, status=400)
+                    except (ValueError, TypeError):
+                        return JsonResponse({
+                            'success': False,
+                            'message': f'Invalid quantity for {item_data.get("merchName")}'
+                        }, status=400)
+                
+                # Validate data structure for combos
+                for combo_data in combos_data:
+                    required_fields = ['comboName', 'quantity', 'price', 'items']
+                    for field in required_fields:
+                        if field not in combo_data:
+                            return JsonResponse({
+                                'success': False,
+                                'message': f'Missing required field "{field}" in combo data'
+                            }, status=400)
+                    
+                    # Validate combo quantity
+                    try:
+                        quantity = int(combo_data.get('quantity', 0))
+                        if quantity <= 0:
+                            return JsonResponse({
+                                'success': False,
+                                'message': f'Quantity must be greater than 0 for combo {combo_data.get("comboName")}'
+                            }, status=400)
+                    except (ValueError, TypeError):
+                        return JsonResponse({
+                            'success': False,
+                            'message': f'Invalid quantity for combo {combo_data.get("comboName")}'
+                        }, status=400)
+                    
+                    # Validate combo items structure
+                    combo_items = combo_data.get('items', [])
+                    if not combo_items:
+                        return JsonResponse({
+                            'success': False,
+                            'message': f'Combo {combo_data.get("comboName")} must contain at least one item'
+                        }, status=400)
+                    
+                    for combo_item in combo_items:
+                        required_item_fields = ['itemName', 'size', 'hasNick']
+                        for field in required_item_fields:
+                            if field not in combo_item:
+                                return JsonResponse({
+                                    'success': False,
+                                    'message': f'Missing required field "{field}" in combo item data'
+                                },                                 status=400)
                 
                 # Check if student already has an order for this bundle
                 existing_order = orders_collection.find_one({
@@ -4342,9 +4398,27 @@ def order_form(request, bundle_id):
                             'success': False,
                             'message': f'Invalid merch item: {merch_name}'
                         }, status=400)
+                    
+                    has_nick = item_data.get('hasNick', False)
+                    if has_nick:
+                        nick_value = item_data.get('nick', '').strip()
+                        if not nick_value:
+                            return JsonResponse({
+                                'success': False,
+                                'message': f'Nickname is required for {merch_name}'
+                            }, status=400)
+                        if len(nick_value) > 50:
+                            return JsonResponse({
+                                'success': False,
+                                'message': f'Nickname for {merch_name} must be 50 characters or less'
+                            }, status=400)
+                        
+                        # Sanitize nickname data (remove any potentially harmful characters)
+                        nick_value = nick_value.replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;')
+                        item_data['nick'] = nick_value
+                    
                     total_price += float(item_data.get('price', 0)) * item_data.get('quantity', 0)
                 
-                # Validate and calculate combos
                 bundle_combo_names = [combo['name'] for combo in bundle.get('combos', [])]
                 for combo_data in combos_data:
                     combo_name = combo_data.get('comboName')
@@ -4353,9 +4427,29 @@ def order_form(request, bundle_id):
                             'success': False,
                             'message': f'Invalid combo: {combo_name}'
                         }, status=400)
+                    
+                    combo_items = combo_data.get('items', [])
+                    for combo_item in combo_items:
+                        item_name = combo_item.get('itemName')
+                        has_nick = combo_item.get('hasNick', False)
+                        if has_nick:
+                            nick_value = combo_item.get('nick', '').strip()
+                            if not nick_value:
+                                return JsonResponse({
+                                    'success': False,
+                                    'message': f'Nickname for {item_name} in combo {combo_name} must be provided'
+                                }, status=400)
+                            if len(nick_value) > 50:
+                                return JsonResponse({
+                                    'success': False,
+                                    'message': f'Nickname for {item_name} in combo {combo_name} must be 50 characters or less'
+                                }, status=400)
+                            
+                            nick_value = nick_value.replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;')
+                            combo_item['nick'] = nick_value
+                    
                     total_price += float(combo_data.get('price', 0)) * combo_data.get('quantity', 0)
                 
-                # Create order in MongoDB
                 order_data = {
                     'studentBITSID': student_bits_id,
                     'studentName': student_name,
@@ -4368,6 +4462,7 @@ def order_form(request, bundle_id):
                 }
                 
                 try:
+                    
                     result = orders_collection.insert_one(order_data)
                     if result.inserted_id:
                         return JsonResponse({
@@ -4375,11 +4470,13 @@ def order_form(request, bundle_id):
                             'message': f'Order placed successfully! Order ID: {str(result.inserted_id)}'
                         })
                     else:
+                        print("Failed to create order - no inserted ID returned")
                         return JsonResponse({
                             'success': False,
                             'message': 'Failed to create order. Please try again.'
                         }, status=500)
                 except Exception as e:
+                    print(f"Error creating order: {str(e)}")
                     return JsonResponse({
                         'success': False,
                         'message': f'Database error while creating order: {str(e)}'

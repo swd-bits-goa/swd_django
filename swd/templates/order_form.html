@@ -1,5 +1,47 @@
 {% extends 'base.html' %}
+{% load staticfiles %}
+
 {% block content %}
+<style>
+    .nick-field .input-field {
+        position: relative;
+    }
+    
+    .nick-field .input-field label {
+        width: 100% !important;
+        margin-left: 10px !important;
+        white-space: normal;
+        word-wrap: break-word;
+        line-height: 1.2;
+        max-width: none;
+        left: 0px;
+        transform: translateY(12px);
+    }
+    
+    .nick-field .input-field label.active {
+        transform: translateY(-14px) scale(0.8);
+    }
+    
+    .nick-field .input-field input {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+    
+    .nick-field .input-field .prefix {
+        display: none !important;
+    }
+    
+    .nick-field {
+        margin-bottom: 20px;
+    }
+    
+    .nick-field .helper-text {
+        margin-top: 5px;
+        font-size: 0.8rem;
+        color: #666;
+    }
+</style>
+
 <div class="container-fluid">
     {% if messages %}
     <div class="section">
@@ -14,7 +56,7 @@
     </div>
     {% endif %}
     
-    <!-- Back to Store Button -->
+    
     <div class="section">
         <a href="{% url 'store' %}" class="btn waves-effect waves-light" style="background-color: #F46036;">
             <i class="material-icons left">arrow_back</i>Back to Store
@@ -27,7 +69,6 @@
             <div class="col s12">
                 <div class="card order-form-card">
                     <div class="card-content">
-                        <!-- Bundle Header -->
                         <div class="bundle-header">
                             <h4>{{ bundle.title }}</h4>
                             <p class="club-name">{{ club.clubName|default:club.username }}</p>
@@ -44,11 +85,9 @@
                             </span>
                         </div>
                         {% else %}
-                        <!-- Order Form -->
                         <form method="POST" id="orderForm">
                             {% csrf_token %}
                             
-                            <!-- Student Information -->
                             <div class="student-info-section">
                                 <h5>Student Information</h5>
                                 <div class="row">
@@ -67,7 +106,6 @@
                                 </div>
                             </div>
                             
-                            <!-- Size Charts -->
                             {% if bundle.sizeCharts %}
                             <div class="size-charts-section">
                                 <h5>Size Charts</h5>
@@ -83,7 +121,6 @@
                             </div>
                             {% endif %}
                             
-                            <!-- Merch Items -->
                             {% if bundle.merchItems %}
                             <div class="merch-items-section">
                                 <h5>Merch Items</h5>
@@ -98,7 +135,7 @@
                                             {% endif %}
                                             <div class="item-header">
                                                 <h6>{{ item.name }}</h6>
-                                                <span class="price">₹{{ item.price }}</span>
+                                                <span class="price" {% if item.nick %}data-nick=" - Nickname available"{% endif %}>₹{{ item.price }}</span>
                                             </div>
                                             {% if item.description %}
                                             <p class="item-description">{{ item.description }}</p>
@@ -123,8 +160,16 @@
                                                     <label for="quantity_{{ forloop.counter0 }}">Quantity (0-10)</label>
                                                 </div>
                                                 
+                                                {% if item.nick %}
+                                                <div class="input-field nick-field">
+                                                    <input id="nick_{{ forloop.counter0 }}" name="items[{{ forloop.counter0 }}][nick]" type="text" class="validate item-nick" maxlength="50" placeholder="Enter nickname for customization">
+                                                    <span class="helper-text">Custom text for the back of this item</span>
+                                                </div>
+                                                {% endif %}
+                                                
                                                 <input type="hidden" name="items[{{ forloop.counter0 }}][merchName]" value="{{ item.name }}">
                                                 <input type="hidden" name="items[{{ forloop.counter0 }}][price]" value="{{ item.price }}">
+                                                <input type="hidden" name="items[{{ forloop.counter0 }}][hasNick]" value="{{ item.nick|yesno:'true,false' }}">
                                             </div>
                                         </div>
                                     </div>
@@ -133,7 +178,6 @@
                             </div>
                             {% endif %}
                             
-                            <!-- Combos -->
                             {% if bundle.combos %}
                             <div class="combos-section">
                                 <h5>Combos</h5>
@@ -143,7 +187,7 @@
                                         <div class="combo-card">
                                             <div class="combo-header">
                                                 <h6>{{ combo.name }}</h6>
-                                                <span class="price">₹{{ combo.comboPrice }}</span>
+                                                <span class="price" {% if combo.hasNick %}data-nick=" - Customizable items"{% endif %}>₹{{ combo.comboPrice }}</span>
                                             </div>
                                             {% if combo.description %}
                                             <p class="combo-description">{{ combo.description }}</p>
@@ -167,7 +211,18 @@
                                                             </select>
                                                             <label>{{ item_name }} - Size</label>
                                                         </div>
+                                                        
+                                                        {% if item_name.nick %}
+                                                        <div class="input-field nick-field">
+                                                            <input id="combo_nick_{{ forloop.parentloop.counter0 }}_{{ forloop.counter0 }}" 
+                                                                   name="combos[{{ forloop.parentloop.counter0 }}][items][{{ forloop.counter0 }}][nick]" 
+                                                                   type="text" class="validate combo-item-nick" maxlength="50" placeholder="Enter nickname for {{ item_name }}">
+                                                            <span class="helper-text">Custom text for the back of this item</span>
+                                                        </div>
+                                                        {% endif %}
+                                                        
                                                         <input type="hidden" name="combos[{{ forloop.parentloop.counter0 }}][items][{{ forloop.counter0 }}][itemName]" value="{{ item_name }}">
+                                                        <input type="hidden" name="combos[{{ forloop.parentloop.counter0 }}][items][{{ forloop.counter0 }}][hasNick]" value="{{ item_name.nick|yesno:'true,false' }}">
                                                     </div>
                                                     {% endfor %}
                                                 </div>
@@ -188,7 +243,6 @@
                             </div>
                             {% endif %}
                             
-                            <!-- Order Summary -->
                             <div class="order-summary">
                                 <h5>Order Summary</h5>
                                 <div class="summary-content">
@@ -207,7 +261,6 @@
                                 </div>
                             </div>
                             
-                            <!-- Terms and Submit -->
                             <div class="order-submit">
                                 <p>
                                     <input id="agree" type="checkbox" class="filled-in" required/>
@@ -446,6 +499,52 @@
         color: #333;
     }
     
+    .merch-item-card .item-options,
+    .combo-card .combo-options {
+        padding: 15px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        margin-top: 15px;
+    }
+    
+    .nick-field {
+        margin-top: 15px;
+        padding: 15px;
+        background-color: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        position: relative;
+    }
+    
+    .nick-field .helper-text {
+        font-size: 0.8em;
+        color: #666;
+        margin-top: 8px;
+        display: block;
+    }
+    
+    .nick-field input {
+        border-bottom: 2px solid #2196F3 !important;
+    }
+    
+    .nick-field input:focus {
+        border-bottom: 2px solid #1976D2 !important;
+        box-shadow: 0 1px 0 0 #1976D2 !important;
+    }
+    
+    .merch-item-card .item-header .price {
+        position: relative;
+    }
+    
+    .merch-item-card .item-header .price::after {
+        content: " (Customizable)" attr(data-nick);
+        font-size: 0.8em;
+        color: #ffffff;
+        font-weight: normal;
+        display: block;
+        margin-top: 2px;
+    }
+    
     @media only screen and (max-width: 600px) {
         .bundle-header {
             padding: 20px;
@@ -469,8 +568,7 @@
 
 <script>
     $(document).ready(function () {
-            // Initialize Materialize components
-            $('select').material_select(); // Use formSelect() instead of material_select() for Materialize v1.0 and above
+            $('select').material_select();
 
             // Update order summary when quantities or sizes change
             $('.item-quantity, .combo-quantity, .item-size, .combo-item-size').on('change', function () {
@@ -499,9 +597,7 @@
             const $submitBtn = $('#place-order');  // Define it here once
             $submitBtn.html('<i class="material-icons left">hourglass_empty</i> Placing Order...')
                         .addClass('disabled')
-                        .css('background-color', '#F46036');
-
-            // Collect form data as JSON
+                        .css('background-color', '#F46036');            // Collect form data as JSON
             const formData = {
                 studentBITSID: $('#studentBITSID').val(),
                 studentName: $('#studentName').val(),
@@ -516,13 +612,17 @@
                 if (quantity > 0) {
                     const price = parseFloat($(this).find('input[name*="[price]"]').val()) || 0;
                     const name = $(this).find('input[name*="[merchName]"]').val();
-                    const size = $(this).find('select.item-size').val() || 'One Size'; // changed line
+                    const size = $(this).find('select.item-size').val() || 'One Size';
+                    const hasNick = $(this).find('input[name*="[hasNick]"]').val() === 'true';
+                    const nick = hasNick ? $(this).find('input[name*="[nick]"]').val() : '';
 
                     formData.items.push({
                         merchName: name,
                         size: size,
                         quantity: quantity,
-                        price: price
+                        price: price,
+                        hasNick: hasNick,
+                        nick: nick
                     });
                 }
             });
@@ -538,9 +638,14 @@
                     $(this).find('.combo-item-size').each(function() {
                         const itemName = $(this).closest('.combo-item-option').find('input[name*="[itemName]"]').val();
                         const size = $(this).val() || 'One Size';
+                        const hasNick = $(this).closest('.combo-item-option').find('input[name*="[hasNick]"]').val() === 'true';
+                        const nick = hasNick ? $(this).closest('.combo-item-option').find('input[name*="[nick]"]').val() : '';
+
                         comboItems.push({
                             itemName: itemName,
-                            size: size
+                            size: size,
+                            hasNick: hasNick,
+                            nick: nick
                         });
                     });
                     
@@ -594,33 +699,113 @@
             });
         });
         
-        // Initialize order summary
         updateOrderSummary();
-    });
-    
-    function validateForm() {
-        let hasItems = false;
-        let isValid = true;
         
-        // Check if any items are selected
-        $('.item-quantity, .combo-quantity').each(function() {
+        $(document).on('input', '.item-nick, .combo-item-nick', function() {
+            const nickValue = $(this).val().trim();
+            if (nickValue) {
+                $(this).removeClass('invalid');
+            }
+            updateOrderSummary();
+        });
+        
+        $(document).on('change', '.item-quantity, .combo-quantity', function() {
+            updateOrderSummary();
+            
             const quantity = parseInt($(this).val()) || 0;
+            const card = $(this).closest('.merch-item-card, .combo-card');
+            
             if (quantity > 0) {
-                hasItems = true;
+                card.find('.nick-field').slideDown(200);
+            } else {
+                card.find('.nick-field').slideUp(200);
             }
         });
         
-        if (!hasItems) {
-            M.toast({html: 'Please add at least one item to your order', classes: 'red'});
-            return false;
+        $(document).on('change', '.item-size, .combo-item-size', function() {
+            updateOrderSummary();
+        });
+        
+        $('.merch-item-card, .combo-card').each(function() {
+            const quantity = parseInt($(this).find('.item-quantity, .combo-quantity').val()) || 0;
+            if (quantity === 0) {
+                $(this).find('.nick-field').hide();
+            }
+        });
+    });
+    
+    function validateForm() {
+        let isValid = true;
+        let errorMessages = [];
+        
+        let hasSelection = false;
+        
+        // Validate merch items
+        $('.merch-item-card').each(function() {
+            const quantity = parseInt($(this).find('.item-quantity').val()) || 0;
+            const hasNick = $(this).find('input[name*="[hasNick]"]').val() === 'true';
+            
+            if (quantity > 0) {
+                hasSelection = true;
+                
+                // If item has nick enabled, validate nickname field
+                if (hasNick) {
+                    const nickField = $(this).find('.item-nick');
+                    const nickValue = nickField.val().trim();
+                    
+                    if (!nickValue) {
+                        nickField.addClass('invalid');
+                        isValid = false;
+                        errorMessages.push('Please enter a nickname for customized items');
+                    } else {
+                        nickField.removeClass('invalid');
+                    }
+                }
+            }
+        });
+        
+        // Validate combos
+        $('.combo-card').each(function() {
+            const quantity = parseInt($(this).find('.combo-quantity').val()) || 0;
+            
+            if (quantity > 0) {
+                hasSelection = true;
+                
+                // Validate combo item nickname fields
+                $(this).find('.combo-item-size').each(function() {
+                    const hasNick = $(this).closest('.combo-item-option').find('input[name*="[hasNick]"]').val() === 'true';
+                    
+                    if (hasNick) {
+                        const nickField = $(this).closest('.combo-item-option').find('.combo-item-nick');
+                        const nickValue = nickField.val().trim();
+                        
+                        if (!nickValue) {
+                            nickField.addClass('invalid');
+                            isValid = false;
+                            errorMessages.push('Please enter nicknames for customized combo items');
+                        } else {
+                            nickField.removeClass('invalid');
+                        }
+                    }
+                });
+            }
+        });
+        
+        if (!hasSelection) {
+            errorMessages.push('Please select at least one item or combo');
         }
         
+        // Check agreement checkbox
         if (!$('#agree').prop('checked')) {
-            M.toast({html: 'Please agree to the terms before placing your order', classes: 'red'});
+            errorMessages.push('Please agree to the terms before placing your order');
+        }
+        
+        if (errorMessages.length > 0) {
+            M.toast({html: errorMessages.join('. '), classes: 'red'});
             return false;
         }
         
-        return true;
+        return isValid;
     }
     
     function updateOrderSummary() {
@@ -633,6 +818,8 @@
             const price = parseFloat($(this).find('input[name*="[price]"]').val()) || 0;
             const name = $(this).find('input[name*="[merchName]"]').val();
             const size = $(this).find('select.item-size').val() || 'One Size'; // changed line
+            const hasNick = $(this).find('input[name*="[hasNick]"]').val() === 'true';
+            const nick = hasNick ? $(this).find('input[name*="[nick]"]').val() : '';
 
             if (quantity > 0) {
                 const itemTotal = quantity * price;
@@ -642,7 +829,9 @@
                     size: size,
                     quantity: quantity,
                     price: price,
-                    total: itemTotal
+                    total: itemTotal,
+                    hasNick: hasNick,
+                    nick: nick
                 });
             }
         });
@@ -654,25 +843,40 @@
             const comboName = $(this).find('input[name*="[comboName]"]').val();
             
             if (quantity > 0) {
-                const itemTotal = quantity * price;
-                totalAmount += itemTotal;
-                
-                // Get individual items in the combo
                 const comboItems = [];
                 $(this).find('.combo-item-size').each(function() {
                     const itemName = $(this).closest('.combo-item-option').find('input[name*="[itemName]"]').val();
-                    const size = $(this).val();
-                    if (size) {
-                        comboItems.push(`${itemName} (${size})`);
-                    }
+                    const size = $(this).val() || 'One Size';
+                    const hasNick = $(this).closest('.combo-item-option').find('input[name*="[hasNick]"]').val() === 'true';
+                    const nick = hasNick ? $(this).closest('.combo-item-option').find('input[name*="[nick]"]').val() : '';
+                    
+                    comboItems.push({
+                        itemName: itemName,
+                        size: size,
+                        hasNick: hasNick,
+                        nick: nick
+                    });
                 });
+                
+                const comboTotal = quantity * price;
+                totalAmount += comboTotal;
+                
+                // Build combo details string with nickname information
+                let comboDetails = comboItems.map(item => {
+                    let itemDetail = `${item.itemName} (${item.size})`;
+                    if (item.hasNick && item.nick) {
+                        itemDetail += ` - Nick: ${item.nick}`;
+                    }
+                    return itemDetail;
+                }).join(', ');
                 
                 orderItems.push({
                     name: comboName,
-                    size: comboItems.join(', '),
+                    size: comboDetails,
                     quantity: quantity,
                     price: price,
-                    total: itemTotal
+                    total: comboTotal,
+                    comboItems: comboItems
                 });
             }
         });
@@ -680,11 +884,15 @@
         // Update order items list
         let itemsHtml = '';
         orderItems.forEach(function(item) {
+            let itemDetails = `Size: ${item.size} | Quantity: ${item.quantity}`;
+            if (item.hasNick) {
+                itemDetails += ` | Nickname: ${item.nick}`;
+            }
             itemsHtml += `
                 <div class="order-item">
                     <div>
                         <div class="order-item-name">${item.name}</div>
-                        <div class="order-item-details">Size: ${item.size} | Quantity: ${item.quantity}</div>
+                        <div class="order-item-details">${itemDetails}</div>
                     </div>
                     <div class="order-item-price">₹${item.total}</div>
                 </div>
