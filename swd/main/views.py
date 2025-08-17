@@ -1524,7 +1524,7 @@ def import_mess_bill(request):
                             month = datetime.strptime(request.POST.get('month'), '%B').date()
                             month = month.replace(day=1, year=year_selected)
                             # desc is hardcoded and referenced in messbill view also
-                            # any change here should also be done in desc
+                            #       exactly same as desc created in import_mess_bill view
                             desc = "Mess Due " + month.strftime("%B %y")
                             category, created = DueCategory.objects.get_or_create(name='Mess Bill',
                                                        description=desc)
@@ -1826,6 +1826,7 @@ def dues(request):
         option = 2
         mess = 0
 
+    # dues
     try:
         lasted = DuesPublished.objects.latest('date_published').date_published
     except:
@@ -1881,7 +1882,7 @@ def dues(request):
 @login_required
 def search(request):    
     perm=0;
-    option='indexbase.html';
+    option='indexbase.html'
     context = {
         'hostels' : [i[0] for i in HOSTELS],
         'branches' : BRANCH,
@@ -3960,6 +3961,7 @@ def leave_diff(request):
 
             row_num = 0
 
+
             for col_num in range(len(columns)):
                 ws.write(row_num, col_num, columns[col_num][0], h2_font_style)
                 ws.col(col_num).width = columns[col_num][1]
@@ -4294,7 +4296,8 @@ def order_form(request, bundle_id):
                 student_email = data.get('studentEmail')
                 items_data = data.get('items', [])
                 combos_data = data.get('combos', [])
-                
+                referral_id = data.get('referralID', None)  # <-- Accept referralID from frontend
+
                 # Validate required fields
                 if not all([student_bits_id, student_name, student_email]):
                     return JsonResponse({
@@ -4450,6 +4453,21 @@ def order_form(request, bundle_id):
                     
                     total_price += float(combo_data.get('price', 0)) * combo_data.get('quantity', 0)
                 
+                # Apply referral discount if referralID is verified
+                discount_percent = 0
+                if referral_id:
+                    # Verify referralID exists in Student table
+                    try:
+                        Student.objects.get(bitsId=referral_id)
+                        # Get discount from constants collection
+                        constants = db.constants.find_one()
+                        discount_percent = constants.get('discount', 0) if constants else 0
+                    except Student.DoesNotExist:
+                        referral_id = None  # Not valid, do not apply discount
+
+                if discount_percent > 0 and referral_id:
+                    total_price = total_price * (1 - discount_percent / 100)
+
                 order_data = {
                     'studentBITSID': student_bits_id,
                     'studentName': student_name,
@@ -4459,6 +4477,7 @@ def order_form(request, bundle_id):
                     'combos': combos_data,
                     'totalPrice': total_price,
                     'status': 'pending',
+                    'referralID': referral_id if referral_id else None,  # <-- Store referralID in order
                 }
                 
                 try:
@@ -4516,5 +4535,47 @@ def order_form(request, bundle_id):
     except Exception as e:
         messages.error(request, f'Error loading order form: {str(e)}')
         return redirect('store')
+
+from django.http import JsonResponse
+from .models import Student
+
+def verify_student_id(request):
+    bits_id = request.GET.get('bitsId', '').strip()
+    if not bits_id:
+        return JsonResponse({'status': 'empty'})
+    try:
+        Student.objects.get(bitsId=bits_id)
+        return JsonResponse({'status': 'verified'})
+    except Student.DoesNotExist:
+        return JsonResponse({'status': 'not_found'})
+
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+import pymongo
+
+@csrf_exempt
+def verify_referral_id(request):
+    if request.method == 'POST':
+        bits_id = request.POST.get('bitsId', '').strip()
+        if not bits_id:
+            return JsonResponse({'status': 'empty'})
+        try:
+            from .models import Student
+            Student.objects.get(bitsId=bits_id)
+
+            # Get discount from constants collection
+            from swd.config import MONGODB_URI
+            client = pymongo.MongoClient(MONGODB_URI)
+            db = client.merchportal
+            constants = db.constants.find_one()
+            discount = constants.get('discount', 0) if constants else 0
+            client.close()
+
+            return JsonResponse({'status': 'verified', 'discount': discount})
+        except Student.DoesNotExist:
+            return JsonResponse({'status': 'not_found'})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'error': str(e)})
+    return JsonResponse({'status': 'invalid'})
 
 

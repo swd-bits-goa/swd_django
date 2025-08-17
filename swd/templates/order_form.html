@@ -106,6 +106,18 @@
                                 </div>
                             </div>
                             
+                            <div class="section">
+                                <div class="row">
+                                    <div class="input-field col s12 m4">
+                                        <input id="verifyStudentID" type="text" class="validate">
+                                        <label for="verifyStudentID">Enter Student BITS ID for Referral</label>
+                                    </div>
+                                    <div class="input-field col s12 m8">
+                                        <span id="studentIdVerifyMsg" style="font-weight: bold;"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            
                             {% if bundle.sizeCharts %}
                             <div class="size-charts-section">
                                 <h5>Size Charts</h5>
@@ -603,8 +615,15 @@
                 studentName: $('#studentName').val(),
                 studentEmail: $('#studentEmail').val(),
                 items: [],
-                combos: []
+                combos: [],
+                referralID: null
             };
+
+            // If referral is verified, add it
+            const referralInput = $('#verifyStudentID').val().trim();
+            if (window.referralDiscount > 0 && referralInput) {
+                formData.referralID = referralInput;
+            }
             
             // Collect items data
             $('.merch-item-card').each(function(index) {
@@ -881,6 +900,13 @@
             }
         });
         
+        // Apply referral discount if available
+        let discountPercent = window.referralDiscount || 0;
+        let discountedAmount = totalAmount;
+        if (discountPercent > 0) {
+            discountedAmount = totalAmount * (1 - discountPercent / 100);
+        }
+
         // Update order items list
         let itemsHtml = '';
         orderItems.forEach(function(item) {
@@ -904,8 +930,35 @@
         }
         
         $('#order-items-list').html(itemsHtml);
-        $('#total-amount').text('₹' + totalAmount.toFixed(2));
+        $('#total-amount').text('₹' + discountedAmount.toFixed(2));
     }
+    
+    $(document).ready(function () {
+        // ...existing code...
+
+        $('#verifyStudentID').on('input', function() {
+            const bitsId = $(this).val().trim();
+            if (!bitsId) {
+                $('#studentIdVerifyMsg').text('');
+                window.referralDiscount = 0;
+                updateOrderSummary();
+                return;
+            }
+            $.post('/verify-referral-id/', { bitsId: bitsId, csrfmiddlewaretoken: $('[name=csrfmiddlewaretoken]').val() }, function(data) {
+                if (data.status === 'verified') {
+                    $('#studentIdVerifyMsg').text('Student verified').css('color', 'green');
+                    window.referralDiscount = data.discount || 0;
+                } else if (data.status === 'not_found') {
+                    $('#studentIdVerifyMsg').text('ID does not exist').css('color', 'red');
+                    window.referralDiscount = 0;
+                } else {
+                    $('#studentIdVerifyMsg').text('');
+                    window.referralDiscount = 0;
+                }
+                updateOrderSummary();
+            });
+        });
+    });
 </script>
 {% endblock %}
 
