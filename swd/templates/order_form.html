@@ -147,7 +147,7 @@
                                             {% endif %}
                                             <div class="item-header">
                                                 <h6>{{ item.name }}</h6>
-                                                <span class="price" {% if item.nick %}data-nick=" - Nickname available"{% endif %}>₹{{ item.price }}</span>
+                                                <span class="price{% if item.nick %} nick-available{% endif %}" {% if item.nick %}data-nick=" - Nickname available"{% endif %}>₹{{ item.price }}</span>
                                             </div>
                                             {% if item.description %}
                                             <p class="item-description">{{ item.description }}</p>
@@ -548,8 +548,7 @@
         position: relative;
     }
     
-    .merch-item-card .item-header .price::after {
-        content: " (Customizable)" attr(data-nick);
+    .merch-item-card .item-header .price.nick-available::after {
         font-size: 0.8em;
         color: #ffffff;
         font-weight: normal;
@@ -678,7 +677,7 @@
             });
             
             // Send JSON data via AJAX
-            console.log('Sending form data:', formData);
+            // console.log('Sending form data:', formData);
             $.ajax({
                 url: window.location.href,
                 method: 'POST',
@@ -688,9 +687,9 @@
                     'X-CSRFToken': $('[name=csrfmiddlewaretoken]').val()
                 },
                 success: function(response) {
-                    console.log('Response received:', response);  // Add this for debugging
+                    
                     if (response.success) {
-                        console.log('Order placed successfully:', response);  // Debug log
+                        
                         
                         // Here we're using the $submitBtn that was defined above
                         $submitBtn.removeClass('disabled')
