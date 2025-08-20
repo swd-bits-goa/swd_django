@@ -1,204 +1,136 @@
 {% block content %}
-<div class="store-container">
-    <!-- Item Details Modal -->
-    <div id="modal1" class="modal store-modal">
+<div>
+    <div id="modal1" class="modal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h4 id="modalheader" class="modal-title"></h4>
-                <a href="#!" class="modal-close waves-effect waves-light">
-                    <i class="material-icons">close</i>
-                </a>
-            </div>
-            <div id="modalinfo" class="modal-body"></div>
+            <h4 id="modalheader"></h4>
+            <div id="modalinfo"></div>
         </div>
     </div>
     
     <!-- Club Details Modal -->
-    <div id="clubModal" class="modal store-modal modal-fixed-footer">
+    <div id="clubModal" class="modal modal-fixed-footer">
         <div class="modal-content">
-            <div class="modal-header">
-                <h4 id="clubModalHeader" class="modal-title"></h4>
-                <a href="#!" class="modal-close waves-effect waves-light">
-                    <i class="material-icons">close</i>
-                </a>
-            </div>
-            <div id="clubModalContent" class="modal-body"></div>
+            <h4 id="clubModalHeader"></h4>
+            <div id="clubModalContent"></div>
         </div>
         <div class="modal-footer">
-            <a href="#!" class="modal-close waves-effect waves-light btn-flat">Close</a>
+            <a href="#!" class="modal-close waves-effect waves-green btn-flat">Close</a>
         </div>
     </div>
-
     <div class="container-fluid">
-        <!-- Messages Section -->
         {% if messages %}
-        <div class="messages-section">
-            {% for message in messages %}
-            <div class="message-card {{ message.tags }}">
-                <i class="material-icons message-icon">
-                    {% if message.tags == 'error' %}error{% elif message.tags == 'success' %}check_circle{% else %}info{% endif %}
-                </i>
-                <span class="message-text">{{ message }}</span>
-            </div>
-            {% endfor %}
-        </div>
+        {% for message in messages %}
+        <span class="new badge {{ message.tags }}" data-badge-caption="{{ message }}"></span>
+        {% endfor %}
         {% endif %}
         
-        <!-- Back to Clubs Button -->
+        <!-- Back to Clubs Button (shown when viewing merch bundles) -->
         {% if selected_club %}
-        <div class="navigation-section">
-            <a href="{% url 'store' %}" class="back-button">
-                <i class="material-icons">arrow_back</i>
-                <span>Back to Clubs</span>
+        <div class="section">
+            <a href="{% url 'store' %}" class="btn waves-effect waves-light" style="background-color: #F46036;">
+                <i class="material-icons left">arrow_back</i>Back to Clubs
             </a>
         </div>
         {% endif %}
         
-        <!-- Clubs Section -->
+        <!-- Clubs Section (hidden when viewing merch bundles) -->
         {% if not selected_club %}
-        <div id="clubsSection" class="clubs-section">
+        <div id="clubsSection">
             {% if clubs %}
-            <div class="section-header">
-                <div class="header-content">
-                    <i class="material-icons header-icon">store</i>
-                    <h2>Clubs Directory</h2>
-                    <p>Explore merchandise from various clubs and organizations</p>
-                </div>
-            </div>
-            
-            <div class="clubs-grid">
-                {% for club in clubs %}
-                <div class="club-card-wrapper">
-                    <div class="club-card">
-                        <div class="club-card-header">
-                            <div class="club-icon">
-                                <i class="material-icons">group</i>
+            <div class="section">
+                <h4 style="color:#F46036; margin: 0; padding: 8px; font-size: 31px">Clubs Directory</h4>
+                <div class="row">
+                    {% for club in clubs %}
+                    <div class="col s12 m6 l4">
+                        <div class="card club-card">
+                            <div class="card-content">
+                                <div class="club-header">
+                                    <i class="material-icons large" style="color: #F46036;">group</i>
+                                    <h5 style="color: #F46036; margin: 10px 0;">{{ club.clubName|default:club.username }}</h5>
+                                </div>
+                                
+                                <div class="club-actions">
+                                    <a href="{% url 'store' %}?club={{ club.username }}" class="btn waves-effect waves-light" style="background-color: #F46036;">
+                                        View Details
+                                    </a>
+                                </div>
                             </div>
-                            <h3 class="club-name">{{ club.clubName|default:club.username }}</h3>
-                        </div>
-                        
-                        <div class="club-card-body">
-                            <div class="club-description">
-                                <p>Browse exclusive merchandise and bundles from this club</p>
-                            </div>
-                        </div>
-                        
-                        <div class="club-card-footer">
-                            <a href="{% url 'store' %}?club={{ club.username }}" class="view-details-btn">
-                                <span>View Details</span>
-                                <i class="material-icons">arrow_forward</i>
-                            </a>
                         </div>
                     </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
             </div>
             {% endif %}
             
             <!-- Error message if clubs couldn't be loaded -->
             {% if not clubs and error %}
-            <div class="error-section">
-                <div class="error-card">
-                    <i class="material-icons error-icon">error_outline</i>
-                    <h3>Unable to Load Clubs</h3>
-                    <p>{{ error }}</p>
+            <div class="section">
+                <div class="card-panel red lighten-4">
+                    <span class="red-text text-darken-2">
+                        <i class="material-icons left">error</i>
+                        {{ error }}
+                    </span>
                 </div>
             </div>
             {% endif %}
         </div>
         {% endif %}
         
-        <!-- Merch Bundles Section -->
+        <!-- Merch Bundles Section (shown when a club is selected) -->
         {% if selected_club %}
-        <div class="bundles-section">
-            <div class="section-header">
-                <div class="header-content">
-                    <i class="material-icons header-icon">inventory_2</i>
-                    <h2>{{ selected_club.clubName|default:selected_club.username }}</h2>
-                    <p>Available merchandise bundles</p>
-                </div>
-            </div>
-            
-            <div class="bundles-grid">
+        <div class="section">
+            <h4 style="color:#F46036; margin: 0; padding: 8px; font-size: 31px">{{ selected_club.clubName|default:selected_club.username }} - Merch Bundles</h4>
+            <div class="row">
                 {% if selected_club.merchBundles %}
                     {% for bundle in selected_club.merchBundles %}
-                    <div class="bundle-card-wrapper">
-                        <div class="bundle-card">
-                            <div class="bundle-card-header">
-                                <h3 class="bundle-title">{{ bundle.title }}</h3>
+                    <div class="col s12 m6 l4">
+                        <div class="card merch-bundle-card">
+                            <div class="card-content">
+                                <h6>{{ bundle.title }}</h6>
+                                
                                 {% if bundle.description %}
-                                <p class="bundle-description">{{ bundle.description }}</p>
-                                {% endif %}
-                            </div>
-                            
-                            <div class="bundle-card-body">
-                                {% if bundle.merchItems %}
-                                <div class="bundle-section">
-                                    <h4 class="section-title">
-                                        <i class="material-icons">shopping_bag</i>
-                                        Merch Items
-                                    </h4>
-                                    <div class="merch-items-grid">
-                                        {% for item in bundle.merchItems %}
-                                                                                 <div class="merch-item-card" data-item='{{ item|safe }}' data-item-json='{{ item|safe|escapejs }}'>
-                                            <div class="merch-item-image">
-                                                {% if item.image %}
-                                                <img src="{{ item.image }}" alt="{{ item.name }}" class="item-img">
-                                                {% else %}
-                                                <div class="no-image-placeholder">
-                                                    <i class="material-icons">image</i>
-                                                </div>
-                                                {% endif %}
-                                            </div>
-                                            <div class="merch-item-details">
-                                                <h5 class="item-name">{{ item.name }}</h5>
-                                                <p class="item-price">₹{{ item.price }}</p>
-                                                {% if item.description %}
-                                                <p class="item-description">{{ item.description }}</p>
-                                                {% endif %}
-                                                                                                 <div class="item-actions">
-                                                     <button class="view-item-btn" onclick="openMerchItemModalFromCard(this, '{{ bundle.title|escapejs }}')">
-                                                         <i class="material-icons">visibility</i>
-                                                         View Details
-                                                     </button>
-                                                 </div>
-                                            </div>
-                                        </div>
-                                        {% endfor %}
-                                    </div>
-                                </div>
+                                <p>{{ bundle.description }}</p>
                                 {% endif %}
                                 
-                                {% if bundle.combos %}
-                                <div class="bundle-section">
-                                    <h4 class="section-title">
-                                        <i class="material-icons">local_offer</i>
-                                        Combos
-                                    </h4>
-                                    <ul class="items-list">
-                                        {% for combo in bundle.combos %}
-                                        <li class="item-entry">{{ combo.name }}</li>
+                                
+                                {% if bundle.merchItems %}
+                                <div class="merch-items">
+                                    <strong>Merch Items:</strong>
+                                    <ul>
+                                        {% for item in bundle.merchItems %}
+                                        <li>{{ item.name }}</li>
                                         {% endfor %}
                                     </ul>
                                 </div>
                                 {% endif %}
-                            </div>
-                            
-                            <div class="bundle-card-footer">
-                                <a href="{% url 'order_form' bundle.id %}" class="order-btn">
-                                    <i class="material-icons">shopping_cart</i>
-                                    <span>Place Order</span>
-                                </a>
+                                
+                                {% if bundle.combos %}
+                                <div class="combos">
+                                    <strong>Combos:</strong>
+                                    <ul>
+                                        {% for combo in bundle.combos %}
+                                        <li>{{ combo.name }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                                {% endif %}
+                                
+                                <div class="bundle-footer">
+                                    <a href="{% url 'order_form' bundle.id %}" class="btn-small waves-effect waves-light" style="background-color: #F46036; color: white;">
+                                        Place Order
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
                     {% endfor %}
                 {% else %}
-                    <div class="empty-state">
-                        <div class="empty-state-card">
-                            <i class="material-icons empty-icon">inventory</i>
-                            <h3>No Bundles Available</h3>
-                            <p>This club doesn't have any merchandise bundles at the moment.</p>
+                    <div class="col s12">
+                        <div class="card-panel orange lighten-4">
+                            <span class="orange-text text-darken-2">
+                                <i class="material-icons left">info</i>
+                                No merch bundles available for this club.
+                            </span>
                         </div>
                     </div>
                 {% endif %}
@@ -206,835 +138,329 @@
         </div>
         {% endif %}
     </div>
+    <br>
+    <br>
 </div>
 
 <style>
-/* Store Container */
-.store-container {
-    min-height: 100vh;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-    padding: 20px 0;
-}
-
-/* Messages Section */
-.messages-section {
-    margin-bottom: 30px;
-}
-
-.message-card {
-    display: flex;
-    align-items: center;
-    padding: 16px 20px;
-    margin-bottom: 15px;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    animation: slideInDown 0.3s ease-out;
-}
-
-.message-card.success {
-    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
-    color: white;
-}
-
-.message-card.error {
-    background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
-    color: white;
-}
-
-.message-card.info {
-    background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
-    color: white;
-}
-
-.message-icon {
-    margin-right: 12px;
-    font-size: 24px;
-}
-
-.message-text {
-    font-weight: 500;
-    font-size: 14px;
-}
-
-/* Navigation Section */
-.navigation-section {
-    margin-bottom: 30px;
-}
-
-.back-button {
-    display: inline-flex;
-    align-items: center;
-    padding: 12px 24px;
-    background: linear-gradient(135deg, #F46036 0%, #e74c3c 100%);
-    color: white;
-    text-decoration: none;
-    border-radius: 25px;
-    font-weight: 500;
-    box-shadow: 0 4px 15px rgba(244, 96, 54, 0.3);
-    transition: all 0.3s ease;
-}
-
-.back-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(244, 96, 54, 0.4);
-    color: white;
-}
-
-.back-button i {
-    margin-right: 8px;
-    font-size: 20px;
-}
-
-/* Section Headers */
-.section-header {
-    text-align: center;
-    margin-bottom: 40px;
-    padding: 40px 20px;
-    background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
-    border-radius: 20px;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-}
-
-.header-content {
-    max-width: 600px;
-    margin: 0 auto;
-}
-
-.header-icon {
-    font-size: 48px;
-    color: #F46036;
-    margin-bottom: 20px;
-}
-
-.section-header h2 {
-    color: #2c3e50;
-    font-size: 36px;
-    font-weight: 700;
-    margin: 0 0 15px 0;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.section-header p {
-    color: #7f8c8d;
-    font-size: 18px;
-    margin: 0;
-    line-height: 1.6;
-}
-
-/* Clubs Grid */
-.clubs-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 30px;
-    margin-bottom: 40px;
-}
-
-.club-card-wrapper {
-    /* Removed perspective for no parallax effect */
-}
-
-.club-card {
-    background: white;
-    border-radius: 20px;
-    overflow: hidden;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-    transition: all 0.3s ease;
-    height: 320px;
-    display: flex;
-    flex-direction: column;
-}
-
-.club-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
-}
-
-.club-card-header {
-    background: linear-gradient(135deg, #F46036 0%, #e74c3c 100%);
-    padding: 30px 25px;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-}
-
-.club-card-header::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-    animation: shimmer 3s infinite;
-}
-
-.club-icon {
-    margin-bottom: 15px;
-}
-
-.club-icon i {
-    font-size: 48px;
-    color: white;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
-}
-
-.club-name {
-    color: white;
-    font-size: 24px;
-    font-weight: 700;
-    margin: 0;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-}
-
-.club-card-body {
-    flex: 1;
-    padding: 25px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.club-description p {
-    color: #7f8c8d;
-    text-align: center;
-    margin: 0;
-    line-height: 1.6;
-    font-size: 16px;
-}
-
-.club-card-footer {
-    padding: 0 25px 25px;
-    text-align: center;
-}
-
-.view-details-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    padding: 15px 30px;
-    background: linear-gradient(135deg, #F46036 0%, #e74c3c 100%);
-    color: white;
-    text-decoration: none;
-    border-radius: 25px;
-    font-weight: 600;
-    font-size: 16px;
-    box-shadow: 0 4px 15px rgba(244, 96, 54, 0.3);
-    transition: all 0.3s ease;
-}
-
-.view-details-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(244, 96, 54, 0.4);
-    color: white;
-}
-
-.view-details-btn i {
-    margin-left: 8px;
-    font-size: 18px;
-}
-
-/* Bundles Grid */
-.bundles-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 30px;
-    margin-bottom: 40px;
-}
-
-.bundle-card-wrapper {
-    /* Removed perspective for no parallax effect */
-}
-
-.bundle-card {
-    background: white;
-    border-radius: 20px;
-    overflow: hidden;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-    transition: all 0.3s ease;
-    height: 450px;
-    display: flex;
-    flex-direction: column;
-}
-
-.bundle-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
-}
-
-.bundle-card-header {
-    background: linear-gradient(135deg, #F46036 0%, #e74c3c 100%);
-    padding: 25px;
-    text-align: center;
-    position: relative;
-}
-
-.bundle-title {
-    color: white;
-    font-size: 22px;
-    font-weight: 700;
-    margin: 0 0 10px 0;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-}
-
-.bundle-description {
-    color: rgba(255,255,255,0.9);
-    margin: 0;
-    font-size: 14px;
-    line-height: 1.5;
-}
-
-.bundle-card-body {
-    flex: 1;
-    padding: 25px;
-    overflow-y: auto;
-}
-
-.bundle-section {
-    margin-bottom: 20px;
-}
-
-.bundle-section:last-child {
-    margin-bottom: 0;
-}
-
-.section-title {
-    display: flex;
-    align-items: center;
-    color: #F46036;
-    font-size: 16px;
-    font-weight: 600;
-    margin: 0 0 12px 0;
-}
-
-.section-title i {
-    margin-right: 8px;
-    font-size: 18px;
-}
-
-.items-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    background: #f8f9fa;
-    border-radius: 12px;
-    padding: 15px;
-    max-height: 120px;
-    overflow-y: auto;
-}
-
-.item-entry {
-    color: #555;
-    font-size: 14px;
-    padding: 8px 0;
-    border-bottom: 1px solid #e9ecef;
-    position: relative;
-    padding-left: 20px;
-}
-
-.item-entry:last-child {
-    border-bottom: none;
-}
-
-.item-entry::before {
-    content: '•';
-    color: #F46036;
-    font-weight: bold;
-    position: absolute;
-    left: 0;
-}
-
-.bundle-card-footer {
-    padding: 0 25px 25px;
-    text-align: center;
-}
-
-.order-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    padding: 15px 30px;
-    background: linear-gradient(135deg, #F46036 0%, #e74c3c 100%);
-    color: white;
-    text-decoration: none;
-    border-radius: 25px;
-    font-weight: 600;
-    font-size: 16px;
-    box-shadow: 0 4px 15px rgba(244, 96, 54, 0.3);
-    transition: all 0.3s ease;
-}
-
-.order-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(244, 96, 54, 0.4);
-    color: white;
-}
-
-.order-btn i {
-    margin-right: 8px;
-    font-size: 18px;
-}
-
-/* Empty State */
-.empty-state {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 60px 20px;
-}
-
-.empty-state-card {
-    background: white;
-    border-radius: 20px;
-    padding: 60px 40px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-    max-width: 500px;
-    margin: 0 auto;
-}
-
-.empty-icon {
-    font-size: 64px;
-    color: #bdc3c7;
-    margin-bottom: 20px;
-}
-
-.empty-state-card h3 {
-    color: #2c3e50;
-    font-size: 24px;
-    font-weight: 600;
-    margin: 0 0 15px 0;
-}
-
-.empty-state-card p {
-    color: #7f8c8d;
-    font-size: 16px;
-    margin: 0;
-    line-height: 1.6;
-}
-
-/* Error Section */
-.error-section {
-    text-align: center;
-    padding: 60px 20px;
-}
-
-.error-card {
-    background: white;
-    border-radius: 20px;
-    padding: 60px 40px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-    max-width: 500px;
-    margin: 0 auto;
-}
-
-.error-icon {
-    font-size: 64px;
-    color: #e74c3c;
-    margin-bottom: 20px;
-}
-
-.error-card h3 {
-    color: #2c3e50;
-    font-size: 24px;
-    font-weight: 600;
-    margin: 0 0 15px 0;
-}
-
-.error-card p {
-    color: #7f8c8d;
-    font-size: 16px;
-    margin: 0;
-    line-height: 1.6;
-}
-
-/* Modal Styling */
-.store-modal {
-    border-radius: 20px;
-    overflow: hidden;
-    max-width: 800px;
-    width: 90%;
-}
-
-.store-modal .modal-content {
-    padding: 0;
-    border-radius: 20px;
-}
-
-.modal-header {
-    background: linear-gradient(135deg, #F46036 0%, #e74c3c 100%);
-    padding: 25px 30px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: relative;
-}
-
-.modal-title {
-    color: white;
-    margin: 0;
-    font-size: 24px;
-    font-weight: 700;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-}
-
-.modal-close {
-    color: white;
-    padding: 8px;
-    border-radius: 50%;
-    transition: all 0.3s ease;
-}
-
-.modal-close:hover {
-    background: rgba(255,255,255,0.2);
-    color: white;
-}
-
-.modal-body {
-    padding: 30px;
-    max-height: 70vh;
-    overflow-y: auto;
-}
-
-/* Animations */
-@keyframes slideInDown {
-    from {
-        transform: translateY(-20px);
-        opacity: 0;
+    .card-store {
+        box-shadow: none;
+        background: #efefef;
+        text-align: center;
     }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
 
-@keyframes shimmer {
-    0% {
-        transform: translate(-50%, -50%) rotate(0deg);
+    #modalinfo img {
+        max-width: 100%;
+        max-height: 100%;
     }
-    100% {
-        transform: translate(-50%, -50%) rotate(360deg);
-    }
-}
 
-/* Responsive Design */
-@media only screen and (max-width: 768px) {
-    .store-container {
-        padding: 15px 0;
+    .card-img-swd {
+        border-bottom: 1px solid grey;
     }
     
-    .section-header {
-        padding: 30px 15px;
-        margin-bottom: 30px;
+    /* Clubs Section Styling */
+    .club-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border-radius: 12px;
+        overflow: hidden;
+        height: 280px;
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 20px;
+        border: none;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     }
     
-    .section-header h2 {
-        font-size: 28px;
+    .club-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 35px rgba(0,0,0,0.2);
     }
     
-    .section-header p {
-        font-size: 16px;
+    .club-card .card-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 25px;
     }
     
-    .clubs-grid,
-    .bundles-grid {
-        grid-template-columns: 1fr;
-        gap: 20px;
+    .club-header {
+        text-align: center;
+        padding: 20px 0;
+        background: linear-gradient(135deg, #F46036 0%, #e74c3c 100%);
+        margin: -25px -25px 25px -25px;
+        border-radius: 12px 12px 0 0;
+        min-height: 100px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
     }
     
-    .club-card,
-    .bundle-card {
-        height: auto;
-        min-height: 280px;
+    .club-header i {
+        color: white !important;
+        margin-bottom: 10px;
     }
     
-    .club-card-header,
-    .bundle-card-header {
-        padding: 20px;
+    .club-header h5 {
+        color: white !important;
+        margin: 0 !important;
+        font-weight: 600;
+        text-shadow: 0 1px 3px rgba(0,0,0,0.3);
     }
     
-    .club-name {
+    .club-info {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+        margin: 20px 0;
+    }
+    
+    .club-info p {
+        margin: 8px 0;
+        color: #666;
+        font-size: 14px;
+        text-align: center;
+    }
+    
+    .club-actions {
+        text-align: center;
+        margin-top: auto;
+        padding-top: 20px;
+    }
+    
+    .club-actions .btn {
+        border-radius: 25px;
+        text-transform: none;
+        font-weight: 500;
+        padding: 0 30px;
+        box-shadow: 0 4px 15px rgba(244, 96, 54, 0.3);
+        transition: all 0.3s ease;
+    }
+    
+    .club-actions .btn:hover {
+        box-shadow: 0 6px 20px rgba(244, 96, 54, 0.4);
+        transform: translateY(-2px);
+    }
+    
+    /* Merch Bundle Cards Styling */
+    .merch-bundle-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border-radius: 12px;
+        overflow: hidden;
+        height: 380px;
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 20px;
+        border: none;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    
+    .merch-bundle-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 35px rgba(0,0,0,0.2);
+    }
+    
+    .merch-bundle-card .card-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        padding: 25px;
+    }
+    
+    .merch-bundle-card h6 {
         font-size: 20px;
+        font-weight: 700;
+        line-height: 1.3;
+        margin: 0 0 15px 0;
+        color: #F46036;
+        text-align: center;
+        border-bottom: 2px solid #F46036;
+        padding-bottom: 10px;
     }
     
-    .bundle-title {
-        font-size: 18px;
+    .merch-bundle-card p {
+        line-height: 1.6;
+        margin: 8px 0;
+        color: #555;
+        font-size: 14px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
     }
     
-    .club-card-body,
-    .bundle-card-body {
-        padding: 20px;
+    .merch-items, .combos {
+        margin: 12px 0;
+        flex: 1;
+        overflow: hidden;
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px;
     }
     
-    .club-card-footer,
-    .bundle-card-footer {
-        padding: 0 20px 20px;
-    }
-    
-    .view-details-btn,
-    .order-btn {
-        padding: 12px 24px;
+    .merch-items strong, .combos strong {
+        color: #F46036;
+        font-weight: 600;
+        display: block;
+        margin-bottom: 8px;
         font-size: 14px;
     }
     
-    .modal-body {
-        padding: 20px;
-    }
-}
-
-@media only screen and (max-width: 480px) {
-    .section-header h2 {
-        font-size: 24px;
+    .merch-items ul, .combos ul {
+        margin: 5px 0;
+        padding-left: 20px;
+        max-height: 100px;
+        overflow-y: auto;
     }
     
-    .club-card-header,
-    .bundle-card-header {
-        padding: 15px;
-    }
-    
-    .club-card-body,
-    .bundle-card-body {
-        padding: 15px;
-    }
-    
-    .club-card-footer,
-    .bundle-card-footer {
-        padding: 0 15px 15px;
-    }
-    
-    .items-list {
-        padding: 12px;
-    }
-    
-    .item-entry {
+    .merch-items li, .combos li {
+        margin: 4px 0;
         font-size: 13px;
-        padding: 6px 0;
+        color: #666;
+        list-style-type: disc;
     }
     
-    .merch-items-grid {
-        grid-template-columns: 1fr;
-        gap: 15px;
+    .bundle-header {
+        border-bottom: 1px solid #eee;
+        padding-bottom: 10px;
+        margin-bottom: 15px;
+        min-height: 50px;
     }
     
-    .merch-item-details {
-        padding: 15px;
+    .bundle-footer {
+        margin-top: auto;
+        padding-top: 15px;
+        border-top: 2px solid #eee;
+        min-height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     
-    .item-name {
-        font-size: 16px;
+    /* Modal content styling */
+    #clubModalContent {
+        max-height: 70vh;
+        overflow-y: auto;
     }
     
-    .item-price {
-        font-size: 18px;
+    #clubModalContent .row {
+        margin-bottom: 0;
     }
     
-    .view-item-btn {
-        padding: 8px 16px;
-        font-size: 13px;
+    /* Bundle header and chip styling */
+    .bundle-header {
+        border-bottom: 1px solid #eee;
+        padding-bottom: 10px;
+        margin-bottom: 15px;
     }
-}
-
-/* Merch Items Grid */
-.merch-items-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 20px;
-    margin-top: 15px;
-}
-
-.merch-item-card {
-    background: white;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    transition: all 0.3s ease;
-    border: 1px solid #e9ecef;
-}
-
-.merch-item-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-}
-
-.merch-item-image {
-    height: 200px;
-    overflow: hidden;
-    background: #f8f9fa;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.item-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.3s ease;
-}
-
-.merch-item-card:hover .item-img {
-    transform: scale(1.05);
-}
-
-.no-image-placeholder {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    color: #bdc3c7;
-}
-
-.no-image-placeholder i {
-    font-size: 48px;
-}
-
-.merch-item-details {
-    padding: 20px;
-}
-
-.item-name {
-    color: #2c3e50;
-    font-size: 18px;
-    font-weight: 600;
-    margin: 0 0 10px 0;
-    line-height: 1.3;
-}
-
-.item-price {
-    color: #F46036;
-    font-size: 20px;
-    font-weight: 700;
-    margin: 0 0 10px 0;
-}
-
-.item-description {
-    color: #7f8c8d;
-    font-size: 14px;
-    line-height: 1.5;
-    margin: 0 0 15px 0;
-}
-
-.item-actions {
-    text-align: center;
-}
-
-.view-item-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 10px 20px;
-    background: linear-gradient(135deg, #F46036 0%, #e74c3c 100%);
-    color: white;
-    border: none;
-    border-radius: 20px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(244, 96, 54, 0.3);
-}
-
-.view-item-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(244, 96, 54, 0.4);
-}
-
-.view-item-btn i {
-    margin-right: 6px;
-    font-size: 16px;
-}
-
-/* Custom Scrollbar */
-.items-list::-webkit-scrollbar {
-    width: 6px;
-}
-
-.items-list::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 3px;
-}
-
-.items-list::-webkit-scrollbar-thumb {
-    background: #F46036;
-    border-radius: 3px;
-}
-
-.items-list::-webkit-scrollbar-thumb:hover {
-    background: #e74c3c;
-}
-
-/* Form Styling in Modals */
-.modal-body .row {
-    margin-bottom: 0;
-}
-
-.modal-body .input-field {
-    margin-bottom: 20px;
-}
-
-.modal-body .input-field input,
-.modal-body .input-field select {
-    border-bottom: 2px solid #e0e0e0;
-    transition: border-bottom 0.3s ease;
-}
-
-.modal-body .input-field input:focus,
-.modal-body .input-field select:focus {
-    border-bottom: 2px solid #F46036;
-    box-shadow: 0 1px 0 0 #F46036;
-}
-
-.modal-body .input-field label {
-    color: #666;
-    font-weight: 500;
-}
-
-.modal-body .input-field label.active {
-    color: #F46036;
-}
-
-.modal-body .btn {
-    background: linear-gradient(135deg, #F46036 0%, #e74c3c 100%);
-    border-radius: 25px;
-    font-weight: 600;
-    text-transform: none;
-    box-shadow: 0 4px 15px rgba(244, 96, 54, 0.3);
-    transition: all 0.3s ease;
-}
-
-.modal-body .btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(244, 96, 54, 0.4);
-}
-
-.modal-body .btn:disabled {
-    background: #bdc3c7;
-    transform: none;
-    box-shadow: none;
-}
-
-/* Checkbox Styling */
-.modal-body [type="checkbox"]:checked + span:before {
-    border-right: 2px solid #F46036;
-    border-bottom: 2px solid #F46036;
-}
-
-.modal-body [type="checkbox"]:checked + span:after {
-    background-color: #F46036;
-    border-color: #F46036;
-}
+    
+    .chip-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin: 5px 0;
+    }
+    
+    .chip-container .chip {
+        background-color: #F46036;
+        color: white;
+        margin: 2px;
+    }
+    
+    .merch-bundle-card .btn-small {
+        font-size: 12px;
+        height: 36px;
+        line-height: 36px;
+        padding: 0 20px;
+        border-radius: 18px;
+        font-weight: 500;
+        text-transform: none;
+        box-shadow: 0 4px 15px rgba(244, 96, 54, 0.3);
+        transition: all 0.3s ease;
+    }
+    
+    .merch-bundle-card .btn-small:hover {
+        box-shadow: 0 6px 20px rgba(244, 96, 54, 0.4);
+        transform: translateY(-2px);
+    }
+    
+    .bundle-preview-image {
+        text-align: center;
+        margin: 15px 0;
+    }
+    
+    .bundle-preview-image img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .bundle-preview-actions {
+        text-align: center;
+        margin-top: 10px;
+    }
+    
+    .bundle-preview-actions .btn-small {
+        font-size: 11px;
+        height: 28px;
+        line-height: 28px;
+        padding: 0 12px;
+        border-radius: 14px;
+        text-transform: none;
+        font-weight: 500;
+        box-shadow: 0 2px 6px rgba(244, 96, 54, 0.3);
+        transition: all 0.3s ease;
+    }
+    
+    .bundle-preview-actions .btn-small:hover {
+        box-shadow: 0 3px 10px rgba(244, 96, 54, 0.4);
+        transform: translateY(-1px);
+    }
+    
+    /* Section headers styling */
+    .section h4 {
+        text-align: center;
+        margin-bottom: 30px !important;
+        font-weight: 700;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    /* Row spacing */
+    .row {
+        margin-bottom: 0;
+    }
+    
+    /* Card grid improvements */
+    .col.s12.m6.l4 {
+        margin-bottom: 20px;
+    }
+    
+    /* Responsive improvements */
+    @media only screen and (max-width: 600px) {
+        .club-card, .merch-bundle-card {
+            height: auto;
+            min-height: 250px;
+        }
+        
+        .club-header {
+            min-height: 80px;
+        }
+        
+        .merch-bundle-card .card-content {
+            padding: 20px;
+        }
+    }
 </style>
 
 <script>
     $(document).ready(function () {
-        // Initialize modals with improved options
+        // Initialize modals
         $('.modal').modal({
-            dismissible: true,
-            opacity: 0.5,
-            inDuration: 300,
-            outDuration: 200,
-            startingTop: '4%',
-            endingTop: '10%',
             onCloseEnd: function() {
                 // Clear form validation on modal close
                 $('form').trigger('reset');
@@ -1053,25 +479,6 @@
                 submitBtn.addClass('disabled').html('<i class="fa fa-spinner fa-spin"></i> Processing...');
             }
         });
-
-        // Add smooth scrolling to page
-        $('html, body').css('scroll-behavior', 'smooth');
-        
-        // Debug function to test data passing
-        window.debugMerchData = function() {
-            const cards = document.querySelectorAll('.merch-item-card');
-            cards.forEach((card, index) => {
-                const itemData = card.getAttribute('data-item-json');
-                console.log(`Card ${index + 1} data:`, itemData);
-                try {
-                    const parsed = JSON.parse(itemData);
-                    console.log(`Card ${index + 1} parsed:`, parsed);
-                    console.log(`Card ${index + 1} sizes:`, parsed.sizes);
-                } catch (e) {
-                    console.error(`Card ${index + 1} parse error:`, e);
-                }
-            });
-        };
     });
 
     openItemModal = function (info) {
@@ -1115,20 +522,13 @@
     $("#modalinfo").html(`
         <div class="row">
             <div class="col s12 l5">
-                <div class="product-image-container">
-                    <img src='` + items[info][2] + `' class="product-image">
-                </div>
+                <img src='items[info][2]'>
             </div>
             <div class="col s12 l7">
                 <form method="POST" action="/store/" id="itemForm">
                     {% csrf_token %}
-                    <div class="product-description">
-                        <p>` + items[info][1] + `</p>
-                    </div>
-                    <div class="product-price">
-                        <span class="price-label">Price:</span>
-                        <span class="price-value">₹` + items[info][3] + `</span>
-                    </div>
+                    <p align="justify">` + items[info][1] + `</p>
+                    <p align="right" id="price"><b>Price: ₹` + items[info][3] + `</b></p>
                     
                     ${sizes}
                     
@@ -1137,21 +537,16 @@
                         <label for="quantity">Quantity</label>
                     </div>
                     
-                    <div class="agreement-section">
-                        <p>
-                            <label>
-                                <input id="agree" type="checkbox" class="filled-in" required/>
-                                <span>I agree to buy this item and understand that the amount will be deducted from my account</span>
-                            </label>
-                        </p>
-                    </div>
+                    <p>
+                        <input id="agree" type="checkbox" class="filled-in" required/>
+                        <label for="agree">I agree to buy this item and understand that the amount will be deducted from my account</label>
+                    </p>
                     
-                    <div class="form-actions">
+                    <div class="right">
                         <input type="hidden" name="what" value="item"/>
                         <input type="hidden" name="info" value="` + info + `"/>
-                        <button type="submit" id="itembuy" class="btn waves-effect waves-light" disabled>
-                            <i class="material-icons left">shopping_cart</i>
-                            Buy Now
+                        <button type="submit" id="itembuy" class="waves-effect waves-light btn" disabled>
+                            Buy
                         </button>
                     </div>
                 </form>
@@ -1240,21 +635,16 @@
         var formHtml = `
         <div class="row">
             <div class="col s12 l5">
-                <div class="product-image-container">
-                    <img src="${tee[2]}" class="product-image">
-                </div>
+                <img src="${tee[2]}" class="responsive-img">
             </div>
             <div class="col s12 l7">
                 <form method="POST" action="/store/" id="teeForm">
                     {% csrf_token %}
-                    <div class="product-description">
-                        <p>${tee[1]}</p>
-                    </div>
-                    <div class="product-price">
-                        <span class="price-label">Price:</span>
-                        <span class="price-value">₹${tee[3]}</span>
-                        ${tee[4] === "True" ? `<span class="nick-price">+ ₹${tee[8] || '0'} for nick</span>` : ''}
-                    </div>
+                    <p align="justify">${tee[1]}</p>
+                    <p align="right" id="price">
+                        <b>Price: ₹${tee[3]}</b>
+                        ${tee[4] === "True" ? `+ ₹${tee[8] || '0'} for nick` : ''}
+                    </p>
                     
                     <div class="row">
                         ${colorField}
@@ -1268,25 +658,20 @@
                         </div>
                         
                         <div class="col s12">
-                            <div class="agreement-section">
-                                <p>
-                                    <label>
-                                        <input type="checkbox" id="teeagree" class="filled-in" required/>
-                                        <span>I agree to buy this item and understand that the amount will be deducted from my account</span>
-                                    </label>
-                                </p>
-                            </div>
+                            <p>
+                                <label>
+                                    <input type="checkbox" id="teeagree" class="filled-in" required/>
+                                    <span>I agree to buy this item and understand that the amount will be deducted from my account</span>
+                                </label>
+                            </p>
                         </div>
                         
-                        <div class="col s12">
-                            <div class="form-actions">
-                                <input type="hidden" name="what" value="tee"/>
-                                <input type="hidden" name="info" value="${info}"/>
-                                <button type="submit" id="teebuy" class="btn waves-effect waves-light" disabled>
-                                    <i class="material-icons left">shopping_cart</i>
-                                    Buy Now
-                                </button>
-                            </div>
+                        <div class="col s12 right-align">
+                            <input type="hidden" name="what" value="tee"/>
+                            <input type="hidden" name="info" value="${info}"/>
+                            <button type="submit" id="teebuy" class="waves-effect waves-light btn" disabled>
+                                <i class="material-icons left">shopping_cart</i>Buy Now
+                            </button>
                         </div>
                     </div>
                 </form>
@@ -1340,269 +725,6 @@
         });
     }
 
-    // Function to open merch item modal from card element
-    openMerchItemModalFromCard = function(buttonElement, bundleTitle) {
-        try {
-            const cardElement = buttonElement.closest('.merch-item-card');
-            const itemData = cardElement.getAttribute('data-item-json');
-            
-            console.log('Card element:', cardElement);
-            console.log('Item data from card:', itemData);
-            
-            openMerchItemModal(itemData, bundleTitle);
-        } catch (error) {
-            console.error('Error opening modal from card:', error);
-            M.toast({html: 'Error loading item details. Please try again.', classes: 'red'});
-        }
-    }
-
-    // Function to open merch item modal with dynamic size dropdowns
-    openMerchItemModal = function(itemData, bundleTitle) {
-        try {
-            console.log('Raw itemData:', itemData); // Debug log
-            console.log('Type of itemData:', typeof itemData); // Debug log
-            
-            // Parse the item data - handle both string and object formats
-            let item;
-            if (typeof itemData === 'string') {
-                try {
-                    // Remove any extra escaping that might have been added
-                    let cleanData = itemData.replace(/\\"/g, '"').replace(/^"|"$/g, '');
-                    console.log('Cleaned data:', cleanData); // Debug log
-                    item = JSON.parse(cleanData);
-                } catch (parseError) {
-                    console.error('Error parsing item data:', parseError);
-                    console.error('Failed data:', itemData);
-                    M.toast({html: 'Error loading item data. Please try again.', classes: 'red'});
-                    return;
-                }
-            } else {
-                item = itemData;
-            }
-            
-            console.log('Parsed item:', item); // Debug log
-            console.log('Sizes array:', item.sizes); // Debug log
-            
-            // Set modal header
-            $("#modalheader").html(item.name);
-            
-            // Build size dropdown if sizes are available
-            let sizeField = "";
-            let sizesArray = [];
-            
-            // Handle different possible formats of sizes data
-            if (item.sizes) {
-                if (Array.isArray(item.sizes)) {
-                    sizesArray = item.sizes;
-                } else if (typeof item.sizes === 'string') {
-                    // If sizes is a comma-separated string, split it
-                    sizesArray = item.sizes.split(',').map(s => s.trim());
-                }
-            }
-            
-            console.log('Processed sizes array:', sizesArray); // Debug log
-            
-            if (sizesArray.length > 0) {
-                sizeField = `
-                    <div class="input-field col s12">
-                        <select id="merchItemSize" name="size" class="validate" required>
-                            <option value="" disabled selected>Select Size</option>
-                `;
-                
-                sizesArray.forEach(size => {
-                    sizeField += `<option value="${size}">${size}</option>`;
-                });
-                
-                sizeField += `
-                        </select>
-                        <label>Size</label>
-                    </div>
-                `;
-            }
-            
-            // Build the modal content
-            const modalContent = `
-                <div class="row">
-                    <div class="col s12 l5">
-                        <div class="product-image-container">
-                            ${item.image ? `<img src="${item.image}" class="product-image" alt="${item.name}">` : 
-                            `<div class="no-image-placeholder"><i class="material-icons">image</i></div>`}
-                        </div>
-                    </div>
-                    <div class="col s12 l7">
-                        <form method="POST" action="/store/" id="merchItemForm">
-                            {% csrf_token %}
-                            <div class="product-description">
-                                <p><strong>Bundle:</strong> ${bundleTitle}</p>
-                                ${item.description ? `<p>${item.description}</p>` : ''}
-                            </div>
-                            <div class="product-price">
-                                <span class="price-label">Price:</span>
-                                <span class="price-value">₹${item.price}</span>
-                            </div>
-                            
-                            ${sizeField}
-                            
-                            <div class="input-field col s12">
-                                <input id="merchItemQuantity" name="quantity" type="number" min="1" value="1" class="validate" required>
-                                <label for="merchItemQuantity">Quantity</label>
-                            </div>
-                            
-                            <div class="agreement-section">
-                                <p>
-                                    <label>
-                                        <input id="merchItemAgree" type="checkbox" class="filled-in" required/>
-                                        <span>I agree to buy this item and understand that the amount will be deducted from my account</span>
-                                    </label>
-                                </p>
-                            </div>
-                            
-                            <div class="form-actions">
-                                <input type="hidden" name="what" value="merchItem"/>
-                                <input type="hidden" name="itemData" value='${JSON.stringify(item)}'/>
-                                <input type="hidden" name="bundleTitle" value="${bundleTitle}"/>
-                                <button type="submit" id="merchItemBuy" class="btn waves-effect waves-light" disabled>
-                                    <i class="material-icons left">shopping_cart</i>
-                                    Buy Now
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            `;
-            
-            // Update modal content
-            $("#modalinfo").html(modalContent);
-            
-            // Initialize modal and form elements
-            $("#modal1").modal('open');
-            $('select').formSelect();
-            
-            // Form validation
-            function validateMerchItemForm() {
-                const form = document.getElementById('merchItemForm');
-                const agree = $('#merchItemAgree').prop('checked');
-                const submitBtn = $('#merchItemBuy');
-                
-                // Check if size is required and selected
-                const sizeSelect = $('#merchItemSize');
-                const sizeRequired = sizeSelect.length > 0;
-                const sizeSelected = sizeSelect.length === 0 || sizeSelect.val();
-                
-                if (form.checkValidity() && agree && (!sizeRequired || sizeSelected)) {
-                    submitBtn.prop('disabled', false);
-                } else {
-                    submitBtn.prop('disabled', true);
-                }
-            }
-            
-            // Validate on any change
-            $(document).off('change', '#merchItemForm input, #merchItemForm select').on('change', '#merchItemForm input, #merchItemForm select', validateMerchItemForm);
-            $(document).on('click', '#merchItemAgree', validateMerchItemForm);
-            
-            // Handle form submission
-            $('#merchItemForm').on('submit', function(e) {
-                if (!validateMerchItemForm()) {
-                    e.preventDefault();
-                    return false;
-                }
-                
-                // Show loading state
-                const submitBtn = $('#merchItemBuy');
-                const originalText = submitBtn.html();
-                submitBtn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Processing...');
-                
-                // Reset button state if form submission fails
-                $(this).one('ajax:error', function() {
-                    submitBtn.prop('disabled', false).html(originalText);
-                    M.toast({html: 'Error processing your request. Please try again.', classes: 'red'});
-                });
-            });
-            
-        } catch (error) {
-            console.error('Error opening merch item modal:', error);
-            M.toast({html: 'Error loading item details. Please try again.', classes: 'red'});
-        }
-    }
-
-    // Additional styles for modal content
-    $('<style>')
-        .prop('type', 'text/css')
-        .html(`
-            .product-image-container {
-                text-align: center;
-                margin-bottom: 20px;
-            }
-            
-            .product-image {
-                max-width: 100%;
-                height: auto;
-                border-radius: 12px;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            }
-            
-            .product-description {
-                margin-bottom: 20px;
-            }
-            
-            .product-description p {
-                line-height: 1.6;
-                color: #555;
-                font-size: 16px;
-            }
-            
-            .product-price {
-                margin-bottom: 25px;
-                padding: 15px;
-                background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-                border-radius: 12px;
-                text-align: center;
-            }
-            
-            .price-label {
-                font-weight: 600;
-                color: #666;
-                margin-right: 8px;
-            }
-            
-            .price-value {
-                font-size: 24px;
-                font-weight: 700;
-                color: #F46036;
-            }
-            
-            .nick-price {
-                display: block;
-                font-size: 14px;
-                color: #666;
-                margin-top: 5px;
-            }
-            
-            .agreement-section {
-                margin: 25px 0;
-                padding: 15px;
-                background: #f8f9fa;
-                border-radius: 12px;
-                border-left: 4px solid #F46036;
-            }
-            
-            .agreement-section p {
-                margin: 0;
-                line-height: 1.5;
-                color: #555;
-            }
-            
-            .form-actions {
-                text-align: center;
-                margin-top: 25px;
-            }
-            
-            .form-actions .btn {
-                padding: 12px 30px;
-                font-size: 16px;
-            }
-        `)
-        .appendTo('head');
 </script>
 {% endblock %}
 
