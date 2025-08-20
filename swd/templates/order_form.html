@@ -156,13 +156,9 @@
                                             <div class="item-options">
                                                 <div class="input-field">
                                                     <select name="items[{{ forloop.counter0 }}][size]" class="item-size">
-                                                        <option value="One Size" selected>One Size</option>
-                                                        <option value="XS">XS</option>
-                                                        <option value="S">S</option>
-                                                        <option value="M">M</option>
-                                                        <option value="L">L</option>
-                                                        <option value="XL">XL</option>
-                                                        <option value="XXL">XXL</option>
+                                                        {% for size in item.sizes %}
+                                                            <option value="{{ size }}">{{ size }}</option>
+                                                        {% endfor %}
                                                     </select>
                                                     <label>Size</label>
                                                 </div>
@@ -213,13 +209,9 @@
                                                     <div class="combo-item-option">
                                                         <div class="input-field">
                                                             <select name="combos[{{ forloop.parentloop.counter0 }}][items][{{ forloop.counter0 }}][size]" class="combo-item-size">
-                                                                <option value="One Size" selected>One Size</option>
-                                                                <option value="XS">XS</option>
-                                                                <option value="S">S</option>
-                                                                <option value="M">M</option>
-                                                                <option value="L">L</option>
-                                                                <option value="XL">XL</option>
-                                                                <option value="XXL">XXL</option>
+                                                            {% for size in item_name.sizes %}
+                                                                <option value="{{ size }}">{{ size }}</option>
+                                                            {% endfor %}
                                                             </select>
                                                             <label>{{ item_name }} - Size</label>
                                                         </div>
