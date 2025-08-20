@@ -4516,6 +4516,35 @@ def order_form(request, bundle_id):
         # Close MongoDB connection
         client.close()
         
+        # Process combo data to include item details
+        if bundle.get('combos'):
+            processed_combos = []
+            for combo in bundle['combos']:
+                processed_combo = combo.copy()
+                processed_combo['processed_items'] = []
+                
+                for item_name in combo.get('items', []):
+                    # Find the corresponding merch item
+                    merch_item = next((item for item in bundle.get('merchItems', []) if item['name'] == item_name), None)
+                    if merch_item:
+                        processed_combo['processed_items'].append({
+                            'name': item_name,
+                            'sizes': merch_item.get('sizes', []),
+                            'nick': merch_item.get('nick', False)
+                        })
+                    else:
+                        # Fallback if item not found
+                        processed_combo['processed_items'].append({
+                            'name': item_name,
+                            'sizes': [],
+                            'nick': False
+                        })
+                
+                processed_combos.append(processed_combo)
+            
+            # Replace the original combos with processed ones
+            bundle['processed_combos'] = processed_combos
+        
         context = {
             'bundle': bundle,
             'club': club,

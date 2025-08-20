@@ -186,11 +186,11 @@
                             </div>
                             {% endif %}
                             
-                            {% if bundle.combos %}
+                            {% if bundle.processed_combos %}
                             <div class="combos-section">
                                 <h5>Combos</h5>
                                 <div class="row">
-                                    {% for combo in bundle.combos %}
+                                    {% for combo in bundle.processed_combos %}
                                     <div class="col s12 m6 l4">
                                         <div class="combo-card">
                                             <div class="combo-header">
@@ -202,31 +202,31 @@
                                             {% endif %}
                                             
                                             <div class="combo-options">
-                                                {% if combo.items %}
+                                                {% if combo.processed_items %}
                                                 <div class="combo-items-selection">
                                                     <label>Select Items:</label>
-                                                    {% for item_name in combo.items %}
+                                                    {% for item in combo.processed_items %}
                                                     <div class="combo-item-option">
                                                         <div class="input-field">
                                                             <select name="combos[{{ forloop.parentloop.counter0 }}][items][{{ forloop.counter0 }}][size]" class="combo-item-size">
-                                                            {% for size in item_name.sizes %}
+                                                            {% for size in item.sizes %}
                                                                 <option value="{{ size }}">{{ size }}</option>
                                                             {% endfor %}
                                                             </select>
-                                                            <label>{{ item_name }} - Size</label>
+                                                            <label>{{ item.name }} - Size</label>
                                                         </div>
                                                         
-                                                        {% if item_name.nick %}
+                                                        {% if item.nick %}
                                                         <div class="input-field nick-field">
                                                             <input id="combo_nick_{{ forloop.parentloop.counter0 }}_{{ forloop.counter0 }}" 
                                                                    name="combos[{{ forloop.parentloop.counter0 }}][items][{{ forloop.counter0 }}][nick]" 
-                                                                   type="text" class="validate combo-item-nick" maxlength="50" placeholder="Enter nickname for {{ item_name }}">
+                                                                   type="text" class="validate combo-item-nick" maxlength="50" placeholder="Enter nickname for {{ item.name }}">
                                                             <span class="helper-text">Custom text for the back of this item</span>
                                                         </div>
                                                         {% endif %}
                                                         
-                                                        <input type="hidden" name="combos[{{ forloop.parentloop.counter0 }}][items][{{ forloop.counter0 }}][itemName]" value="{{ item_name }}">
-                                                        <input type="hidden" name="combos[{{ forloop.parentloop.counter0 }}][items][{{ forloop.counter0 }}][hasNick]" value="{{ item_name.nick|yesno:'true,false' }}">
+                                                        <input type="hidden" name="combos[{{ forloop.parentloop.counter0 }}][items][{{ forloop.counter0 }}][itemName]" value="{{ item.name }}">
+                                                        <input type="hidden" name="combos[{{ forloop.parentloop.counter0 }}][items][{{ forloop.counter0 }}][hasNick]" value="{{ item.nick|yesno:'true,false' }}">
                                                     </div>
                                                     {% endfor %}
                                                 </div>
@@ -240,6 +240,24 @@
                                                 <input type="hidden" name="combos[{{ forloop.counter0 }}][comboName]" value="{{ combo.name }}">
                                                 <input type="hidden" name="combos[{{ forloop.counter0 }}][price]" value="{{ combo.comboPrice }}">
                                             </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            {% if bundle.combos and not bundle.processed_combos %}
+                            <div class="combos-section">
+                                <h5>Combos</h5>
+                                <div class="row">
+                                    {% for combo in bundle.combos %}
+                                    <div class="col s12 m6 l4">
+                                        <div class="card-panel yellow lighten-4">
+                                            <span class="yellow-text text-darken-2">
+                                                <i class="material-icons left">warning</i>
+                                                Combo "{{ combo.name }}" is not properly configured. Please contact the administrator.
+                                            </span>
                                         </div>
                                     </div>
                                     {% endfor %}
