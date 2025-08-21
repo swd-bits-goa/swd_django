@@ -3,6 +3,7 @@
 
 {% block content %}
 <style>
+    /* Base styling for nickname fields */
     .nick-field .input-field {
         position: relative;
     }
@@ -40,13 +41,144 @@
         font-size: 0.8rem;
         color: #666;
     }
+    
+    /* Modern card styling */
+    .card-shadow {
+        box-shadow: 0 10px 20px rgba(0,0,0,0.05), 0 6px 6px rgba(0,0,0,0.1);
+        transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+    }
+    
+    .card-shadow:hover {
+        box-shadow: 0 14px 28px rgba(0,0,0,0.1), 0 10px 10px rgba(0,0,0,0.08);
+    }
+    
+    /* Verification status styling */
+    .verification-status {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            border: 1px solid transparent;
+            animation: fadeIn 0.5s ease-in-out;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .verification-status::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: all 0.8s ease;
+        }
+        
+        .verification-status:hover::before {
+            left: 100%;
+        }
+        
+        .verification-status i {
+            animation: scaleIn 0.5s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes scaleIn {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
+        }
+        
+        #verificationIcon {
+            transition: transform 0.3s ease;
+        }
+        
+        #verificationIcon:hover {
+            transform: scale(1.2) rotate(5deg);
+        }
+        
+        .pulse-animation {
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .success-animation {
+            animation: successPop 0.5s ease-out;
+        }
+        
+        @keyframes successPop {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        .error-animation {
+            animation: errorShake 0.5s ease-in-out;
+        }
+        
+        @keyframes errorShake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+        
+        .verifying-bg {
+            background: linear-gradient(145deg, rgba(255, 160, 0, 0.05), rgba(255, 160, 0, 0.15));
+            background-size: 200% 200%;
+            animation: gradientShift 2s infinite alternate;
+        }
+        
+        .success-bg {
+            background: linear-gradient(145deg, rgba(76, 175, 80, 0.05), rgba(76, 175, 80, 0.15));
+            background-size: 200% 200%;
+            animation: successGlow 2s infinite alternate;
+        }
+        
+        .error-bg {
+            background: linear-gradient(145deg, rgba(244, 67, 54, 0.05), rgba(244, 67, 54, 0.15));
+            background-size: 200% 200%;
+            animation: errorGlow 2s infinite alternate;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+        
+        @keyframes successGlow {
+            0% { box-shadow: 0 0 5px rgba(76, 175, 80, 0.1); }
+            100% { box-shadow: 0 0 15px rgba(76, 175, 80, 0.3); }
+        }
+        
+        @keyframes errorGlow {
+            0% { box-shadow: 0 0 5px rgba(244, 67, 54, 0.1); }
+            100% { box-shadow: 0 0 15px rgba(244, 67, 54, 0.3); }
+        }
+    
+    .verification-status i {
+        margin-right: 10px;
+        font-size: 24px;
+    }
 </style>
 
 <div class="container-fluid">
     {% if messages %}
     <div class="section">
         {% for message in messages %}
-        <div class="card-panel {% if message.tags == 'error' %}red{% else %}green{% endif %} lighten-4">
+        <div class="card-panel card-shadow {% if message.tags == 'error' %}red{% else %}green{% endif %} lighten-4">
             <span class="{% if message.tags == 'error' %}red{% else %}green{% endif %}-text text-darken-2">
                 <i class="material-icons left">{% if message.tags == 'error' %}error{% else %}check_circle{% endif %}</i>
                 {{ message }}
@@ -67,13 +199,13 @@
     <div class="section">
         <div class="row">
             <div class="col s12">
-                <div class="card order-form-card">
+                <div class="card order-form-card card-shadow">
                     <div class="card-content">
                         <div class="bundle-header">
                             <h4>{{ bundle.title }}</h4>
                             <p class="club-name">{{ club.clubName|default:club.username }}</p>
                             {% if bundle.description %}
-                            <p class="bundle-description">{{ bundle.description }}</p>
+                            <!-- <p class="bundle-description">{{ bundle.description }}</p> -->
                             {% endif %}
                         </div>
                         
@@ -88,32 +220,40 @@
                         <form method="POST" id="orderForm">
                             {% csrf_token %}
                             
-                            <div class="student-info-section">
+                            <div class="student-info-section card-shadow">
                                 <h5>Student Information</h5>
                                 <div class="row">
                                     <div class="input-field col s12 m4">
+                                        <i class="material-icons prefix">badge</i>
                                         <input id="studentBITSID" name="studentBITSID" type="text" class="validate" required value="{{ student.bitsId|default:'' }}">
                                         <label for="studentBITSID">BITS ID</label>
                                     </div>
                                     <div class="input-field col s12 m4">
+                                        <i class="material-icons prefix">person</i>
                                         <input id="studentName" name="studentName" type="text" class="validate" required value="{{ student.name|default:'' }}">
                                         <label for="studentName">Full Name</label>
                                     </div>
                                     <div class="input-field col s12 m4">
+                                        <i class="material-icons prefix">email</i>
                                         <input id="studentEmail" name="studentEmail" type="email" class="validate" required value="{{ student.email|default:'' }}">
                                         <label for="studentEmail">Email</label>
                                     </div>
                                 </div>
                             </div>
                             
-                            <div class="section">
+                            <div class="section card-shadow" style="padding: 20px; border-radius: 8px; margin-top: 20px;">
+                                <h5>Referral Verification</h5>
                                 <div class="row">
                                     <div class="input-field col s12 m4">
+                                        <i class="material-icons prefix">verified_user</i>
                                         <input id="verifyStudentID" type="text" class="validate">
                                         <label for="verifyStudentID">Enter Student BITS ID for Referral</label>
                                     </div>
                                     <div class="input-field col s12 m8">
-                                        <span id="studentIdVerifyMsg" style="font-weight: bold;"></span>
+                                        <div id="verification-status" class="verification-status">
+                                            <i id="verificationIcon" class="material-icons left" style="display: none;"></i>
+                                            <span id="studentIdVerifyMsg" style="font-weight: bold; font-size: 16px;"></span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -139,7 +279,7 @@
                                 <div class="row">
                                     {% for item in bundle.merchItems %}
                                     <div class="col s12 m6 l4">
-                                        <div class="merch-item-card">
+                                        <div class="merch-item-card card-shadow z-depth-1 hoverable">
                                             {% if item.image %}
                                             <div class="item-image">
                                                 <img src="{{ item.image }}" alt="{{ item.name }}" class="responsive-img">
@@ -192,7 +332,7 @@
                                 <div class="row">
                                     {% for combo in bundle.processed_combos %}
                                     <div class="col s12 m6 l4">
-                                        <div class="combo-card">
+                                        <div class="combo-card card-shadow z-depth-1 hoverable">
                                             <div class="combo-header">
                                                 <h6>{{ combo.name }}</h6>
                                                 <span class="price" {% if combo.hasNick %}data-nick=" - Customizable items"{% endif %}>₹{{ combo.comboPrice }}</span>
@@ -265,7 +405,7 @@
                             </div>
                             {% endif %}
                             
-                            <div class="order-summary">
+                            <div class="order-summary card-shadow z-depth-1">
                                 <h5>Order Summary</h5>
                                 <div class="summary-content">
                                     <div class="row">
@@ -283,7 +423,7 @@
                                 </div>
                             </div>
                             
-                            <div class="order-submit">
+                            <div class="order-submit card-shadow">
                                 <p>
                                     <input id="agree" type="checkbox" class="filled-in" required/>
                                     <label for="agree">I agree to place this order and understand that the amount will be deducted from my account</label>
@@ -315,36 +455,59 @@
 
 <style>
     .order-form-card {
-        border-radius: 12px;
+        border-radius: 16px;
         overflow: hidden;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        box-shadow: 0 8px 30px rgba(0,0,0,0.12);
         margin-bottom: 30px;
+        transition: transform 0.3s ease;
+    }
+    
+    .order-form-card:hover {
+        transform: translateY(-5px);
     }
     
     .bundle-header {
         text-align: center;
-        padding: 30px;
+        padding: 40px 30px;
         background: linear-gradient(135deg, #F46036 0%, #e74c3c 100%);
         color: white;
-        margin: -25px -25px 25px -25px;
+        margin: -25px -25px 30px -25px;
+        position: relative;
+    }
+    
+    .bundle-header:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 6px;
+        background: rgba(0,0,0,0.1);
     }
     
     .bundle-header h4 {
         color: white !important;
-        margin-bottom: 10px !important;
+        margin-bottom: 15px !important;
+        font-weight: 500;
+        letter-spacing: 0.5px;
     }
     
     .club-name {
         font-size: 18px;
         margin: 10px 0;
         opacity: 0.9;
+        font-weight: 300;
     }
     
     .bundle-description {
         font-size: 16px;
         line-height: 1.6;
-        margin: 15px 0 0 0;
+        margin: 20px auto 0;
         opacity: 0.95;
+        max-width: 800px;
+        text-align: center;
+        display: block; /* Ensure it's a block element */
+        width: 100%; /* Set width to 100% to enable proper centering */
     }
     
     .student-info-section {
@@ -368,17 +531,35 @@
     }
     
     .merch-item-card, .combo-card {
-        background: #f8f9fa;
-        border-radius: 8px;
-        padding: 20px;
-        margin-bottom: 20px;
-        border: 2px solid transparent;
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 25px;
+        border: 1px solid #eaeaea;
         transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
     }
     
     .merch-item-card:hover, .combo-card:hover {
         border-color: #F46036;
-        box-shadow: 0 4px 15px rgba(244, 96, 54, 0.2);
+        box-shadow: 0 10px 30px rgba(244, 96, 54, 0.15);
+        transform: translateY(-5px);
+    }
+    
+    .merch-item-card:before, .combo-card:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 0;
+        background: #F46036;
+        transition: height 0.3s ease;
+    }
+    
+    .merch-item-card:hover:before, .combo-card:hover:before {
+        height: 100%;
     }
     
     .item-image {
@@ -397,25 +578,51 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 15px;
-        padding-bottom: 10px;
-        border-bottom: 2px solid #F46036;
+        margin-bottom: 18px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid rgba(244, 96, 54, 0.3);
+        position: relative;
+    }
+    
+    .item-header:after, .combo-header:after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        width: 60px;
+        height: 3px;
+        background: #F46036;
     }
     
     .item-header h6, .combo-header h6 {
-        color: #F46036;
+        color: #333;
         font-weight: 600;
         margin: 0;
         font-size: 18px;
+        letter-spacing: 0.5px;
+        transition: color 0.3s ease;
+    }
+    
+    .merch-item-card:hover .item-header h6, 
+    .combo-card:hover .combo-header h6 {
+        color: #F46036;
     }
     
     .price {
-        background: #F46036;
+        background: linear-gradient(135deg, #F46036 0%, #e74c3c 100%);
         color: white;
-        padding: 5px 12px;
-        border-radius: 15px;
+        padding: 6px 14px;
+        border-radius: 20px;
         font-weight: 600;
         font-size: 14px;
+        box-shadow: 0 2px 5px rgba(244, 96, 54, 0.3);
+        transition: all 0.3s ease;
+    }
+    
+    .merch-item-card:hover .price, 
+    .combo-card:hover .price {
+        transform: scale(1.05);
+        box-shadow: 0 4px 8px rgba(244, 96, 54, 0.4);
     }
     
     .item-description, .combo-description {
@@ -442,64 +649,110 @@
     }
     
     .order-summary {
-        background: #f8f9fa;
-        padding: 20px;
-        border-radius: 8px;
-        margin: 30px 0;
+        background: #ffffff;
+        padding: 30px;
+        border-radius: 16px;
+        margin: 40px 0;
+        position: relative;
+        border: 1px solid #eaeaea;
+    }
+    
+    .order-summary h5 {
+        margin-top: 0;
+        color: #333;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        border-bottom: 1px solid rgba(244, 96, 54, 0.3);
+        padding-bottom: 15px;
+        margin-bottom: 25px;
+        position: relative;
+    }
+    
+    .order-summary h5:after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        width: 80px;
+        height: 3px;
+        background: #F46036;
     }
     
     .summary-content {
         background: white;
-        padding: 20px;
-        border-radius: 8px;
-        border: 2px solid #F46036;
+        padding: 25px;
+        border-radius: 12px;
+        border: 1px solid rgba(244, 96, 54, 0.3);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
     }
     
     .total-section {
         text-align: center;
-        padding: 20px;
-        background: #F46036;
+        padding: 25px;
+        background: linear-gradient(135deg, #F46036 0%, #e74c3c 100%);
         color: white;
-        border-radius: 8px;
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(244, 96, 54, 0.2);
+        margin-top: 20px;
     }
     
     .total-section h6 {
         color: white !important;
         margin: 0;
-        font-size: 20px;
+        font-size: 22px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
     }
     
     .order-submit {
         text-align: center;
-        padding: 30px;
-        background: #f8f9fa;
-        border-radius: 8px;
-        margin: 30px 0;
+        padding: 40px;
+        background: #ffffff;
+        border-radius: 16px;
+        margin: 40px 0;
+        border: 1px solid #eaeaea;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.05);
     }
     
     .submit-section .btn {
-        padding: 0 40px;
-        height: 50px;
-        line-height: 50px;
+        padding: 0 50px;
+        height: 54px;
+        line-height: 54px;
         font-size: 16px;
-        border-radius: 25px;
+        border-radius: 27px;
         text-transform: none;
         font-weight: 600;
-        box-shadow: 0 4px 15px rgba(244, 96, 54, 0.3);
+        letter-spacing: 0.5px;
+        background: linear-gradient(135deg, #F46036 0%, #e74c3c 100%);
+        box-shadow: 0 6px 15px rgba(244, 96, 54, 0.3);
         transition: all 0.3s ease;
     }
     
     .submit-section .btn:hover:not(.disabled) {
-        box-shadow: 0 6px 20px rgba(244, 96, 54, 0.4);
-        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(244, 96, 54, 0.4);
+        transform: translateY(-3px);
+    }
+    
+    .submit-section .btn.disabled {
+        background: #cccccc;
+        box-shadow: none;
     }
     
     .order-item {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 10px 0;
-        border-bottom: 1px solid #eee;
+        padding: 15px 0;
+        border-bottom: 1px solid rgba(238, 238, 238, 0.7);
+        transition: all 0.3s ease;
+    }
+    
+    .order-item:hover {
+        background-color: rgba(244, 96, 54, 0.05);
+        transform: translateX(5px);
+        padding-left: 10px;
+        padding-right: 10px;
+        border-radius: 8px;
     }
     
     .order-item:last-child {
@@ -508,17 +761,32 @@
     
     .order-item-name {
         font-weight: 600;
+        color: #333;
+        transition: color 0.3s ease;
+    }
+    
+    .order-item:hover .order-item-name {
         color: #F46036;
     }
     
     .order-item-details {
         color: #666;
         font-size: 14px;
+        margin-top: 5px;
     }
     
     .order-item-price {
         font-weight: 600;
         color: #333;
+        background: rgba(244, 96, 54, 0.1);
+        padding: 5px 10px;
+        border-radius: 15px;
+        transition: all 0.3s ease;
+    }
+    
+    .order-item:hover .order-item-price {
+        background: rgba(244, 96, 54, 0.2);
+        color: #F46036;
     }
     
     .merch-item-card .item-options,
@@ -566,13 +834,28 @@
         margin-top: 2px;
     }
     
-    @media only screen and (max-width: 600px) {
+    @media only screen and (max-width: 992px) {
         .bundle-header {
-            padding: 20px;
+            padding: 30px 20px;
         }
         
         .bundle-header h4 {
-            font-size: 24px !important;
+            font-size: 26px !important;
+        }
+        
+        .order-summary, .order-submit {
+            padding: 25px;
+        }
+    }
+    
+    @media only screen and (max-width: 600px) {
+        .bundle-header {
+            padding: 25px 15px;
+            margin: -20px -20px 20px -20px;
+        }
+        
+        .bundle-header h4 {
+            font-size: 22px !important;
         }
         
         .merch-item-card, .combo-card {
@@ -583,6 +866,24 @@
             flex-direction: column;
             align-items: flex-start;
             gap: 10px;
+        }
+        
+        .order-summary, .order-submit {
+            padding: 20px 15px;
+            margin: 25px 0;
+        }
+        
+        .summary-content {
+            padding: 15px;
+        }
+        
+        .submit-section .btn {
+            width: 100%;
+            padding: 0 15px;
+        }
+        
+        .student-info-section, .merch-items-section, .combos-section {
+            margin: 20px 0;
         }
     }
 </style>
@@ -944,24 +1245,61 @@
     
     $(document).ready(function () {
         // ...existing code...
+        
+        // Hide verification status div initially if no ID is entered
+        if (!$('#verifyStudentID').val().trim()) {
+            $('#verification-status').hide();
+        }
 
         $('#verifyStudentID').on('input', function() {
             const bitsId = $(this).val().trim();
             if (!bitsId) {
                 $('#studentIdVerifyMsg').text('');
+                $('#verificationIcon').hide();
+                $('#verification-status').hide();
                 window.referralDiscount = 0;
                 updateOrderSummary();
                 return;
             }
+            
+            // Show the verification status div if it was hidden
+            $('#verification-status').show();
+            
+            // Show loading indicator
+            $('#studentIdVerifyMsg').text('Verifying...').css('color', '#FFA000');
+            $('#verificationIcon').show().text('hourglass_empty').css('color', '#FFA000');
+            $('#verificationIcon').addClass('pulse-animation');
+            $('.verification-status').removeClass('success-bg error-bg').addClass('verifying-bg').css({
+                'background-color': 'rgba(255, 160, 0, 0.1)',
+                'border-color': '#FFA000'
+            });
+            
             $.post('/verify-referral-id/', { bitsId: bitsId, csrfmiddlewaretoken: $('[name=csrfmiddlewaretoken]').val() }, function(data) {
                 if (data.status === 'verified') {
-                    $('#studentIdVerifyMsg').text('Student verified').css('color', 'green');
+                    $('#studentIdVerifyMsg').text('Student verified - ' + data.discount + '% discount applied').css('color', 'green');
+                    $('#verificationIcon').removeClass('pulse-animation').addClass('success-animation');
+                    $('#verificationIcon').show().text('check_circle').css('color', 'green');
+                    $('.verification-status').removeClass('verifying-bg error-bg').addClass('success-bg').css({
+                        'background-color': 'rgba(76, 175, 80, 0.1)',
+                        'border-color': 'green'
+                    });
                     window.referralDiscount = data.discount || 0;
                 } else if (data.status === 'not_found') {
                     $('#studentIdVerifyMsg').text('ID does not exist').css('color', 'red');
+                    $('#verificationIcon').removeClass('pulse-animation').addClass('error-animation');
+                    $('#verificationIcon').show().text('cancel').css('color', 'red');
+                    $('.verification-status').removeClass('verifying-bg success-bg').addClass('error-bg').css({
+                        'background-color': 'rgba(244, 67, 54, 0.1)',
+                        'border-color': 'red'
+                    });
                     window.referralDiscount = 0;
                 } else {
                     $('#studentIdVerifyMsg').text('');
+                    $('#verificationIcon').removeClass('pulse-animation success-animation error-animation').hide();
+                    $('.verification-status').removeClass('verifying-bg success-bg error-bg').css({
+                        'background-color': 'transparent',
+                        'border-color': 'transparent'
+                    });
                     window.referralDiscount = 0;
                 }
                 updateOrderSummary();
