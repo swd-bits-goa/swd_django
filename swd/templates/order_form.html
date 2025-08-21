@@ -943,20 +943,26 @@
             // Collect items data
             $('.merch-item-card').each(function(index) {
                 const quantity = parseInt($(this).find('.item-quantity').val()) || 0;
-                if (quantity > 0) {
-                    const price = parseFloat($(this).find('input[name*="[price]"]').val()) || 0;
-                    const name = $(this).find('input[name*="[merchName]"]').val();
-                    const size = $(this).find('select.item-size').val() || 'One Size';
-                    const hasNick = $(this).find('input[name*="[hasNick]"]').val() === 'true';
-                    const nick = hasNick ? $(this).find('input[name*="[nick]"]').val() : '';
+                const price = parseFloat($(this).find('input[name*="[price]"]').val()) || 0;
+                const name = $(this).find('input[name*="[merchName]"]').val();
+                const size = $(this).find('select.item-size').val() || 'One Size';
+                const hasNick = $(this).find('input[name*="[hasNick]"]').val() === 'true';
+                const nick = hasNick ? $(this).find('input[name*="[nick]"]').val() : '';
+                const nickPrice = hasNick ? parseFloat($(this).find('input[name*="[nickPrice]"]').val()) || 0 : 0;
 
-                    formData.items.push({
-                        merchName: name,
+                if (quantity > 0) {
+                    // Use per-item nickPrice
+                    const itemTotal = quantity * price + (hasNick && nick ? quantity * nickPrice : 0);
+                    totalAmount += itemTotal;
+                    orderItems.push({
+                        name: name,
                         size: size,
                         quantity: quantity,
                         price: price,
+                        total: itemTotal,
                         hasNick: hasNick,
-                        nick: nick
+                        nick: nick,
+                        nickPrice: nickPrice
                     });
                 }
             });
@@ -964,29 +970,39 @@
             // Collect combos data
             $('.combo-card').each(function(index) {
                 const quantity = parseInt($(this).find('.combo-quantity').val()) || 0;
+                const basePrice = parseFloat($(this).find('input[name*="[price]"]').val()) || 0;
+                const comboName = $(this).find('input[name*="[comboName]"]').val();
+                
                 if (quantity > 0) {
-                    const price = parseFloat($(this).find('input[name*="[price]"]').val()) || 0;
-                    const comboName = $(this).find('input[name*="[comboName]"]').val();
-                    
                     const comboItems = [];
-                    $(this).find('.combo-item-size').each(function() {
-                        const itemName = $(this).closest('.combo-item-option').find('input[name*="[itemName]"]').val();
-                        const size = $(this).val() || 'One Size';
-                        const hasNick = $(this).closest('.combo-item-option').find('input[name*="[hasNick]"]').val() === 'true';
-                        const nick = hasNick ? $(this).closest('.combo-item-option').find('input[name*="[nick]"]').val() : '';
+                    let additionalNickPrice = 0;
+
+                    $(this).find('.combo-item-option').each(function() {
+                        const itemName = $(this).find('input[name*="[itemName]"]').val();
+                        const size = $(this).find('select.combo-item-size').val() || 'One Size';
+                        const hasNick = $(this).find('input[name*="[hasNick]"]').val() === 'true';
+                        const nick = hasNick ? $(this).find('input[name*="[nick]"]').val() : '';
+                        const nickPrice = hasNick ? parseFloat($(this).find('input[name*="[nickPrice]"]').val()) || 0 : 0;
+
+                        // Add per-item nickPrice
+                        if (hasNick && nick) {
+                            additionalNickPrice += nickPrice;
+                        }
 
                         comboItems.push({
                             itemName: itemName,
                             size: size,
                             hasNick: hasNick,
-                            nick: nick
+                            nick: nick,
+                            nickPrice: nickPrice
                         });
                     });
                     
+                    // Include the total price with nickname costs
                     formData.combos.push({
                         comboName: comboName,
                         quantity: quantity,
-                        price: price,
+                        price: basePrice + additionalNickPrice, // Include nickname price
                         items: comboItems
                     });
                 }
@@ -1142,6 +1158,7 @@
         return isValid;
     }
     
+    // Replace the updateOrderSummary function with this improved version
     function updateOrderSummary() {
         let totalAmount = 0;
         let orderItems = [];
@@ -1151,12 +1168,13 @@
             const quantity = parseInt($(this).find('.item-quantity').val()) || 0;
             const price = parseFloat($(this).find('input[name*="[price]"]').val()) || 0;
             const name = $(this).find('input[name*="[merchName]"]').val();
-            const size = $(this).find('select.item-size').val() || 'One Size'; // changed line
+            const size = $(this).find('select.item-size').val() || 'One Size';
             const hasNick = $(this).find('input[name*="[hasNick]"]').val() === 'true';
             const nick = hasNick ? $(this).find('input[name*="[nick]"]').val() : '';
 
             if (quantity > 0) {
-                const itemTotal = quantity * price;
+                // Apply nickname price if applicable (assuming extra ₹100 per nickname)
+                const itemTotal = quantity * price + (hasNick && nick ? quantity * 30 : 0);
                 totalAmount += itemTotal;
                 orderItems.push({
                     name: name,
@@ -1177,12 +1195,20 @@
             const comboName = $(this).find('input[name*="[comboName]"]').val();
             
             if (quantity > 0) {
+                // Collect all combo items into an array
                 const comboItems = [];
-                $(this).find('.combo-item-size').each(function() {
-                    const itemName = $(this).closest('.combo-item-option').find('input[name*="[itemName]"]').val();
-                    const size = $(this).val() || 'One Size';
-                    const hasNick = $(this).closest('.combo-item-option').find('input[name*="[hasNick]"]').val() === 'true';
-                    const nick = hasNick ? $(this).closest('.combo-item-option').find('input[name*="[nick]"]').val() : '';
+                let additionalNickPrice = 0;
+                
+                $(this).find('.combo-item-option').each(function() {
+                    const itemName = $(this).find('input[name*="[itemName]"]').val();
+                    const size = $(this).find('select.combo-item-size').val() || 'One Size';
+                    const hasNick = $(this).find('input[name*="[hasNick]"]').val() === 'true';
+                    const nick = hasNick ? $(this).find('input[name*="[nick]"]').val() : '';
+                    
+                    // Add nickname price (assuming ₹100 per nickname)
+                    if (hasNick && nick) {
+                        additionalNickPrice += 100;
+                    }
                     
                     comboItems.push({
                         itemName: itemName,
@@ -1192,23 +1218,25 @@
                     });
                 });
                 
-                const comboTotal = quantity * price;
+                // Calculate total for this combo including nickname prices
+                const comboTotal = quantity * (price + additionalNickPrice);
                 totalAmount += comboTotal;
                 
-                // Build combo details string with nickname information
-                let comboDetails = comboItems.map(item => {
+                // Build a consolidated summary of the combo items
+                let comboSummary = comboItems.map(item => {
                     let itemDetail = `${item.itemName} (${item.size})`;
                     if (item.hasNick && item.nick) {
                         itemDetail += ` - Nick: ${item.nick}`;
                     }
                     return itemDetail;
-                }).join(', ');
+                }).join('; ');
                 
+                // Add one entry per combo to avoid duplication
                 orderItems.push({
                     name: comboName,
-                    size: comboDetails,
+                    size: comboSummary,
                     quantity: quantity,
-                    price: price,
+                    price: price + additionalNickPrice, // Include nick price
                     total: comboTotal,
                     comboItems: comboItems
                 });
@@ -1226,7 +1254,7 @@
         let itemsHtml = '';
         orderItems.forEach(function(item) {
             let itemDetails = `Size: ${item.size} | Quantity: ${item.quantity}`;
-            if (item.hasNick) {
+            if (item.hasNick && item.nick) {
                 itemDetails += ` | Nickname: ${item.nick}`;
             }
             itemsHtml += `
@@ -1235,7 +1263,7 @@
                         <div class="order-item-name">${item.name}</div>
                         <div class="order-item-details">${itemDetails}</div>
                     </div>
-                    <div class="order-item-price">₹${item.total}</div>
+                    <div class="order-item-price">₹${item.total.toFixed(2)}</div>
                 </div>
             `;
         });

@@ -1548,7 +1548,7 @@ def import_mess_bill(request):
     return render(request, "import_mess_bill.html", {})
 
 
-
+@login_required
 def store(request):
     student = Student.objects.get(user=request.user)
     leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
