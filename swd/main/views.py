@@ -4270,6 +4270,15 @@ def order_form(request, bundle_id):
         if 'createdAt' in bundle:
             bundle['createdAt'] = bundle['createdAt'].strftime('%Y-%m-%d')
         
+        # Transform field names for consistency with frontend
+        if bundle.get('merchItems'):
+            for item in bundle['merchItems']:
+                # Convert nick_price to nickPrice for consistency
+                if 'nick_price' in item:
+                    item['nickPrice'] = item.pop('nick_price')
+                elif 'nickPrice' not in item:
+                    item['nickPrice'] = 0
+        
         has_existing_order = False
         try:
             existing_order_get = orders_collection.find_one({
@@ -4530,14 +4539,16 @@ def order_form(request, bundle_id):
                         processed_combo['processed_items'].append({
                             'name': item_name,
                             'sizes': merch_item.get('sizes', []),
-                            'nick': merch_item.get('nick', False)
+                            'nick': merch_item.get('nick', False),
+                            'nickPrice': merch_item.get('nickPrice', 0)
                         })
                     else:
                         # Fallback if item not found
                         processed_combo['processed_items'].append({
                             'name': item_name,
                             'sizes': [],
-                            'nick': False
+                            'nick': False,
+                            'nickPrice': 0
                         })
                 
                 processed_combos.append(processed_combo)
