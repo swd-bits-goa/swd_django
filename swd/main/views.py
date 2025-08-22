@@ -1645,6 +1645,10 @@ def store(request):
         print(f"Error fetching clubs: {e}")
         clubs = []
         error = "Unable to load clubs at the moment"
+        return JsonResponse({
+            success : False,
+            message : "Error ${e}",
+        })
 
     try:
         lasted = DuesPublished.objects.latest('date_published').date_published
