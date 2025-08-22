@@ -4472,7 +4472,7 @@ def order_form(request, bundle_id):
                         constants = db.constants.find_one()
                         discount_percent = constants.get('discount', 0) if constants else 0
                     except Student.DoesNotExist:
-                        referral_id = None  # Not valid, do not apply discount
+                        referral_id = None  
 
                 if discount_percent > 0 and referral_id:
                     total_price = total_price * (1 - discount_percent / 100)
@@ -4485,8 +4485,7 @@ def order_form(request, bundle_id):
                     'items': items_data,
                     'combos': combos_data,
                     'totalPrice': total_price,
-                    'status': 'pending',
-                    'referralID': referral_id if referral_id else None,  # <-- Store referralID in order
+                    'referralID': referral_id if referral_id else None,  
                 }
                 
                 try:

@@ -643,20 +643,25 @@
     
     .item-image img {
         width: 100%;
-        height: 100%;
-        object-fit: cover;
+        height: auto;
+        max-width: 100%;
+        object-fit: contain;
         border-radius: 8px;
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         transition: transform 0.3s ease;
+        /* Ensures image fits width and maintains aspect ratio */
+        display: block;
     }
     
     .merch-item-img {
         width: 100%;
-        height: 100%;
-        object-fit: cover;
+        height: auto;
+        max-width: 100%;
+        object-fit: contain;
         border-radius: 8px;
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         transition: transform 0.3s ease;
+        display: block;
     }
     
     .merch-item-card:hover .item-image img,
@@ -1096,6 +1101,7 @@
         }
         
         .item-image {
+            object-fit: contain;
             height: 240px;
         }
     }
@@ -1160,6 +1166,9 @@
 </style>
 
 <script>
+    // Initialize global variables
+    window.referralDiscount = 0;
+    
     $(document).ready(function () {
             $('select').material_select();
 
@@ -1178,9 +1187,14 @@
         $('#orderForm').on('submit', function(e) {
             e.preventDefault();
             
+            console.log('Form submission started');
+            
             if (!validateForm()) {
+                console.log('Form validation failed');
                 return false;
             }
+            
+            console.log('Form validation passed, building form data...');
             
             const $submitBtn = $('#place-order');
             $submitBtn.html('<i class="material-icons left">hourglass_empty</i> Placing Order...')
@@ -1200,6 +1214,7 @@
                 formData.referralID = referralInput;
             }
             
+            console.log('Found', $('.merch-item-card').length, 'merch-item-card elements');
             $('.merch-item-card').each(function(index) {
                 const quantity = parseInt($(this).find('.item-quantity').val()) || 0;
                 const price = parseFloat($(this).find('input[name*="[price]"]').val()) || 0;
@@ -1209,11 +1224,24 @@
                 const nick = hasNick ? $(this).find('input[name*="[nick]"]').val() : '';
                 const nickPrice = hasNick ? parseFloat($(this).find('input[name*="[nickPrice]"]').val()) || 0 : 0;
 
+                // Debug: Log the raw values found
+                console.log('Raw values for item', index, ':', {
+                    quantity: $(this).find('.item-quantity').val(),
+                    price: $(this).find('input[name*="[price]"]').val(),
+                    name: $(this).find('input[name*="[merchName]"]').val(),
+                    size: $(this).find('select.item-size').val(),
+                    hasNick: $(this).find('input[name*="[hasNick]"]').val(),
+                    nick: $(this).find('input[name*="[nick]"]').val(),
+                    nickPrice: $(this).find('input[name*="[nickPrice]"]').val()
+                });
+
                 if (quantity > 0) {
+                    // Debug: Log each item being processed
+                    console.log('Processing item:', { name, quantity, price, hasNick, nick, nickPrice });
+                    
                     const itemTotal = quantity * price + (hasNick && nick ? quantity * nickPrice : 0);
-                    totalAmount += itemTotal;
-                    orderItems.push({
-                        name: name,
+                    formData.items.push({
+                        merchName: name,
                         size: size,
                         quantity: quantity,
                         price: price,
@@ -1225,12 +1253,16 @@
                 }
             });
             
+            console.log('Found', $('.combo-card').length, 'combo-card elements');
             $('.combo-card').each(function(index) {
                 const quantity = parseInt($(this).find('.combo-quantity').val()) || 0;
                 const basePrice = parseFloat($(this).find('input[name*="[price]"]').val()) || 0;
                 const comboName = $(this).find('input[name*="[comboName]"]').val();
                 
                 if (quantity > 0) {
+                    // Debug: Log combo being processed
+                    console.log('Processing combo:', { comboName, quantity, basePrice });
+                    
                     const comboItems = [];
                     let additionalNickPrice = 0;
 
@@ -1240,6 +1272,9 @@
                         const hasNick = $(this).find('input[name*="[hasNick]"]').val() === 'true';
                         const nick = hasNick ? $(this).find('input[name*="[nick]"]').val() : '';
                         const nickPrice = parseFloat($(this).find('input[name*="[nickPrice]"]').val()) || 0;
+
+                        // Debug: Log combo item being processed
+                        console.log('Processing combo item:', { itemName, size, hasNick, nick, nickPrice });
 
                         if (hasNick && nick) {
                             additionalNickPrice += nickPrice;
@@ -1262,13 +1297,29 @@
                 }
             });
             
+            // Debug: Log the form data being sent
+            console.log('Form data being sent:', formData);
+            console.log('Items:', formData.items);
+            console.log('Combos:', formData.combos);
+            
+            // Validate that we have data before sending
+            if (formData.items.length === 0 && formData.combos.length === 0) {
+                console.error('No items or combos selected!');
+                M.toast({html: 'Please select at least one item or combo', classes: 'red'});
+                $submitBtn.removeClass('disabled').html('<i class="material-icons left">shopping_cart</i>Place Order');
+                return;
+            }
+            
+            const csrfToken = $('[name=csrfmiddlewaretoken]').val();
+            console.log('CSRF Token:', csrfToken);
+            
             $.ajax({
                 url: window.location.href,
                 method: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify(formData),
                 headers: {
-                    'X-CSRFToken': $('[name=csrfmiddlewaretoken]').val()
+                    'X-CSRFToken': csrfToken
                 },
                 success: function(response) {
                     
