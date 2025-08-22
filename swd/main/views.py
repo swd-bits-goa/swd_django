@@ -4237,6 +4237,14 @@ def delete_students(request):
 def messagefromdean(request):
     return render(request,"messagefromdean.html",{})
 
+def get_combo_individual_price(combo, merch_items):
+    total = 0
+    for item_name in combo.get('items', []):
+        item = next((i for i in merch_items if i['name'] == item_name), None)
+        if item:
+            total += float(item.get('price', 0))
+    return total
+
 
 
 
@@ -4548,6 +4556,7 @@ def order_form(request, bundle_id):
                             'nick': merch_item.get('nick', False),
                             'nickPrice': merch_item.get('nickPrice', 0)
                         })
+                        processed_combo['indPrice'] = get_combo_individual_price(processed_combo, bundle.get('merchItems', []))
                     else:
                         # Fallback if item not found
                         processed_combo['processed_items'].append({
