@@ -385,6 +385,7 @@ def address_approval_dashboard(request):
 @csrf_protect
 def loginform(request):
 
+    next_url = request.GET.get('next') or request.POST.get('next')
     if request.user.is_authenticated:
         if request.user.is_staff:
                 return redirect('/admin')
@@ -394,6 +395,9 @@ def loginform(request):
             return redirect('/hostelsuperintendent')
         if Security.objects.filter(user=request.user):
             return redirect('dash_security_leaves')
+        # Redirect to next if present
+        if next_url:
+            return redirect(next_url)
         return redirect('dashboard')
 
     if request.POST:
@@ -402,6 +406,9 @@ def loginform(request):
         user = authenticate(request, username=username.lower(), password=password)
         if user is not None:
             login(request, user)
+            # Redirect to next if present
+            if next_url:
+                return redirect(next_url)
             if user.is_staff:
                 return redirect('/admin')
             if Warden.objects.filter(user=request.user):
@@ -414,7 +421,7 @@ def loginform(request):
         else:
             messages.add_message(request, messages.INFO,  "Incorrect username or password", extra_tags='red')
 
-    return render(request, "sign-in.html", {})
+    return render(request, "sign-in.html", {'next': next_url})
 
 
 @login_required

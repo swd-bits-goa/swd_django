@@ -356,6 +356,15 @@
                                                     {% endif %}
                                                 </div>
                                             </div>
+                                            {% if combo.items %}
+                                            <div class="combo-items-tags" style="margin-bottom: 10px;">
+                                                {% for item_name in combo.items %}
+                                                    <span class="combo-item-tag" style="display:inline-block;background:#F46036;color:#fff;padding:4px 10px;border-radius:12px;font-size:12px;margin-right:6px;margin-bottom:4px;">
+                                                        {{ item_name }}
+                                                    </span>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
                                             {% if combo.description %}
                                             <p class="combo-description">{{ combo.description }}</p>
                                             {% endif %}
