@@ -1646,8 +1646,8 @@ def store(request):
         clubs = []
         error = "Unable to load clubs at the moment"
         return JsonResponse({
-            success : False,
-            message : "Error ${e}",
+            'success' : False,
+            'message' : f'Failed to load store :{str(e)}'
         })
 
     try:
