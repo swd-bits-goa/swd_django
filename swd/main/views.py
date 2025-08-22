@@ -4324,7 +4324,7 @@ def order_form(request, bundle_id):
                 referral_id = data.get('referralID', None)  # <-- Accept referralID from frontend
 
                 # Validate required fields
-                if not all([student_bits_id, student_name, student_email]):
+                if not all([student_bits_id, student_name]):
                     return JsonResponse({
                         'success': False,
                         'message': 'Please fill in all required student information.'
