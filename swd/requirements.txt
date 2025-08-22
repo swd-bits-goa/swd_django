@@ -22,14 +22,14 @@ jdcal==1.4.1
 MarkupPy==1.14
 odfpy==1.4.0
 openpyxl==3.0.0
-Pillow==9.1.0
+Pillow
 promise==2.1
-psycopg2==2.9.1
+psycopg2==2.8
 PyJWT==1.5.3
 python-dateutil==2.7.5
 pytz==2018.3
 PyYAML==5.1.2
-pymongo==4.6.1
+pymongo[srv]
 requests==2.24.0
 Rx==1.6.1
 singledispatch==3.4.0.3
