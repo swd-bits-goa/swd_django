@@ -1,11 +1,11 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.urls import reverse
 from .models import *
 from django.views.decorators.csrf import csrf_protect
-from datetime import date, time, datetime, timedelta
+from datetime import date, time, datetime, timedelta, timezone
 from .forms import MessBillForm, MessForm, LeaveForm, BonafideForm, DayPassForm, VacationLeaveNoMessForm
 from django.contrib import messages
 from django.utils.timezone import make_aware
@@ -22,7 +22,6 @@ from django.contrib.auth.models import User
 
 from calendar import monthrange, month_name
 from dateutil import rrule
-from datetime import datetime
 from django.db import IntegrityError
 from django.db.models import Q
 from .models import BRANCH, HOSTELS
@@ -43,6 +42,16 @@ import json
 from calendar import monthrange
 
 from pytz import timezone
+
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+from rest_framework import status
+from django.core.exceptions import ValidationError
+from django.db import transaction
+import json
+import pymongo
+from bson import ObjectId
 
 @user_passes_test(lambda a: a.is_superuser)
 def view_duplicates(request, end_year:str):
@@ -376,6 +385,7 @@ def address_approval_dashboard(request):
 @csrf_protect
 def loginform(request):
 
+    next_url = request.GET.get('next') or request.POST.get('next')
     if request.user.is_authenticated:
         if request.user.is_staff:
                 return redirect('/admin')
@@ -385,6 +395,9 @@ def loginform(request):
             return redirect('/hostelsuperintendent')
         if Security.objects.filter(user=request.user):
             return redirect('dash_security_leaves')
+        # Redirect to next if present
+        if next_url:
+            return redirect(next_url)
         return redirect('dashboard')
 
     if request.POST:
@@ -393,6 +406,9 @@ def loginform(request):
         user = authenticate(request, username=username.lower(), password=password)
         if user is not None:
             login(request, user)
+            # Redirect to next if present
+            if next_url:
+                return redirect(next_url)
             if user.is_staff:
                 return redirect('/admin')
             if Warden.objects.filter(user=request.user):
@@ -405,7 +421,7 @@ def loginform(request):
         else:
             messages.add_message(request, messages.INFO,  "Incorrect username or password", extra_tags='red')
 
-    return render(request, "sign-in.html", {})
+    return render(request, "sign-in.html", {'next': next_url})
 
 
 @login_required
@@ -1515,7 +1531,7 @@ def import_mess_bill(request):
                             month = datetime.strptime(request.POST.get('month'), '%B').date()
                             month = month.replace(day=1, year=year_selected)
                             # desc is hardcoded and referenced in messbill view also
-                            # any change here should also be done in desc
+                            #       exactly same as desc created in import_mess_bill view
                             desc = "Mess Due " + month.strftime("%B %y")
                             category, created = DueCategory.objects.get_or_create(name='Mess Bill',
                                                        description=desc)
@@ -1531,7 +1547,7 @@ def import_mess_bill(request):
                             os.remove(tmp)
                             return HttpResponse("Make sure the the sheet ({}) have proper header rows.".format(sheet.name))
 
-            os.remove(tmp)
+            os.remove(tmp)  
             if failed == '':
                 failed = str(0)
             return HttpResponse(str(tot_dues_added) + " Dues successfully added.<br>" + failed + " bitsIDs not found in database")
@@ -1539,7 +1555,7 @@ def import_mess_bill(request):
     return render(request, "import_mess_bill.html", {})
 
 
-
+@login_required
 def store(request):
     student = Student.objects.get(user=request.user)
     leaves = Leave.objects.filter(student=student, dateTimeStart__gte=date.today() - timedelta(days=7))
@@ -1548,6 +1564,87 @@ def store(request):
     tees = TeeAdd.objects.filter(available=True).order_by('-pk')
     items = ItemAdd.objects.filter(available=True)
     teesj = TeeAdd.objects.filter(available=True).values_list('title')
+    
+    # Check if a specific club is requested
+    selected_club = None
+    club_username = request.GET.get('club')
+    
+    # Fetch clubs from MongoDB
+    clubs = []
+    try:
+        from swd.config import MONGODB_URI
+        client = pymongo.MongoClient(MONGODB_URI)
+        db = client.merchportal
+        clubs_collection = db.users
+        
+        # Fetch all clubs (users with role 'club')
+        clubs = list(clubs_collection.find({'role': 'club'}, {
+            '_id': 1,
+            'username': 1,
+            'clubName': 1,
+            'createdAt': 1
+        }))
+        
+        # Fetch merch bundles for each club
+        merch_bundles_collection = db.merchbundles
+        
+        # Convert ObjectId to string for JSON serialization and add merch bundles
+        clubs_with_bundles = []
+        all_merch_bundles = []
+        
+        for club in clubs:
+            club_id_str = str(club['_id'])
+            club['_id'] = club_id_str
+            if 'createdAt' in club:
+                club['createdAt'] = club['createdAt'].strftime('%Y-%m-%d')
+            
+            # Fetch approved and visible merch bundles for this club
+            # Try both ObjectId and string versions of club ID
+            club_bundles = list(merch_bundles_collection.find({
+                '$or': [
+                    {'club': ObjectId(club_id_str)},
+                    {'club': club_id_str}
+                ],
+                'approvalStatus': 'approved',
+                'visibility': True
+            }, {
+                '_id': 1,
+                'title': 1,
+                'description': 1,
+                'merchItems': 1,
+                'combos': 1,
+                'createdAt': 1
+            }))
+            
+            # Convert ObjectIds to strings
+            for bundle in club_bundles:
+                bundle['id'] = str(bundle['_id'])  # Use 'id' instead of '_id' for template compatibility
+                if 'createdAt' in bundle:
+                    bundle['createdAt'] = bundle['createdAt'].strftime('%Y-%m-%d')
+                # Add club info to bundle for display
+                bundle['clubName'] = club.get('clubName', club['username'])
+                bundle['clubUsername'] = club['username']
+            
+            club['merchBundles'] = club_bundles
+            
+            # Check if this is the selected club
+            if club_username and club['username'] == club_username:
+                selected_club = club
+            
+            # Only include clubs that have merch bundles
+            if club_bundles:
+                clubs_with_bundles.append(club)
+                all_merch_bundles.extend(club_bundles)
+        
+        # Replace clubs with only those that have bundles
+        clubs = clubs_with_bundles
+        
+        client.close()
+        
+    except Exception as e:
+        print(f"Error fetching clubs: {e}")
+        clubs = []
+        error = "Unable to load clubs at the moment"
 
     try:
         lasted = DuesPublished.objects.latest('date_published').date_published
@@ -1602,6 +1699,10 @@ def store(request):
         'student': student,
         'tees': tees,
         'items': items,
+        'clubs': clubs,
+        'selected_club': selected_club,
+        'all_merch_bundles': all_merch_bundles if 'all_merch_bundles' in locals() else [],
+        'error': error if 'error' in locals() else None,
         'option': option,
         'balance': balance,
         'mess': mess,
@@ -1612,19 +1713,64 @@ def store(request):
 
     if request.POST:
         if request.POST.get('what') == 'item':
-            itemno = ItemAdd.objects.get(id=int(request.POST.get('info')))
-            bought = False;
-            if ItemBuy.objects.filter(student=student,item=itemno).exists():
-                bought = True
-            else:
-                bought = False
-            if bought == True:
-                messages.add_message(request, messages.INFO,"You have already paid for "+ itemno.title,extra_tags='orange')
-            elif itemno.available == True:
-                itembuy = ItemBuy.objects.create(item = itemno, student=student)
-                messages.add_message(request, messages.INFO, itemno.title + ' item bought. Thank you for purchasing. Headover to DUES to check your purchases.', extra_tags='green')
-            else:
-                messages.add_message(request, messages.INFO,  'Item not available', extra_tags='red')
+            try:
+                itemno = ItemAdd.objects.get(id=int(request.POST.get('info')))
+                size = request.POST.get('sizes', '')
+                quantity = int(request.POST.get('quantity', 1))
+                
+                # Validate quantity
+                if quantity < 1:
+                    messages.add_message(request, messages.ERROR, 'Quantity must be at least 1', extra_tags='red')
+                    return render(request, "store.html", context)
+                
+                # Check if item is available
+                if not itemno.available:
+                    messages.add_message(request, messages.ERROR, 'Item not available', extra_tags='red')
+                    return render(request, "store.html", context)
+                
+                # Check if size is required but not provided
+                if itemno.sizes and not size:
+                    messages.add_message(request, messages.ERROR, 'Please select a size', extra_tags='red')
+                    return render(request, "store.html", context)
+                
+                # Check if item with same size already purchased
+                # Note: This is a simplified check - you might want to adjust based on your requirements
+                existing_purchase = ItemBuy.objects.filter(student=student, item=itemno).first()
+                if existing_purchase:
+                    messages.add_message(
+                        request, 
+                        messages.INFO,
+                        f"You have already purchased {itemno.title}",
+                        extra_tags='orange'
+                    )
+                else:
+                    # Create purchase record for each quantity
+                    for _ in range(quantity):
+                        ItemBuy.objects.create(
+                            item=itemno,
+                            student=student,
+                            size=size if size else None
+                        )
+                    
+                    messages.add_message(
+                        request,
+                        messages.SUCCESS,
+                        f'Successfully purchased {quantity} {itemno.title}(s). Thank you for your purchase!',
+                        extra_tags='green'
+                    )
+                
+            except ItemAdd.DoesNotExist:
+                messages.add_message(request, messages.ERROR, 'Invalid item', extra_tags='red')
+            except ValueError:
+                messages.add_message(request, messages.ERROR, 'Invalid quantity', extra_tags='red')
+            except Exception as e:
+                print(f"Error processing purchase: {e}")
+                messages.add_message(
+                    request,
+                    messages.ERROR,
+                    'An error occurred while processing your purchase. Please try again.',
+                    extra_tags='red'
+                )
         if request.POST.get('what') == 'tee':
             teeno = TeeAdd.objects.get(id=int(request.POST.get('info')))
             bought = False;
@@ -1687,6 +1833,7 @@ def dues(request):
         option = 2
         mess = 0
 
+    # dues
     try:
         lasted = DuesPublished.objects.latest('date_published').date_published
     except:
@@ -1742,7 +1889,7 @@ def dues(request):
 @login_required
 def search(request):    
     perm=0;
-    option='indexbase.html';
+    option='indexbase.html'
     context = {
         'hostels' : [i[0] for i in HOSTELS],
         'branches' : BRANCH,
@@ -3821,6 +3968,7 @@ def leave_diff(request):
 
             row_num = 0
 
+
             for col_num in range(len(columns)):
                 ws.write(row_num, col_num, columns[col_num][0], h2_font_style)
                 ws.col(col_num).width = columns[col_num][1]
@@ -4088,3 +4236,401 @@ def delete_students(request):
 
 def messagefromdean(request):
     return render(request,"messagefromdean.html",{})
+
+def get_combo_individual_price(combo, merch_items):
+    total = 0
+    for item_name in combo.get('items', []):
+        item = next((i for i in merch_items if i['name'] == item_name), None)
+        if item:
+            total += float(item.get('price', 0))
+    return total
+
+
+
+
+def order_form(request, bundle_id):
+    """
+    Display order form for a specific merch bundle and handle form submission
+    """
+    try:
+
+        # Get current student information
+        student = Student.objects.get(user=request.user)
+        
+        from swd.config import MONGODB_URI
+        client = pymongo.MongoClient(MONGODB_URI, serverSelectionTimeoutMS=5000)
+        db = client.merchportal
+        merch_bundles_collection = db.merchbundles
+        users_collection = db.users
+        orders_collection = db.orders
+        
+        try:
+            bundle_object_id = ObjectId(bundle_id)
+        except:
+            messages.error(request, 'Invalid bundle ID.')
+            return redirect('store')
+            
+        bundle = merch_bundles_collection.find_one({
+            '_id': bundle_object_id,
+            'approvalStatus': 'approved',
+            'visibility': True
+        })
+        if not bundle:
+            messages.error(request, 'Bundle not found or not available for ordering.')
+            return redirect('store')
+        
+        club = users_collection.find_one({'_id': bundle['club']})
+        
+        bundle['id'] = str(bundle['_id'])
+        if 'createdAt' in bundle:
+            bundle['createdAt'] = bundle['createdAt'].strftime('%Y-%m-%d')
+        
+        # Transform field names for consistency with frontend
+        if bundle.get('merchItems'):
+            for item in bundle['merchItems']:
+                # Convert nick_price to nickPrice for consistency
+                if 'nick_price' in item:
+                    item['nickPrice'] = item.pop('nick_price')
+                elif 'nickPrice' not in item:
+                    item['nickPrice'] = 0
+        
+        has_existing_order = False
+        try:
+            existing_order_get = orders_collection.find_one({
+                'studentBITSID': student.bitsId,
+                'bundle': bundle_object_id
+            })
+            has_existing_order = existing_order_get is not None
+        except Exception:
+            has_existing_order = False
+
+        if request.method == 'POST':
+            
+            if request.content_type == 'application/json':
+                try:
+                    data = json.loads(request.body)
+                except json.JSONDecodeError as e:
+                    return JsonResponse({
+                        'success': False,
+                        'message': 'Invalid JSON data'
+                    }, status=400)
+                
+                student_bits_id = data.get('studentBITSID')
+                student_name = data.get('studentName')
+                student_email = data.get('studentEmail')
+                items_data = data.get('items', [])
+                combos_data = data.get('combos', [])
+                referral_id = data.get('referralID', None)  # <-- Accept referralID from frontend
+
+                # Validate required fields
+                if not all([student_bits_id, student_name, student_email]):
+                    return JsonResponse({
+                        'success': False,
+                        'message': 'Please fill in all required student information.'
+                    }, status=400)
+                
+                # Check if any items were selected
+                if not items_data and not combos_data:
+                    return JsonResponse({
+                        'success': False,
+                        'message': 'Please select at least one item or combo to order.'
+                    }, status=400)
+                
+                # Validate data structure for items
+                for item_data in items_data:
+                    required_fields = ['merchName', 'quantity', 'price', 'hasNick']
+                    for field in required_fields:
+                        if field not in item_data:
+                            return JsonResponse({
+                                'success': False,
+                                'message': f'Missing required field "{field}" in item data'
+                            }, status=400)
+                    
+                    # Validate quantity
+                    try:
+                        quantity = int(item_data.get('quantity', 0))
+                        if quantity <= 0:
+                            return JsonResponse({
+                                'success': False,
+                                'message': f'Quantity must be greater than 0 for {item_data.get("merchName")}'
+                            }, status=400)
+                    except (ValueError, TypeError):
+                        return JsonResponse({
+                            'success': False,
+                            'message': f'Invalid quantity for {item_data.get("merchName")}'
+                        }, status=400)
+                
+                # Validate data structure for combos
+                for combo_data in combos_data:
+                    required_fields = ['comboName', 'quantity', 'price', 'items']
+                    for field in required_fields:
+                        if field not in combo_data:
+                            return JsonResponse({
+                                'success': False,
+                                'message': f'Missing required field "{field}" in combo data'
+                            }, status=400)
+                    
+                    # Validate combo quantity
+                    try:
+                        quantity = int(combo_data.get('quantity', 0))
+                        if quantity <= 0:
+                            return JsonResponse({
+                                'success': False,
+                                'message': f'Quantity must be greater than 0 for combo {combo_data.get("comboName")}'
+                            }, status=400)
+                    except (ValueError, TypeError):
+                        return JsonResponse({
+                            'success': False,
+                            'message': f'Invalid quantity for combo {combo_data.get("comboName")}'
+                        }, status=400)
+                    
+                    # Validate combo items structure
+                    combo_items = combo_data.get('items', [])
+                    if not combo_items:
+                        return JsonResponse({
+                            'success': False,
+                            'message': f'Combo {combo_data.get("comboName")} must contain at least one item'
+                        }, status=400)
+                    
+                    for combo_item in combo_items:
+                        required_item_fields = ['itemName', 'size', 'hasNick']
+                        for field in required_item_fields:
+                            if field not in combo_item:
+                                return JsonResponse({
+                                    'success': False,
+                                    'message': f'Missing required field "{field}" in combo item data'
+                                },                                 status=400)
+                
+                # Check if student already has an order for this bundle
+                existing_order = orders_collection.find_one({
+                    'studentBITSID': student_bits_id,
+                    'bundle': bundle_object_id
+                })
+                
+                if existing_order:
+                    return JsonResponse({
+                        'success': False,
+                        'message': 'You have already placed an order for this bundle.'
+                    }, status=400)
+                
+                # Calculate total price
+                total_price = 0
+                
+                # Validate and calculate items
+                bundle_item_names = [item['name'] for item in bundle.get('merchItems', [])]
+                for item_data in items_data:
+                    merch_name = item_data.get('merchName')
+                    if merch_name not in bundle_item_names:
+                        return JsonResponse({
+                            'success': False,
+                            'message': f'Invalid merch item: {merch_name}'
+                        }, status=400)
+                    
+                    has_nick = item_data.get('hasNick', False)
+                    if has_nick:
+                        nick_value = item_data.get('nick', '').strip()
+                        if not nick_value:
+                            return JsonResponse({
+                                'success': False,
+                                'message': f'Nickname is required for {merch_name}'
+                            }, status=400)
+                        if len(nick_value) > 50:
+                            return JsonResponse({
+                                'success': False,
+                                'message': f'Nickname for {merch_name} must be 50 characters or less'
+                            }, status=400)
+                        
+                        # Sanitize nickname data (remove any potentially harmful characters)
+                        nick_value = nick_value.replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;')
+                        item_data['nick'] = nick_value
+                    
+                    total_price += float(item_data.get('price', 0)) * item_data.get('quantity', 0)
+                
+                bundle_combo_names = [combo['name'] for combo in bundle.get('combos', [])]
+                for combo_data in combos_data:
+                    combo_name = combo_data.get('comboName')
+                    if combo_name not in bundle_combo_names:
+                        return JsonResponse({
+                            'success': False,
+                            'message': f'Invalid combo: {combo_name}'
+                        }, status=400)
+                    
+                    combo_items = combo_data.get('items', [])
+                    for combo_item in combo_items:
+                        item_name = combo_item.get('itemName')
+                        has_nick = combo_item.get('hasNick', False)
+                        if has_nick:
+                            nick_value = combo_item.get('nick', '').strip()
+                            if not nick_value:
+                                return JsonResponse({
+                                    'success': False,
+                                    'message': f'Nickname for {item_name} in combo {combo_name} must be provided'
+                                }, status=400)
+                            if len(nick_value) > 50:
+                                return JsonResponse({
+                                    'success': False,
+                                    'message': f'Nickname for {item_name} in combo {combo_name} must be 50 characters or less'
+                                }, status=400)
+                            
+                            nick_value = nick_value.replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;')
+                            combo_item['nick'] = nick_value
+                    
+                    total_price += float(combo_data.get('price', 0)) * combo_data.get('quantity', 0)
+                
+                # Apply referral discount if referralID is verified
+                discount_percent = 0
+                if referral_id:
+                    # Verify referralID exists in Student table
+                    try:
+                        Student.objects.get(bitsId=referral_id)
+                        # Get discount from constants collection
+                        constants = db.constants.find_one()
+                        discount_percent = constants.get('discount', 0) if constants else 0
+                    except Student.DoesNotExist:
+                        referral_id = None  
+
+                if discount_percent > 0 and referral_id:
+                    total_price = total_price * (1 - discount_percent / 100)
+
+                order_data = {
+                    'studentBITSID': student_bits_id,
+                    'studentName': student_name,
+                    'studentEmail': student_email,
+                    'bundle': bundle_object_id,
+                    'items': items_data,
+                    'combos': combos_data,
+                    'totalPrice': total_price,
+                    'referralID': referral_id if referral_id else None,  
+                }
+                
+                try:
+                    
+                    result = orders_collection.insert_one(order_data)
+                    if result.inserted_id:
+                        return JsonResponse({
+                            'success': True,
+                            'message': f'Order placed successfully! Order ID: {str(result.inserted_id)}'
+                        })
+                    else:
+                        print("Failed to create order - no inserted ID returned")
+                        return JsonResponse({
+                            'success': False,
+                            'message': 'Failed to create order. Please try again.'
+                        }, status=500)
+                except Exception as e:
+                    print(f"Error creating order: {str(e)}")
+                    return JsonResponse({
+                        'success': False,
+                        'message': f'Database error while creating order: {str(e)}'
+                    }, status=500)
+            else:
+                # Handle traditional form data (fallback)
+                messages.error(request, 'Invalid request format. Please try again.')
+                return render(request, 'order_form.html', {
+                    'bundle': bundle,
+                    'club': club,
+                    'student': {
+                        'bitsId': student.bitsId,
+                        'name': student.name,
+                        'email': student.user.email
+                    }
+                })
+        
+        # Close MongoDB connection
+        client.close()
+        
+        # Process combo data to include item details
+        if bundle.get('combos'):
+            processed_combos = []
+            for combo in bundle['combos']:
+                processed_combo = combo.copy()
+                processed_combo['processed_items'] = []
+                
+                for item_name in combo.get('items', []):
+                    # Find the corresponding merch item
+                    merch_item = next((item for item in bundle.get('merchItems', []) if item['name'] == item_name), None)
+                    if merch_item:
+                        processed_combo['processed_items'].append({
+                            'name': item_name,
+                            'sizes': merch_item.get('sizes', []),
+                            'nick': merch_item.get('nick', False),
+                            'nickPrice': merch_item.get('nickPrice', 0)
+                        })
+                        processed_combo['indPrice'] = get_combo_individual_price(processed_combo, bundle.get('merchItems', []))
+                    else:
+                        # Fallback if item not found
+                        processed_combo['processed_items'].append({
+                            'name': item_name,
+                            'sizes': [],
+                            'nick': False,
+                            'nickPrice': 0
+                        })
+                
+                processed_combos.append(processed_combo)
+            
+            # Replace the original combos with processed ones
+            bundle['processed_combos'] = processed_combos
+        
+        context = {
+            'bundle': bundle,
+            'club': club,
+            'student': {
+                'bitsId': student.bitsId,
+                'name': student.name,
+                'email': student.user.email
+            },
+            'has_existing_order': has_existing_order
+        }
+        
+        return render(request, 'order_form.html', context)
+        
+    except Student.DoesNotExist:
+        messages.error(request, 'Student information not found.')
+        return redirect('store')
+    except Exception as e:
+        messages.error(request, f'Error loading order form: {str(e)}')
+        return redirect('store')
+
+from django.http import JsonResponse
+from .models import Student
+
+def verify_student_id(request):
+    bits_id = request.GET.get('bitsId', '').strip()
+    if not bits_id:
+        return JsonResponse({'status': 'empty'})
+    try:
+        Student.objects.get(bitsId=bits_id)
+        return JsonResponse({'status': 'verified'})
+    except Student.DoesNotExist:
+        return JsonResponse({'status': 'not_found'})
+
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+import pymongo
+
+@csrf_exempt
+def verify_referral_id(request):
+    if request.method == 'POST':
+        bits_id = request.POST.get('bitsId', '').strip()
+        if not bits_id:
+            return JsonResponse({'status': 'empty'})
+        try:
+            from .models import Student
+            Student.objects.get(bitsId=bits_id)
+
+            # Get discount from constants collection
+            from swd.config import MONGODB_URI
+            client = pymongo.MongoClient(MONGODB_URI)
+            db = client.merchportal
+            constants = db.constants.find_one()
+            discount = constants.get('discount', 0) if constants else 0
+            client.close()
+
+            return JsonResponse({'status': 'verified', 'discount': discount})
+        except Student.DoesNotExist:
+            return JsonResponse({'status': 'not_found'})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'error': str(e)})
+    return JsonResponse({'status': 'invalid'})
+
+

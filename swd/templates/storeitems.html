@@ -6,86 +6,135 @@
             <div id="modalinfo"></div>
         </div>
     </div>
+    
+    <!-- Club Details Modal -->
+    <div id="clubModal" class="modal modal-fixed-footer">
+        <div class="modal-content">
+            <h4 id="clubModalHeader"></h4>
+            <div id="clubModalContent"></div>
+        </div>
+        <div class="modal-footer">
+            <a href="#!" class="modal-close waves-effect waves-green btn-flat">Close</a>
+        </div>
+    </div>
     <div class="container-fluid">
         {% if messages %}
         {% for message in messages %}
         <span class="new badge {{ message.tags }}" data-badge-caption="{{ message }}"></span>
         {% endfor %}
         {% endif %}
-        {% if tees %}
+        
+        <!-- Back to Clubs Button (shown when viewing merch bundles) -->
+        {% if selected_club %}
         <div class="section">
-            <h4 style="color:#F46036; margin: 0; padding: 8px; font-size: 31px"> T-Shirts</h4>
-            <!--   Icon Section   -->
-            <div class="row">
-                {% for i in tees %}
-                <div class="col s12 l3 ">
-                    <div class="card">
-                        <div class="card-img-swd"
-                            style="height: 280px; width: 200px; position: relative; margin: 0 auto;">
-                            <img src="/media/{{ i.pic }}" style="position: absolute;
-                                bottom: 0;
-                                left: 0;
-                                right: 0;
-                                top: 0;
-                                margin: auto;
-                                max-width: 100%;
-                                max-height: 100%;
-                                " />
-                            <a class="btn-floating halfway-fab waves-effect waves-light desert-yellow"
-                                onclick="openTeeModal({{ i.id }})"><i class="material-icons">shopping_cart</i></a>
-                        </div>
-                        <div class="card-content">
-                            <p style="font-size: 16px"><b>{{ i.title }}</b></p>
-                            <p style="color:#4e4e4e">{{ i.desc }}</p>
-
-                            <p style="color: #B12704;">Price without nick: <b>₹{{ i.price }}</b></p>
-                            {% if i.nick %}
-                            <p style="color: #B12704;">Price with nick: <b>₹{{ i.nick_price }}</b></p>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-
-                {% endfor %}
-            </div>
-
+            <a href="{% url 'store' %}" class="btn waves-effect waves-light" style="background-color: #F46036;">
+                <i class="material-icons left">arrow_back</i>Back to Clubs
+            </a>
         </div>
         {% endif %}
-        {% if items %}
-        <div class="section">
-            <h4 style="color:#F46036; margin: 0; padding: 8px; font-size: 31px">Events</h4>
-
-            <!--   Icon Section   -->
-            <div class="row">
-                {% for i in items %}
-                <div class="col s12 l3">
-                    <div class="card">
-                        <div class="card-img-swd"
-                            style="height: 280px; width: 200px; position: relative; margin: 0 auto;">
-                            <img src="/media/{{ i.pic }}" style="position: absolute;
-                                bottom: 0;
-                                left: 0;
-                                right: 0;
-                                top: 0;
-                                margin: auto;
-                                max-width: 100%;
-                                max-height: 100%;
-                                " />
-                            <a class="btn-floating halfway-fab waves-effect waves-light desert-yellow"
-                                onclick="openItemModal({{ i.id }})"><i class="material-icons">shopping_cart</i></a>
-                        </div>
-                        <div class="card-content">
-                            <p style="font-size: 14px"><b>{{ i.title }}</b></p>
-                            <p style="color: grey">{{ i.desc }}</p>
-
-                            <p><b>Price: {{ i.price }}</b></p>
+        
+        <!-- Clubs Section (hidden when viewing merch bundles) -->
+        {% if not selected_club %}
+        <div id="clubsSection">
+            {% if clubs %}
+            <div class="section">
+                <h4 style="color:#F46036; margin: 0; padding: 8px; font-size: 31px">Clubs Directory</h4>
+                <div class="row">
+                    {% for club in clubs %}
+                    <div class="col s12 m6 l4">
+                        <div class="card club-card">
+                            <div class="card-content">
+                                <div class="club-header">
+                                    <i class="material-icons large" style="color: #F46036;">group</i>
+                                    <h5 style="color: #F46036; margin: 10px 0;">{{ club.clubName|default:club.username }}</h5>
+                                </div>
+                                
+                                <div class="club-actions">
+                                    <a href="{% url 'store' %}?club={{ club.username }}" class="btn waves-effect waves-light" style="background-color: #F46036;">
+                                        View Details
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                     </div>
+                    {% endfor %}
                 </div>
-
-                {% endfor %}
             </div>
-
+            {% endif %}
+            
+            <!-- Error message if clubs couldn't be loaded -->
+            {% if not clubs and error %}
+            <div class="section">
+                <div class="card-panel red lighten-4">
+                    <span class="red-text text-darken-2">
+                        <i class="material-icons left">error</i>
+                        {{ error }}
+                    </span>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+        
+        <!-- Merch Bundles Section (shown when a club is selected) -->
+        {% if selected_club %}
+        <div class="section">
+            <h4 style="color:#F46036; margin: 0; padding: 8px; font-size: 31px">{{ selected_club.clubName|default:selected_club.username }} - Merch Bundles</h4>
+            <div class="row">
+                {% if selected_club.merchBundles %}
+                    {% for bundle in selected_club.merchBundles %}
+                    <div class="col s12 m6 l4">
+                        <div class="card merch-bundle-card">
+                            <div class="card-content">
+                                <h6>{{ bundle.title }}</h6>
+                                
+                                {% if bundle.description %}
+                                <p>{{ bundle.description }}</p>
+                                {% endif %}
+                                
+                                
+                                {% if bundle.merchItems %}
+                                <div class="merch-items">
+                                    <strong>Merch Items:</strong>
+                                    <ul>
+                                        {% for item in bundle.merchItems %}
+                                        <li>{{ item.name }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                                {% endif %}
+                                
+                                {% if bundle.combos %}
+                                <div class="combos">
+                                    <strong>Combos:</strong>
+                                    <ul>
+                                        {% for combo in bundle.combos %}
+                                        <li>{{ combo.name }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                                {% endif %}
+                                
+                                <div class="bundle-footer">
+                                    <a href="{% url 'order_form' bundle.id %}" class="btn-small waves-effect waves-light" style="background-color: #F46036; color: white;">
+                                        Place Order
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="col s12">
+                        <div class="card-panel orange lighten-4">
+                            <span class="orange-text text-darken-2">
+                                <i class="material-icons left">info</i>
+                                No merch bundles available for this club.
+                            </span>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
         </div>
         {% endif %}
     </div>
@@ -108,152 +157,574 @@
     .card-img-swd {
         border-bottom: 1px solid grey;
     }
+    
+    /* Clubs Section Styling */
+    .club-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border-radius: 12px;
+        overflow: hidden;
+        height: 280px;
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 20px;
+        border: none;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    
+    .club-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 35px rgba(0,0,0,0.2);
+    }
+    
+    .club-card .card-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 25px;
+    }
+    
+    .club-header {
+        text-align: center;
+        padding: 20px 0;
+        background: linear-gradient(135deg, #F46036 0%, #e74c3c 100%);
+        margin: -25px -25px 25px -25px;
+        border-radius: 12px 12px 0 0;
+        min-height: 100px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .club-header i {
+        color: white !important;
+        margin-bottom: 10px;
+    }
+    
+    .club-header h5 {
+        color: white !important;
+        margin: 0 !important;
+        font-weight: 600;
+        text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
+    
+    .club-info {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+        margin: 20px 0;
+    }
+    
+    .club-info p {
+        margin: 8px 0;
+        color: #666;
+        font-size: 14px;
+        text-align: center;
+    }
+    
+    .club-actions {
+        text-align: center;
+        margin-top: auto;
+        padding-top: 20px;
+    }
+    
+    .club-actions .btn {
+        border-radius: 25px;
+        text-transform: none;
+        font-weight: 500;
+        padding: 0 30px;
+        box-shadow: 0 4px 15px rgba(244, 96, 54, 0.3);
+        transition: all 0.3s ease;
+    }
+    
+    .club-actions .btn:hover {
+        box-shadow: 0 6px 20px rgba(244, 96, 54, 0.4);
+        transform: translateY(-2px);
+    }
+    
+    /* Merch Bundle Cards Styling */
+    .merch-bundle-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border-radius: 12px;
+        overflow: hidden;
+        height: 380px;
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 20px;
+        border: none;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    
+    .merch-bundle-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 35px rgba(0,0,0,0.2);
+    }
+    
+    .merch-bundle-card .card-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        padding: 25px;
+    }
+    
+    .merch-bundle-card h6 {
+        font-size: 20px;
+        font-weight: 700;
+        line-height: 1.3;
+        margin: 0 0 15px 0;
+        color: #F46036;
+        text-align: center;
+        border-bottom: 2px solid #F46036;
+        padding-bottom: 10px;
+    }
+    
+    .merch-bundle-card p {
+        line-height: 1.6;
+        margin: 8px 0;
+        color: #555;
+        font-size: 14px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+    }
+    
+    .merch-items, .combos {
+        margin: 12px 0;
+        flex: 1;
+        overflow: hidden;
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px;
+    }
+    
+    .merch-items strong, .combos strong {
+        color: #F46036;
+        font-weight: 600;
+        display: block;
+        margin-bottom: 8px;
+        font-size: 14px;
+    }
+    
+    .merch-items ul, .combos ul {
+        margin: 5px 0;
+        padding-left: 20px;
+        max-height: 100px;
+        overflow-y: auto;
+    }
+    
+    .merch-items li, .combos li {
+        margin: 4px 0;
+        font-size: 13px;
+        color: #666;
+        list-style-type: disc;
+    }
+    
+    .bundle-header {
+        border-bottom: 1px solid #eee;
+        padding-bottom: 10px;
+        margin-bottom: 15px;
+        min-height: 50px;
+    }
+    
+    .bundle-footer {
+        margin-top: auto;
+        padding-top: 15px;
+        border-top: 2px solid #eee;
+        min-height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* Modal content styling */
+    #clubModalContent {
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+    
+    #clubModalContent .row {
+        margin-bottom: 0;
+    }
+    
+    /* Bundle header and chip styling */
+    .bundle-header {
+        border-bottom: 1px solid #eee;
+        padding-bottom: 10px;
+        margin-bottom: 15px;
+    }
+    
+    .chip-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin: 5px 0;
+    }
+    
+    .chip-container .chip {
+        background-color: #F46036;
+        color: white;
+        margin: 2px;
+    }
+    
+    .merch-bundle-card .btn-small {
+        font-size: 12px;
+        height: 36px;
+        line-height: 36px;
+        padding: 0 20px;
+        border-radius: 18px;
+        font-weight: 500;
+        text-transform: none;
+        box-shadow: 0 4px 15px rgba(244, 96, 54, 0.3);
+        transition: all 0.3s ease;
+    }
+    
+    .merch-bundle-card .btn-small:hover {
+        box-shadow: 0 6px 20px rgba(244, 96, 54, 0.4);
+        transform: translateY(-2px);
+    }
+    
+    .bundle-preview-image {
+        text-align: center;
+        margin: 15px 0;
+    }
+    
+    .bundle-preview-image img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .bundle-preview-actions {
+        text-align: center;
+        margin-top: 10px;
+    }
+    
+    .bundle-preview-actions .btn-small {
+        font-size: 11px;
+        height: 28px;
+        line-height: 28px;
+        padding: 0 12px;
+        border-radius: 14px;
+        text-transform: none;
+        font-weight: 500;
+        box-shadow: 0 2px 6px rgba(244, 96, 54, 0.3);
+        transition: all 0.3s ease;
+    }
+    
+    .bundle-preview-actions .btn-small:hover {
+        box-shadow: 0 3px 10px rgba(244, 96, 54, 0.4);
+        transform: translateY(-1px);
+    }
+    
+    /* Section headers styling */
+    .section h4 {
+        text-align: center;
+        margin-bottom: 30px !important;
+        font-weight: 700;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    /* Row spacing */
+    .row {
+        margin-bottom: 0;
+    }
+    
+    /* Card grid improvements */
+    .col.s12.m6.l4 {
+        margin-bottom: 20px;
+    }
+    
+    /* Responsive improvements */
+    @media only screen and (max-width: 600px) {
+        .club-card, .merch-bundle-card {
+            height: auto;
+            min-height: 250px;
+        }
+        
+        .club-header {
+            min-height: 80px;
+        }
+        
+        .merch-bundle-card .card-content {
+            padding: 20px;
+        }
+    }
 </style>
 
 <script>
     $(document).ready(function () {
-        $('.modal').modal();
-        $('select').material_select();
+        // Initialize modals
+        $('.modal').modal({
+            onCloseEnd: function() {
+                // Clear form validation on modal close
+                $('form').trigger('reset');
+                $('select').val('').formSelect();
+                $('input[type="checkbox"]').prop('checked', false);
+            }
+        });
+        
+        // Initialize select elements
+        $('select').formSelect();
+        
+        // Add loading state to all forms
+        $('form').on('submit', function() {
+            const submitBtn = $(this).find('button[type="submit"], input[type="submit"]');
+            if (submitBtn.length && !submitBtn.hasClass('no-loading')) {
+                submitBtn.addClass('disabled').html('<i class="fa fa-spinner fa-spin"></i> Processing...');
+            }
+        });
     });
 
     openItemModal = function (info) {
-        info = parseInt(info)
-        var items = { {% for i in items %} "{{ i.id }}" : ["{{ i.title|safe }}", `{{ i.desc|safe }}`, "{{ i.pic|safe }}", "{{ i.price }}", "{{ i.nick|safe }}", "{{ i.colors|safe }}", "{{ i.sizes|safe }}", "{{ i.available }}"], {% endfor %} }
+        info = parseInt(info);
+        // Initialize items object with proper JSON structure
+        var items = JSON.parse('{' +
+            '{% for i in items %}' +
+                '"{{ i.id|escapejs }}":' + 
+                JSON.stringify([
+                    '{{ i.title|escapejs }}',
+                    '{{ i.desc|escapejs|escapejs }}',
+                    '{{ i.pic|escapejs }}',
+                    '{{ i.price|escapejs }}',
+                    '{{ i.nick|escapejs }}',
+                    '{{ i.colors|escapejs }}',
+                    '{{ i.sizes|escapejs }}',
+                    '{{ i.available|escapejs }}'
+                ]) + '{% if not forloop.last %},{% endif %}' +
+            '{% endfor %}' + 
+        '}');
+    
+    var sizes = "";
+    if (items[info][6] && items[info][6] !== "None") {
+        var sizelist = items[info][6].split(",");
+        sizes = `
+            <div class="input-field col s12">
+                <select id="sizes" name="sizes" required>
+                    <option value="" disabled selected>Select Size</option>
+        `;
+        for (var i = 0; i < sizelist.length; i++) {
+            sizes += `<option value="` + sizelist[i].trim() + `">` + sizelist[i].trim() + `</option>`;
+        }
+        sizes += `
+                </select>
+                <label>Size</label>
+            </div>
+        `;
+    }
+
     $("#modalheader").html(items[info][0])
     $("#modalinfo").html(`
         <div class="row">
             <div class="col s12 l5">
-                <img src="/media/` + items[info][2] + `">
+                <img src='items[info][2]'>
             </div>
             <div class="col s12 l7">
-
-                <p align="justify">` + items[info][1] + `</p>
-                <p align="right" id="price"><b>Price without nick: ₹` + items[info][3] + `</b></p>
-                <p>
-                    <input id="agree" type="checkbox" class="filled-in"/>
-                    <label for="agree">I agree to buy this item and understand that the amount will be deducted from my account</label for="agree">
-                </p>
-                <form method="POST" action="/store/">
+                <form method="POST" action="/store/" id="itemForm">
                     {% csrf_token %}
+                    <p align="justify">` + items[info][1] + `</p>
+                    <p align="right" id="price"><b>Price: ₹` + items[info][3] + `</b></p>
+                    
+                    ${sizes}
+                    
+                    <div class="input-field col s12">
+                        <input id="quantity" name="quantity" type="number" min="1" value="1" class="validate" required>
+                        <label for="quantity">Quantity</label>
+                    </div>
+                    
+                    <p>
+                        <input id="agree" type="checkbox" class="filled-in" required/>
+                        <label for="agree">I agree to buy this item and understand that the amount will be deducted from my account</label>
+                    </p>
+                    
                     <div class="right">
-                        <input type="hidden" id="what" name="what" value="item"/>
-                        <input type="hidden" id="info" name="info" value="` + info + `"/>
-                        <input type="submit" id="itembuy" class="waves-effect waves-light disabled btn" value="Buy">
+                        <input type="hidden" name="what" value="item"/>
+                        <input type="hidden" name="info" value="` + info + `"/>
+                        <button type="submit" id="itembuy" class="waves-effect waves-light btn" disabled>
+                            Buy
+                        </button>
                     </div>
                 </form>
             </div>
-        `)
+        </div>
+    `);
 
-    $("#modal1").modal('open')
-    $("#agree").change(function () {
-        if ($(this).prop('checked')) {
-            $("#itembuy").removeClass("disabled");
+    // Initialize modal and form validation
+    $("#modal1").modal('open');
+    $('select').formSelect(); // Initialize materialize select
+    
+    // Form validation
+    function validateForm() {
+        const form = document.getElementById('itemForm');
+        const agree = $('#agree').prop('checked');
+        const submitBtn = $('#itembuy');
+        
+        if (form.checkValidity() && agree) {
+            submitBtn.prop('disabled', false);
         } else {
-            $("#itembuy").addClass("disabled");
+            submitBtn.prop('disabled', true);
         }
-    });
+    }
+    
+    // Validate form on any change
+    $(document).on('change', '#itemForm input, #itemForm select', validateForm);
+    $(document).on('click', '#agree', validateForm);
     }
 
     openTeeModal = function (info) {
-        info = parseInt(info)
-        var tees = { {% for i in tees %} "{{ i.id }}" : ["{{ i.title|safe }}", `{{ i.desc|safe }}`, "{{ i.pic|safe }}", "{{ i.price }}", "{{ i.nick|safe }}", "{{ i.colors|safe }}", "{{ i.sizes|safe }}", "{{ i.available }}", "{{i.nick_price|safe}}"], {% endfor %} }
-    console.log(tees)
-    $("#modalheader").html(tees[info][0])
-    var nick = "";
-    var colors = "";
-    var sizes = "";
-    if (tees[info][4] == "True") {
-        nick = `
-            <div class="input-field col s12">
-                <input id="nick" name="nick" type="text" class="validate">
-                <label for="nick">Nick</label>
-            </div>
-            `
-    }
-    if (tees[info][5] != "None") {
-        colorlist = tees[info][5].split(",");
-        colors = `
-            <div class="input-field col s6">
-                <select id="colors" name="colors">
-            `
-        for (var i = 0; i < colorlist.length; i++) {
-            colors += `<option value="` + colorlist[i] + `">` + colorlist[i] + `</option>`
+        info = parseInt(info);
+        var tees = JSON.parse('{ {% for i in tees %} "{{ i.id|escapejs }}" : ["{{ i.title|escapejs }}", `{{ i.desc|escapejs }}`, "{{ i.pic|escapejs }}", "{{ i.price|escapejs }}", "{{ i.nick|escapejs }}", "{{ i.colors|escapejs }}", "{{ i.sizes|escapejs }}", "{{ i.available|escapejs }}", "{{i.nick_price|escapejs}}"], {% endfor %} }');
+        
+        var tee = tees[info];
+        $("#modalheader").html(tee[0]);
+        
+        // Build form fields
+        var nickField = "";
+        var colorField = "";
+        var sizeField = "";
+        
+        // Nick field
+        if (tee[4] === "True") {
+            nickField = `
+                <div class="input-field col s12">
+                    <input id="nick" name="nick" type="text" class="validate">
+                    <label for="nick">Nick</label>
+                </div>`;
         }
-        colors += `</select><label for="colors">Colors</label></div>`
-    }
-    if (tees[info][6] != "None") {
-        sizelist = tees[info][6].split(",");
-        sizes = `
-            <div class="input-field col s6">
-                <select id="sizes" name="sizes">
-            `
-        for (var i = 0; i < sizelist.length; i++) {
-            sizes += `<option value="` + sizelist[i] + `">` + sizelist[i] + `</option>`
+        
+        // Color field
+        if (tee[5] && tee[5] !== "None") {
+            var colorOptions = '';
+            var colorList = tee[5].split(',');
+            for (var i = 0; i < colorList.length; i++) {
+                colorOptions += `<option value="${colorList[i].trim()}">${colorList[i].trim()}</option>`;
+            }
+            colorField = `
+                <div class="input-field col s12 m6">
+                    <select id="colors" name="colors" class="validate" required>
+                        <option value="" disabled selected>Select Color</option>
+                        ${colorOptions}
+                    </select>
+                    <label>Color</label>
+                </div>`;
         }
-        sizes += `</select><label for="sizes">Sizes</label></div>`
-    }
-    $("#modalinfo").html(`
+        
+        // Size field
+        if (tee[6] && tee[6] !== "None") {
+            var sizeOptions = '';
+            var sizeList = tee[6].split(',');
+            for (var i = 0; i < sizeList.length; i++) {
+                sizeOptions += `<option value="${sizeList[i].trim()}">${sizeList[i].trim()}</option>`;
+            }
+            sizeField = `
+                <div class="input-field col s12 m6">
+                    <select id="sizes" name="sizes" class="validate" required>
+                        <option value="" disabled selected>Select Size</option>
+                        ${sizeOptions}
+                    </select>
+                    <label>Size</label>
+                </div>`;
+        }
+        
+        // Build the form HTML
+        var formHtml = `
         <div class="row">
             <div class="col s12 l5">
-                <img src="/media/` + tees[info][2] + `">
+                <img src="${tee[2]}" class="responsive-img">
             </div>
             <div class="col s12 l7">
-                <form method="POST" action="/store/">
+                <form method="POST" action="/store/" id="teeForm">
                     {% csrf_token %}
-                <p align="justify">` + tees[info][1] + `</p>
-                <p align="right" id="price"> Price without nick: <b> ₹` + tees[info][3] + `</b></p>
-                ` + nick + colors + sizes + `    
-                <div class="input-field col s4 offset-s8">
-                    <input id="quantity" name="quantity" type="text" class="validate">
-                    <label for="quantity">Quantity</label>
-                </div>
-                <p align="right"><b id="money"></b></p>
-                <p>
-                    <input id="teeagree" type="checkbox" class="filled-in"/>
-                    <label for="teeagree">I agree to buy this item and understand that the amount will be deducted from my account</label for="agree">
-                </p>
-                    <div class="right">
-                        <input type="hidden" id="what" name="what" value="tee"/>
-                        <input type="hidden" id="info" name="info" value="` + info + `"/>
-                        <input type="submit" id="teebuy" class="waves-effect waves-light disabled btn" value="Buy">
+                    <p align="justify">${tee[1]}</p>
+                    <p align="right" id="price">
+                        <b>Price: ₹${tee[3]}</b>
+                        ${tee[4] === "True" ? `+ ₹${tee[8] || '0'} for nick` : ''}
+                    </p>
+                    
+                    <div class="row">
+                        ${colorField}
+                        ${sizeField}
+                        ${nickField}
+                        
+                        <div class="input-field col s12">
+                            <input id="quantity" name="quantity" type="number" 
+                                   min="1" value="1" class="validate" required>
+                            <label for="quantity">Quantity</label>
+                        </div>
+                        
+                        <div class="col s12">
+                            <p>
+                                <label>
+                                    <input type="checkbox" id="teeagree" class="filled-in" required/>
+                                    <span>I agree to buy this item and understand that the amount will be deducted from my account</span>
+                                </label>
+                            </p>
+                        </div>
+                        
+                        <div class="col s12 right-align">
+                            <input type="hidden" name="what" value="tee"/>
+                            <input type="hidden" name="info" value="${info}"/>
+                            <button type="submit" id="teebuy" class="waves-effect waves-light btn" disabled>
+                                <i class="material-icons left">shopping_cart</i>Buy Now
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>
-        `)
-
-    var buyable = false;
-    $('#quantity').on('input', function (e) {
-        if (isNaN(parseInt($('#quantity').val()))) {
-            $("#money").text('Please enter valid number.')
-            $("#teebuy").addClass("disabled");
-            buyable = false;
-        }
-        else if ((parseInt($('#quantity').val())) >= 9 || (parseInt($('#quantity').val())) <= 0) {
-            $("#money").text('Please enter quantity between 0 and 9.')
-            $("#teebuy").addClass("disabled");
-            buyable = false;
-        }
-        else {
+        </div>`;
+        
+        // Update modal content
+        $("#modalinfo").html(formHtml);
+        
+        // Initialize modal and form elements
+        var modal = $("#modal1");
+        modal.modal('open');
+        
+        // Reinitialize Materialize components
+        $('select').formSelect();
+        
+        // Form validation
+        function validateTeeForm() {
+            const form = document.getElementById('teeForm');
+            const agree = $('#teeagree').prop('checked');
+            const submitBtn = $('#teebuy');
             
-            if((tees[info][4] == "True") && $("#nick").val().length!=0){
-                $("#money").text('Total Amount : ₹' + parseInt($('#quantity').val()) * tees[info][8])
-            }
-            else {
-                $("#money").text('Total Amount : ₹' + parseInt($('#quantity').val()) * tees[info][3])
-            }
-            buyable = true;
+            // Check form validity and agreement
+            const isValid = form.checkValidity() && agree;
+            submitBtn.prop('disabled', !isValid);
+            
+            return isValid;
         }
-    });
-    $("#teeagree").change(function () {
-        if ($(this).prop('checked') && buyable == true) {
-            $("#teebuy").removeClass("disabled");
-        } else {
-            $("#teebuy").addClass("disabled");
-        }
-    });
-    $('select').material_select();
-    $("#modal1").modal('open')
+        
+        // Validate on any change
+        $(document).off('change', '#teeForm input, #teeForm select').on('change', '#teeForm input, #teeForm select', validateTeeForm);
+        $(document).on('click', '#teeagree', validateTeeForm);
+        
+        // Handle form submission
+        $('#teeForm').on('submit', function(e) {
+            if (!validateTeeForm()) {
+                e.preventDefault();
+                return false;
+            }
+            
+            // Show loading state
+            const submitBtn = $('#teebuy');
+            const originalText = submitBtn.html();
+            submitBtn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Processing...');
+            
+            // Reset button state if form submission fails
+            $(this).one('ajax:error', function() {
+                submitBtn.prop('disabled', false).html(originalText);
+                M.toast({html: 'Error processing your request. Please try again.', classes: 'red'});
+            });
+        });
     }
 
 </script>
 {% endblock %}
+

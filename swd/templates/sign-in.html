@@ -17,6 +17,9 @@
 
                 <form id="sign_in" method="POST">
                    {% csrf_token %}
+                   {% if next %}
+                   <input type="hidden" name="next" value="{{ next }}">
+                   {% endif %}
                   <div class="input-field" id="username" >
                       <input  type="text" class="validate" name="username" autocomplete='username' autocorrect="off" autocapitalize="none">
                       <label for="username">Username</label>
