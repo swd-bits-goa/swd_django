@@ -60,6 +60,17 @@
                     {% endfor %}
                 </div>
             </div>
+            {% elif not clubs %}
+                <div class="section">
+                    <div class="card-panel orange lighten-4">
+                        <span class="orange-text text-darken-2">
+                            <i class="material-icons left">info</i>
+                            No merch bundles available right now
+                        </span>
+                    </div>
+                </div>
+
+            
             {% endif %}
             
             <!-- Error message if clubs couldn't be loaded -->
