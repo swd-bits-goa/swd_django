@@ -173,6 +173,45 @@
     .card-shadow {
         overflow: visible !important;
     }
+    
+    /* Add or update in your style block for merch images */
+.item-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 500px; /* Increased from 400px */
+    min-height: 250px; /* Increased from 180px */
+    max-height: 600px; /* Increased from 400px */
+    width: 100%;
+    background: #f8f9fa;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 15px;
+}
+
+.item-image img,
+.merch-item-img {
+    flex: 0 1 auto;
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    display: block;
+    margin: auto;
+}
+
+@media (max-width: 600px) {
+    .item-image {
+        height: 300px; /* Increased from 200px */
+        min-height: 180px; /* Increased from 120px */
+        max-height: 350px; /* Increased from 220px */
+    }
+}
+
+
 </style>
 
 <div class="container-fluid">
@@ -609,7 +648,7 @@
         height: 100%;
         display: flex;
         flex-direction: column;
-        min-height: 650px;
+        min-height: 800px; /* Increased from 650px */
         box-shadow: 0 4px 15px rgba(0,0,0,0.08);
         margin: 10px;
     }
@@ -638,7 +677,7 @@
     .item-image {
         text-align: center;
         margin-bottom: 15px;
-        height: 400px;
+        height: 500px; /* Increased from 400px */
         display: flex;
         align-items: center;
         justify-content: center;
@@ -1103,12 +1142,12 @@
         }
         
         .merch-item-card, .combo-card {
-            min-height: 580px;
+            min-height: 600px; /* Increased from 500px */
         }
         
         .item-image {
             object-fit: contain;
-            height: 240px;
+            height: 300px; /* Increased from 200px */
         }
     }
     
@@ -1128,7 +1167,7 @@
         
         .merch-item-card, .combo-card {
             padding: 15px;
-            min-height: 500px;
+            min-height: 600px; /* Increased from 500px */
         }
         
         .item-header, .combo-header {
@@ -1166,7 +1205,7 @@
         }
         
         .item-image {
-            height: 200px;
+            height: 300px; /* Increased from 200px */
         }
     }
 </style>
