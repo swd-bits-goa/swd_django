@@ -3,9 +3,11 @@ from django.contrib import admin
 from django.conf.urls.static import static
 from django.conf import settings
 from django.views.generic import TemplateView
-
+from django.urls import path
+from .views import verify_referral_id
 
 from . import views
+from .views import verify_student_id
 
 
 urlpatterns = [
@@ -31,6 +33,8 @@ urlpatterns = [
     url(r'^hostelsuperintendent/([0-9]+)/$', views.hostelsuperintendentdaypassapprove, name="hostelsuperintendentdaypassapprove"),
     url(r'^daypass/', views.daypass, name="daypass"),
     url(r'^store/', views.store, name="store"),
+    url(r'^order_form/(?P<bundle_id>[^/]+)/$', views.order_form, name="order_form"),
+
     url(r'^dues/', views.dues, name="dues"),
     url(r'^notices/', views.notices, name="notices"),
     url(r'^search/', views.search, name="search"),
@@ -82,5 +86,11 @@ urlpatterns = [
     url(r'^admin/delete_students/',views.delete_students, name='delete_students'),
 
     url(r'^admin/view_duplicates/(?P<end_year>\d+)?/?', views.view_duplicates, name='view_duplicates'),
+
+    path('verify-student-id/', verify_student_id, name='verify_student_id'),
+    path('verify-referral-id/', verify_referral_id, name='verify_referral_id'),
+    
+    # API endpoints
+    path('api/students-on-leave-today/', views.students_on_leave_today, name='students_on_leave_today'),
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
