@@ -84,7 +84,6 @@ urlpatterns = [
     url(r'^leave_diff/', views.leave_diff, name='leave_diff'),
     url(r'^admin/get_cor_add', views.get_corr_address, name='get_corr_address'),
     url(r'^admin/delete_students/',views.delete_students, name='delete_students'),
-
     url(r'^admin/view_duplicates/(?P<end_year>\d+)?/?', views.view_duplicates, name='view_duplicates'),
 
     path('verify-student-id/', verify_student_id, name='verify_student_id'),
