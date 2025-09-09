@@ -89,8 +89,11 @@ urlpatterns = [
 
     path('verify-student-id/', verify_student_id, name='verify_student_id'),
     path('verify-referral-id/', verify_referral_id, name='verify_referral_id'),
+<<<<<<< HEAD
     
     # API endpoints
     path('api/students-on-leave-today/', views.students_on_leave_today, name='students_on_leave_today'),
+=======
+>>>>>>> a58d6dedf2636c83ad05eda1c22354689545922d
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,0 +1,1679 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block content %}
+<style>
+    .nick-field .input-field {
+        position: relative;
+    }
+    
+    .nick-field .input-field label {
+        width: 100% !important;
+        margin-left: 10px !important;
+        white-space: normal;
+        word-wrap: break-word;
+        line-height: 1.2;
+        max-width: none;
+        left: 0px;
+    }
+    
+    .nick-field .input-field label.active {
+        transform: translateY(-14px) scale(0.8);
+    }
+    
+    .nick-field .input-field input {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+    
+    .nick-field .input-field .prefix {
+        display: none !important;
+    }
+    
+    .nick-field {
+        margin-bottom: 20px;
+    }
+    
+    .nick-field .helper-text {
+        margin-top: 5px;
+        font-size: 0.8rem;
+        color: #666;
+    }
+    
+    .card-shadow {
+        box-shadow: 0 10px 20px rgba(0,0,0,0.05), 0 6px 6px rgba(0,0,0,0.1);
+        transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+    }
+    
+    .card-shadow:hover {
+        box-shadow: 0 14px 28px rgba(0,0,0,0.1), 0 10px 10px rgba(0,0,0,0.08);
+    }
+    
+    .verification-status {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            border: 1px solid transparent;
+            animation: fadeIn 0.5s ease-in-out;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .verification-status::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: all 0.8s ease;
+        }
+        
+        .verification-status:hover::before {
+            left: 100%;
+        }
+        
+        .verification-status i {
+            animation: scaleIn 0.5s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes scaleIn {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
+        }
+        
+        #verificationIcon {
+            transition: transform 0.3s ease;
+        }
+        
+        #verificationIcon:hover {
+            transform: scale(1.2) rotate(5deg);
+        }
+        
+        .pulse-animation {
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .success-animation {
+            animation: successPop 0.5s ease-out;
+        }
+        
+        @keyframes successPop {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        .error-animation {
+            animation: errorShake 0.5s ease-in-out;
+        }
+        
+        @keyframes errorShake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+        
+        .verifying-bg {
+            background: linear-gradient(145deg, rgba(255, 160, 0, 0.05), rgba(255, 160, 0, 0.15));
+            background-size: 200% 200%;
+            animation: gradientShift 2s infinite alternate;
+        }
+        
+        .success-bg {
+            background: linear-gradient(145deg, rgba(76, 175, 80, 0.05), rgba(76, 175, 80, 0.15));
+            background-size: 200% 200%;
+            animation: successGlow 2s infinite alternate;
+        }
+        
+        .error-bg {
+            background: linear-gradient(145deg, rgba(244, 67, 54, 0.05), rgba(244, 67, 54, 0.15));
+            background-size: 200% 200%;
+            animation: errorGlow 2s infinite alternate;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+        
+        @keyframes successGlow {
+            0% { box-shadow: 0 0 5px rgba(76, 175, 80, 0.1); }
+            100% { box-shadow: 0 0 15px rgba(76, 175, 80, 0.3); }
+        }
+        
+        @keyframes errorGlow {
+            0% { box-shadow: 0 0 5px rgba(244, 67, 54, 0.1); }
+            100% { box-shadow: 0 0 15px rgba(244, 67, 54, 0.3); }
+        }
+    
+    .verification-status i {
+        margin-right: 10px;
+        font-size: 24px;
+    }
+    
+    .merch-item-card,
+    .card-shadow {
+        overflow: visible !important;
+    }
+    
+    /* Add or update in your style block for merch images */
+.item-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 500px; /* Increased from 400px */
+    min-height: 250px; /* Increased from 180px */
+    max-height: 600px; /* Increased from 400px */
+    width: 100%;
+    background: #f8f9fa;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 15px;
+}
+
+.item-image img,
+.merch-item-img {
+    flex: 0 1 auto;
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    display: block;
+    margin: auto;
+}
+
+@media (max-width: 600px) {
+    .item-image {
+        height: 300px; /* Increased from 200px */
+        min-height: 180px; /* Increased from 120px */
+        max-height: 350px; /* Increased from 220px */
+    }
+}
+
+
+</style>
+
+<div class="container-fluid">
+    {% if messages %}
+    <div class="section">
+        {% for message in messages %}
+        <div class="card-panel card-shadow {% if message.tags == 'error' %}red{% else %}green{% endif %} lighten-4">
+            <span class="{% if message.tags == 'error' %}red{% else %}green{% endif %}-text text-darken-2">
+                <i class="material-icons left">{% if message.tags == 'error' %}error{% else %}check_circle{% endif %}</i>
+                {{ message }}
+            </span>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    
+    <div class="section">
+        <a href="{% url 'store' %}" class="btn waves-effect waves-light" style="background-color: #F46036;">
+            <i class="material-icons left">arrow_back</i>Back to Store
+        </a>
+    </div>
+    
+    {% if bundle %}
+    <div class="section">
+        <div class="row">
+            <div class="col s12">
+                <div class="card order-form-card card-shadow">
+                    <div class="card-content">
+                        <div class="bundle-header">
+                            <h4>{{ bundle.title }}</h4>
+                            <p class="club-name">{{ club.clubName|default:club.username }}</p>
+                            {% if bundle.description %}
+                            <!-- <p class="bundle-description">{{ bundle.description }}</p> -->
+                            {% endif %}
+                        </div>
+                        
+                        {% if has_existing_order %}
+                        <div class="card-panel red lighten-4" style="margin-top: 10px;">
+                            <span class="red-text text-darken-2">
+                                <i class="material-icons left">error</i>
+                                You have already placed an order for this bundle. Duplicate orders are not allowed.
+                            </span>
+                        </div>
+                        {% else %}
+                        <form method="POST" id="orderForm">
+                            {% csrf_token %}
+                            
+                            <div class="student-info-section card-shadow">
+                                <h5>Student Information</h5>
+                                <div class="row">
+                                    <div class="input-field col s12 m4">
+                                        <i class="material-icons prefix">badge</i>
+                                        <input id="studentBITSID" name="studentBITSID" type="text" class="validate" required value="{{ student.bitsId|default:'' }}">
+                                        <label for="studentBITSID">BITS ID</label>
+                                    </div>
+                                    <div class="input-field col s12 m4">
+                                        <i class="material-icons prefix">person</i>
+                                        <input id="studentName" name="studentName" type="text" class="validate" required value="{{ student.name|default:'' }}">
+                                        <label for="studentName">Full Name</label>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                            
+                            <div class="section card-shadow" style="padding: 20px; border-radius: 8px; margin-top: 20px;">
+                                <h5>Referral Verification</h5>
+                                <div class="row">
+                                    <div class="input-field col s12 m4">
+                                        <i class="material-icons prefix">verified_user</i>
+                                        <input id="verifyStudentID" type="text" class="validate">
+                                        <label for="verifyStudentID">Enter Student BITS ID for Referral</label>
+                                    </div>
+                                    <div class="input-field col s12 m8">
+                                        <div id="verification-status" class="verification-status">
+                                            <i id="verificationIcon" class="material-icons left" style="display: none;"></i>
+                                            <span id="studentIdVerifyMsg" style="font-weight: bold; font-size: 16px;"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {% if bundle.sizeCharts %}
+                            <div class="size-charts-section">
+                                <h5>Size Charts</h5>
+                                <div class="row">
+                                    {% for size_chart in bundle.sizeCharts %}
+                                    <div class="col s12 m6 l4">
+                                        <div class="size-chart-card">
+                                            <img src="{{ size_chart }}" alt="Size Chart" class="responsive-img">
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            {% if bundle.merchItems %}
+                            <div class="merch-items-section">
+                                <h5>Merch Items</h5>
+                                <div class="row merch-grid">
+                                    {% for item in bundle.merchItems %}
+                                    <div class="col s12 m6 l4 merch-item-wrapper">
+                                        <div class="merch-item-card card-shadow z-depth-1 hoverable">
+                                            {% if item.image %}
+                                            <div class="item-image">
+                                                <img src="{{ item.image }}" alt="{{ item.name }}" class="merch-item-img">
+                                            </div>
+                                            {% endif %}
+                                            <div class="item-header">
+                                                <h6>{{ item.name }}</h6>
+                                                <div class="price-section">
+                                                    <span class="base-price">₹{{ item.price }}</span>
+                                                    {% if item.nick %}
+                                                        {% if item.nickPrice > 0 %}
+                                                        <span class="nick-price">+ ₹{{ item.nickPrice }} (nick)</span>
+                                                        {% else %}
+                                                        <span class="nick-price free">Free (nick)</span>
+                                                        {% endif %}
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            {% if item.description %}
+                                            <p class="item-description">{{ item.description }}</p>
+                                            {% endif %}
+                                            
+                            
+                                            
+                                            <div class="item-options">
+                                                <div class="input-field">
+                                                    <select name="items[{{ forloop.counter0 }}][size]" class="item-size">
+                                                        {% for size in item.sizes %}
+                                                            <option value="{{ size }}">{{ size }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                    <label>Size</label>
+                                                </div>
+                                                
+                                                <div class="input-field">
+                                                    <input id="quantity_{{ forloop.counter0 }}" name="items[{{ forloop.counter0 }}][quantity]" type="number" min="0" max="10" class="validate item-quantity" value="0">
+                                                    <label for="quantity_{{ forloop.counter0 }}">Quantity (0-10)</label>
+                                                </div>
+                                                
+                                                {% if item.nick %}
+                                                <div class="input-field nick-field">
+                                                    <input id="nick_{{ forloop.counter0 }}" name="items[{{ forloop.counter0 }}][nick]" type="text" class="validate item-nick" maxlength="50" placeholder="Enter nickname for customization">
+                                                    <span class="helper-text">Custom text for the back of this item</span>
+                                                </div>
+                                                {% endif %}
+                                                
+                                                <input type="hidden" name="items[{{ forloop.counter0 }}][merchName]" value="{{ item.name }}">
+                                                <input type="hidden" name="items[{{ forloop.counter0 }}][price]" value="{{ item.price }}">
+                                                <input type="hidden" name="items[{{ forloop.counter0 }}][hasNick]" value="{{ item.nick|yesno:'true,false' }}">
+                                                <input type="hidden" name="items[{{ forloop.counter0 }}][nickPrice]" value="{{ item.nickPrice }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            {% if bundle.processed_combos %}
+                            <div class="combos-section">
+                                <h5>Combos</h5>
+                                <div class="row merch-grid">
+                                    {% for combo in bundle.processed_combos %}
+                                    <div class="col s12 m6 l4 merch-item-wrapper">
+                                        <div class="combo-card card-shadow z-depth-1 hoverable">
+                                            <div class="combo-header">
+                                                <h6>{{ combo.name }}</h6>
+                                                <div class="price-section">
+                                                    <del>₹{{ combo.indPrice }}</del>
+                                                    <span class="base-price">₹{{ combo.comboPrice }}</span>
+                                                    {% if combo.hasNick %}
+                                                    <span class="nick-price">+ Variable per item (nick)</span>
+                                                    <div class="total-price">Base: ₹{{ combo.comboPrice }}</div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            {% if combo.items %}
+                                            <div class="combo-items-tags" style="margin-bottom: 10px;">
+                                                {% for item_name in combo.items %}
+                                                    <span class="combo-item-tag" style="display:inline-block;background:#F46036;color:#fff;padding:4px 10px;border-radius:12px;font-size:12px;margin-right:6px;margin-bottom:4px;">
+                                                        {{ item_name }}
+                                                    </span>
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                            {% if combo.description %}
+                                            <p class="combo-description">{{ combo.description }}</p>
+                                            {% endif %}
+                                            
+                                            {% if combo.hasNick %}
+                                            <div class="nick-available-badge">
+                                                <i class="material-icons">edit</i>
+                                                <span>Customizable Items Available</span>
+                                            </div>
+                                            {% endif %}
+                                            
+                                            <div class="combo-options">
+                                                {% if combo.processed_items %}
+                                                <div class="combo-items-selection">
+                                                    <label>Select Items:</label>
+                                                    {% for item in combo.processed_items %}
+                                                    <div class="combo-item-option">
+                                                        <div class="input-field">
+                                                            <select name="combos[{{ forloop.parentloop.counter0 }}][items][{{ forloop.counter0 }}][size]" class="combo-item-size">
+                                                            {% for size in item.sizes %}
+                                                                <option value="{{ size }}">{{ size }}</option>
+                                                            {% endfor %}
+                                                            </select>
+                                                            <label>{{ item.name }} - Size</label>
+                                                        </div>
+                                                        
+                                                        {% if item.nick %}
+                                                        <div class="input-field nick-field">
+                                                            <input id="combo_nick_{{ forloop.parentloop.counter0 }}_{{ forloop.counter0 }}" 
+                                                                   name="combos[{{ forloop.parentloop.counter0 }}][items][{{ forloop.counter0 }}][nick]" 
+                                                                   type="text" class="validate combo-item-nick" maxlength="50" placeholder="Enter nickname for {{ item.name }}">
+                                                            <span class="helper-text">Custom text for the back of this item</span>
+                                                        </div>
+                                                        {% endif %}
+                                                        
+                                                        <input type="hidden" name="combos[{{ forloop.parentloop.counter0 }}][items][{{ forloop.counter0 }}][itemName]" value="{{ item.name }}">
+                                                        <input type="hidden" name="combos[{{ forloop.parentloop.counter0 }}][items][{{ forloop.counter0 }}][hasNick]" value="{{ item.nick|yesno:'true,false' }}">
+                                                        <input type="hidden" name="combos[{{ forloop.parentloop.counter0 }}][items][{{ forloop.counter0 }}][nickPrice]" value="{{ item.nickPrice }}">
+                                                    </div>
+                                                    {% endfor %}
+                                                </div>
+                                                {% endif %}
+                                                
+                                                <div class="input-field">
+                                                    <input id="combo_quantity_{{ forloop.counter0 }}" name="combos[{{ forloop.counter0 }}][quantity]" type="number" min="0" max="10" class="validate combo-quantity" value="0">
+                                                    <label for="combo_quantity_{{ forloop.counter0 }}">Quantity (0-10)</label>
+                                                </div>
+                                                
+                                                <input type="hidden" name="combos[{{ forloop.counter0 }}][comboName]" value="{{ combo.name }}">
+                                                <input type="hidden" name="combos[{{ forloop.counter0 }}][price]" value="{{ combo.comboPrice }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            {% if bundle.combos and not bundle.processed_combos %}
+                            <div class="combos-section">
+                                <h5>Combos</h5>
+                                <div class="row">
+                                    {% for combo in bundle.combos %}
+                                    <div class="col s12 m6 l4">
+                                        <div class="card-panel yellow lighten-4">
+                                            <span class="yellow-text text-darken-2">
+                                                <i class="material-icons left">warning</i>
+                                                Combo "{{ combo.name }}" is not properly configured. Please contact the administrator.
+                                            </span>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            <div class="order-summary card-shadow z-depth-1">
+                                <h5>Order Summary</h5>
+                                <div class="summary-content">
+                                    <div class="row">
+                                        <div class="col s12 m8">
+                                            <div id="order-items-list">
+                                                <p style="color: #666; text-align: center;">No items selected</p>
+                                            </div>
+                                        </div>
+                                        <div class="col s12 m4">
+                                            <div class="total-section">
+                                                <h6>Total Amount: <span id="total-amount">₹0</span></h6>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="order-submit card-shadow">
+                                <p>
+                                    <input id="agree" type="checkbox" class="filled-in" required/>
+                                    <label for="agree">I agree to place this order and understand that the amount will be deducted from my account</label>
+                                </p>
+                                <div class="submit-section">
+                                    <button type="submit" id="place-order" class="btn waves-effect waves-light disabled" style="background-color: #F46036;">
+                                        <i class="material-icons left">shopping_cart</i>Place Order
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="section">
+        <div class="card-panel red lighten-4">
+            <span class="red-text text-darken-2">
+                <i class="material-icons left">error</i>
+                Bundle not found or not available for ordering.
+            </span>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    .order-form-card {
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        margin-bottom: 30px;
+        transition: transform 0.3s ease;
+    }
+    
+    .order-form-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .bundle-header {
+        text-align: center;
+        padding: 40px 30px;
+        background: linear-gradient(135deg, #F46036 0%, #e74c3c 100%);
+        color: white;
+        margin: -25px -25px 30px -25px;
+        position: relative;
+    }
+    
+    .bundle-header:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 6px;
+        background: rgba(0,0,0,0.1);
+    }
+    
+    .bundle-header h4 {
+        color: white !important;
+        margin-bottom: 15px !important;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+    }
+    
+    .club-name {
+        font-size: 18px;
+        margin: 10px 0;
+        opacity: 0.9;
+        font-weight: 300;
+    }
+    
+    .bundle-description {
+        font-size: 16px;
+        line-height: 1.6;
+        margin: 20px auto 0;
+        opacity: 0.95;
+        max-width: 800px;
+        text-align: center;
+        display: block;
+        width: 100%;
+    }
+    
+    .student-info-section {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 20px 0;
+    }
+    
+    .size-charts-section, .merch-items-section, .combos-section {
+        margin: 30px 0;
+    }
+    
+    .size-chart-card {
+        background: white;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 2px solid #F46036;
+        box-shadow: 0 4px 15px rgba(244, 96, 54, 0.1);
+    }
+    
+    .merch-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 20px;
+        margin: 0;
+        justify-items: start;
+    }
+    
+    .merch-item-wrapper {
+        min-width: 400px;
+        width: 100%;
+        display: flex;
+        margin: 0;
+        padding: 0;
+    }
+    
+    @media only screen and (min-width: 1200px) {
+        .merch-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+    
+    @media only screen and (max-width: 1199px) and (min-width: 993px) {
+        .merch-grid {
+            grid-template-columns: repeat(2, 1fr); /* Force 2 columns */
+        }
+    }
+    
+    @media only screen and (max-width: 992px) {
+        .merch-grid {
+            grid-template-columns: 1fr; /* Single column */
+        }
+    }
+    
+    .merch-item-card, .combo-card {
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 25px;
+        border: 1px solid #eaeaea;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        min-height: 800px; /* Increased from 650px */
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        margin: 10px;
+    }
+    
+    .merch-item-card:hover, .combo-card:hover {
+        border-color: #F46036;
+        box-shadow: 0 10px 30px rgba(244, 96, 54, 0.15);
+        transform: translateY(-5px);
+    }
+    
+    .merch-item-card:before, .combo-card:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 0;
+        background: #F46036;
+        transition: height 0.3s ease;
+    }
+    
+    .merch-item-card:hover:before, .combo-card:hover:before {
+        height: 100%;
+    }
+    
+    .item-image {
+        text-align: center;
+        margin-bottom: 15px;
+        height: 500px; /* Increased from 400px */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        border-radius: 8px;
+        background: #f8f9fa;
+    }
+    
+    .item-image img {
+        width: 100%;
+        height: auto;
+        max-width: 100%;
+        object-fit: contain;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+        /* Ensures image fits width and maintains aspect ratio */
+        display: block;
+    }
+    
+    .merch-item-img {
+        width: 100%;
+        height: auto;
+        max-width: 100%;
+        object-fit: contain;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+        display: block;
+    }
+    
+    .merch-item-card:hover .item-image img,
+    .merch-item-card:hover .merch-item-img {
+        transform: scale(1.05);
+    }
+    
+    .item-header, .combo-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 18px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid rgba(244, 96, 54, 0.3);
+        position: relative;
+        flex-shrink: 0;
+    }
+    
+    .item-header:after, .combo-header:after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        width: 60px;
+        height: 3px;
+        background: #F46036;
+    }
+    
+    .item-header h6, .combo-header h6 {
+        color: #333;
+        font-weight: 600;
+        margin: 0;
+        font-size: 18px;
+        letter-spacing: 0.5px;
+        transition: color 0.3s ease;
+        flex: 1;
+        margin-right: 10px;
+    }
+    
+    .merch-item-card:hover .item-header h6, 
+    .combo-card:hover .combo-header h6 {
+        color: #F46036;
+    }
+    
+    .price-section {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
+        flex-shrink: 0;
+        position: relative;
+    }
+    
+    .price-section::before {
+        content: '';
+        position: absolute;
+        right: -5px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 3px;
+        height: 80%;
+        background: linear-gradient(135deg, #F46036 0%, #e74c3c 100%);
+        border-radius: 2px;
+        opacity: 0.7;
+    }
+    
+    .base-price {
+        background: linear-gradient(135deg, #F46036 0%, #e74c3c 100%);
+        color: white;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 14px;
+        box-shadow: 0 2px 5px rgba(244, 96, 54, 0.3);
+        transition: all 0.3s ease;
+        white-space: nowrap;
+    }
+    
+    .nick-price {
+        background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+        color: white;
+        padding: 4px 10px;
+        border-radius: 15px;
+        font-weight: 500;
+        font-size: 12px;
+        box-shadow: 0 2px 4px rgba(33, 150, 243, 0.3);
+        transition: all 0.3s ease;
+        white-space: nowrap;
+    }
+    
+    .nick-price.free {
+        background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);
+        box-shadow: 0 2px 4px rgba(76, 175, 80, 0.3);
+    }
+    
+    .total-price {
+        background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);
+        color: white;
+        padding: 4px 10px;
+        border-radius: 15px;
+        font-weight: 600;
+        font-size: 12px;
+        box-shadow: 0 2px 4px rgba(76, 175, 80, 0.3);
+        transition: all 0.3s ease;
+        white-space: nowrap;
+    }
+    
+    .merch-item-card:hover .base-price, 
+    .combo-card:hover .base-price {
+        transform: scale(1.05);
+        box-shadow: 0 4px 8px rgba(244, 96, 54, 0.4);
+    }
+    
+    .merch-item-card:hover .nick-price, 
+    .combo-card:hover .nick-price {
+        transform: scale(1.05);
+        box-shadow: 0 4px 8px rgba(33, 150, 243, 0.4);
+    }
+    
+    .merch-item-card:hover .total-price, 
+    .combo-card:hover .total-price {
+        transform: scale(1.05);
+        box-shadow: 0 4px 8px rgba(76, 175, 80, 0.4);
+    }
+    
+    .price {
+        background: linear-gradient(135deg, #F46036 0%, #e74c3c 100%);
+        color: white;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 14px;
+        box-shadow: 0 2px 5px rgba(244, 96, 54, 0.3);
+        transition: all 0.3s ease;
+        flex-shrink: 0;
+        white-space: nowrap;
+    }
+    
+    .item-description, .combo-description {
+        color: #666;
+        font-size: 14px;
+        line-height: 1.5;
+        margin: 10px 0;
+        flex-shrink: 0;
+    }
+    
+    .nick-available-badge {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+        color: white;
+        padding: 8px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+        margin: 10px 0;
+        box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
+        transition: all 0.3s ease;
+        flex-shrink: 0;
+    }
+    
+    .nick-available-badge i {
+        font-size: 16px;
+    }
+    
+    .nick-available-badge:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(255, 152, 0, 0.4);
+    }
+    
+    .combo-items-selection {
+        background: #f0f0f0;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        border: 1px solid #ddd;
+        flex-shrink: 0;
+    }
+    
+    .combo-item-option {
+        margin-bottom: 10px;
+        padding: 10px;
+        background: white;
+        border-radius: 6px;
+        border: 1px solid #e0e0e0;
+    }
+    
+    .item-options, .combo-options {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        padding: 15px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+    }
+    
+    .merch-grid .row {
+        margin: 0;
+    }
+    
+    .merch-grid .col {
+        padding: 10px;
+    }
+    
+    .merch-item-card > *, .combo-card > * {
+        margin-bottom: 15px;
+    }
+    
+    .merch-item-card > *:last-child, .combo-card > *:last-child {
+        margin-bottom: 0;
+    }
+    
+    .merch-grid {
+        direction: ltr;
+        align-content: flex-start;
+    }
+    
+    .merch-item-wrapper {
+        order: 0;
+        flex-grow: 0;
+        flex-basis: auto;
+    }
+    
+    .order-summary {
+        background: #ffffff;
+        padding: 30px;
+        border-radius: 16px;
+        margin: 40px 0;
+        position: relative;
+        border: 1px solid #eaeaea;
+    }
+    
+    .order-summary h5 {
+        margin-top: 0;
+        color: #333;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        border-bottom: 1px solid rgba(244, 96, 54, 0.3);
+        padding-bottom: 15px;
+        margin-bottom: 25px;
+        position: relative;
+    }
+    
+    .order-summary h5:after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        width: 80px;
+        height: 3px;
+        background: #F46036;
+    }
+    
+    .summary-content {
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        border: 1px solid rgba(244, 96, 54, 0.3);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+    
+    .total-section {
+        text-align: center;
+        padding: 25px;
+        background: linear-gradient(135deg, #F46036 0%, #e74c3c 100%);
+        color: white;
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(244, 96, 54, 0.2);
+        margin-top: 20px;
+    }
+    
+    .total-section h6 {
+        color: white !important;
+        margin: 0;
+        font-size: 22px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+    
+    .order-submit {
+        text-align: center;
+        padding: 40px;
+        background: #ffffff;
+        border-radius: 16px;
+        margin: 40px 0;
+        border: 1px solid #eaeaea;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    }
+    
+    .submit-section .btn {
+        padding: 0 50px;
+        height: 54px;
+        line-height: 54px;
+        font-size: 16px;
+        border-radius: 27px;
+        text-transform: none;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        background: linear-gradient(135deg, #F46036 0%, #e74c3c 100%);
+        box-shadow: 0 6px 15px rgba(244, 96, 54, 0.3);
+        transition: all 0.3s ease;
+    }
+    
+    .submit-section .btn:hover:not(.disabled) {
+        box-shadow: 0 8px 25px rgba(244, 96, 54, 0.4);
+        transform: translateY(-3px);
+    }
+    
+    .submit-section .btn.disabled {
+        background: #cccccc;
+        box-shadow: none;
+    }
+    
+    .order-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 0;
+        border-bottom: 1px solid rgba(238, 238, 238, 0.7);
+        transition: all 0.3s ease;
+    }
+    
+    .order-item:hover {
+        background-color: rgba(244, 96, 54, 0.05);
+        transform: translateX(5px);
+        padding-left: 10px;
+        padding-right: 10px;
+        border-radius: 8px;
+    }
+    
+    .order-item:last-child {
+        border-bottom: none;
+    }
+    
+    .order-item-name {
+        font-weight: 600;
+        color: #333;
+        transition: color 0.3s ease;
+    }
+    
+    .order-item:hover .order-item-name {
+        color: #F46036;
+    }
+    
+    .order-item-details {
+        color: #666;
+        font-size: 14px;
+        margin-top: 5px;
+    }
+    
+    .order-item-price {
+        font-weight: 600;
+        color: #333;
+        background: rgba(244, 96, 54, 0.1);
+        padding: 5px 10px;
+        border-radius: 15px;
+        transition: all 0.3s ease;
+    }
+    
+    .order-item:hover .order-item-price {
+        background: rgba(244, 96, 54, 0.2);
+        color: #F46036;
+    }
+    
+    .merch-item-card .item-options,
+    .combo-card .combo-options {
+        padding: 15px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        margin-top: 15px;
+    }
+    
+    .nick-field {
+        margin-top: 15px;
+        padding: 15px;
+        background-color: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        position: relative;
+    }
+    
+    .nick-field .helper-text {
+        font-size: 0.8em;
+        color: #666;
+        margin-top: 8px;
+        display: block;
+    }
+    
+    .nick-field input {
+        border-bottom: 2px solid #2196F3 !important;
+    }
+    
+    .nick-field input:focus {
+        border-bottom: 2px solid #1976D2 !important;
+        box-shadow: 0 1px 0 0 #1976D2 !important;
+    }
+    
+    .merch-item-card .item-header .price {
+        position: relative;
+    }
+    
+    .merch-item-card .item-header .price.nick-available::after {
+        font-size: 0.8em;
+        color: #ffffff;
+        font-weight: normal;
+        display: block;
+        margin-top: 2px;
+    }
+
+    @media only screen and (max-width: 1200px) {
+        .merch-item-wrapper {
+            width: 50%;
+        }
+    }
+    
+    @media only screen and (max-width: 992px) {
+        .bundle-header {
+            padding: 30px 20px;
+        }
+        
+        .bundle-header h4 {
+            font-size: 26px !important;
+        }
+        
+        .order-summary, .order-submit {
+            padding: 25px;
+        }
+        
+        .merch-item-wrapper {
+            width: 50%;
+        }
+        
+        .merch-item-card, .combo-card {
+            min-height: 600px; /* Increased from 500px */
+        }
+        
+        .item-image {
+            object-fit: contain;
+            height: 300px; /* Increased from 200px */
+        }
+    }
+    
+    @media only screen and (max-width: 600px) {
+        .bundle-header {
+            padding: 25px 15px;
+            margin: -20px -20px 20px -20px;
+        }
+        
+        .bundle-header h4 {
+            font-size: 22px !important;
+        }
+        
+        .merch-item-wrapper {
+            width: 100%;
+        }
+        
+        .merch-item-card, .combo-card {
+            padding: 15px;
+            min-height: 600px; /* Increased from 500px */
+        }
+        
+        .item-header, .combo-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        
+        .price-section {
+            align-items: flex-start;
+            gap: 3px;
+        }
+        
+        .base-price, .nick-price, .total-price {
+            font-size: 11px;
+            padding: 3px 8px;
+        }
+        
+        .order-summary, .order-submit {
+            padding: 20px 15px;
+            margin: 25px 0;
+        }
+        
+        .summary-content {
+            padding: 15px;
+        }
+        
+        .submit-section .btn {
+            width: 100%;
+            padding: 0 15px;
+        }
+        
+        .student-info-section, .merch-items-section, .combos-section {
+            margin: 20px 0;
+        }
+        
+        .item-image {
+            height: 300px; /* Increased from 200px */
+        }
+    }
+</style>
+
+<script>
+    // Initialize global variables
+    window.referralDiscount = 0;
+    
+    $(document).ready(function () {
+            $('select').material_select();
+
+            $('.item-quantity, .combo-quantity, .item-size, .combo-item-size').on('change', function () {
+                updateOrderSummary();
+            });
+
+            $('#agree').change(function () {
+                if ($(this).prop('checked')) {
+                    $('#place-order').removeClass('disabled');
+                } else {
+                    $('#place-order').addClass('disabled');
+                }
+            });
+        
+        $('#orderForm').on('submit', function(e) {
+            e.preventDefault();
+            
+            console.log('Form submission started');
+            
+            if (!validateForm()) {
+                console.log('Form validation failed');
+                return false;
+            }
+            
+            console.log('Form validation passed, building form data...');
+            
+            const $submitBtn = $('#place-order');
+            $submitBtn.html('<i class="material-icons left">hourglass_empty</i> Placing Order...')
+                        .addClass('disabled')
+                        .css('background-color', '#F46036');
+            const formData = {
+                studentBITSID: $('#studentBITSID').val(),
+                studentName: $('#studentName').val(),
+                studentEmail: $('#studentEmail').val(),
+                items: [],
+                combos: [],
+                referralID: null
+            };
+
+            const referralInput = $('#verifyStudentID').val().trim();
+            if (window.referralDiscount > 0 && referralInput) {
+                formData.referralID = referralInput;
+            }
+            
+            console.log('Found', $('.merch-item-card').length, 'merch-item-card elements');
+            $('.merch-item-card').each(function(index) {
+                const quantity = parseInt($(this).find('.item-quantity').val()) || 0;
+                const price = parseFloat($(this).find('input[name*="[price]"]').val()) || 0;
+                const name = $(this).find('input[name*="[merchName]"]').val();
+                const size = $(this).find('select.item-size').val() || 'One Size';
+                const hasNick = $(this).find('input[name*="[hasNick]"]').val() === 'true';
+                const nick = hasNick ? $(this).find('input[name*="[nick]"]').val() : '';
+                const nickPrice = hasNick ? parseFloat($(this).find('input[name*="[nickPrice]"]').val()) || 0 : 0;
+
+                // Debug: Log the raw values found
+                console.log('Raw values for item', index, ':', {
+                    quantity: $(this).find('.item-quantity').val(),
+                    price: $(this).find('input[name*="[price]"]').val(),
+                    name: $(this).find('input[name*="[merchName]"]').val(),
+                    size: $(this).find('select.item-size').val(),
+                    hasNick: $(this).find('input[name*="[hasNick]"]').val(),
+                    nick: $(this).find('input[name*="[nick]"]').val(),
+                    nickPrice: $(this).find('input[name*="[nickPrice]"]').val()
+                });
+
+                if (quantity > 0) {
+                    // Debug: Log each item being processed
+                    console.log('Processing item:', { name, quantity, price, hasNick, nick, nickPrice });
+                    
+                    const itemTotal = quantity * price + (hasNick && nick ? quantity * nickPrice : 0);
+                    formData.items.push({
+                        merchName: name,
+                        size: size,
+                        quantity: quantity,
+                        price: price,
+                        total: itemTotal,
+                        hasNick: hasNick,
+                        nick: nick,
+                        nickPrice: nickPrice
+                    });
+                }
+            });
+            
+            console.log('Found', $('.combo-card').length, 'combo-card elements');
+            $('.combo-card').each(function(index) {
+                const quantity = parseInt($(this).find('.combo-quantity').val()) || 0;
+                const basePrice = parseFloat($(this).find('input[name*="[price]"]').val()) || 0;
+                const comboName = $(this).find('input[name*="[comboName]"]').val();
+                
+                if (quantity > 0) {
+                    // Debug: Log combo being processed
+                    console.log('Processing combo:', { comboName, quantity, basePrice });
+                    
+                    const comboItems = [];
+                    let additionalNickPrice = 0;
+
+                    $(this).find('.combo-item-option').each(function() {
+                        const itemName = $(this).find('input[name*="[itemName]"]').val();
+                        const size = $(this).find('select.combo-item-size').val() || 'One Size';
+                        const hasNick = $(this).find('input[name*="[hasNick]"]').val() === 'true';
+                        const nick = hasNick ? $(this).find('input[name*="[nick]"]').val() : '';
+                        const nickPrice = parseFloat($(this).find('input[name*="[nickPrice]"]').val()) || 0;
+
+                        // Debug: Log combo item being processed
+                        console.log('Processing combo item:', { itemName, size, hasNick, nick, nickPrice });
+
+                        if (hasNick && nick) {
+                            additionalNickPrice += nickPrice;
+                        }
+
+                        comboItems.push({
+                            itemName: itemName,
+                            size: size,
+                            hasNick: hasNick,
+                            nick: nick
+                        });
+                    });
+                    
+                    formData.combos.push({
+                        comboName: comboName,
+                        quantity: quantity,
+                        price: basePrice + additionalNickPrice,
+                        items: comboItems
+                    });
+                }
+            });
+            
+            // Debug: Log the form data being sent
+            console.log('Form data being sent:', formData);
+            console.log('Items:', formData.items);
+            console.log('Combos:', formData.combos);
+            
+            // Validate that we have data before sending
+            if (formData.items.length === 0 && formData.combos.length === 0) {
+                console.error('No items or combos selected!');
+                M.toast({html: 'Please select at least one item or combo', classes: 'red'});
+                $submitBtn.removeClass('disabled').html('<i class="material-icons left">shopping_cart</i>Place Order');
+                return;
+            }
+            
+            const csrfToken = $('[name=csrfmiddlewaretoken]').val();
+            console.log('CSRF Token:', csrfToken);
+            
+            $.ajax({
+                url: window.location.href,
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                headers: {
+                    'X-CSRFToken': csrfToken
+                },
+                success: function(response) {
+                    
+                    if (response.success) {
+                        
+                        
+                        $submitBtn.removeClass('disabled')
+                                .html('<i class="material-icons left">check_circle</i>Order Placed')
+                                .css('background-color', '#4CAF50');
+                        
+                        setTimeout(function() {
+                            window.location.href = '/dashboard/';
+                        }, 2000);
+                    } else {
+                        $submitBtn.removeClass('disabled').html('<i class="material-icons left">shopping_cart</i>Place Order');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error:', xhr.responseText);
+                    $submitBtn.removeClass('disabled').html('<i class="material-icons left">shopping_cart</i>Place Order');
+                }
+            }).then(() => {
+                console.log('AJAX request completed');  // Debug log
+            }).catch(error => {
+                console.error('AJAX request failed:', error);  // Debug log
+
+            });
+        });
+        
+        updateOrderSummary();
+        
+        $(document).on('input', '.item-nick, .combo-item-nick', function() {
+            const nickValue = $(this).val().trim();
+            if (nickValue) {
+                $(this).removeClass('invalid');
+            }
+            updateOrderSummary();
+        });
+        
+        $(document).on('change', '.item-quantity, .combo-quantity', function() {
+            updateOrderSummary();
+            
+            const quantity = parseInt($(this).val()) || 0;
+            const card = $(this).closest('.merch-item-card, .combo-card');
+            
+            if (quantity > 0) {
+                card.find('.nick-field').slideDown(200);
+            } else {
+                card.find('.nick-field').slideUp(200);
+            }
+        });
+        
+        $(document).on('change', '.item-size, .combo-item-size', function() {
+            updateOrderSummary();
+        });
+        
+        $('.merch-item-card, .combo-card').each(function() {
+            const quantity = parseInt($(this).find('.item-quantity, .combo-quantity').val()) || 0;
+            if (quantity === 0) {
+                $(this).find('.nick-field').hide();
+            }
+        });
+    });
+    
+    function validateForm() {
+        let isValid = true;
+        let errorMessages = [];
+        
+        let hasSelection = false;
+        
+        // Validate merch items
+        $('.merch-item-card').each(function() {
+            const quantity = parseInt($(this).find('.item-quantity').val()) || 0;
+            const hasNick = $(this).find('input[name*="[hasNick]"]').val() === 'true';
+            
+            if (quantity > 0) {
+                hasSelection = true;
+                
+                // If item has nick enabled, validate nickname field
+                if (hasNick) {
+                    const nickField = $(this).find('.item-nick');
+                    const nickValue = nickField.val().trim();
+                    
+                    if (!nickValue) {
+                        nickField.addClass('invalid');
+                        isValid = false;
+                        errorMessages.push('Please enter a nickname for customized items');
+                    } else {
+                        nickField.removeClass('invalid');
+                    }
+                }
+            }
+        });
+        
+        // Validate combos
+        $('.combo-card').each(function() {
+            const quantity = parseInt($(this).find('.combo-quantity').val()) || 0;
+            
+            if (quantity > 0) {
+                hasSelection = true;
+                
+                // Validate combo item nickname fields
+                $(this).find('.combo-item-size').each(function() {
+                    const hasNick = $(this).closest('.combo-item-option').find('input[name*="[hasNick]"]').val() === 'true';
+                    
+                    if (hasNick) {
+                        const nickField = $(this).closest('.combo-item-option').find('.combo-item-nick');
+                        const nickValue = nickField.val().trim();
+                        
+                        if (!nickValue) {
+                            nickField.addClass('invalid');
+                            isValid = false;
+                            errorMessages.push('Please enter nicknames for customized combo items');
+                        } else {
+                            nickField.removeClass('invalid');
+                        }
+                    }
+                });
+            }
+        });
+        
+        if (!hasSelection) {
+            errorMessages.push('Please select at least one item or combo');
+        }
+        
+        // Check agreement checkbox
+        if (!$('#agree').prop('checked')) {
+            errorMessages.push('Please agree to the terms before placing your order');
+        }
+        
+        if (errorMessages.length > 0) {
+            M.toast({html: errorMessages.join('. '), classes: 'red'});
+            return false;
+        }
+        
+        return isValid;
+    }
+    
+    function updateOrderSummary() {
+        let totalAmount = 0;
+        let orderItems = [];
+        
+        $('.merch-item-card').each(function (index) {
+            const quantity = parseInt($(this).find('.item-quantity').val()) || 0;
+            const price = parseFloat($(this).find('input[name*="[price]"]').val()) || 0;
+            const name = $(this).find('input[name*="[merchName]"]').val();
+            const size = $(this).find('select.item-size').val() || 'One Size';
+            const hasNick = $(this).find('input[name*="[hasNick]"]').val() === 'true';
+            const nick = hasNick ? $(this).find('input[name*="[nick]"]').val() : '';
+
+            if (quantity > 0) {
+                const nickPrice = parseFloat($(this).find('input[name*="[nickPrice]"]').val()) || 0;
+                const itemTotal = quantity * price + (hasNick && nick ? quantity * nickPrice : 0);
+                totalAmount += itemTotal;
+                orderItems.push({
+                    name: name,
+                    size: size,
+                    quantity: quantity,
+                    price: price,
+                    total: itemTotal,
+                    hasNick: hasNick,
+                    nick: nick,
+                    nickPrice: nickPrice
+                });
+            }
+        });
+        
+        $('.combo-card').each(function(index) {
+            const quantity = parseInt($(this).find('.combo-quantity').val()) || 0;
+            const price = parseFloat($(this).find('input[name*="[price]"]').val()) || 0;
+            const comboName = $(this).find('input[name*="[comboName]"]').val();
+            
+            if (quantity > 0) {
+                const comboItems = [];
+                let additionalNickPrice = 0;
+                
+                $(this).find('.combo-item-option').each(function() {
+                    const itemName = $(this).find('input[name*="[itemName]"]').val();
+                    const size = $(this).find('select.combo-item-size').val() || 'One Size';
+                    const hasNick = $(this).find('input[name*="[hasNick]"]').val() === 'true';
+                    const nick = hasNick ? $(this).find('input[name*="[nick]"]').val() : '';
+                    const nickPrice = parseFloat($(this).find('input[name*="[nickPrice]"]').val()) || 0;
+                    
+                    if (hasNick && nick) {
+                        additionalNickPrice += nickPrice;
+                    }
+                    
+                    comboItems.push({
+                        itemName: itemName,
+                        size: size,
+                        hasNick: hasNick,
+                        nick: nick,
+                        nickPrice: nickPrice
+                    });
+                });
+                
+                const comboTotal = quantity * (price + additionalNickPrice);
+                
+                totalAmount += comboTotal;
+                
+                let comboSummary = comboItems.map(item => {
+                    let itemDetail = `${item.itemName} (${item.size})`;
+                    if (item.hasNick && item.nick) {
+                        itemDetail += ` - Nick: ${item.nick}`;
+                    }
+                    return itemDetail;
+                }).join('; ');
+                
+                orderItems.push({
+                    name: comboName,
+                    size: comboSummary,
+                    quantity: quantity,
+                    price: price + additionalNickPrice,
+                    total: comboTotal,
+                    comboItems: comboItems
+                });
+            }
+        });
+        
+        let discountPercent = window.referralDiscount || 0;
+        let discountedAmount = totalAmount;
+        if (discountPercent > 0) {
+            discountedAmount = totalAmount * (1 - discountPercent / 100);
+        }
+
+        let itemsHtml = '';
+        orderItems.forEach(function(item) {
+            let itemDetails = `Size: ${item.size} | Quantity: ${item.quantity}`;
+            if (item.hasNick && item.nick) {
+                itemDetails += ` | Nickname: ${item.nick}`;
+            }
+            itemsHtml += `
+                <div class="order-item">
+                    <div>
+                        <div class="order-item-name">${item.name}</div>
+                        <div class="order-item-details">${itemDetails}</div>
+                    </div>
+                    <div class="order-item-price">₹${item.total.toFixed(2)}</div>
+                </div>
+            `;
+        });
+        
+        if (orderItems.length === 0) {
+            itemsHtml = '<p style="color: #666; text-align: center;">No items selected</p>';
+        }
+        
+        $('#order-items-list').html(itemsHtml);
+        $('#total-amount').text('₹' + discountedAmount.toFixed(2));
+    }
+    
+    $(document).ready(function () {
+
+        if (!$('#verifyStudentID').val().trim()) {
+            $('#verification-status').hide();
+        }
+
+        $('#verifyStudentID').on('input', function() {
+            const bitsId = $(this).val().trim();
+            if (!bitsId) {
+                $('#studentIdVerifyMsg').text('');
+                $('#verificationIcon').hide();
+                $('#verification-status').hide();
+                window.referralDiscount = 0;
+                updateOrderSummary();
+                return;
+            }
+            
+            $('#verification-status').show();
+            
+            $('#studentIdVerifyMsg').text('Verifying...').css('color', '#FFA000');
+            $('#verificationIcon').show().text('hourglass_empty').css('color', '#FFA000');
+            $('#verificationIcon').addClass('pulse-animation');
+            $('.verification-status').removeClass('success-bg error-bg').addClass('verifying-bg').css({
+                'background-color': 'rgba(255, 160, 0, 0.1)',
+                'border-color': '#FFA000'
+            });
+            
+            $.post('/verify-referral-id/', { bitsId: bitsId, csrfmiddlewaretoken: $('[name=csrfmiddlewaretoken]').val() }, function(data) {
+                if (data.status === 'verified') {
+                    $('#studentIdVerifyMsg').text('Student verified - ' + data.discount + '% discount applied').css('color', 'green');
+                    $('#verificationIcon').removeClass('pulse-animation').addClass('success-animation');
+                    $('#verificationIcon').show().text('check_circle').css('color', 'green');
+                    $('.verification-status').removeClass('verifying-bg error-bg').addClass('success-bg').css({
+                        'background-color': 'rgba(76, 175, 80, 0.1)',
+                        'border-color': 'green'
+                    });
+                    window.referralDiscount = data.discount || 0;
+                } else if (data.status === 'not_found') {
+                    $('#studentIdVerifyMsg').text('ID does not exist').css('color', 'red');
+                    $('#verificationIcon').removeClass('pulse-animation').addClass('error-animation');
+                    $('#verificationIcon').show().text('cancel').css('color', 'red');
+                    $('.verification-status').removeClass('verifying-bg success-bg').addClass('error-bg').css({
+                        'background-color': 'rgba(244, 67, 54, 0.1)',
+                        'border-color': 'red'
+                    });
+                    window.referralDiscount = 0;
+                } else {
+                    $('#studentIdVerifyMsg').text('');
+                    $('#verificationIcon').removeClass('pulse-animation success-animation error-animation').hide();
+                    $('.verification-status').removeClass('verifying-bg success-bg error-bg').css({
+                        'background-color': 'transparent',
+                        'border-color': 'transparent'
+                    });
+                    window.referralDiscount = 0;
+                }
+                updateOrderSummary();
+            });
+        });
+    });
+</script>
+{% endblock %}
+

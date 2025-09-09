@@ -6,7 +6,7 @@ The main repository for the development of SWD website of BITS Goa.<br>Hosted at
 
 ## Setting the Environment
 
-Assuming you have python 3.4 (or above) already installed, go to the desired folder on your machine and follow these commands to clone the repository and install dependencies in a virtual environment:
+Assuming you have python 3.7 (recommended) already installed, go to the desired folder on your machine and follow these commands to clone the repository and install dependencies in a virtual environment:
 
 #### Virtual Environment
 
@@ -53,6 +53,14 @@ any previous database and session invalid.
 ```bash
 $ python manage.py setup_keys
 $ python manage.py migrate
+```
+
+* For specific app migrations, especially for gate_security and main_mcn apps, run:
+
+```bash
+$ python manage.py makemigrations gate_security main mcn
+$ python manage.py migrate
+
 ```
 
 * Create a superuser for admin controls (accessible at localhost:8000/admin)
