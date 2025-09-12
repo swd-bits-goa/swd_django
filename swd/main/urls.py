@@ -84,10 +84,14 @@ urlpatterns = [
     url(r'^leave_diff/', views.leave_diff, name='leave_diff'),
     url(r'^admin/get_cor_add', views.get_corr_address, name='get_corr_address'),
     url(r'^admin/delete_students/',views.delete_students, name='delete_students'),
-
     url(r'^admin/view_duplicates/(?P<end_year>\d+)?/?', views.view_duplicates, name='view_duplicates'),
 
     path('verify-student-id/', verify_student_id, name='verify_student_id'),
     path('verify-referral-id/', verify_referral_id, name='verify_referral_id'),
+
+    
+    path('api/students-on-leave-today/', views.students_on_leave_today, name='students_on_leave_today'),
+
+
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

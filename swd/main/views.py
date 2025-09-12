@@ -43,10 +43,14 @@ from calendar import monthrange
 
 from pytz import timezone
 
+#<<<<<<< HEAD
+# REST framework imports removed due to Python 3.10 compatibility issues
+#=======
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
+#>>>>>>> a58d6dedf2636c83ad05eda1c22354689545922d
 from django.core.exceptions import ValidationError
 from django.db import transaction
 import json
@@ -4248,7 +4252,6 @@ def get_combo_individual_price(combo, merch_items):
 
 
 
-
 def order_form(request, bundle_id):
     """
     Display order form for a specific merch bundle and handle form submission
@@ -4595,6 +4598,62 @@ def order_form(request, bundle_id):
 from django.http import JsonResponse
 from .models import Student
 
+#<<<<<<< HEAD
+def students_on_leave_today(request):
+#    """
+#    API endpoint to get all students who are on leave today.
+#    Returns JSON response with student details and leave information.
+#    """
+    try:
+        # Get today's date
+        today = date.today()
+        
+        # Query for approved leaves that include today
+        # A student is on leave today if:
+        # - Their leave is approved
+        # - Today falls between their leave start and end dates
+        leaves_today = Leave.objects.filter(
+            approved=True,
+            dateTimeStart__date__lte=today,
+            dateTimeEnd__date__gte=today
+        ).select_related('student', 'student__user')
+        
+        # Prepare response data
+        students_data = []
+        for leave in leaves_today:
+            student_data = {
+                'bits_id': leave.student.bitsId,
+                'name': leave.student.name,
+                'email': leave.student.user.email if leave.student.user else None,
+                'phone': leave.student.phone,
+                'leave_id': leave.id,
+                'leave_start': leave.dateTimeStart.strftime('%Y-%m-%d %H:%M:%S') if leave.dateTimeStart else None,
+                'leave_end': leave.dateTimeEnd.strftime('%Y-%m-%d %H:%M:%S') if leave.dateTimeEnd else None,
+                'reason': leave.reason,
+                'correspondence_address': leave.corrAddress,
+                'correspondence_phone': leave.corrPhone,
+                'approved_by': leave.approvedBy.name if leave.approvedBy else None,
+                'comment': leave.comment
+            }
+            students_data.append(student_data)
+        
+        response_data = {
+            'success': True,
+            'date': today.strftime('%Y-%m-%d'),
+            'total_students_on_leave': len(students_data),
+            'students': students_data
+        }
+        
+        return JsonResponse(response_data)
+        
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+
+#=======
+#>>>>>>> a58d6dedf2636c83ad05eda1c22354689545922d
 def verify_student_id(request):
     bits_id = request.GET.get('bitsId', '').strip()
     if not bits_id:
