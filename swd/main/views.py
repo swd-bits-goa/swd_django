@@ -43,14 +43,7 @@ from calendar import monthrange
 
 from pytz import timezone
 
-<<<<<<< HEAD
 # REST framework imports removed due to Python 3.10 compatibility issues
-=======
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
-from rest_framework.response import Response
-from rest_framework import status
->>>>>>> a58d6dedf2636c83ad05eda1c22354689545922d
 from django.core.exceptions import ValidationError
 from django.db import transaction
 import json
@@ -4499,7 +4492,7 @@ def order_form(request, bundle_id):
                 order_data = {
                     'studentBITSID': student_bits_id,
                     'studentName': student_name,
-                    'studentEmail': student_email,
+                    # 'studentEmail': student_email,
                     'bundle': bundle_object_id,
                     'items': items_data,
                     'combos': combos_data,
@@ -4598,7 +4591,6 @@ def order_form(request, bundle_id):
 from django.http import JsonResponse
 from .models import Student
 
-<<<<<<< HEAD
 def students_on_leave_today(request):
     """
     API endpoint to get all students who are on leave today.
@@ -4652,8 +4644,6 @@ def students_on_leave_today(request):
             'error': str(e)
         }, status=500)
 
-=======
->>>>>>> a58d6dedf2636c83ad05eda1c22354689545922d
 def verify_student_id(request):
     bits_id = request.GET.get('bitsId', '').strip()
     if not bits_id:
