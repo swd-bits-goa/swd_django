@@ -1570,7 +1570,11 @@ def store(request):
     clubs = []
     try:
         from swd.config import MONGODB_URI
-        client = pymongo.MongoClient(MONGODB_URI)
+        client = pymongo.MongoClient(
+            MONGODB_URI,
+            tls=True,
+            tlsAllowInvalidCertificates=True
+        )
         db = client.merchportal
         clubs_collection = db.users
         
@@ -4255,7 +4259,11 @@ def order_form(request, bundle_id):
         student = Student.objects.get(user=request.user)
         
         from swd.config import MONGODB_URI
-        client = pymongo.MongoClient(MONGODB_URI, serverSelectionTimeoutMS=5000)
+        client = pymongo.MongoClient(
+            MONGODB_URI,
+            tls=True,
+            tlsAllowInvalidCertificates=True                            
+        )
         db = client.merchportal
         merch_bundles_collection = db.merchbundles
         users_collection = db.users
@@ -4670,7 +4678,11 @@ def verify_referral_id(request):
 
             # Get discount from constants collection
             from swd.config import MONGODB_URI
-            client = pymongo.MongoClient(MONGODB_URI)
+            client = pymongo.MongoClient(
+                MONGODB_URI,
+                tls=True,
+                tlsAllowInvalidCertificates=True
+            )
             db = client.merchportal
             constants = db.constants.find_one()
             discount = constants.get('discount', 0) if constants else 0
