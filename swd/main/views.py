@@ -43,7 +43,6 @@ from calendar import monthrange
 
 from pytz import timezone
 
-<<<<<<< HEAD
 #<<<<<<< HEAD
 # REST framework imports removed due to Python 3.10 compatibility issues
 #=======
@@ -52,9 +51,6 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
 #>>>>>>> a58d6dedf2636c83ad05eda1c22354689545922d
-=======
-# REST framework imports removed due to Python 3.10 compatibility issues
->>>>>>> 1ed39d72f55c1e6b0a40b141378fdfd0d0be07f6
 from django.core.exceptions import ValidationError
 from django.db import transaction
 import json
@@ -4610,20 +4606,12 @@ def order_form(request, bundle_id):
 from django.http import JsonResponse
 from .models import Student
 
-<<<<<<< HEAD
 #<<<<<<< HEAD
 def students_on_leave_today(request):
 #    """
 #    API endpoint to get all students who are on leave today.
 #    Returns JSON response with student details and leave information.
 #    """
-=======
-def students_on_leave_today(request):
-    """
-    API endpoint to get all students who are on leave today.
-    Returns JSON response with student details and leave information.
-    """
->>>>>>> 1ed39d72f55c1e6b0a40b141378fdfd0d0be07f6
     try:
         # Get today's date
         today = date.today()
@@ -4672,11 +4660,8 @@ def students_on_leave_today(request):
             'error': str(e)
         }, status=500)
 
-<<<<<<< HEAD
 #=======
 #>>>>>>> a58d6dedf2636c83ad05eda1c22354689545922d
-=======
->>>>>>> 1ed39d72f55c1e6b0a40b141378fdfd0d0be07f6
 def verify_student_id(request):
     bits_id = request.GET.get('bitsId', '').strip()
     if not bits_id:
