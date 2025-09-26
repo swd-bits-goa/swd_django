@@ -14,6 +14,7 @@ from django.conf import settings
 from django.core.files.storage import default_storage, FileSystemStorage
 from main.storage import no_duplicate_storage
 from tools.utils import gen_random_datetime
+import datetime as dt
 
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -4513,6 +4514,7 @@ def order_form(request, bundle_id):
                     'combos': combos_data,
                     'totalPrice': total_price,
                     'referralID': referral_id if referral_id else None,  
+                    'createdAt': dt.datetime.now(),
                 }
                 
                 try:
