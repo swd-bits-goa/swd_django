@@ -7,6 +7,34 @@
         position: relative;
     }
     
+.dropdown-content {
+    z-index: 9999 !important;
+    max-height: 180px !important;
+    overflow-y: auto !important;
+    height: auto !important;
+    position: absolute !important;
+    top: auto !important; 
+}
+
+.select-wrapper input.select-dropdown {
+    cursor: pointer !important;
+}
+
+
+
+.select-wrapper .dropdown-content li {
+    min-height: 40px !important;
+    display: block !important;
+}
+
+.merch-item-card, .combo-card {
+    overflow: visible !important;
+}
+
+.input-field {
+    overflow: visible !important;
+}
+    
     .nick-field .input-field label {
         width: 100% !important;
         margin-left: 10px !important;
@@ -265,13 +293,13 @@
                                 <div class="row">
                                     <div class="input-field col s12 m4">
                                         <i class="material-icons prefix">badge</i>
-                                        <input id="studentBITSID" name="studentBITSID" type="text" class="validate" required value="{{ student.bitsId|default:'' }}">
-                                        <label for="studentBITSID">BITS ID</label>
+                                        <input id="studentBITSID" name="studentBITSID" type="text" class="validate" readonly value="{{ student.bitsId|default:'' }}">
+                                        <label for="studentBITSID" {% if student.bitsId %}class="active"{% endif %}>BITS ID</label>
                                     </div>
                                     <div class="input-field col s12 m4">
                                         <i class="material-icons prefix">person</i>
-                                        <input id="studentName" name="studentName" type="text" class="validate" required value="{{ student.name|default:'' }}">
-                                        <label for="studentName">Full Name</label>
+                                        <input id="studentName" name="studentName" type="text" class="validate" readonly value="{{ student.name|default:'' }}">
+                                        <label for="studentName" {% if student.name %}class="active"{% endif %}>Full Name</label>
                                     </div>
                                     
                                 </div>
@@ -559,9 +587,9 @@
     
     .bundle-header h4 {
         color: white !important;
-        margin-bottom: 15px !important;
-        font-weight: 500;
-        letter-spacing: 0.5px;
+         margin-bottom: 15px !important;
+         font-weight: 500;
+         letter-spacing: 0.5px;
     }
     
     .club-name {
@@ -1215,7 +1243,13 @@
     window.referralDiscount = 0;
     
     $(document).ready(function () {
+            // Initialize select with proper event handling for closing
             $('select').material_select();
+            
+            // Fix for dropdown not closing when clicked again
+            $(document).on('click', '.select-dropdown', function(e) {
+                e.stopPropagation();
+            });
 
             $('.item-quantity, .combo-quantity, .item-size, .combo-item-size').on('change', function () {
                 updateOrderSummary();
@@ -1326,11 +1360,12 @@
                         }
 
                         comboItems.push({
-                            itemName: itemName,
-                            size: size,
-                            hasNick: hasNick,
-                            nick: nick
-                        });
+                         itemName: itemName,
+                         size: size,
+                         hasNick: hasNick,
+                         nick: nick,
+                         nickPrice: nickPrice
+                     });
                     });
                     
                     formData.combos.push({
@@ -1547,17 +1582,16 @@
                     const hasNick = $(this).find('input[name*="[hasNick]"]').val() === 'true';
                     const nick = hasNick ? $(this).find('input[name*="[nick]"]').val() : '';
                     const nickPrice = parseFloat($(this).find('input[name*="[nickPrice]"]').val()) || 0;
-                    
+
                     if (hasNick && nick) {
                         additionalNickPrice += nickPrice;
                     }
-                    
+
                     comboItems.push({
                         itemName: itemName,
                         size: size,
                         hasNick: hasNick,
-                        nick: nick,
-                        nickPrice: nickPrice
+                        nick: nick
                     });
                 });
                 
