@@ -293,13 +293,13 @@
                                 <div class="row">
                                     <div class="input-field col s12 m4">
                                         <i class="material-icons prefix">badge</i>
-                                        <input id="studentBITSID" name="studentBITSID" type="text" class="validate" required value="{{ student.bitsId|default:'' }}">
-                                        <label for="studentBITSID">BITS ID</label>
+                                        <input id="studentBITSID" name="studentBITSID" type="text" class="validate" readonly value="{{ student.bitsId|default:'' }}">
+                                        <label for="studentBITSID" {% if student.bitsId %}class="active"{% endif %}>BITS ID</label>
                                     </div>
                                     <div class="input-field col s12 m4">
                                         <i class="material-icons prefix">person</i>
-                                        <input id="studentName" name="studentName" type="text" class="validate" required value="{{ student.name|default:'' }}">
-                                        <label for="studentName">Full Name</label>
+                                        <input id="studentName" name="studentName" type="text" class="validate" readonly value="{{ student.name|default:'' }}">
+                                        <label for="studentName" {% if student.name %}class="active"{% endif %}>Full Name</label>
                                     </div>
                                     
                                 </div>
