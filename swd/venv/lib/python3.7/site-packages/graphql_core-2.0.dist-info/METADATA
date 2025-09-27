@@ -1,0 +1,42 @@
+Metadata-Version: 2.0
+Name: graphql-core
+Version: 2.0
+Summary: GraphQL implementation for Python
+Home-page: https://github.com/graphql-python/graphql-core
+Author: Syrus Akbary, Jake Heinz, Taeho Kim
+Author-email: me@syrusakbary.com
+License: MIT
+Download-URL: https://github.com/graphql-python/graphql-core/releases
+Keywords: api graphql protocol rest
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Software Development :: Libraries
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.3
+Classifier: Programming Language :: Python :: 3.4
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: Implementation :: PyPy
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Topic :: Database :: Front-Ends
+Classifier: Topic :: Internet :: WWW/HTTP
+Requires-Dist: promise (>=2.1)
+Requires-Dist: rx (>=1.6.0)
+Requires-Dist: six (>=1.10.0)
+Provides-Extra: gevent
+Requires-Dist: gevent (==1.1rc1); extra == 'gevent'
+Provides-Extra: test
+Requires-Dist: coveralls; extra == 'test'
+Requires-Dist: gevent (==1.1rc1); extra == 'test'
+Requires-Dist: pytest (==3.0.2); extra == 'test'
+Requires-Dist: pytest-benchmark (==3.0.0); extra == 'test'
+Requires-Dist: pytest-cov (==2.3.1); extra == 'test'
+Requires-Dist: pytest-django (==2.9.1); extra == 'test'
+Requires-Dist: pytest-mock (==1.2); extra == 'test'
+Requires-Dist: six (>=1.10.0); extra == 'test'
+
+UNKNOWN
+
+

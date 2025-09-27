@@ -1,0 +1,240 @@
+{% load materializecss %}
+{% load l10n %}
+
+
+    {% if field|is_checkbox %}
+    <div class="col {{ classes.label }} {{ classes.value }} {{ classes.single_value }}">
+        <div class="{% if field.field.required and form.required_css_class %}{{ form.required_css_class }}{% endif %}">
+            {% if classes.icon %}
+                {% include 'materializecssform/field_icon.html' %}
+            {% endif %}
+            <label>
+
+                    {{ field }}
+                    {% if field.auto_id %}
+                        <span>{{ field.label }}</span>
+                    {% endif %}
+                    {% for error in field.errors %}
+                        <span class="help-block {{ form.error_css_class }}">{{ error }}</span>
+                    {% endfor %}
+
+            </label>
+            {% if field.help_text %}
+                <p class="help-block">
+                    {{ field.help_text|safe }}
+                </p>
+            {% endif %}
+        </div>
+    </div>
+    {% elif field|is_radio %}
+    <div class="col {{ classes.label }} {{ classes.value }} {{ classes.single_value }}">
+        <div class="{% if field.field.required and form.required_css_class %}{{ form.required_css_class }}{% endif %}">
+            {% if classes.icon %}
+                {% include 'materializecssform/field_icon.html' %}
+            {% endif %}
+            <label>
+                    {{ field }}
+                    {% if field.auto_id %}
+                        <span>{{ field.label }}</span>
+                    {% endif %}
+                    {% for error in field.errors %}
+                        <span class="help-block {{ form.error_css_class }}">{{ error }}</span>
+                    {% endfor %}
+            </label>
+            {% if field.help_text %}
+                <p class="help-block">
+                    {{ field.help_text|safe }}
+                </p>
+            {% endif %}
+        </div>
+    </div>
+    {% elif field|is_date_input %}
+    <div class="input-field col {{ classes.label }} {{ classes.value }} {{ classes.single_value }}">
+        {% if classes.icon %}
+            {% include 'materializecssform/field_icon.html' %}
+        {% endif %}
+
+        <input type="date" id="{{ field.auto_id }}" name="{{ field.html_name }}" class="datepicker" value="{% if field.value %}{% localize off %}{{ field.value }}{% endlocalize %}{% endif %}" {% include 'materializecssform/attrs.html' %} >
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+
+        {% for error in field.errors %}
+            <span class="help-block {{ form.error_css_class }}">{{ error }}</span>
+        {% endfor %}
+
+        {% if field.help_text %}
+        <p class="help-block">
+            {{ field.help_text|safe }}
+        </p>
+        {% endif %}
+
+    </div>
+    {% elif field|is_datetime_input %}
+    <div class="input-field col {{ classes.label }} {{ classes.value }} {{ classes.single_value }}">
+        {% if classes.icon %}
+            {% include 'materializecssform/field_icon.html' %}
+        {% endif %}
+
+        <input type="datetime-local" id="{{ field.auto_id }}" name="{{ field.html_name }}" value="{% if field.value %}{{ field.value|date:'c' }}{% endif %}" {% include 'materializecssform/attrs.html' %}  >
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+
+        {% for error in field.errors %}
+            <span class="help-block {{ form.error_css_class }}">{{ error }}</span>
+        {% endfor %}
+
+        {% if field.help_text %}
+        <p class="help-block">
+            {{ field.help_text|safe }}
+        </p>
+        {% endif %}
+
+    </div>
+    {% elif field|is_select %}
+    <div class="input-field col {{ classes.label }} {{ classes.value }} {{ classes.single_value }}">
+            {% if field|is_select_multiple %}
+                {% if classes.icon %}
+                    {% include 'materializecssform/field_icon.html' %}
+                {% endif %}
+                <select multiple name="{{ field.html_name }}" {% include 'materializecssform/attrs.html' %} >
+                    {% for choice in field %}
+                          {{ choice.tag }}
+                    {% endfor %}
+                </select>
+                {% if field.auto_id %}
+                    <label class="control-label {{ classes.label }} {% if field.field.required %}{{ form.required_css_class }}{% endif %}">{{ field.label }}</label>
+                {% endif %}
+
+                {% for error in field.errors %}
+                    <span class="help-block {{ form.error_css_class }}">{{ error }}</span>
+                {% endfor %}
+
+                {% if field.help_text %}
+                <p class="help-block">
+                    {{ field.help_text|safe }}
+                </p>
+                {% endif %}
+
+            {% else %}
+                {% if classes.icon %}
+                    {% include 'materializecssform/field_icon.html' %}
+                {% endif %}
+                <select name="{{ field.html_name }}" {% include 'materializecssform/attrs.html' %} >
+                    {% for choice in field %}
+                          {{ choice.tag }}
+                    {% endfor %}
+                </select>
+                {% if field.auto_id %}
+                <label class="control-label {{ classes.label }} {% if field.field.required %}{{ form.required_css_class }}{% endif %}">{{ field.label }}</label>
+                {% endif %}
+
+                {% for error in field.errors %}
+                    <span class="help-block {{ form.error_css_class }}">{{ error }}</span>
+                {% endfor %}
+
+                {% if field.help_text %}
+                <p class="help-block">
+                    {{ field.help_text|safe }}
+                </p>
+                {% endif %}
+
+            {% endif %}
+
+    </div>
+
+    {% elif field|is_multiple_checkbox %}
+    <div class="col {{ classes.label }} {{ classes.value }} {{ classes.single_value }}">
+        {% if field.auto_id %}
+            <label>{{ field.label }}</label>
+        {% endif %}
+        <div id="{{field.auto_id}}">
+            <ul>
+
+                {% for choice in field %}
+
+                    <li class="{% if field.field.required and form.required_css_class %}{{ form.required_css_class }}{% endif %}">
+                        <label>
+                            {{ choice.tag }}
+                            <span>{{ choice.choice_label }}</span>
+                        </label>
+                    </li>
+
+                {% endfor %}
+
+            </ul>
+            {% for error in field.errors %}
+                <span class="help-block {{ form.error_css_class }}">{{ error }}</span>
+            {% endfor %}
+
+            {% if field.help_text %}
+            <p class="help-block">
+                {{ field.help_text|safe }}
+            </p>
+            {% endif %}
+        </div>
+
+    </div>
+
+    {% elif field|is_textarea %}
+        <div class="input-field col {{ classes.label }} {{ classes.value }} {{ classes.single_value }}">
+            {% if classes.icon %}
+                {% include 'materializecssform/field_icon.html' %}
+            {% endif %}
+            <textarea id="{{ field.auto_id }}" class="materialize-textarea" name="{{field.html_name}}" {% include 'materializecssform/attrs.html' %} >{% if field.value %}{{ field.value }}{% endif %}</textarea>
+            {% if field.auto_id %}
+                <label class="{% if field.field.required %}{{ form.required_css_class }}{% endif %}" for="{{ field.auto_id }}">{{ field.label }}</label>
+            {% endif %}
+
+            {% for error in field.errors %}
+                <p class="help-block orange-text {{ form.error_css_class }}">{{ error }}</p>
+                {% endfor %}
+
+            {% if field.help_text %}
+                <p>
+                    {{ field.help_text|safe }}
+                </p>
+            {% endif %}
+        </div>
+
+    {% elif field|is_file %}
+        <div class="col {{ classes.label }} {{ classes.value }} {{ classes.single_value }}">
+
+            {% for error in field.errors %}
+                <p class="help-block orange-text {{ form.error_css_class }}">{{ error }}</p>
+            {% endfor %}
+
+            <div class="file-field input-field">
+                <div class="btn">
+                    <span>{{ field.label }}</span>
+                    {% if classes.icon %}
+                        {% include 'materializecssform/field_icon.html' %}
+                    {% endif %}
+                    {{ field }}
+                </div>
+                <div class="file-path-wrapper">
+                    <input class="file-path validate" type="text">
+                </div>
+            </div>
+
+        </div>
+    {% else %}
+
+        <div class="input-field col {{ classes.label }} {{ classes.value }} {{ classes.single_value }}">
+            {% if classes.icon %}
+                {% include 'materializecssform/field_icon.html' %}
+            {% endif %}
+            {{ field }}
+            {% if field.auto_id %}
+                <label class="{% if field.field.required %}{{ form.required_css_class }}{% endif %}" for="{{ field.auto_id }}">{{ field.label }}</label>
+            {% endif %}
+
+            {% for error in field.errors %}
+                <p class="help-block orange-text {{ form.error_css_class }}">{{ error }}</p>
+                {% endfor %}
+
+            {% if field.help_text %}
+                <p>
+                    {{ field.help_text|safe }}
+                </p>
+            {% endif %}
+        </div>
+
+    {% endif %}
