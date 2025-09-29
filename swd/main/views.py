@@ -14,7 +14,6 @@ from django.conf import settings
 from django.core.files.storage import default_storage, FileSystemStorage
 from main.storage import no_duplicate_storage
 from tools.utils import gen_random_datetime
-import datetime
 
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -4275,7 +4274,7 @@ def order_form(request, bundle_id):
         db = client.merchportal
         merch_bundles_collection = db.merchbundles
         users_collection = db.users
-        orders_collection = db.orders
+        orders_collection = db.temporders
         
         try:
             bundle_object_id = ObjectId(bundle_id)
