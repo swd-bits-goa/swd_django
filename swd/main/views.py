@@ -2261,6 +2261,7 @@ def antiragging(request):
 def mess_import(request):
 
     no_of_mess_option_added = 0
+    missing_students = []
     if request.POST:
         if request.FILES:
             mess_file = request.FILES['file']
@@ -2280,7 +2281,11 @@ def mess_import(request):
                         continue
                     # Format : Name | Bits ID | MESS | MONTH(1-12)
                     bid = str(i[1].value)
-                    s = Student.objects.get(bitsId=bid)
+                    try:
+                        s = Student.objects.get(bitsId=bid)
+                    except Student.DoesNotExist:
+                        missing_students.append(bid)
+                        continue
                     # month = date.today().month + 1
                     month = int(i[3].value)
                     my = datetime(date.today().year, month, 1)
@@ -2292,7 +2297,7 @@ def mess_import(request):
                         messop = MessOption.objects.create(student = s, monthYear = my, mess = str(i[2].value))
                     no_of_mess_option_added += 1
 
-    context = {'added': no_of_mess_option_added}
+    context = {'added': no_of_mess_option_added, 'missing_students': missing_students}
     return render(request, "mess_defaulters_upload.html", context)
 
 @user_passes_test(lambda u: u.is_superuser)

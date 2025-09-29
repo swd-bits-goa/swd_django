@@ -12,5 +12,13 @@
 	<p>The number of entries added = {{added}}</p>
 	{%else%}
 		<p>No entries added till now</p>
+		{% if missing_students %}
+			<p>The following BITS IDs were not found in the database:</p>
+			<ul>
+				{% for bid in missing_students %}
+					<li>{{ bid }}</li>
+				{% endfor %}
+			</ul>
+		{% endif %}
 {%endif%}
 
