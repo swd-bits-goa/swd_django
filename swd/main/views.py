@@ -14,6 +14,7 @@ from django.conf import settings
 from django.core.files.storage import default_storage, FileSystemStorage
 from main.storage import no_duplicate_storage
 from tools.utils import gen_random_datetime
+import datetime
 
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -4333,6 +4334,7 @@ def order_form(request, bundle_id):
                 items_data = data.get('items', [])
                 combos_data = data.get('combos', [])
                 referral_id = data.get('referralID', None)  # <-- Accept referralID from frontend
+                
 
                 # Validate required fields
                 if not all([student_bits_id, student_name]):
@@ -4512,7 +4514,8 @@ def order_form(request, bundle_id):
                     'items': items_data,
                     'combos': combos_data,
                     'totalPrice': total_price,
-                    'referralID': referral_id if referral_id else None,  
+                    'referralID': referral_id if referral_id else None,
+                    'createdAt': datetime.utcnow()
                 }
                 
                 try:
