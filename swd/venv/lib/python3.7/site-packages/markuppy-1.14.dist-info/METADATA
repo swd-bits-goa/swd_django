@@ -1,0 +1,39 @@
+Metadata-Version: 2.2
+Name: MarkupPy
+Version: 1.14
+Summary: An HTML/XML generator
+Home-page: https://github.com/tylerbakke/MarkupPy
+Author: Daniel Nogradi
+Author-email: Daniel Nogradi <nogradi@gmail.com>
+Maintainer-email: Tyler Bakke <tylerbakke@gmail.com>
+License: MIT
+Project-URL: Homepage, https://github.com/tylerbakke/MarkupPy
+Project-URL: Documentation, https://tylerbakke.github.io/MarkupPy/
+Project-URL: Bug Tracker, https://github.com/tylerbakke/MarkupPy/issues
+Classifier: Environment :: Console
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Text Processing :: Markup :: HTML
+Classifier: Topic :: Text Processing :: Markup :: XML
+Requires-Python: >=2.7
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Dynamic: author
+Dynamic: home-page
+
+## MarkupPy
+This is MarkupPy - a Python module that attempts to make it easier to generate HTML/XML from a Python program in an intuitive, lightweight, customizable and pythonic way. It works with both python 2 and 3.
+
+<b>Installation:</b>
+    
+    pip install MarkupPy
+
+Documentation and further info is at https://tylerbakke.github.io/MarkupPy/
+
+Please send bug reports, feature requests, enhancement ideas or questions to tylerbakke@gmail.com.
+
+The Python Package can be found at https://pypi.python.org/pypi/MarkupPy.
+
+The code is in the public domain. Version: 1.14 as of July 12 2017.
