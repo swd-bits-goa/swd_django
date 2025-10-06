@@ -116,7 +116,8 @@ HOSTELS = (
     ('DH4', 'DH4'),
     ('DH5', 'DH5'),
     ('DH5_2', 'DH5_2'),
-    ('DH6', 'DH6')
+    ('DH6', 'DH6'),
+    ('QTR', 'QTR')
     
 )
 
@@ -594,7 +595,7 @@ class Document(models.Model):
 
         hostel_set = set()
         for i in hostel_list:
-            if i in ['AH1','AH2','AH3','AH4','AH5','AH6','AH7','AH8','AH9','CH1','CH2','CH3','CH4','CH5','CH6','CH7','DH1','DH2','DH3','DH4','DH5','DH6',]:
+            if i in ['AH1','AH2','AH3','AH4','AH5','AH6','AH7','AH8','AH9', 'AH10', 'CH1','CH2','CH3','CH4','CH5','CH6','CH7','DH1','DH2','DH3','DH4','DH5','DH6','QTR',]:
                 hostel_set.add(i)
         
         self.hostels = ', '.join(hostel_set)
