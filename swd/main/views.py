@@ -4441,20 +4441,19 @@ def order_form(request, bundle_id):
                     has_nick = item_data.get('hasNick', False)
                     if has_nick:
                         nick_value = item_data.get('nick', '').strip()
-                        if not nick_value:
-                            return JsonResponse({
-                                'success': False,
-                                'message': f'Nickname is required for {merch_name}'
-                            }, status=400)
-                        if len(nick_value) > 50:
+                        # Allow empty nick values - nick is optional even when hasNick is true
+                        if nick_value and len(nick_value) > 50:
                             return JsonResponse({
                                 'success': False,
                                 'message': f'Nickname for {merch_name} must be 50 characters or less'
                             }, status=400)
                         
-                        # Sanitize nickname data (remove any potentially harmful characters)
-                        nick_value = nick_value.replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;')
-                        item_data['nick'] = nick_value
+                        # Sanitize nickname data (remove any potentially harmful characters) only if nick is provided
+                        if nick_value:
+                            nick_value = nick_value.replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;')
+                            item_data['nick'] = nick_value
+                        else:
+                            item_data['nick'] = ''
                     
                     total_price += float(item_data.get('price', 0)) * item_data.get('quantity', 0)
                 
@@ -4473,19 +4472,19 @@ def order_form(request, bundle_id):
                         has_nick = combo_item.get('hasNick', False)
                         if has_nick:
                             nick_value = combo_item.get('nick', '').strip()
-                            if not nick_value:
-                                return JsonResponse({
-                                    'success': False,
-                                    'message': f'Nickname for {item_name} in combo {combo_name} must be provided'
-                                }, status=400)
-                            if len(nick_value) > 50:
+                            # Allow empty nick values - nick is optional even when hasNick is true
+                            if nick_value and len(nick_value) > 50:
                                 return JsonResponse({
                                     'success': False,
                                     'message': f'Nickname for {item_name} in combo {combo_name} must be 50 characters or less'
                                 }, status=400)
                             
-                            nick_value = nick_value.replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;')
-                            combo_item['nick'] = nick_value
+                            # Sanitize nickname data (remove any potentially harmful characters) only if nick is provided
+                            if nick_value:
+                                nick_value = nick_value.replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;')
+                                combo_item['nick'] = nick_value
+                            else:
+                                combo_item['nick'] = ''
                     
                     total_price += float(combo_data.get('price', 0)) * combo_data.get('quantity', 0)
                 
@@ -4512,7 +4511,8 @@ def order_form(request, bundle_id):
                     'items': items_data,
                     'combos': combos_data,
                     'totalPrice': total_price,
-                    'referralID': referral_id if referral_id else None,  
+                    'referralID': referral_id if referral_id else None,
+                    'createdAt': datetime.now()
                 }
                 
                 try:
