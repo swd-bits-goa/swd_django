@@ -372,6 +372,10 @@
                             {% if bundle.merchItems %}
                             <div class="merch-items-section">
                                 <h5>Merch Items</h5>
+                                <div class="combo-selection-notice">
+                                    <i class="material-icons">info</i>
+                                    You can select either individual items OR combos, but not both. Selecting individual items will deselect any combos.
+                                </div>
                                 <div class="merch-grid">
                                     {% for item in bundle.merchItems %}
                                     <div class="merch-item-wrapper">
@@ -437,6 +441,10 @@
                             {% if bundle.processed_combos %}
                             <div class="combos-section">
                                 <h5>Combos</h5>
+                                <div class="combo-selection-notice">
+                                    <i class="material-icons">info</i>
+                                    You can select either individual items OR combos, but not both. Selecting a combo will deselect all individual items.
+                                </div>
                                 <div class="merch-grid">
                                     {% for combo in bundle.processed_combos %}
                                     <div class="merch-item-wrapper">
@@ -742,7 +750,7 @@
         }
     }
     
-    .merch-item-card, .combo-card {
+    .merch-item-card,     .combo-card {
         background: #ffffff;
         border-radius: 12px;
         padding: 20px;
@@ -757,6 +765,51 @@
         min-height: 600px;
         box-shadow: 0 4px 15px rgba(0,0,0,0.08);
         margin: 5px;
+    }
+    
+    /* Combo selection styling */
+    .combo-card.selected {
+        border: 2px solid #F46036;
+        box-shadow: 0 8px 25px rgba(244, 96, 54, 0.3);
+        background: linear-gradient(135deg, #fff 0%, #fef7f5 100%);
+    }
+    
+    
+    .combo-card.disabled {
+        opacity: 0.6;
+        pointer-events: none;
+        background: #f5f5f5;
+        border-color: #ddd;
+    }
+    
+    .combo-card {
+        cursor: pointer;
+        user-select: none;
+    }
+    
+    .combo-card:hover:not(.selected) {
+        border-color: #F46036;
+        box-shadow: 0 6px 20px rgba(244, 96, 54, 0.2);
+    }
+    
+    .combo-item-option {
+        transition: all 0.3s ease;
+    }
+    
+    .combo-selection-notice {
+        background: linear-gradient(135deg, #F46036 0%, #e74c3c 100%);
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        text-align: center;
+        font-weight: 500;
+        box-shadow: 0 4px 15px rgba(244, 96, 54, 0.2);
+    }
+    
+    .combo-selection-notice i {
+        margin-right: 8px;
+        vertical-align: middle;
     }
     
     .merch-item-card:hover, .combo-card:hover {
@@ -1469,6 +1522,76 @@
             $('.item-quantity, .combo-quantity, .item-size, .combo-item-size').on('change', function () {
                 updateOrderSummary();
             });
+            
+            // Handle single combo selection
+            $('.combo-quantity').on('change', function() {
+                const quantity = parseInt($(this).val()) || 0;
+                const currentCombo = $(this).closest('.combo-card');
+                
+                if (quantity > 0) {
+                    // Deselect all other combos
+                    $('.combo-card').not(currentCombo).each(function() {
+                        $(this).removeClass('selected');
+                        $(this).find('.combo-quantity').val(0);
+                        $(this).find('.combo-item-option').hide();
+                    });
+                    
+                    // Deselect all individual items when combo is selected
+                    $('.merch-item-card').each(function() {
+                        $(this).find('.item-quantity').val(0);
+                        $(this).find('.nick-field').hide();
+                    });
+                    
+                    // Select current combo
+                    currentCombo.addClass('selected');
+                    currentCombo.find('.combo-item-option').show();
+                } else {
+                    // Deselect current combo
+                    currentCombo.removeClass('selected');
+                    currentCombo.find('.combo-item-option').hide();
+                }
+                
+                updateOrderSummary();
+            });
+            
+            // Handle combo card clicks to select/deselect
+            $('.combo-card').on('click', function(e) {
+                // Don't trigger if clicking on form elements
+                if ($(e.target).is('input, select, label, .input-field')) {
+                    return;
+                }
+                
+                const comboCard = $(this);
+                const quantityInput = comboCard.find('.combo-quantity');
+                const currentQuantity = parseInt(quantityInput.val()) || 0;
+                
+                if (currentQuantity === 0) {
+                    // Deselect all individual items when combo is selected
+                    $('.merch-item-card').each(function() {
+                        $(this).find('.item-quantity').val(0);
+                        $(this).find('.nick-field').hide();
+                    });
+                    
+                    // Select this combo
+                    quantityInput.val(1);
+                    comboCard.addClass('selected');
+                    comboCard.find('.combo-item-option').show();
+                    
+                    // Deselect all other combos
+                    $('.combo-card').not(comboCard).each(function() {
+                        $(this).removeClass('selected');
+                        $(this).find('.combo-quantity').val(0);
+                        $(this).find('.combo-item-option').hide();
+                    });
+                } else {
+                    // Deselect this combo
+                    quantityInput.val(0);
+                    comboCard.removeClass('selected');
+                    comboCard.find('.combo-item-option').hide();
+                }
+                
+                updateOrderSummary();
+            });
 
             $('#agree').change(function () {
                 if ($(this).prop('checked')) {
@@ -1655,16 +1778,52 @@
         });
         
         $(document).on('change', '.item-quantity, .combo-quantity', function() {
-            updateOrderSummary();
-            
             const quantity = parseInt($(this).val()) || 0;
             const card = $(this).closest('.merch-item-card, .combo-card');
+            
+            // Handle combo single selection
+            if (card.hasClass('combo-card')) {
+                if (quantity > 0) {
+                    // Deselect all other combos
+                    $('.combo-card').not(card).each(function() {
+                        $(this).removeClass('selected');
+                        $(this).find('.combo-quantity').val(0);
+                        $(this).find('.combo-item-option').hide();
+                    });
+                    
+                    // Deselect all individual items when combo is selected
+                    $('.merch-item-card').each(function() {
+                        $(this).find('.item-quantity').val(0);
+                        $(this).find('.nick-field').hide();
+                    });
+                    
+                    // Select current combo
+                    card.addClass('selected');
+                    card.find('.combo-item-option').show();
+                } else {
+                    // Deselect current combo
+                    card.removeClass('selected');
+                    card.find('.combo-item-option').hide();
+                }
+            } else if (card.hasClass('merch-item-card')) {
+                // Handle individual item selection
+                if (quantity > 0) {
+                    // Deselect all combos when individual item is selected
+                    $('.combo-card').each(function() {
+                        $(this).removeClass('selected');
+                        $(this).find('.combo-quantity').val(0);
+                        $(this).find('.combo-item-option').hide();
+                    });
+                }
+            }
             
             if (quantity > 0) {
                 card.find('.nick-field').slideDown(200);
             } else {
                 card.find('.nick-field').slideUp(200);
             }
+            
+            updateOrderSummary();
         });
         
         $(document).on('change', '.item-size, .combo-item-size', function() {
@@ -1676,7 +1835,56 @@
             if (quantity === 0) {
                 $(this).find('.nick-field').hide();
             }
+            
+            // Initialize combo cards - hide item options by default
+            if ($(this).hasClass('combo-card')) {
+                $(this).find('.combo-item-option').hide();
+            }
         });
+        
+        // Apply mutual exclusivity logic on page load
+        let hasSelectedCombo = false;
+        let hasSelectedItems = false;
+        
+        // Check if any combos are selected
+        $('.combo-card').each(function() {
+            const quantity = parseInt($(this).find('.combo-quantity').val()) || 0;
+            if (quantity > 0) {
+                hasSelectedCombo = true;
+                // If this combo has a quantity, deselect all others
+                $('.combo-card').not(this).each(function() {
+                    $(this).removeClass('selected');
+                    $(this).find('.combo-quantity').val(0);
+                    $(this).find('.combo-item-option').hide();
+                });
+                
+                // Deselect all individual items when combo is selected
+                $('.merch-item-card').each(function() {
+                    $(this).find('.item-quantity').val(0);
+                    $(this).find('.nick-field').hide();
+                });
+                
+                // Select this combo
+                $(this).addClass('selected');
+                $(this).find('.combo-item-option').show();
+            }
+        });
+        
+        // Check if any individual items are selected
+        $('.merch-item-card').each(function() {
+            const quantity = parseInt($(this).find('.item-quantity').val()) || 0;
+            if (quantity > 0) {
+                hasSelectedItems = true;
+            }
+        });
+        
+        // If both combos and items are selected, prioritize combos (deselect items)
+        if (hasSelectedCombo && hasSelectedItems) {
+            $('.merch-item-card').each(function() {
+                $(this).find('.item-quantity').val(0);
+                $(this).find('.nick-field').hide();
+            });
+        }
     });
     
     function validateForm() {
@@ -1710,11 +1918,13 @@
             }
         });
         
-        // Validate combos
+        // Validate combos - ensure only one combo is selected
+        let selectedComboCount = 0;
         $('.combo-card').each(function() {
             const quantity = parseInt($(this).find('.combo-quantity').val()) || 0;
             
             if (quantity > 0) {
+                selectedComboCount++;
                 hasSelection = true;
                 
                 // Validate combo item nickname fields
@@ -1737,6 +1947,29 @@
                 });
             }
         });
+        
+        // Check if more than one combo is selected
+        if (selectedComboCount > 1) {
+            isValid = false;
+            errorMessages.push('You can only select one combo at a time');
+        }
+        
+        // Check mutual exclusivity - cannot have both combos and individual items selected
+        if (selectedComboCount > 0 && hasSelection) {
+            // Check if any individual items are selected
+            let hasIndividualItems = false;
+            $('.merch-item-card').each(function() {
+                const quantity = parseInt($(this).find('.item-quantity').val()) || 0;
+                if (quantity > 0) {
+                    hasIndividualItems = true;
+                }
+            });
+            
+            if (hasIndividualItems) {
+                isValid = false;
+                errorMessages.push('You cannot select both combos and individual items. Please choose either combos or individual items.');
+            }
+        }
         
         if (!hasSelection) {
             errorMessages.push('Please select at least one item or combo');
