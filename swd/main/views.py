@@ -1573,8 +1573,9 @@ def store(request):
     selected_club = None
     club_username = request.GET.get('club')
     
-    # Fetch clubs from MongoDB
+    # Fetch clubs from MongoDB and student orders
     clubs = []
+    student_orders = []
     try:
         from swd.config import MONGODB_URI
         client = pymongo.MongoClient(
@@ -1584,6 +1585,8 @@ def store(request):
         )
         db = client.merchportal
         clubs_collection = db.users
+        users_collection = db.users
+        orders_collection = db.orders
         
         # Fetch all clubs (users with role 'club')
         clubs = list(clubs_collection.find({'role': 'club'}, {
@@ -1646,6 +1649,47 @@ def store(request):
         
         # Replace clubs with only those that have bundles
         clubs = clubs_with_bundles
+        
+        # Fetch student orders
+        student_orders = list(orders_collection.find({
+            'studentBITSID': student.bitsId
+        }, {
+            '_id': 1,
+            'bundle': 1,
+            'items': 1,
+            'combos': 1,
+            'totalPrice': 1,
+            'status': 1,
+            'createdAt': 1,
+            'club': 1
+        }).sort('createdAt', -1))  # Sort by newest first
+        
+        # Convert ObjectIds to strings and add bundle details
+        for order in student_orders:
+            order['id'] = str(order['_id'])
+            if 'createdAt' in order:
+                order['createdAt'] = order['createdAt'].strftime('%Y-%m-%d %H:%M')
+            
+            # Get bundle details
+            if 'bundle' in order:
+                bundle = merch_bundles_collection.find_one({'_id': order['bundle']})
+                if bundle:
+                    club_id = bundle.get('club')
+                    club = users_collection.find_one({'_id': club_id})
+                    if club:
+                        order['clubName'] = club.get('clubName', club.get('username', 'Unknown Club'))
+                    else:
+                        order['clubName'] = 'Unknown Club'
+
+                    
+
+                    order['bundleTitle'] = bundle.get('title', 'Unknown Bundle')
+                    order['bundleDescription'] = bundle.get('description', '')
+                else:
+                    order['bundleTitle'] = 'Bundle Not Found'
+                    order['bundleDescription'] = ''
+            
+            
         
         client.close()
         
@@ -1711,6 +1755,7 @@ def store(request):
         'clubs': clubs,
         'selected_club': selected_club,
         'all_merch_bundles': all_merch_bundles if 'all_merch_bundles' in locals() else [],
+        'student_orders': student_orders if 'student_orders' in locals() else [],
         'error': error if 'error' in locals() else None,
         'option': option,
         'balance': balance,
