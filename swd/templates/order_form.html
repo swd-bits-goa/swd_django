@@ -311,13 +311,13 @@
                         </div>
                         
                         {% if has_existing_order %}
-                        <div class="card-panel red lighten-4" style="margin-top: 10px;">
-                            <span class="red-text text-darken-2">
-                                <i class="material-icons left">error</i>
-                                You have already placed an order for this bundle. Duplicate orders are not allowed.
+                        <div class="card-panel orange lighten-4" style="margin-top: 10px;">
+                            <span class="orange-text text-darken-2">
+                                <i class="material-icons left">warning</i>
+                                You have already placed an order for this bundle, but you can still place additional orders.
                             </span>
                         </div>
-                        {% else %}
+                        {% endif %}
                         <form method="POST" id="orderForm">
                             {% csrf_token %}
                             
@@ -567,7 +567,6 @@
                                 </div>
                             </div>
                         </form>
-                        {% endif %}
                     </div>
                 </div>
             </div>

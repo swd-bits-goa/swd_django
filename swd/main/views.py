@@ -4413,17 +4413,13 @@ def order_form(request, bundle_id):
                                     'message': f'Missing required field "{field}" in combo item data'
                                 },                                 status=400)
                 
-                # Check if student already has an order for this bundle
+                # Check if student already has an order for this bundle (for warning purposes)
                 existing_order = orders_collection.find_one({
                     'studentBITSID': student_bits_id,
                     'bundle': bundle_object_id
                 })
                 
-                if existing_order:
-                    return JsonResponse({
-                        'success': False,
-                        'message': 'You have already placed an order for this bundle.'
-                    }, status=400)
+                # Note: We now allow multiple orders, so we don't block the request here
                 
                 # Calculate total price
                 total_price = 0
