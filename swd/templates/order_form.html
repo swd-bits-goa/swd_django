@@ -1,13 +1,16 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
 
+<!-- Ensure responsive viewport -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 {% block content %}
 <style>
     .nick-field .input-field {
         position: relative;
     }
     
-.dropdown-content {
+    .dropdown-content {
     z-index: 9999 !important;
     max-height: 180px !important;
     overflow-y: auto !important;
@@ -18,6 +21,19 @@
 
 .select-wrapper input.select-dropdown {
     cursor: pointer !important;
+}
+
+/* Responsive dropdown improvements */
+@media (max-width: 767px) {
+    .dropdown-content {
+        max-height: 150px !important;
+        font-size: 14px;
+    }
+    
+    .select-wrapper .dropdown-content li {
+        min-height: 35px !important;
+        padding: 8px 16px;
+    }
 }
 
 
@@ -202,14 +218,14 @@
         overflow: visible !important;
     }
     
-    /* Add or update in your style block for merch images */
+    /* Responsive image styles */
 .item-image {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 500px; /* Increased from 400px */
-    min-height: 250px; /* Increased from 180px */
-    max-height: 600px; /* Increased from 400px */
+    height: 300px;
+    min-height: 200px;
+    max-height: 400px;
     width: 100%;
     background: #f8f9fa;
     border-radius: 8px;
@@ -231,11 +247,28 @@
     margin: auto;
 }
 
-@media (max-width: 600px) {
+/* Responsive image heights */
+@media (min-width: 1200px) {
     .item-image {
-        height: 300px; /* Increased from 200px */
-        min-height: 180px; /* Increased from 120px */
-        max-height: 350px; /* Increased from 220px */
+        height: 400px;
+        min-height: 300px;
+        max-height: 500px;
+    }
+}
+
+@media (max-width: 1199px) and (min-width: 768px) {
+    .item-image {
+        height: 350px;
+        min-height: 250px;
+        max-height: 450px;
+    }
+}
+
+@media (max-width: 767px) {
+    .item-image {
+        height: 250px;
+        min-height: 180px;
+        max-height: 300px;
     }
 }
 
@@ -278,42 +311,41 @@
                         </div>
                         
                         {% if has_existing_order %}
-                        <div class="card-panel red lighten-4" style="margin-top: 10px;">
-                            <span class="red-text text-darken-2">
-                                <i class="material-icons left">error</i>
-                                You have already placed an order for this bundle. Duplicate orders are not allowed.
+                        <div class="card-panel orange lighten-4" style="margin-top: 10px;">
+                            <span class="orange-text text-darken-2">
+                                <i class="material-icons left">warning</i>
+                                You have already placed an order for this bundle, but you can still place additional orders.
                             </span>
                         </div>
-                        {% else %}
+                        {% endif %}
                         <form method="POST" id="orderForm">
                             {% csrf_token %}
                             
                             <div class="student-info-section card-shadow">
                                 <h5>Student Information</h5>
                                 <div class="row">
-                                    <div class="input-field col s12 m4">
+                                    <div class="input-field col s12 m6">
                                         <i class="material-icons prefix">badge</i>
                                         <input id="studentBITSID" name="studentBITSID" type="text" class="validate" readonly value="{{ student.bitsId|default:'' }}">
                                         <label for="studentBITSID" {% if student.bitsId %}class="active"{% endif %}>BITS ID</label>
                                     </div>
-                                    <div class="input-field col s12 m4">
+                                    <div class="input-field col s12 m6">
                                         <i class="material-icons prefix">person</i>
                                         <input id="studentName" name="studentName" type="text" class="validate" readonly value="{{ student.name|default:'' }}">
                                         <label for="studentName" {% if student.name %}class="active"{% endif %}>Full Name</label>
                                     </div>
-                                    
                                 </div>
                             </div>
                             
                             <div class="section card-shadow" style="padding: 20px; border-radius: 8px; margin-top: 20px;">
                                 <h5>Referral Verification</h5>
                                 <div class="row">
-                                    <div class="input-field col s12 m4">
+                                    <div class="input-field col s12 m6">
                                         <i class="material-icons prefix">verified_user</i>
                                         <input id="verifyStudentID" type="text" class="validate">
                                         <label for="verifyStudentID">Enter Student BITS ID for Referral</label>
                                     </div>
-                                    <div class="input-field col s12 m8">
+                                    <div class="input-field col s12 m6">
                                         <div id="verification-status" class="verification-status">
                                             <i id="verificationIcon" class="material-icons left" style="display: none;"></i>
                                             <span id="studentIdVerifyMsg" style="font-weight: bold; font-size: 16px;"></span>
@@ -325,9 +357,9 @@
                             {% if bundle.sizeCharts %}
                             <div class="size-charts-section">
                                 <h5>Size Charts</h5>
-                                <div class="row">
+                                <div class="size-charts-grid">
                                     {% for size_chart in bundle.sizeCharts %}
-                                    <div class="col s12 m6 l4">
+                                    <div class="size-chart-wrapper">
                                         <div class="size-chart-card">
                                             <img src="{{ size_chart }}" alt="Size Chart" class="responsive-img">
                                         </div>
@@ -340,9 +372,13 @@
                             {% if bundle.merchItems %}
                             <div class="merch-items-section">
                                 <h5>Merch Items</h5>
-                                <div class="row merch-grid">
+                                <div class="combo-selection-notice">
+                                    <i class="material-icons">info</i>
+                                    You can select either individual items OR combos, but not both. Selecting individual items will deselect any combos.
+                                </div>
+                                <div class="merch-grid">
                                     {% for item in bundle.merchItems %}
-                                    <div class="col s12 m6 l4 merch-item-wrapper">
+                                    <div class="merch-item-wrapper">
                                         <div class="merch-item-card card-shadow z-depth-1 hoverable">
                                             {% if item.image %}
                                             <div class="item-image">
@@ -405,9 +441,13 @@
                             {% if bundle.processed_combos %}
                             <div class="combos-section">
                                 <h5>Combos</h5>
-                                <div class="row merch-grid">
+                                <div class="combo-selection-notice">
+                                    <i class="material-icons">info</i>
+                                    You can select either individual items OR combos, but not both. Selecting a combo will deselect all individual items.
+                                </div>
+                                <div class="merch-grid">
                                     {% for combo in bundle.processed_combos %}
-                                    <div class="col s12 m6 l4 merch-item-wrapper">
+                                    <div class="merch-item-wrapper">
                                         <div class="combo-card card-shadow z-depth-1 hoverable">
                                             <div class="combo-header">
                                                 <h6>{{ combo.name }}</h6>
@@ -490,9 +530,9 @@
                             {% if bundle.combos and not bundle.processed_combos %}
                             <div class="combos-section">
                                 <h5>Combos</h5>
-                                <div class="row">
+                                <div class="merch-grid">
                                     {% for combo in bundle.combos %}
-                                    <div class="col s12 m6 l4">
+                                    <div class="merch-item-wrapper">
                                         <div class="card-panel yellow lighten-4">
                                             <span class="yellow-text text-darken-2">
                                                 <i class="material-icons left">warning</i>
@@ -535,7 +575,6 @@
                                 </div>
                             </div>
                         </form>
-                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -621,6 +660,20 @@
         margin: 30px 0;
     }
     
+    .size-charts-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 20px;
+        margin: 0;
+    }
+    
+    .size-chart-wrapper {
+        width: 100%;
+        display: flex;
+        margin: 0;
+        padding: 0;
+    }
+    
     .size-chart-card {
         background: white;
         border-radius: 8px;
@@ -628,46 +681,79 @@
         margin-bottom: 20px;
         border: 2px solid #F46036;
         box-shadow: 0 4px 15px rgba(244, 96, 54, 0.1);
+        width: 100%;
+    }
+    
+    /* Size charts responsive grid */
+    @media (min-width: 768px) {
+        .size-charts-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+        }
+    }
+    
+    @media (min-width: 1200px) {
+        .size-charts-grid {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
     }
     
     .merch-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-        gap: 20px;
-        margin: 0;
-        justify-items: start;
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 20px !important;
+        margin: 0 !important;
+        justify-items: center !important;
+        width: 100% !important;
     }
     
     .merch-item-wrapper {
-        min-width: 400px;
-        width: 100%;
-        display: flex;
-        margin: 0;
-        padding: 0;
+        width: 100% !important;
+        max-width: 500px !important;
+        display: flex !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-sizing: border-box !important;
     }
     
+    /* Desktop - 3 columns */
     @media only screen and (min-width: 1200px) {
         .merch-grid {
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(3, 1fr) !important;
+            gap: 30px !important;
+        }
+        .merch-item-wrapper {
+            max-width: none !important;
         }
     }
     
-    @media only screen and (max-width: 1199px) and (min-width: 993px) {
+    /* Tablet - 2 columns */
+    @media only screen and (max-width: 1199px) and (min-width: 768px) {
         .merch-grid {
-            grid-template-columns: repeat(2, 1fr); /* Force 2 columns */
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 25px !important;
+        }
+        .merch-item-wrapper {
+            max-width: none !important;
         }
     }
     
-    @media only screen and (max-width: 992px) {
+    /* Mobile - 1 column */
+    @media only screen and (max-width: 767px) {
         .merch-grid {
-            grid-template-columns: 1fr; /* Single column */
+            grid-template-columns: 1fr !important;
+            gap: 15px !important;
+        }
+        .merch-item-wrapper {
+            max-width: 100% !important;
         }
     }
     
-    .merch-item-card, .combo-card {
+    .merch-item-card,     .combo-card {
         background: #ffffff;
         border-radius: 12px;
-        padding: 25px;
+        padding: 20px;
         border: 1px solid #eaeaea;
         transition: all 0.3s ease;
         position: relative;
@@ -676,9 +762,54 @@
         height: 100%;
         display: flex;
         flex-direction: column;
-        min-height: 800px; /* Increased from 650px */
+        min-height: 600px;
         box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-        margin: 10px;
+        margin: 5px;
+    }
+    
+    /* Combo selection styling */
+    .combo-card.selected {
+        border: 2px solid #F46036;
+        box-shadow: 0 8px 25px rgba(244, 96, 54, 0.3);
+        background: linear-gradient(135deg, #fff 0%, #fef7f5 100%);
+    }
+    
+    
+    .combo-card.disabled {
+        opacity: 0.6;
+        pointer-events: none;
+        background: #f5f5f5;
+        border-color: #ddd;
+    }
+    
+    .combo-card {
+        cursor: pointer;
+        user-select: none;
+    }
+    
+    .combo-card:hover:not(.selected) {
+        border-color: #F46036;
+        box-shadow: 0 6px 20px rgba(244, 96, 54, 0.2);
+    }
+    
+    .combo-item-option {
+        transition: all 0.3s ease;
+    }
+    
+    .combo-selection-notice {
+        background: linear-gradient(135deg, #F46036 0%, #e74c3c 100%);
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        text-align: center;
+        font-weight: 500;
+        box-shadow: 0 4px 15px rgba(244, 96, 54, 0.2);
+    }
+    
+    .combo-selection-notice i {
+        margin-right: 8px;
+        vertical-align: middle;
     }
     
     .merch-item-card:hover, .combo-card:hover {
@@ -705,7 +836,7 @@
     .item-image {
         text-align: center;
         margin-bottom: 15px;
-        height: 500px; /* Increased from 400px */
+        height: 300px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -718,11 +849,11 @@
         width: 100%;
         height: auto;
         max-width: 100%;
+        max-height: 100%;
         object-fit: contain;
         border-radius: 8px;
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         transition: transform 0.3s ease;
-        /* Ensures image fits width and maintains aspect ratio */
         display: block;
     }
     
@@ -730,6 +861,7 @@
         width: 100%;
         height: auto;
         max-width: 100%;
+        max-height: 100%;
         object-fit: contain;
         border-radius: 8px;
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
@@ -933,13 +1065,6 @@
         border-radius: 8px;
     }
     
-    .merch-grid .row {
-        margin: 0;
-    }
-    
-    .merch-grid .col {
-        padding: 10px;
-    }
     
     .merch-item-card > *, .combo-card > * {
         margin-bottom: 15px;
@@ -949,16 +1074,6 @@
         margin-bottom: 0;
     }
     
-    .merch-grid {
-        direction: ltr;
-        align-content: flex-start;
-    }
-    
-    .merch-item-wrapper {
-        order: 0;
-        flex-grow: 0;
-        flex-basis: auto;
-    }
     
     .order-summary {
         background: #ffffff;
@@ -1146,13 +1261,8 @@
         margin-top: 2px;
     }
 
-    @media only screen and (max-width: 1200px) {
-        .merch-item-wrapper {
-            width: 50%;
-        }
-    }
-    
-    @media only screen and (max-width: 992px) {
+    /* Tablet styles */
+    @media only screen and (max-width: 1199px) and (min-width: 768px) {
         .bundle-header {
             padding: 30px 20px;
         }
@@ -1165,58 +1275,68 @@
             padding: 25px;
         }
         
-        .merch-item-wrapper {
-            width: 50%;
-        }
-        
         .merch-item-card, .combo-card {
-            min-height: 600px; /* Increased from 500px */
+            min-height: 550px;
+            padding: 20px;
         }
         
         .item-image {
-            object-fit: contain;
-            height: 300px; /* Increased from 200px */
+            height: 300px;
         }
     }
     
-    @media only screen and (max-width: 600px) {
+    /* Mobile styles */
+    @media only screen and (max-width: 767px) {
+        .container-fluid {
+            padding: 10px;
+        }
+        
         .bundle-header {
-            padding: 25px 15px;
-            margin: -20px -20px 20px -20px;
+            padding: 20px 15px;
+            margin: -15px -15px 15px -15px;
         }
         
         .bundle-header h4 {
-            font-size: 22px !important;
+            font-size: 20px !important;
+            line-height: 1.3;
         }
         
-        .merch-item-wrapper {
-            width: 100%;
+        .club-name {
+            font-size: 16px;
         }
         
         .merch-item-card, .combo-card {
             padding: 15px;
-            min-height: 600px; /* Increased from 500px */
+            min-height: 500px;
+            margin: 5px 0;
         }
         
         .item-header, .combo-header {
             flex-direction: column;
             align-items: flex-start;
-            gap: 10px;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .item-header h6, .combo-header h6 {
+            font-size: 16px;
+            margin-bottom: 8px;
         }
         
         .price-section {
             align-items: flex-start;
-            gap: 3px;
+            gap: 5px;
+            flex-wrap: wrap;
         }
         
         .base-price, .nick-price, .total-price {
-            font-size: 11px;
-            padding: 3px 8px;
+            font-size: 12px;
+            padding: 4px 8px;
         }
         
         .order-summary, .order-submit {
-            padding: 20px 15px;
-            margin: 25px 0;
+            padding: 15px;
+            margin: 20px 0;
         }
         
         .summary-content {
@@ -1226,14 +1346,162 @@
         .submit-section .btn {
             width: 100%;
             padding: 0 15px;
+            height: 48px;
+            line-height: 48px;
+            font-size: 14px;
         }
         
         .student-info-section, .merch-items-section, .combos-section {
-            margin: 20px 0;
+            margin: 15px 0;
+            padding: 15px;
         }
         
         .item-image {
-            height: 300px; /* Increased from 200px */
+            height: 200px;
+            min-height: 150px;
+            max-height: 250px;
+        }
+        
+        .verification-status {
+            padding: 10px;
+            font-size: 14px;
+        }
+        
+        .verification-status i {
+            font-size: 20px;
+        }
+        
+        .nick-field {
+            padding: 10px;
+        }
+        
+        .combo-items-selection {
+            padding: 10px;
+        }
+        
+        .combo-item-option {
+            padding: 8px;
+        }
+        
+        .size-chart-card {
+            padding: 10px;
+        }
+    }
+    
+    /* Small mobile styles */
+    @media only screen and (max-width: 480px) {
+        .bundle-header h4 {
+            font-size: 18px !important;
+        }
+        
+        .club-name {
+            font-size: 14px;
+        }
+        
+        .merch-item-card, .combo-card {
+            padding: 12px;
+            min-height: 450px;
+        }
+        
+        .item-header h6, .combo-header h6 {
+            font-size: 14px;
+        }
+        
+        .base-price, .nick-price, .total-price {
+            font-size: 11px;
+            padding: 3px 6px;
+        }
+        
+        .order-summary, .order-submit {
+            padding: 12px;
+        }
+        
+        .item-image {
+            height: 180px;
+            min-height: 120px;
+            max-height: 220px;
+        }
+        
+        .verification-status {
+            padding: 8px;
+            font-size: 12px;
+        }
+        
+        .verification-status i {
+            font-size: 18px;
+        }
+        
+        .order-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        
+        .order-item-price {
+            align-self: flex-end;
+        }
+        
+        .total-section h6 {
+            font-size: 18px;
+        }
+    }
+    
+    /* Override Materialize CSS conflicts */
+    .merch-grid .row {
+        display: none !important;
+    }
+    
+    .merch-grid .col {
+        display: none !important;
+    }
+    
+    .merch-item-wrapper.col {
+        display: flex !important;
+    }
+    
+    /* Additional responsive improvements */
+    @media (max-width: 767px) {
+        .input-field {
+            margin-bottom: 15px;
+        }
+        
+        .input-field input, .input-field select {
+            font-size: 16px; /* Prevents zoom on iOS */
+        }
+        
+        .btn {
+            font-size: 14px;
+            padding: 0 20px;
+        }
+        
+        .card-panel {
+            padding: 15px;
+            margin: 10px 0;
+        }
+        
+        .section {
+            padding: 15px 0;
+        }
+        
+        /* Improve touch targets for mobile */
+        .btn, .input-field input, .input-field select {
+            min-height: 44px;
+        }
+        
+        .select-wrapper .dropdown-content li {
+            min-height: 44px !important;
+            line-height: 44px;
+        }
+        
+        /* Better spacing for mobile */
+        .merch-item-card .item-options,
+        .combo-card .combo-options {
+            padding: 12px;
+        }
+        
+        .nick-field {
+            margin-top: 12px;
+            padding: 12px;
         }
     }
 </style>
@@ -1252,6 +1520,76 @@
             });
 
             $('.item-quantity, .combo-quantity, .item-size, .combo-item-size').on('change', function () {
+                updateOrderSummary();
+            });
+            
+            // Handle single combo selection
+            $('.combo-quantity').on('change', function() {
+                const quantity = parseInt($(this).val()) || 0;
+                const currentCombo = $(this).closest('.combo-card');
+                
+                if (quantity > 0) {
+                    // Deselect all other combos
+                    $('.combo-card').not(currentCombo).each(function() {
+                        $(this).removeClass('selected');
+                        $(this).find('.combo-quantity').val(0);
+                        $(this).find('.combo-item-option').hide();
+                    });
+                    
+                    // Deselect all individual items when combo is selected
+                    $('.merch-item-card').each(function() {
+                        $(this).find('.item-quantity').val(0);
+                        $(this).find('.nick-field').hide();
+                    });
+                    
+                    // Select current combo
+                    currentCombo.addClass('selected');
+                    currentCombo.find('.combo-item-option').show();
+                } else {
+                    // Deselect current combo
+                    currentCombo.removeClass('selected');
+                    currentCombo.find('.combo-item-option').hide();
+                }
+                
+                updateOrderSummary();
+            });
+            
+            // Handle combo card clicks to select/deselect
+            $('.combo-card').on('click', function(e) {
+                // Don't trigger if clicking on form elements
+                if ($(e.target).is('input, select, label, .input-field')) {
+                    return;
+                }
+                
+                const comboCard = $(this);
+                const quantityInput = comboCard.find('.combo-quantity');
+                const currentQuantity = parseInt(quantityInput.val()) || 0;
+                
+                if (currentQuantity === 0) {
+                    // Deselect all individual items when combo is selected
+                    $('.merch-item-card').each(function() {
+                        $(this).find('.item-quantity').val(0);
+                        $(this).find('.nick-field').hide();
+                    });
+                    
+                    // Select this combo
+                    quantityInput.val(1);
+                    comboCard.addClass('selected');
+                    comboCard.find('.combo-item-option').show();
+                    
+                    // Deselect all other combos
+                    $('.combo-card').not(comboCard).each(function() {
+                        $(this).removeClass('selected');
+                        $(this).find('.combo-quantity').val(0);
+                        $(this).find('.combo-item-option').hide();
+                    });
+                } else {
+                    // Deselect this combo
+                    quantityInput.val(0);
+                    comboCard.removeClass('selected');
+                    comboCard.find('.combo-item-option').hide();
+                }
+                
                 updateOrderSummary();
             });
 
@@ -1440,16 +1778,52 @@
         });
         
         $(document).on('change', '.item-quantity, .combo-quantity', function() {
-            updateOrderSummary();
-            
             const quantity = parseInt($(this).val()) || 0;
             const card = $(this).closest('.merch-item-card, .combo-card');
+            
+            // Handle combo single selection
+            if (card.hasClass('combo-card')) {
+                if (quantity > 0) {
+                    // Deselect all other combos
+                    $('.combo-card').not(card).each(function() {
+                        $(this).removeClass('selected');
+                        $(this).find('.combo-quantity').val(0);
+                        $(this).find('.combo-item-option').hide();
+                    });
+                    
+                    // Deselect all individual items when combo is selected
+                    $('.merch-item-card').each(function() {
+                        $(this).find('.item-quantity').val(0);
+                        $(this).find('.nick-field').hide();
+                    });
+                    
+                    // Select current combo
+                    card.addClass('selected');
+                    card.find('.combo-item-option').show();
+                } else {
+                    // Deselect current combo
+                    card.removeClass('selected');
+                    card.find('.combo-item-option').hide();
+                }
+            } else if (card.hasClass('merch-item-card')) {
+                // Handle individual item selection
+                if (quantity > 0) {
+                    // Deselect all combos when individual item is selected
+                    $('.combo-card').each(function() {
+                        $(this).removeClass('selected');
+                        $(this).find('.combo-quantity').val(0);
+                        $(this).find('.combo-item-option').hide();
+                    });
+                }
+            }
             
             if (quantity > 0) {
                 card.find('.nick-field').slideDown(200);
             } else {
                 card.find('.nick-field').slideUp(200);
             }
+            
+            updateOrderSummary();
         });
         
         $(document).on('change', '.item-size, .combo-item-size', function() {
@@ -1461,7 +1835,56 @@
             if (quantity === 0) {
                 $(this).find('.nick-field').hide();
             }
+            
+            // Initialize combo cards - hide item options by default
+            if ($(this).hasClass('combo-card')) {
+                $(this).find('.combo-item-option').hide();
+            }
         });
+        
+        // Apply mutual exclusivity logic on page load
+        let hasSelectedCombo = false;
+        let hasSelectedItems = false;
+        
+        // Check if any combos are selected
+        $('.combo-card').each(function() {
+            const quantity = parseInt($(this).find('.combo-quantity').val()) || 0;
+            if (quantity > 0) {
+                hasSelectedCombo = true;
+                // If this combo has a quantity, deselect all others
+                $('.combo-card').not(this).each(function() {
+                    $(this).removeClass('selected');
+                    $(this).find('.combo-quantity').val(0);
+                    $(this).find('.combo-item-option').hide();
+                });
+                
+                // Deselect all individual items when combo is selected
+                $('.merch-item-card').each(function() {
+                    $(this).find('.item-quantity').val(0);
+                    $(this).find('.nick-field').hide();
+                });
+                
+                // Select this combo
+                $(this).addClass('selected');
+                $(this).find('.combo-item-option').show();
+            }
+        });
+        
+        // Check if any individual items are selected
+        $('.merch-item-card').each(function() {
+            const quantity = parseInt($(this).find('.item-quantity').val()) || 0;
+            if (quantity > 0) {
+                hasSelectedItems = true;
+            }
+        });
+        
+        // If both combos and items are selected, prioritize combos (deselect items)
+        if (hasSelectedCombo && hasSelectedItems) {
+            $('.merch-item-card').each(function() {
+                $(this).find('.item-quantity').val(0);
+                $(this).find('.nick-field').hide();
+            });
+        }
     });
     
     function validateForm() {
@@ -1478,15 +1901,16 @@
             if (quantity > 0) {
                 hasSelection = true;
                 
-                // If item has nick enabled, validate nickname field
+                // If item has nick enabled, validate nickname field (nick is optional)
                 if (hasNick) {
                     const nickField = $(this).find('.item-nick');
                     const nickValue = nickField.val().trim();
                     
-                    if (!nickValue) {
+                    // Only validate length if nick is provided, nick is optional
+                    if (nickValue && nickValue.length > 50) {
                         nickField.addClass('invalid');
                         isValid = false;
-                        errorMessages.push('Please enter a nickname for customized items');
+                        errorMessages.push('Nickname must be 50 characters or less');
                     } else {
                         nickField.removeClass('invalid');
                     }
@@ -1494,11 +1918,13 @@
             }
         });
         
-        // Validate combos
+        // Validate combos - ensure only one combo is selected
+        let selectedComboCount = 0;
         $('.combo-card').each(function() {
             const quantity = parseInt($(this).find('.combo-quantity').val()) || 0;
             
             if (quantity > 0) {
+                selectedComboCount++;
                 hasSelection = true;
                 
                 // Validate combo item nickname fields
@@ -1509,10 +1935,11 @@
                         const nickField = $(this).closest('.combo-item-option').find('.combo-item-nick');
                         const nickValue = nickField.val().trim();
                         
-                        if (!nickValue) {
+                        // Only validate length if nick is provided, nick is optional
+                        if (nickValue && nickValue.length > 50) {
                             nickField.addClass('invalid');
                             isValid = false;
-                            errorMessages.push('Please enter nicknames for customized combo items');
+                            errorMessages.push('Nickname must be 50 characters or less');
                         } else {
                             nickField.removeClass('invalid');
                         }
@@ -1520,6 +1947,29 @@
                 });
             }
         });
+        
+        // Check if more than one combo is selected
+        if (selectedComboCount > 1) {
+            isValid = false;
+            errorMessages.push('You can only select one combo at a time');
+        }
+        
+        // Check mutual exclusivity - cannot have both combos and individual items selected
+        if (selectedComboCount > 0 && hasSelection) {
+            // Check if any individual items are selected
+            let hasIndividualItems = false;
+            $('.merch-item-card').each(function() {
+                const quantity = parseInt($(this).find('.item-quantity').val()) || 0;
+                if (quantity > 0) {
+                    hasIndividualItems = true;
+                }
+            });
+            
+            if (hasIndividualItems) {
+                isValid = false;
+                errorMessages.push('You cannot select both combos and individual items. Please choose either combos or individual items.');
+            }
+        }
         
         if (!hasSelection) {
             errorMessages.push('Please select at least one item or combo');
@@ -1710,4 +2160,5 @@
     });
 </script>
 {% endblock %}
+
 

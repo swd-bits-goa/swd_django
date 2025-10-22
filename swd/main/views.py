@@ -1573,8 +1573,9 @@ def store(request):
     selected_club = None
     club_username = request.GET.get('club')
     
-    # Fetch clubs from MongoDB
+    # Fetch clubs from MongoDB and student orders
     clubs = []
+    student_orders = []
     try:
         from swd.config import MONGODB_URI
         client = pymongo.MongoClient(
@@ -1584,6 +1585,8 @@ def store(request):
         )
         db = client.merchportal
         clubs_collection = db.users
+        users_collection = db.users
+        orders_collection = db.orders
         
         # Fetch all clubs (users with role 'club')
         clubs = list(clubs_collection.find({'role': 'club'}, {
@@ -1646,6 +1649,47 @@ def store(request):
         
         # Replace clubs with only those that have bundles
         clubs = clubs_with_bundles
+        
+        # Fetch student orders
+        student_orders = list(orders_collection.find({
+            'studentBITSID': student.bitsId
+        }, {
+            '_id': 1,
+            'bundle': 1,
+            'items': 1,
+            'combos': 1,
+            'totalPrice': 1,
+            'status': 1,
+            'createdAt': 1,
+            'club': 1
+        }).sort('createdAt', -1))  # Sort by newest first
+        
+        # Convert ObjectIds to strings and add bundle details
+        for order in student_orders:
+            order['id'] = str(order['_id'])
+            if 'createdAt' in order:
+                order['createdAt'] = order['createdAt'].strftime('%Y-%m-%d %H:%M')
+            
+            # Get bundle details
+            if 'bundle' in order:
+                bundle = merch_bundles_collection.find_one({'_id': order['bundle']})
+                if bundle:
+                    club_id = bundle.get('club')
+                    club = users_collection.find_one({'_id': club_id})
+                    if club:
+                        order['clubName'] = club.get('clubName', club.get('username', 'Unknown Club'))
+                    else:
+                        order['clubName'] = 'Unknown Club'
+
+                    
+
+                    order['bundleTitle'] = bundle.get('title', 'Unknown Bundle')
+                    order['bundleDescription'] = bundle.get('description', '')
+                else:
+                    order['bundleTitle'] = 'Bundle Not Found'
+                    order['bundleDescription'] = ''
+            
+            
         
         client.close()
         
@@ -1711,6 +1755,7 @@ def store(request):
         'clubs': clubs,
         'selected_club': selected_club,
         'all_merch_bundles': all_merch_bundles if 'all_merch_bundles' in locals() else [],
+        'student_orders': student_orders if 'student_orders' in locals() else [],
         'error': error if 'error' in locals() else None,
         'option': option,
         'balance': balance,
@@ -4413,17 +4458,13 @@ def order_form(request, bundle_id):
                                     'message': f'Missing required field "{field}" in combo item data'
                                 },                                 status=400)
                 
-                # Check if student already has an order for this bundle
+                # Check if student already has an order for this bundle (for warning purposes)
                 existing_order = orders_collection.find_one({
                     'studentBITSID': student_bits_id,
                     'bundle': bundle_object_id
                 })
                 
-                if existing_order:
-                    return JsonResponse({
-                        'success': False,
-                        'message': 'You have already placed an order for this bundle.'
-                    }, status=400)
+                # Note: We now allow multiple orders, so we don't block the request here
                 
                 # Calculate total price
                 total_price = 0
@@ -4441,20 +4482,19 @@ def order_form(request, bundle_id):
                     has_nick = item_data.get('hasNick', False)
                     if has_nick:
                         nick_value = item_data.get('nick', '').strip()
-                        if not nick_value:
-                            return JsonResponse({
-                                'success': False,
-                                'message': f'Nickname is required for {merch_name}'
-                            }, status=400)
-                        if len(nick_value) > 50:
+                        # Allow empty nick values - nick is optional even when hasNick is true
+                        if nick_value and len(nick_value) > 50:
                             return JsonResponse({
                                 'success': False,
                                 'message': f'Nickname for {merch_name} must be 50 characters or less'
                             }, status=400)
                         
-                        # Sanitize nickname data (remove any potentially harmful characters)
-                        nick_value = nick_value.replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;')
-                        item_data['nick'] = nick_value
+                        # Sanitize nickname data (remove any potentially harmful characters) only if nick is provided
+                        if nick_value:
+                            nick_value = nick_value.replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;')
+                            item_data['nick'] = nick_value
+                        else:
+                            item_data['nick'] = ''
                     
                     total_price += float(item_data.get('price', 0)) * item_data.get('quantity', 0)
                 
@@ -4473,19 +4513,19 @@ def order_form(request, bundle_id):
                         has_nick = combo_item.get('hasNick', False)
                         if has_nick:
                             nick_value = combo_item.get('nick', '').strip()
-                            if not nick_value:
-                                return JsonResponse({
-                                    'success': False,
-                                    'message': f'Nickname for {item_name} in combo {combo_name} must be provided'
-                                }, status=400)
-                            if len(nick_value) > 50:
+                            # Allow empty nick values - nick is optional even when hasNick is true
+                            if nick_value and len(nick_value) > 50:
                                 return JsonResponse({
                                     'success': False,
                                     'message': f'Nickname for {item_name} in combo {combo_name} must be 50 characters or less'
                                 }, status=400)
                             
-                            nick_value = nick_value.replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;')
-                            combo_item['nick'] = nick_value
+                            # Sanitize nickname data (remove any potentially harmful characters) only if nick is provided
+                            if nick_value:
+                                nick_value = nick_value.replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;')
+                                combo_item['nick'] = nick_value
+                            else:
+                                combo_item['nick'] = ''
                     
                     total_price += float(combo_data.get('price', 0)) * combo_data.get('quantity', 0)
                 
@@ -4512,7 +4552,8 @@ def order_form(request, bundle_id):
                     'items': items_data,
                     'combos': combos_data,
                     'totalPrice': total_price,
-                    'referralID': referral_id if referral_id else None,  
+                    'referralID': referral_id if referral_id else None,
+                    'createdAt': datetime.now()
                 }
                 
                 try:
