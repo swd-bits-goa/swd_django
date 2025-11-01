@@ -89,7 +89,7 @@ urlpatterns = [
     path('verify-student-id/', verify_student_id, name='verify_student_id'),
     path('verify-referral-id/', verify_referral_id, name='verify_referral_id'),
     
-    # API endpoints
+    #API endpoints
     path('api/students-on-leave-today/', views.students_on_leave_today, name='students_on_leave_today'),
 
 
