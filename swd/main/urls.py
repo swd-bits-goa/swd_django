@@ -91,7 +91,7 @@ urlpatterns = [
     
     #API endpoints
     path('api/students-on-leave-today/', views.students_on_leave_today, name='students_on_leave_today'),
-
+    path('api/student-details/', views.get_student_details, name='get_student_details'),
 
 
 
