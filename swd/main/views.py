@@ -4746,4 +4746,161 @@ def verify_referral_id(request):
             return JsonResponse({'status': 'error', 'error': str(e)})
     return JsonResponse({'status': 'invalid'})
 
+    def students_on_leave_today(request):
+
+    try:
+        # Check for secret key authentication
+        secret_key = request.GET.get('secret_key') or request.POST.get('secret_key')
+        expected_secret_key = getattr(settings, 'STUDENTS_ON_LEAVE_API_SECRET_KEY', 'default_secret_key_2024')
+        
+        if not secret_key or secret_key != expected_secret_key:
+            return JsonResponse({
+                'success': False,
+                'error': 'Unauthorized access. Valid secret key required.'
+            }, status=401)
+        
+        # Get today's date
+        today = date.today()
+        
+        # Get pagination parameters
+        page = int(request.GET.get('page', 1))
+        limit = int(request.GET.get('limit', 10))
+        
+        # Validate pagination parameters
+        if page < 1:
+            page = 1
+        if limit < 1:
+            limit = 10
+        if limit > 50:  # Maximum limit to prevent performance issues
+            limit = 50
+        
+        # Query for approved leaves that include today
+        # A student is on leave today if:
+        # - Their leave is approved
+        # - Today falls between their leave start and end dates
+        leaves_queryset = Leave.objects.filter(
+            approved=True,
+            dateTimeStart__date__lte=today,
+            dateTimeEnd__date__gte=today
+        ).select_related('student', 'student__user').order_by('student__bitsId')
+        
+        # Calculate pagination
+        total_count = leaves_queryset.count()
+        total_pages = (total_count + limit - 1) // limit  # Ceiling division
+        
+        # Get the page data
+        start_index = (page - 1) * limit
+        end_index = start_index + limit
+        leaves_page = leaves_queryset[start_index:end_index]
+        
+        # Prepare response data
+        students_data = []
+        for leave in leaves_page:
+            student_data = {
+                'bits_id': leave.student.bitsId,
+                'name': leave.student.name,
+                'email': leave.student.user.email if leave.student.user else None,
+                'phone': leave.student.phone,
+                'leave_id': leave.id,
+                'leave_start': leave.dateTimeStart.strftime('%Y-%m-%d %H:%M:%S') if leave.dateTimeStart else None,
+                'leave_end': leave.dateTimeEnd.strftime('%Y-%m-%d %H:%M:%S') if leave.dateTimeEnd else None,
+                'reason': leave.reason,
+                'correspondence_address': leave.corrAddress,
+                'correspondence_phone': leave.corrPhone,
+                'approved_by': leave.approvedBy.name if leave.approvedBy else None,
+                'comment': leave.comment
+            }
+            students_data.append(student_data)
+        
+        response_data = {
+            'success': True,
+            'date': today.strftime('%Y-%m-%d'),
+            'pagination': {
+                'current_page': page,
+                'total_pages': total_pages,
+                'total_records': total_count,
+                'records_per_page': limit,
+                'has_next': page < total_pages,
+                'has_previous': page > 1,
+                'next_page': page + 1 if page < total_pages else None,
+                'previous_page': page - 1 if page > 1 else None
+            },
+            'students': students_data
+        }
+        
+        return JsonResponse(response_data)
+        
+    except ValueError as e:
+        return JsonResponse({
+            'success': False,
+            'error': 'Invalid pagination parameters. Page and limit must be positive integers.'
+        }, status=400)
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+
+def get_student_details(request):
+
+    try:
+        # Check for secret key authentication
+        secret_key = request.GET.get('secret_key') or request.POST.get('secret_key')
+        expected_secret_key = getattr(settings, 'STUDENTS_ON_LEAVE_API_SECRET_KEY', 'default_secret_key_2024')
+        
+        if not secret_key or secret_key != expected_secret_key:
+            return JsonResponse({
+                'success': False,
+                'error': 'Unauthorized access. Valid secret key required.'
+            }, status=401)
+        
+        # Get student BITS ID
+        bits_id = request.GET.get('bits_id', '').strip()
+        if not bits_id:
+            return JsonResponse({
+                'success': False,
+                'error': 'BITS ID is required.'
+            }, status=400)
+        
+        # Query for the student
+        try:
+            student = Student.objects.select_related('user').get(bitsId=bits_id)
+        except Student.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'error': 'Student not found.'
+            }, status=404)
+        
+        # Prepare response data
+        response_data = {
+            'success': True,
+            'student': {
+                'bits_id': student.bitsId,
+                'name': student.name,
+                'phone': student.phone,
+                'email': student.email if student.email else None,
+                'profile_picture_url': student.profile_picture.url if student.profile_picture else None,
+                'gender': student.gender if student.gender else None,
+                'blood_group': student.bloodGroup if student.bloodGroup else None,
+                'cgpa': student.cgpa if student.cgpa else None,
+                'admit_date': student.admit.strftime('%Y-%m-%d') if student.admit else None,
+                'birth_date': student.bDay.strftime('%Y-%m-%d') if student.bDay else None,
+                'address': student.address if student.address else None,
+                'parent_name': student.parentName if student.parentName else None,
+                'parent_phone': student.parentPhone if student.parentPhone else None,
+                'parent_email': student.parentEmail if student.parentEmail else None,
+                'bank_account': student.bank_account_no if student.bank_account_no else None,
+                'advance_amount': student.advance_amount if student.advance_amount else None,
+                'is_phd': not student.nophd() if hasattr(student, 'nophd') else None
+            }
+        }
+        
+        return JsonResponse(response_data)
+        
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+
 
