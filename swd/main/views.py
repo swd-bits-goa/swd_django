@@ -4745,9 +4745,9 @@ def verify_referral_id(request):
         except Exception as e:
             return JsonResponse({'status': 'error', 'error': str(e)})
     return JsonResponse({'status': 'invalid'})
+    
 
-    def students_on_leave_today(request):
-
+def students_on_leave_today(request):
     try:       
         secret_key = request.GET.get('secret_key') or request.POST.get('secret_key')
         expected_secret_key = getattr(settings, 'STUDENTS_ON_LEAVE_API_SECRET_KEY', 'default_secret_key_2024')
