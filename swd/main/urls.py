@@ -5,7 +5,7 @@ from django.conf import settings
 from django.views.generic import TemplateView
 from django.urls import path
 from .views import verify_referral_id
-from .import views
+from . import views
 from .views import verify_student_id
 
 
